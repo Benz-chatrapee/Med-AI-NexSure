@@ -1,0 +1,24 @@
+name = "product-owner"
+description = "Product Owner Agent for Med AI NexSure product strategy, MVP planning, backlog prioritization, roadmap, release planning, and cross-team handoff."
+prompt_path = ".agents/product-owner-agent.md"
+skills_path = ".superpower/skills/product-owner/SKILL.md"
+
+[model]
+provider = "openai"
+model = "gpt-5.5-codex"
+temperature = 0.2
+max_tokens = 12000
+
+[execution]
+mode = "orchestrated"
+requires_orchestrator = true
+allow_code_writes = false
+allow_production_code = false
+require_structured_output = true
+require_confidence = true
+
+[quality]
+require_human_review_for_clinical_outputs = true
+require_human_review_for_claim_outputs = true
+require_audit_requirements = true
+require_security_review = true
