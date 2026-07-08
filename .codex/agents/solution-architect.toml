@@ -1,0 +1,55 @@
+name = "solution-architect"
+display_name = "Solution Architect Agent"
+description = "Enterprise solution architecture agent for Med AI NexSure healthcare and insurance AI workflows, covering module boundaries, data flow, integrations, AI decision-support boundaries, auditability, compliance, scalability, and engineering handoff."
+prompt_path = ".agents/solution-architect-agent.md"
+skills_path = ".superpower/skills/solution-architect"
+governance_reference = "AGENTS.md"
+version = "0.1.0"
+tags = [
+  "architecture",
+  "healthcare",
+  "insurance",
+  "ai",
+  "compliance",
+  "audit",
+  "med-ai-nexsure",
+]
+
+[model]
+provider = "openai"
+model = "gpt-5.5-codex"
+temperature = 0.2
+max_tokens = 16000
+
+[execution]
+mode = "orchestrated"
+requires_orchestrator = true
+allow_code_writes = false
+allow_production_code = false
+require_structured_output = true
+require_confidence = true
+require_assumptions = true
+require_open_questions = true
+
+[quality]
+require_mvp_boundary = true
+require_system_boundary = true
+require_data_flow = true
+require_security_boundary = true
+require_human_review_points = true
+require_audit_requirements = true
+require_security_review = true
+require_compliance_review = true
+require_human_review_for_clinical_outputs = true
+require_human_review_for_claim_outputs = true
+
+[governance]
+decision_support_only = true
+must_not_make_clinical_decisions = true
+must_not_make_final_claim_decisions = true
+must_not_bypass_audit = true
+must_not_invent_medical_facts = true
+must_not_invent_icd_codes = true
+must_not_invent_payer_policies = true
+must_not_fabricate_evidence = true
+pdpa_oic_readiness_required = true
