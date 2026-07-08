@@ -1,51 +1,63 @@
 # Business Analyst Checklists
 
-## Intake Checklist
+## Requirement Quality Checklist
 
-- Request has a clear business objective.
-- Primary users and decision makers are identified.
-- Workflow and affected objects are identified.
-- MVP fit is stated.
-- Assumptions are explicit.
-- Missing information is explicit.
-- Clinical, insurance, compliance, security, and audit impacts are considered.
+- Clear: requirement is understandable by all stakeholders.
+- Complete: requirement has enough detail for design and development.
+- Testable: QA can create test cases from it.
+- Traceable: requirement can link to epic, story, test, API, database, and audit log.
+- Prioritized: requirement has MoSCoW or business priority for Product Owner review.
+- Safe: requirement does not violate clinical, compliance, PDPA, OIC, or insurance governance rules.
+- Feasible: requirement is practical for MVP delivery.
+- Consistent: requirement does not conflict with other workflows or rules.
+- Auditable: requirement supports audit trail and evidence review where needed.
 
-## Requirement Checklist
+## BRD Checklist
 
-- Requirement is written from a user or stakeholder perspective.
-- Business outcome is explicit.
-- Acceptance criteria are observable and testable.
-- AI behavior is explainable.
-- Confidence is required when AI generates recommendations.
-- Human review is preserved for clinical or claim-impacting outputs.
-- No automatic diagnosis, prescribing, claim approval, or policy invention is
-  allowed.
+- Business problem and objective are stated.
+- Scope and out-of-scope boundaries are explicit.
+- Stakeholders and user roles are identified.
+- Requirements are grouped by workflow or capability.
+- Risks, assumptions, dependencies, and constraints are documented.
+- Audit, compliance, privacy, and AI governance needs are included.
 
-## Audit Checklist
+## User Story Checklist
 
-- Important actions produce audit logs.
-- Audit logs include timestamp, actor, reason, before state, and after state.
-- Reviewer overrides are logged.
-- AI-generated outputs are traceable.
-- Logs are sanitized and do not expose PHI, PII, PDPA protected information, or
-  secrets.
+- Story follows As a / I want / So that.
+- Actor is specific.
+- Outcome is business or user value.
+- Story is small enough for delivery planning.
+- Clinical or claim authority remains with a human.
 
-## Quality Gate Checklist
+## Acceptance Criteria Checklist
 
-- Patient safety reviewed.
-- Clinical correctness dependencies identified.
-- Compliance requirements identified.
-- Security and privacy risks identified.
-- Insurance rule assumptions identified.
-- Documentation needs identified.
-- Downstream handoff is structured.
-- Confidence level matches uncertainty.
+- Uses Given / When / Then.
+- Covers success, empty, error, override, and low-confidence states.
+- Includes audit behavior for important actions.
+- Is measurable and QA-ready.
+- Does not require invented medical facts, payer rules, or evidence.
 
-## Confidence Checklist
+## Workflow Checklist
 
-- Use `high` only when the request is clear, in MVP scope, and does not depend on
-  unresolved clinical, payer policy, coding, or compliance details.
-- Use `medium` when the request is mostly clear but includes open workflow, role,
-  data, or implementation questions.
-- Use `low` when clinical facts, payer policy, ICD details, evidence rules, or
-  compliance requirements are missing or ambiguous.
+- Trigger, actor, input, action, output, state change, exception, and audit event are defined.
+- Current state and future state are separated.
+- Human review points are visible.
+- AI decision-support boundaries are explicit.
+- Cross-module impacts are identified.
+
+## Handoff Checklist
+
+- Downstream owner is named.
+- Each handoff contains only that agent's responsibility.
+- Open questions and missing information are explicit.
+- Confidence and risk level are included.
+- No final specialist decision is made by the Business Analyst.
+
+## MVP Readiness Checklist
+
+- Requirement supports MVP scope.
+- Business value is clear.
+- Delivery risk is manageable.
+- Safety and compliance controls are included.
+- QA can validate the requirement.
+- Product Owner can prioritize it.
