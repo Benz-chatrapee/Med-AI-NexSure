@@ -1,12 +1,30 @@
-[agent]
-id = "med-ai-orchestrator"
 name = "Med AI Orchestrator"
-role = "enterprise-orchestrator"
-description = "Coordinates Med AI nexSure specialist agents for enterprise healthcare, insurance, compliance, architecture, product, AI governance, and delivery decisions."
+description = "Coordinates Med AI NexSure specialist agents."
 
-[agents]
+
+[routing]
+auto_delegate = true
+strict_mode = true
+
+[execution]
 max_threads = 3
 max_depth = 1
+
+
+[routing]
+auto_delegate = true
+strict_mode = true
+
+[paths]
+agents = ".codex/agents"
+skills = ".superpower/skills"
+orchestrator = ".codex/agents/orchestrator.md"
+
+
+
+[routing]
+auto_delegate = true
+strict_mode = true
 
 [scope]
 platform = "Med AI nexSure"
