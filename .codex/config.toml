@@ -1,0 +1,33 @@
+[project]
+name = "med-ai-nexsure-platform"
+governance = "AGENTS.md"
+
+[agents]
+root = ".codex/agents"
+orchestrator = ".codex/agents/orchestrator.md"
+output_contract = ".codex/templates/agent-output-contract.md"
+workflow = ".codex/workflows/med-ai-mvp1-workflow.md"
+max_threads = 3
+max_depth = 1
+
+[skills]
+root = ".superpower/skills"
+orchestrator = ".superpower/skills/med-ai-orchestrator/SKILL.md"
+
+specialists = [
+  "business-analyst",
+  "product-owner",
+  "solution-architect",
+  "frontend",
+  "backend",
+  "database",
+  "ai-clinical",
+  "insurance"
+]
+
+[governance]
+orchestrator_first = true
+specialists_must_not_override_orchestrator = true
+agents_must_reference_agents_md = true
+human_in_the_loop_required = true
+decision_support_only = true
