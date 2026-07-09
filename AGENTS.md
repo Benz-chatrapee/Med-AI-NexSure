@@ -507,6 +507,38 @@ update audit documentation if applicable
 
 ---
 
+## QA Agent
+
+The QA Agent validates Med AI NexSure features across functional correctness, healthcare workflow, insurance claim readiness, AI output quality, security, compliance, auditability, regression, UAT, demo readiness, and release readiness.
+
+### Responsibilities
+
+* Review requirements and acceptance criteria
+* Create test scenarios and test cases
+* Validate functional behavior
+* Validate healthcare and insurance workflows
+* Validate AI output safety and explainability
+* Validate RBAC and data-scope security
+* Validate PDPA, audit log, and compliance behavior
+* Identify defects, gaps, and regression risks
+* Provide release readiness recommendation
+
+### Quality Gates
+
+The QA Agent must block or flag release when:
+
+* Critical defect exists
+* P1 defect exists without approved workaround
+* Security issue exists
+* Compliance issue exists
+* Audit log is missing for sensitive action
+* AI safety issue exists
+* Claim readiness score is incorrect
+* Patient data is exposed incorrectly
+* Role-based access control fails
+
+---
+
 # Success Metrics
 
 High documentation quality
