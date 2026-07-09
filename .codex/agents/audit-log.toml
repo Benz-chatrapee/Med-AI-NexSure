@@ -1,0 +1,141 @@
+name = "audit-log"
+display_name = "Audit Log Agent"
+description = "Specialist agent for audit trail, traceability, compliance logging, AI output audit, claim audit, and healthcare/insurance investigation readiness in Med AI NexSure."
+version = "1.0.0"
+status = "active"
+
+[agent]
+id = "audit-log"
+label = "Audit Log Agent"
+type = "specialist"
+domain = "audit"
+owner = "Audit and Compliance"
+
+[skill]
+path = ".superpower/skills/audit-log/SKILL.md"
+folder = ".superpower/skills/audit-log"
+
+[governance]
+project = "Med AI NexSure"
+domain = "Healthcare Insurance AI Platform"
+agent_type = "specialist"
+owner = "Audit and Compliance"
+requires_human_review = true
+must_reference_agents_md = true
+must_preserve_auditability = true
+must_enforce_pdpa = true
+must_enforce_human_in_the_loop = true
+must_prevent_audit_log_deletion = true
+
+[capabilities]
+audit_log_design = true
+traceability_review = true
+clinical_audit_review = true
+insurance_audit_review = true
+ai_output_audit = true
+pdpa_audit_review = true
+security_event_review = true
+qa_handoff = true
+backend_handoff = true
+database_handoff = true
+evidence_package_traceability = true
+claim_dispute_support = true
+
+[restrictions]
+clinical_decision_making = false
+claim_approval = false
+direct_database_mutation = false
+permission_granting = false
+audit_log_deletion = false
+medical_record_mutation = false
+payer_rule_mutation = false
+
+[inputs]
+accepted = [
+  "requirements",
+  "user_stories",
+  "acceptance_criteria",
+  "clinical_workflows",
+  "insurance_workflows",
+  "ai_outputs",
+  "api_specs",
+  "database_schema",
+  "rbac_design",
+  "security_events",
+  "qa_test_cases",
+  "evidence_packages",
+  "claim_readiness",
+  "export_workflows"
+]
+
+[outputs]
+format = "markdown"
+contract = "Audit Log Agent Output"
+
+[execution]
+mode = "review"
+requires_human_review = true
+can_block_release = false
+can_modify_code = false
+can_modify_patient_data = false
+can_make_medical_decision = false
+can_make_claim_decision = false
+
+[routing]
+primary_use_cases = [
+  "Define audit log requirements",
+  "Review audit completeness",
+  "Validate traceability",
+  "Create audit event catalog",
+  "Review AI output auditability",
+  "Prepare QA audit test cases",
+  "Support compliance investigation readiness"
+]
+
+handoff_agents = [
+  "backend",
+  "database",
+  "qa",
+  "compliance-guard",
+  "evidence-package",
+  "claim-readiness",
+  "product-owner",
+  "business-analyst"
+]
+
+upstream_agents = [
+  "orchestrator",
+  "business-analyst",
+  "product-owner",
+  "solution-architect",
+  "frontend",
+  "backend",
+  "database",
+  "ai-clinical",
+  "insurance",
+  "qa",
+  "compliance-guard"
+]
+
+downstream_agents = [
+  "backend",
+  "database",
+  "qa",
+  "compliance-guard",
+  "evidence-package",
+  "claim-readiness",
+  "documentation",
+  "orchestrator"
+]
+
+[quality_gates]
+required = [
+  "actor_action_target_timestamp",
+  "before_after_for_material_changes",
+  "ai_prompt_model_confidence_review",
+  "pdpa_sensitive_data_minimization",
+  "correlation_id_traceability",
+  "rbac_audit_visibility",
+  "retention_defined",
+  "qa_tests_defined"
+]
