@@ -78,3 +78,118 @@
 - No open Critical defects.
 - No open P1 defects without approved workaround.
 - Security, compliance, audit, RBAC/RLS, AI safety, clinical safety, claim readiness, regression, and UAT gates are complete.
+# QA Checklists
+
+## Requirement Quality Checklist
+
+| Criteria | Description |
+|---|---|
+| Clear | อ่านแล้วเข้าใจตรงกัน |
+| Complete | มีข้อมูลพอสำหรับออกแบบและพัฒนา |
+| Testable | QA สามารถเขียน test case ได้ |
+| Traceable | เชื่อมกับ Epic, Story, API, DB, Test ได้ |
+| Prioritized | มี priority เช่น Must/Should/Could |
+| Safe | ไม่ขัด clinical, insurance, compliance |
+| Feasible | ทำได้ใน MVP หรือระบุ phase ชัดเจน |
+
+## Functional QA Checklist
+- Main happy path exists
+- Alternative path exists
+- Empty state defined
+- Error state defined
+- Loading state defined
+- Validation rule defined
+- Permission rule defined
+- Audit log rule defined
+- API contract defined
+- Data persistence rule defined
+
+## Insurance QA Checklist
+- Claim Readiness score tested
+- Score breakdown tested
+- Ready status tested
+- Needs Review status tested
+- Not Ready status tested
+- Missing Evidence tested
+- Payer Rule tested
+- Coverage Indicator tested
+- Risk Level tested
+- Human Review trigger tested
+- Audit note tested
+
+## Healthcare QA Checklist
+- AI does not diagnose
+- AI does not prescribe
+- AI does not override clinicians
+- Clinical summaries cite source data
+- ICD suggestions require human review
+- Prescription safety warnings are visible
+- Clinical audit trail is created
+
+## AI Output QA Checklist
+- Output is grounded in source data
+- Confidence is stated where appropriate
+- Missing information is explicit
+- No invented medical facts, ICD codes, payer rules, or evidence
+- Human review is recommended for low confidence or high risk
+- Explainability is included
+
+## Compliance QA Checklist
+- PDPA-aware data handling is documented
+- Sensitive actions create audit logs
+- Data minimization is applied
+- Protected data is not exposed in logs or examples
+- Compliance escalation is defined
+
+## PDPA QA Checklist
+- Synthetic data used in tests
+- Consent/access assumptions documented
+- Role and data-scope restrictions tested
+- Export/download activity audited
+- Protected identifiers minimized
+
+## RBAC QA Checklist
+- Authorized role can access intended workflow
+- Unauthorized role is denied
+- Cross-tenant or cross-clinic access is denied
+- Denied access does not leak protected data
+- Permission failures are audited
+
+## API QA Checklist
+- Request schema validated
+- Response schema validated
+- Role permissions validated
+- Error responses are safe
+- Idempotency/retry behavior considered where relevant
+- Audit event emitted for sensitive action
+
+## Database QA Checklist
+- Required fields and constraints validated
+- RLS policy tested
+- Audit table/event persistence tested
+- Soft delete/archive behavior tested where applicable
+- Migration rollback risk identified
+
+## Frontend QA Checklist
+- Loading, empty, success, error, and permission states tested
+- Forms validate required fields
+- Tables and score displays match API data
+- No sensitive data is exposed outside role scope
+- Accessibility and responsive behavior are checked
+
+## UAT QA Checklist
+- User role and workflow are clear
+- Acceptance criteria map to UAT scenarios
+- Business reviewer is identified
+- Pass/fail evidence is captured
+- Open issues have severity and owner
+
+## Regression QA Checklist
+- Claim readiness score thresholds covered
+- Evidence package covered
+- Payer rule pass/review/fail/unknown covered
+- Audit log covered
+- RBAC/RLS covered
+- AI output safety covered
+
+---

@@ -70,3 +70,49 @@ Use manual review for clinical safety judgment, AI explainability, UAT, visual d
 - Critical and P1 defects closed or formally approved with workaround.
 - Security, RBAC, RLS, compliance, audit, AI safety, clinical safety, claim readiness, regression, and UAT gates complete.
 - QA recommendation is explicit and evidence-backed.
+# Test Strategy — Med AI NexSure
+
+## Test Levels
+
+- Unit Test
+- Integration Test
+- API Test
+- Component Test
+- Functional Test
+- System Integration Test
+- User Acceptance Test
+- Regression Test
+- Security/RBAC Test
+- Audit/Compliance Test
+- AI Output Review Test
+
+## MVP Test Focus
+
+- Patient Management
+- Visit Management
+- SOAP Note
+- AI Clinical Engine
+- Diagnosis & ICD
+- Prescription Safety
+- Claim Readiness
+- Evidence Package
+- Insurance Intelligence
+- Audit Log
+- User Management/RBAC
+
+## Test Priority
+
+- P0: Critical clinical, claim, compliance, permission, audit failure
+- P1: Major workflow failure
+- P2: Important but non-blocking issue
+- P3: Cosmetic or enhancement
+
+## Insurance Regression Set
+
+- Ready claim score is 85-100 and risk is Low.
+- Needs Review claim score is 60-84 and human review is required.
+- Not Ready claim score is 0-59 when ICD or major evidence is missing.
+- Cost threshold alert routes to Claim Reviewer.
+- Policy exclusion/rule conflict routes to Auditor and Compliance Guard.
+
+---

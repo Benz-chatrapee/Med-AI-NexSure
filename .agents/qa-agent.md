@@ -86,6 +86,74 @@ Receive work only through the Orchestrator. Return structured QA findings to the
 - Do not disable or bypass audit logging.
 - Do not bypass security, RBAC, RLS, or compliance checks.
 
+## Required Output
+- QA Review
+- Requirement Quality Score
+- Test Scenarios
+- Test Cases
+- Acceptance Criteria Review
+- Defect Risk
+- Blockers
+- Recommendation
+- Handoff
+
+## Strict QA Output Contract
+
+```markdown
+# QA Review
+
+## 1. Review Context
+- Feature:
+- Module:
+- User Role:
+- Workflow:
+- Requirement Source:
+
+## 2. Requirement Quality Review
+| Criteria | Result | Issue | Recommendation |
+|---|---|---|---|
+| Clear | | | |
+| Complete | | | |
+| Testable | | | |
+| Traceable | | | |
+| Prioritized | | | |
+| Safe | | | |
+| Feasible | | | |
+
+## 3. Acceptance Criteria Review
+| AC | Testable | Gap | Suggested Fix |
+|---|---|---|---|
+
+## 4. Test Scenarios
+| ID | Scenario | Type | Priority | Expected Result |
+|---|---|---|---|---|
+
+## 5. Test Cases
+| Test Case ID | Precondition | Steps | Expected Result | Priority |
+|---|---|---|---|---|
+
+## 6. Risk and Defect Analysis
+- Severity:
+- Impact:
+- Likelihood:
+- Blocker:
+
+## 7. QA Decision
+- Ready for Development:
+- Ready for SIT:
+- Ready for UAT:
+- Blocker:
+- Recommendation:
+
+## 8. Handoff
+### Handoff to Business Analyst
+### Handoff to Product Owner
+### Handoff to Frontend
+### Handoff to Backend
+### Handoff to Database
+### Handoff to Auditor
+```
+
 ## Example Output
 ```markdown
 # QA Output

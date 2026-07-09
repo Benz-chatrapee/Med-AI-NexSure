@@ -127,3 +127,86 @@
 - Output: Triaged defect report.
 - Quality Gate: Critical and High defects have owners and timelines.
 - Handoff: Responsible specialist agent.
+# QA Workflows
+
+## Requirement QA Workflow
+
+1. Receive requirement/user story
+2. Identify module and workflow
+3. Check requirement quality
+4. Check acceptance criteria
+5. Check business rules
+6. Check data rules
+7. Check role/permission rules
+8. Check error and edge cases
+9. Identify test scenarios
+10. Generate test cases
+11. Identify blockers
+12. Provide QA decision
+13. Handoff to BA/PO/Frontend/Backend/Database
+
+## Claim Readiness QA Workflow
+
+1. Receive claim readiness requirement or output
+2. Verify scoring components and weights total 100%
+3. Verify status thresholds: Ready 85-100, Needs Review 60-84, Not Ready 0-59
+4. Verify missing evidence, policy result, coverage indicator, risk, human review, and audit note
+5. Generate tests for Ready, Needs Review, Not Ready, High Risk, and Critical cases
+6. Block release for incorrect score, missing audit, or missing human review trigger
+
+## Evidence Package QA Workflow
+
+1. Identify required evidence by claim type and payer rule
+2. Validate evidence statuses and severity
+3. Test complete, missing, incomplete, expired, and not-required evidence
+4. Verify protected-data minimization
+5. Verify handoff to Evidence Package Agent and Claim Reviewer
+
+## Policy Rule QA Workflow
+
+1. Identify rule source and version
+2. Test pass, review, fail, and unknown outcomes
+3. Verify reason, action, severity, and audit note
+4. Verify unknown/conflict outcomes require human review
+
+## API QA Workflow
+
+1. Review API contract and schemas
+2. Test allowed roles and denied roles
+3. Test valid, invalid, empty, and boundary payloads
+4. Verify response body, status code, and audit behavior
+5. Verify protected data is not leaked
+
+## UI QA Workflow
+
+1. Identify target page, role, and workflow
+2. Test loading, empty, success, error, validation, and permission states
+3. Verify score/status/risk/evidence displays
+4. Verify reassessment and handoff actions
+5. Verify audit feedback where visible
+
+## UAT QA Workflow
+
+1. Map business process to user scenarios
+2. Confirm synthetic test data
+3. Execute role-based acceptance scenarios
+4. Capture pass/fail evidence
+5. Record defects, blockers, and sign-off decision
+
+## Regression QA Workflow
+
+1. Identify changed module and impacted workflows
+2. Select high-risk regression scenarios
+3. Run claim, evidence, policy, audit, RBAC, and AI safety tests
+4. Compare results against baseline
+5. Report release recommendation
+
+## Defect Triage Workflow
+
+1. Receive defect evidence
+2. Classify severity and priority
+3. Identify impacted requirement, workflow, role, API, DB, audit, and compliance area
+4. Recommend owner and retest scope
+5. Block release when Critical or unresolved P1 risk exists
+
+---

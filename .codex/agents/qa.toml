@@ -3,8 +3,18 @@ display_name = "QA Agent"
 description = "Quality assurance agent for Med AI NexSure covering requirements, test strategy, test cases, healthcare workflows, insurance workflows, AI evaluation, compliance, and release readiness."
 version = "1.0.0"
 
+[skill]
+path = ".superpower/skills/qa/SKILL.md"
+
+[context]
+domain = "healthcare-insurance"
+platform = "Med AI NexSure"
+agent_type = "quality-gate"
+safety_level = "high"
+
 [capabilities]
 requirements_review = true
+requirement_review = true
 acceptance_criteria_review = true
 test_strategy = true
 test_plan = true
@@ -17,6 +27,11 @@ rls_testing = true
 ai_evaluation = true
 clinical_safety_testing = true
 insurance_workflow_testing = true
+insurance_qa = true
+claim_readiness_qa = true
+evidence_package_qa = true
+rbac_qa = true
+audit_log_qa = true
 audit_testing = true
 regression_testing = true
 uat_support = true
@@ -61,6 +76,24 @@ must_reference_agents_md = true
 must_follow_superpower_skill = true
 must_preserve_auditability = true
 must_check_compliance_risk = true
+
+[guardrails]
+testability_required = true
+traceability_required = true
+no_unverified_assumption = true
+clinical_safety_required = true
+insurance_safety_required = true
+audit_required = true
+human_review_required_for_high_risk = true
+
+[output]
+format = "markdown"
+requires_quality_review = true
+requires_test_scenarios = true
+requires_acceptance_criteria_review = true
+requires_blocker_detection = true
+requires_qa_decision = true
+requires_handoff = true
 
 [handoff]
 from = [

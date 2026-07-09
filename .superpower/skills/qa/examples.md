@@ -78,3 +78,59 @@ Feature: Prescription safety warnings
 | Conditions | One Medium prompt library usability defect deferred with Product Owner approval. |
 | Blockers | None |
 | Recommendation | Release after documented deferral and regression evidence are attached. |
+# QA Examples
+
+## Example 1: QA Review Claim Readiness Requirement
+
+### Summary
+Claim readiness requirement is testable with conditions. Score thresholds, audit event name, and human reviewer role must be explicit.
+
+### Requirement Quality
+| Criteria | Result | Issue | Recommendation |
+|---|---|---|---|
+| Clear | Pass | Core workflow is understandable | Keep scoring definitions visible |
+| Complete | Fail | Audit event and reviewer role missing | Add audit event and reviewer role |
+| Testable | Pass | Score thresholds are testable | Add synthetic data matrix |
+| Traceable | Needs Review | API/DB mapping absent | Link to service and audit table |
+
+### QA Decision
+Ready for development after audit and reviewer-role clarification.
+
+## Example 2: QA Generate Test Cases for Evidence Package
+
+| Test Case ID | Precondition | Steps | Expected Result | Priority |
+|---|---|---|---|---|
+| EP-001 | Complete OPD evidence exists | Open evidence package | SOAP, diagnosis, ICD, receipt, claim summary show Available | P0 |
+| EP-002 | Medical certificate missing | Run package validation | Medical certificate shows Missing with Medium severity | P1 |
+| EP-003 | Unauthorized role | Open evidence package | Access denied without protected data leak | P0 |
+
+## Example 3: QA Review Acceptance Criteria for Payer Rule
+
+### Gap
+The AC says "system validates payer rule" but does not define pass/review/fail/unknown behavior.
+
+### Suggested Fix
+Use Given/When/Then and require rule_id, rule_version, result, severity, reason, required_action, and audit_note.
+
+## Example 4: QA Find Gap in Missing Evidence Workflow
+
+### Finding
+Missing evidence severity is not defined for expired or incomplete attachments.
+
+### Impact
+Claim reviewer may not know whether the case is Ready, Needs Review, or Not Ready.
+
+### Recommendation
+Add severity mapping and reviewer handoff behavior for Missing, Incomplete, Expired, Needs Review, and Not Required statuses.
+
+## Example 5: QA Regression Test Set for Insurance Intelligence
+
+| ID | Scenario | Type | Priority | Expected Result |
+|---|---|---|---|---|
+| REG-INS-001 | Complete claim | Regression | P0 | Score 85-100, Ready, Low risk |
+| REG-INS-002 | Missing ICD | Regression | P0 | Score 0-59, Not Ready, High risk |
+| REG-INS-003 | Cost threshold | Regression | P1 | Needs Review, High risk, Claim Reviewer handoff |
+| REG-INS-004 | Policy exclusion | Regression | P0 | Not Ready, Critical risk, Auditor/Compliance handoff |
+| REG-INS-005 | Unknown payer rule | Regression | P1 | Needs Review, Unknown rule result, human review |
+
+---

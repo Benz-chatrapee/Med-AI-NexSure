@@ -1,0 +1,38 @@
+name = "insurance"
+description = "Insurance Intelligence Agent for Med AI NexSure. Handles claim readiness, payer rules, missing evidence, coverage indicator, risk scoring, and audit-ready insurance workflow support."
+
+[skill]
+path = ".superpower/skills/insurance/SKILL.md"
+
+[context]
+domain = "healthcare-insurance"
+platform = "Med AI NexSure"
+agent_type = "specialist"
+safety_level = "high"
+
+[capabilities]
+claim_readiness = true
+payer_rule_validation = true
+missing_evidence_detection = true
+coverage_indicator = true
+risk_scoring = true
+audit_ready_output = true
+human_review_escalation = true
+
+[guardrails]
+decision_support_only = true
+no_claim_approval = true
+no_coverage_guarantee = true
+no_clinical_diagnosis = true
+human_in_the_loop = true
+audit_required = true
+explainability_required = true
+
+[output]
+format = "markdown"
+requires_score_breakdown = true
+requires_missing_evidence = true
+requires_policy_result = true
+requires_risk_level = true
+requires_recommended_action = true
+requires_audit_notes = true
