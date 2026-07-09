@@ -1,64 +1,80 @@
-# QA Agent Examples
+# QA Examples
 
-## Claim Readiness QA Review
-- Summary: Claim readiness calculation is testable but release is blocked until scoring evidence and audit logs are verified.
-- Reasoning: The workflow must validate completed visit -> score -> missing evidence -> payer rule result -> evidence package -> claim review. Scores must use SOAP 25%, Diagnosis & ICD 20%, Prescription / Procedure 15%, Evidence 20%, Insurance Rule 10%, Economic 10%.
-- Confidence: Medium, pending sample score calculations and audit records.
-- Deliverables: Test cases QA-CLAIM-001 through QA-CLAIM-008, regression checklist, defect BUG-CLAIM-001 if score mismatch is reproduced.
-- Risks: Incorrect readiness score, invented payer rule, missing evidence, reviewer over-reliance on AI.
-- Recommendations: Add score component breakdown and human review reminder.
-- Next Action: Backend and Insurance agents provide scoring contract and payer rule fixtures.
+## 1. QA Review for SOAP Note Feature
+| Field | Example |
+|---|---|
+| Feature | SOAP Note Save/Edit/Autosave |
+| Requirement Quality | Needs Review |
+| Gap | Autosave interval, conflict handling, and version history audit event are not specified. |
+| Risks | Lost clinical documentation, incomplete audit trail, stale AI summary. |
+| Recommendation | Define autosave behavior, edit permissions, version compare fields, and audit event names before test execution. |
 
-## SOAP Note QA Review
-- Summary: SOAP workflow requires functional, clinical, audit, and AI summary checks.
-- Reasoning: SOAP completeness affects clinical documentation and claim readiness; version history and clinician review are required.
-- Confidence: Medium.
-- Deliverables: SOAP completeness checklist, QA-SOAP-001 create draft, QA-SOAP-002 submit note, QA-SOAP-003 audit version history.
-- Risks: Missing objective findings, unsupported AI summary, incomplete audit trail.
-- Recommendations: Block finalization when required fields are missing.
-- Next Action: Frontend and Backend agents confirm validation rules.
+## 2. Test Cases for Claim Readiness
+| Test Case ID | Scenario | Expected Result |
+|---|---|---|
+| QA-CLAIM-001 | Complete SOAP, ICD, prescription, evidence, and payer checks | Score is Ready and evidence is traceable. |
+| QA-CLAIM-002 | Missing medical certificate | Score decreases, status is Needs Review or Not Ready, missing evidence is listed. |
+| QA-CLAIM-003 | Unauthorized user recalculates score | Action is blocked and no score changes. |
 
-## AI ICD Suggestion QA Review
-- Summary: ICD suggestions must be evidence-linked and clinician-reviewed.
-- Reasoning: AI may suggest but must not invent ICD codes or make final diagnosis.
-- Confidence: Medium.
-- Deliverables: AI safety review, QA-ICD-001 evidence-supported suggestion, QA-ICD-002 low-confidence disclaimer.
-- Risks: Incorrect ICD, unsupported diagnosis, overconfident output.
-- Recommendations: Display confidence, rationale, source evidence, alternatives, and human review reminder.
-- Next Action: AI Clinical agent provides prompt/output samples.
+## 3. Gherkin Scenarios for Prescription Safety
+```gherkin
+Feature: Prescription safety warnings
+  Scenario: Allergy warning is shown before medication confirmation
+    Given a patient has a recorded penicillin allergy
+    And a doctor adds a penicillin medication
+    When the doctor attempts to save the prescription
+    Then a critical allergy warning is displayed
+    And the action requires authorized review or documented override
+    And an audit event is created
+```
 
-## Evidence Package QA Review
-- Summary: Evidence package readiness depends on completeness score, source traceability, permissions, and export audit.
-- Reasoning: Claim reviewers need complete and auditable evidence without unauthorized data exposure.
-- Confidence: Medium.
-- Deliverables: QA-EVID-001 package generation, QA-EVID-002 missing evidence, QA-EVID-003 export log.
-- Risks: Missing documents, stale evidence, PHI leakage, missing export audit.
-- Recommendations: Include package version and source list.
-- Next Action: Database agent confirms evidence tables and audit schema.
+## 4. API Test Matrix for Patient Management
+| Endpoint | Method | Role | Scenario | Expected Status | Audit Event |
+|---|---|---|---|---|---|
+| `/api/patients` | POST | Clinic Admin | Create valid patient | 201 | patient.created |
+| `/api/patients` | POST | Nurse | Duplicate HN | 409 | patient.create_rejected |
+| `/api/patients/{id}` | GET | External Clinic User | Cross-clinic access | 403 | access.denied |
 
-## Prescription Safety QA Review
-- Summary: Prescription safety is release-blocking if critical allergy or interaction alerts fail.
-- Reasoning: Patient safety priority requires visible, auditable alerts and clinician acknowledgement.
-- Confidence: Medium.
-- Deliverables: QA-RX-001 allergy alert, QA-RX-002 interaction alert, QA-RX-003 acknowledgement audit.
-- Risks: Harmful medication, missing alert, unaudited override.
-- Recommendations: Treat missed critical alert as Critical/P1.
-- Next Action: Clinical AI and Backend agents provide alert rule sources.
+## 5. Database Validation for Prompt Library
+| Rule | Scenario | Expected Result |
+|---|---|---|
+| Version increment | Edit active prompt | New version is created or version number increments. |
+| Archive behavior | Archive prompt | Prompt is hidden from active use and audit logged. |
+| Search fields | Search by title/category | Matching prompts return within tenant scope. |
 
-## RBAC QA Review
-- Summary: Role and data-scope validation must include UI, API, direct URL, and Supabase RLS checks.
-- Reasoning: Unauthorized patient access is a Critical defect.
-- Confidence: Medium.
-- Deliverables: RBAC matrix, QA-RBAC-001 doctor allowed access, QA-RBAC-002 cross-clinic denial.
-- Risks: Cross-organization exposure, clinic leakage, admin overreach.
-- Recommendations: Test denied paths as thoroughly as allowed paths.
-- Next Action: Backend and Database agents provide role matrix and RLS policies.
+## 6. RLS Validation for User Management
+| Role | Scenario | Expected Result |
+|---|---|---|
+| Admin | View users in own organization | Allowed |
+| Clinic Admin | Disable user in own clinic | Allowed if permission exists |
+| Clinic Admin | Disable user in another clinic | Denied |
+| Disabled User | Access user list | Denied |
 
-## Defect Report Example
-- Summary: BUG-CLAIM-001 blocks release because claim readiness score differs from approved weights.
-- Reasoning: Incorrect score can mislead claim readiness decisions and downstream evidence packaging.
-- Confidence: High if reproduced with controlled test data.
-- Deliverables: Defect report with score input, expected calculation, actual score, screenshots/logs, and affected roles.
-- Risks: Incorrect claim readiness status, reviewer confusion, compliance issue if audit lacks calculation trace.
-- Recommendations: Fix scoring service and add regression tests for Ready, Needs Review, and Not Ready thresholds.
-- Next Action: Backend and Insurance agents investigate scoring implementation.
+## 7. AI Evaluation for ICD Suggestion
+| Dimension | Result |
+|---|---|
+| Groundedness | Pass: suggestion references SOAP assessment. |
+| Safety | Pass: marked as suggestion requiring doctor review. |
+| Fail Condition | Any invented diagnosis, unsupported ICD code, or final diagnosis wording. |
+| Decision | Needs Review until clinician confirms. |
+
+## 8. Defect Report for Evidence Package
+| Field | Example |
+|---|---|
+| Defect ID | BUG-EVIDENCE-001 |
+| Title | Evidence package export omits audit summary |
+| Severity | High |
+| Impact | Claim reviewer receives incomplete traceability evidence. |
+| Expected | PDF includes SOAP, diagnosis, ICD, prescription, certificate, attachments, claim summary, and audit summary. |
+| Actual | Audit summary section is missing. |
+| Recommendation | Add audit summary section and regression test export contents. |
+
+## 9. Release Sign-off Summary for MVP 1
+| Field | Example |
+|---|---|
+| Release | MVP 1 |
+| Decision | Pass With Conditions |
+| Passed Gates | Login, patient, visit, SOAP, claim readiness, audit, RLS smoke. |
+| Conditions | One Medium prompt library usability defect deferred with Product Owner approval. |
+| Blockers | None |
+| Recommendation | Release after documented deferral and regression evidence are attached. |

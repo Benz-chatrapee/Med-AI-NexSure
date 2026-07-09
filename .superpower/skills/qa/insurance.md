@@ -1,39 +1,49 @@
 # Insurance QA Rules
 
-## Validation Areas
-- Claim readiness scoring.
-- Missing evidence detection.
-- Evidence package completeness.
-- Payer rule result.
-- Coverage indicator.
-- Waiting period rule.
-- Exclusion rule.
-- Benefit limit rule.
-- Risk level.
-- Claim alert.
-- Claim reviewer workflow.
-
 ## Claim Readiness Scoring
-- SOAP completeness: 25%
-- Diagnosis & ICD: 20%
-- Prescription / Procedure: 15%
-- Evidence: 20%
-- Insurance Rule: 10%
-- Economic: 10%
+Validate calculation inputs, weights, status thresholds, recalculation triggers, missing data handling, and audit trail.
 
-## Claim Readiness Status
-- Ready: 85-100
-- Needs Review: 60-84
-- Not Ready: 0-59
+## Evidence Completeness
+Verify SOAP, diagnosis, ICD, prescription/procedure, medical certificate, attachments, claim summary, and audit summary inclusion.
 
-## Evidence Package Completeness
-- Complete: 90-100
-- Review Needed: 70-89
-- Incomplete: 0-69
+## Required Document Checklist
+Validate required documents by claim type and payer rule source when available. Do not invent payer requirements.
 
-## Required Checks
-- Scores use approved weights and explain each component.
-- Missing evidence is specific, actionable, and traceable.
-- Payer rule results use configured rules only.
-- Coverage, waiting period, exclusion, benefit limit, and risk indicators do not make final claim decisions.
-- Claim reviewer workflow keeps human review mandatory.
+## Payer Rule Validation
+Verify rule source, version, effective date, applicability, uncertainty handling, and reviewer handoff.
+
+## Coverage Indicator
+Validate coverage is shown as decision support with evidence and uncertainty, not final approval.
+
+## Waiting Period Rule
+Validate waiting period calculations against known policy dates and source data.
+
+## Exclusion Rule
+Validate exclusion warnings are evidence-backed and routed for human review.
+
+## Benefit Limit Warning
+Validate benefit limit warnings, thresholds, currency handling, and reviewer handoff.
+
+## Diagnosis and ICD Support
+Validate diagnosis/ICD evidence consistency and highlight unsupported or missing codes.
+
+## Procedure Support
+Validate procedure evidence, required documentation, and consistency with claim reason.
+
+## Medical Certificate Requirement
+Validate presence, completeness, issuer authority, and date alignment of medical certificates.
+
+## Cost Threshold Review
+Validate high-cost thresholds, economic warnings, and audit evidence.
+
+## Claim Risk Level
+Validate Ready, Needs Review, Not Ready, and risk explanations from configured rules.
+
+## Claim Reviewer Handoff
+Validate handoff queue, reviewer notes, status change, assignment, and audit events.
+
+## Audit Evidence for Claim Decision Support
+Claim support actions must log actor, timestamp, rule version, inputs, output, reason, and reviewer action.
+
+## Approval Boundary
+The QA Agent must validate that Med AI NexSure does not automatically approve or reject insurance claims unless explicitly designed, authorized, reviewed, and audited.

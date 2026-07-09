@@ -1,143 +1,157 @@
 # QA Templates
 
-## QA Review Result
-- Feature / Module Reviewed:
-- QA Summary:
-- Requirement Quality Assessment:
-- Key Business Rules:
-- Risk Areas:
-- Test Scenarios:
-- Detailed Test Cases:
-- AI Safety Checks:
-- Security & Permission Checks:
-- Compliance & Audit Checks:
-- Regression Checklist:
-- Defects / Gaps Found:
-- Open Questions:
-- Release Recommendation:
-- Final QA Decision:
-- Summary:
-- Reasoning:
-- Confidence:
-- Deliverables:
-- Risks:
-- Recommendations:
-- Next Action:
+## QA Review Summary Template
+| Field | Value |
+|---|---|
+| Review ID | |
+| Feature / Story | |
+| Reviewer | QA Agent |
+| Date | |
+| Requirement Quality | Pass / Needs Review / Blocked |
+| Testability | Pass / Needs Review / Blocked |
+| Roles Covered | |
+| Audit Events Covered | |
+| Clinical Risk | Low / Medium / High / Critical |
+| Insurance Risk | Low / Medium / High / Critical |
+| Compliance Risk | Low / Medium / High / Critical |
+| Decision | Pass / Pass With Conditions / Needs Review / Block Release |
+| Summary | |
+| Risks | |
+| Recommendations | |
 
-## Test Case
-- Test Case ID:
-- Title:
-- Objective:
-- Preconditions:
-- Test Data:
-- Steps:
-- Expected Result:
-- Actual Result:
-- Status:
-- Severity:
-- Priority:
-- Notes:
+## Test Plan Template
+| Field | Value |
+|---|---|
+| Test Plan ID | |
+| Feature | |
+| Scope | |
+| Out of Scope | |
+| Roles | |
+| Test Levels | Unit / Integration / API / UI / E2E / Regression / UAT |
+| Test Types | Functional / Negative / Boundary / Role-Based / Audit / AI Safety |
+| Test Data | |
+| Environments | |
+| Entry Criteria | |
+| Exit Criteria | |
+| Risks | |
+| Dependencies | |
 
-## Defect Report
-- Defect ID:
-- Title:
-- Module:
-- Environment:
-- Role/User:
-- Preconditions:
-- Steps to Reproduce:
-- Expected Result:
-- Actual Result:
-- Severity:
-- Priority:
-- Business Impact:
-- Evidence:
-- Suggested Fix:
-- Regression Risk:
+## Test Scenario Template
+| Field | Value |
+|---|---|
+| Scenario ID | |
+| Feature | |
+| User Role | |
+| Business Goal | |
+| Preconditions | |
+| Scenario | |
+| Expected Outcome | |
+| Risks Covered | |
+| Audit Evidence | |
 
-## UAT Scenario
-- Scenario ID:
-- Business Role:
-- Workflow:
-- Objective:
-- Preconditions:
-- Business Data:
-- Steps:
-- Expected Business Outcome:
-- Acceptance Criteria Covered:
-- Pass/Fail:
-- Business Sign-Off:
+## Test Case Template
+| Field | Value |
+|---|---|
+| Test Case ID | |
+| Feature | |
+| User Story | |
+| Role | |
+| Preconditions | |
+| Test Data | |
+| Steps | |
+| Expected Result | |
+| Actual Result | |
+| Status | Not Run / Pass / Fail / Blocked |
+| Severity | Low / Medium / High / Critical |
+| Evidence | |
+| Notes | |
 
-## Regression Checklist
-- Changed Module:
-- Impacted Workflows:
-- Impacted Roles:
-- Impacted APIs:
-- Impacted Database Tables:
-- Impacted AI Outputs:
-- Impacted Audit Logs:
-- Impacted Reports:
-- Smoke Tests:
-- Critical Path Tests:
-- Known Risk Areas:
+## Gherkin Scenario Template
+```gherkin
+Feature:
+  Scenario:
+    Given
+    And
+    When
+    Then
+    And
+```
 
-## Release Readiness Report
-- Release / Version:
-- Scope Reviewed:
-- Test Coverage Summary:
-- Open Defects by Severity:
-- Open Defects by Priority:
-- Security Status:
-- Compliance Status:
-- Audit Status:
-- AI Safety Status:
-- Clinical Safety Status:
-- Insurance Readiness Status:
-- Regression Status:
-- UAT Status:
-- Demo Readiness:
-- Release Recommendation:
-- Final QA Decision:
+## Defect Report Template
+| Field | Value |
+|---|---|
+| Defect ID | BUG-[MODULE]-[NUMBER] |
+| Title | |
+| Module | |
+| Environment | |
+| Role / User | |
+| Preconditions | |
+| Steps to Reproduce | |
+| Expected Result | |
+| Actual Result | |
+| Severity | Critical / High / Medium / Low |
+| Priority | P1 / P2 / P3 / P4 |
+| Business Impact | |
+| Clinical / Insurance / Compliance Impact | |
+| Evidence | |
+| Suggested Fix | |
+| Regression Risk | |
+| Owner | |
+| Status | New / Triaged / In Progress / Fixed / Verified / Closed |
 
-## AI Safety Review
-- AI Feature:
-- Input Evidence Reviewed:
-- Output Reviewed:
-- Confidence Present:
-- Explanation Present:
-- Supporting Evidence Present:
-- Human Review Reminder Present:
-- Disclaimer Present Where Needed:
-- Hallucination Risk:
-- Clinical Safety Risk:
-- Insurance Decision Risk:
-- Sensitive Data Exposure Risk:
-- Final QA Decision:
+## Regression Test Suite Template
+| Suite ID | Area | Scenario | Priority | Automated | Owner | Status | Evidence |
+|---|---|---|---|---|---|---|---|
+| REG-001 | | | P1 | Yes / No | | Not Run | |
 
-## Security Review
-- Feature:
-- Roles Tested:
-- Authentication Checks:
-- Authorization Checks:
-- Organization Scope Checks:
-- Clinic Scope Checks:
-- Direct URL Checks:
-- API Permission Checks:
-- Supabase RLS Checks:
-- Sensitive Data Exposure Checks:
-- Error Leakage Checks:
-- Final QA Decision:
+## UAT Checklist Template
+| Role | Workflow | Business Scenario | Acceptance Criteria | Test Data | Status | Sign-off |
+|---|---|---|---|---|---|---|
+| | | | | | Not Run / Pass / Fail / Blocked | |
 
-## Compliance Review
-- Feature:
-- PDPA Consent Checks:
-- Audit Log Checks:
-- Version History Checks:
-- Access History Checks:
-- AI Traceability Checks:
-- Export Log Checks:
-- Evidence Package Audit Checks:
-- Soft Delete / Archive Checks:
-- User Activity Log Checks:
-- Human Review Checks:
-- Final QA Decision:
+## API Test Matrix Template
+| Endpoint | Method | Role | Scenario | Request Validation | Expected Status | Audit Event | Security Check | Status |
+|---|---|---|---|---|---|---|---|---|
+| | | | | | | | | |
+
+## Database Test Matrix Template
+| Table | Rule / Constraint | Scenario | Test Data | Expected Result | RLS Check | Audit Check | Status |
+|---|---|---|---|---|---|---|---|
+| | | | | | | | |
+
+## AI Evaluation Result Template
+| Field | Value |
+|---|---|
+| Evaluation ID | |
+| AI Feature | |
+| Prompt / Model Version | |
+| Input Evidence | |
+| Output Summary | |
+| Groundedness | Pass / Fail |
+| Safety | Pass / Fail |
+| Explainability | Pass / Fail |
+| Confidence Calibration | Pass / Fail |
+| Human Review Required | Yes / No |
+| Hallucination Detected | Yes / No |
+| Audit Log Present | Yes / No |
+| Decision | Pass / Needs Review / Fail |
+| Notes | |
+
+## QA Sign-off Report Template
+| Field | Value |
+|---|---|
+| Release / Feature | |
+| QA Decision | Pass / Pass With Conditions / Needs Review / Block Release |
+| Coverage Summary | |
+| Open Critical Defects | |
+| Open High Defects | |
+| Workarounds Approved | |
+| Security Result | |
+| Compliance Result | |
+| Audit Result | |
+| AI Safety Result | |
+| Clinical Safety Result | |
+| Insurance Workflow Result | |
+| Regression Result | |
+| UAT Result | |
+| Recommendation | |

@@ -1,53 +1,66 @@
 name = "qa"
 display_name = "QA Agent"
-description = "Validates Med AI NexSure features across functional correctness, healthcare workflow, insurance claim readiness, AI output quality, security, compliance, auditability, regression, UAT, and release readiness."
+description = "Quality assurance agent for Med AI NexSure covering requirements, test strategy, test cases, healthcare workflows, insurance workflows, AI evaluation, compliance, and release readiness."
+version = "1.0.0"
 
-[role]
-type = "specialist"
-domain = "quality-assurance"
-project = "Med AI NexSure"
+[capabilities]
+requirements_review = true
+acceptance_criteria_review = true
+test_strategy = true
+test_plan = true
+test_case_generation = true
+gherkin_generation = true
+ui_testing = true
+api_testing = true
+database_testing = true
+rls_testing = true
+ai_evaluation = true
+clinical_safety_testing = true
+insurance_workflow_testing = true
+audit_testing = true
+regression_testing = true
+uat_support = true
+release_signoff = true
 
-[skill]
-path = ".superpower/skills/qa/SKILL.md"
-
-[prompt]
-path = ".agents/qa-agent.md"
-
-[responsibilities]
-items = [
-  "Review requirements and acceptance criteria",
-  "Create test scenarios and test cases",
-  "Validate functional behavior",
-  "Validate business rules",
-  "Validate healthcare workflows",
-  "Validate insurance claim readiness",
-  "Validate AI output safety and explainability",
-  "Validate RBAC and permission boundaries",
-  "Validate audit log and compliance behavior",
-  "Identify defects and regression risks",
-  "Recommend release readiness decision",
+[inputs]
+accepted = [
+  "business_requirement",
+  "user_story",
+  "acceptance_criteria",
+  "wireframe",
+  "api_contract",
+  "database_schema",
+  "workflow",
+  "ai_prompt",
+  "test_result",
+  "defect_report"
 ]
 
-[boundaries]
-can_do = [
-  "Review requirements",
-  "Generate test cases",
-  "Create defect reports",
-  "Review AI output quality",
-  "Validate functional and business rules",
-  "Check security and compliance readiness",
-  "Assess regression and UAT readiness",
+[outputs]
+produces = [
+  "qa_review",
+  "test_strategy",
+  "test_plan",
+  "test_cases",
+  "gherkin_scenarios",
+  "api_test_matrix",
+  "database_test_matrix",
+  "rls_test_matrix",
+  "ai_evaluation_report",
+  "defect_report",
+  "regression_suite",
+  "uat_checklist",
+  "release_signoff"
 ]
 
-cannot_do = [
-  "Approve unsafe AI medical decisions",
-  "Make final clinical decisions",
-  "Make final insurance approval decisions",
-  "Override Product Owner priority",
-  "Change business rules without approval",
-  "Ignore compliance or audit gaps",
-  "Mark release ready when Critical or P1 defects exist",
-]
+[constraints]
+human_review_required = true
+clinical_decision_authority = false
+claim_approval_authority = false
+must_reference_agents_md = true
+must_follow_superpower_skill = true
+must_preserve_auditability = true
+must_check_compliance_risk = true
 
 [handoff]
 from = [
@@ -60,28 +73,17 @@ from = [
   "ai-clinical",
   "insurance",
   "compliance-guard",
+  "audit-log"
 ]
 
 to = [
-  "product-owner",
   "business-analyst",
+  "product-owner",
+  "solution-architect",
   "frontend",
   "backend",
   "database",
-  "solution-architect",
+  "devops",
   "compliance-guard",
-]
-
-[quality_gates]
-required = [
-  "Requirement is testable",
-  "Acceptance criteria are covered",
-  "Critical path test cases exist",
-  "Business rules are validated",
-  "RBAC checks exist",
-  "Audit log checks exist",
-  "AI safety checks exist when AI is involved",
-  "Compliance checks exist",
-  "Regression checklist exists",
-  "Release recommendation is provided",
+  "audit-log"
 ]
