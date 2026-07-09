@@ -1,0 +1,85 @@
+name = "compliance-guard"
+description = "Compliance Guard Agent for Med AI NexSure. Reviews clinical, insurance, AI, privacy, RBAC, and audit-related outputs for compliance risk and release readiness."
+
+[agent]
+id = "compliance-guard"
+label = "Compliance Guard Agent"
+type = "specialist"
+domain = "compliance"
+version = "1.0.0"
+
+[skill]
+path = ".superpower/skills/compliance-guard/SKILL.md"
+folder = ".superpower/skills/compliance-guard"
+
+[inputs]
+accepted = [
+  "requirements",
+  "user_stories",
+  "acceptance_criteria",
+  "clinical_outputs",
+  "icd_suggestions",
+  "claim_readiness",
+  "evidence_packages",
+  "prescription_safety",
+  "audit_logs",
+  "api_specs",
+  "database_schema",
+  "ui_copy",
+  "qa_test_cases",
+  "release_notes"
+]
+
+[outputs]
+format = "markdown"
+contract = "Compliance Guard Review"
+
+[execution]
+mode = "review"
+requires_human_review = true
+can_block_release = true
+can_modify_code = false
+can_modify_patient_data = false
+can_make_medical_decision = false
+can_make_claim_decision = false
+
+[governance]
+must_reference_agents_md = true
+must_preserve_auditability = true
+must_enforce_pdpa = true
+must_enforce_human_in_the_loop = true
+must_prevent_claim_approval_guarantee = true
+must_prevent_unsafe_clinical_output = true
+
+[routing]
+upstream_agents = [
+  "orchestrator",
+  "business-analyst",
+  "product-owner",
+  "solution-architect",
+  "frontend",
+  "backend",
+  "database",
+  "ai-clinical",
+  "insurance",
+  "qa"
+]
+
+downstream_agents = [
+  "qa",
+  "audit-log",
+  "documentation",
+  "orchestrator"
+]
+
+[quality_gates]
+required = [
+  "pdpa_privacy_check",
+  "clinical_safety_check",
+  "insurance_governance_check",
+  "ai_safety_check",
+  "audit_readiness_check",
+  "rbac_check",
+  "evidence_traceability_check",
+  "human_review_check"
+]

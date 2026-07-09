@@ -539,6 +539,12 @@ The QA Agent must block or flag release when:
 
 ---
 
+## Compliance Guard Agent
+
+The Compliance Guard Agent reviews outputs for PDPA, clinical safety, insurance governance, AI safety, RBAC, evidence traceability, and audit readiness. It can mark outputs as PASS, PASS_WITH_WARNINGS, NEEDS_REVISION, or BLOCKED.
+
+---
+
 # Success Metrics
 
 High documentation quality

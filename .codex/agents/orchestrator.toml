@@ -77,6 +77,7 @@ specialist_agents = [
   "missing_evidence",
   "policy_rule_validator",
   "recommendation",
+  "compliance_guard",
 ]
 
 [delegation.business_analyst]
@@ -159,6 +160,25 @@ before_final_output = [
   "compliance_validation",
   "security_validation",
   "documentation_validation",
+]
+
+[routing.compliance_guard]
+skill_path = ".superpower/skills/compliance-guard/SKILL.md"
+type = "superpower_skill"
+invoke_before = [
+  "release_readiness",
+  "clinical_ai_output_approval",
+  "claim_readiness_finalization",
+  "evidence_package_export",
+  "audit_sensitive_workflow_completion",
+  "role_permission_changes",
+]
+can_block_handoff = true
+decisions = [
+  "PASS",
+  "PASS_WITH_WARNINGS",
+  "NEEDS_REVISION",
+  "BLOCKED",
 ]
 
 [output_contract]
