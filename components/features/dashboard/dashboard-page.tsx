@@ -161,6 +161,7 @@ export function DashboardPage() {
         .visit-consult { color:#1E3A8A; background:#DBEAFE; border-color:#93C5FD; }
         .visit-evidence { color:#7C3AED; background:#F3E8FF; border-color:#C4B5FD; }
         .visit-completed { color:#166534; background:#DCFCE7; border-color:#86EFAC; }
+        .visit-cancel { color:#B91C1C; background:#FEE2E2; border-color:#FCA5A5; }
         .actions { display:flex; gap:8px; flex-wrap:wrap; }
         .link-btn { border:1px solid var(--border); background:white; color:var(--primary); padding:7px 10px; border-radius:10px; font-size:12px; font-weight:800; cursor:pointer; }
         .link-btn:hover { background:var(--soft); border-color:var(--blue-border); }
@@ -176,7 +177,6 @@ export function DashboardPage() {
         .audit-item { position:relative; padding-left:18px; margin-bottom:12px; color:#334155; font-size:13px; line-height:1.5; }
         .audit-item:before { content:""; position:absolute; left:0; top:5px; width:8px; height:8px; background:var(--ai); border-radius:999px; }
         .audit-time { color:var(--muted); font-size:12px; margin-top:2px; }
-        .chart-box { height:96px; margin:0 0 8px; }
         @media(max-width:1280px) { .content { grid-template-columns:1fr; } .side { position:relative; top:auto; max-height:none; overflow:visible; } }
         @media(max-width:1100px) { .app { grid-template-columns:1fr; } .sidebar { display:none; } .command-bar, .filters { grid-template-columns:1fr 1fr; } .kpis { grid-template-columns:repeat(2, minmax(0,1fr)); } }
         @media(max-width:760px) { .main { padding:18px; } .command-bar, .filters, .kpis { grid-template-columns:1fr; } .header { flex-direction:column; } }
@@ -226,7 +226,7 @@ export function DashboardPage() {
             <button className="btn">+ Create Patient</button>
           </section>
 
-          <section className="kpis" aria-label="Executive KPIs">
+          <section className="kpis" aria-label="Patient management KPIs">
             <div className="card kpi">
               <div className="kpi-label">Today Visits</div>
               <div className="kpi-value">4</div>
