@@ -1,311 +1,402 @@
 "use client";
 
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+const patients = [
+  {
+    hn: "HN-1029",
+    name: "Somchai Jaidee",
+    gender: "Male",
+    age: 42,
+    phone: "0812345678",
+    visitNo: "VN-7782",
+    visitStatus: "กำลังตรวจ",
+    readiness: "Ready",
+    ai: true,
+    risk: "Low",
+    lastVisit: "2026-07-06",
+  },
+  {
+    hn: "HN-1030",
+    name: "Suda Wongchai",
+    gender: "Female",
+    age: 36,
+    phone: "0899876543",
+    visitNo: "VN-7783",
+    visitStatus: "เสร็จสิ้น",
+    readiness: "Needs Review",
+    ai: true,
+    risk: "Medium",
+    lastVisit: "2026-07-06",
+  },
+  {
+    hn: "HN-1031",
+    name: "Anan Prasert",
+    gender: "Male",
+    age: 58,
+    phone: "0861112233",
+    visitNo: "VN-7784",
+    visitStatus: "รอตรวจ",
+    readiness: "Not Ready",
+    ai: false,
+    risk: "High",
+    lastVisit: "2026-07-04",
+  },
+  {
+    hn: "HN-1032",
+    name: "Malee Rattanakul",
+    gender: "Female",
+    age: 29,
+    phone: "0827774455",
+    visitNo: "VN-7785",
+    visitStatus: "รอเอกสาร",
+    readiness: "Ready",
+    ai: true,
+    risk: "Low",
+    lastVisit: "2026-07-03",
+  },
+];
 
-import {
-  activities,
-  domainMix,
-  executiveControls,
-  kpiCards,
-  navigationGroups,
-  portfolioRows,
-  readinessTrend,
-  rightSidebarItems,
-} from "./dashboard-content";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-
-function StatusBadge({ status }: { status: string }) {
-  const tone =
-    status === "On Track"
-      ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
-      : status === "Needs Review"
-        ? "bg-amber-50 text-amber-700 ring-amber-200"
-        : "bg-rose-50 text-rose-700 ring-rose-200";
-
-  return (
-    <span className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-bold ring-1 ${tone}`}>
-      {status}
-    </span>
-  );
+function readinessClass(readiness: string) {
+  if (readiness === "Ready") return "ready";
+  if (readiness === "Needs Review") return "review";
+  return "notready";
 }
 
-function SectionHeader({ title, subtitle }: { title: string; subtitle: string }) {
-  return (
-    <div>
-      <h2 className="text-sm font-bold text-slate-950">{title}</h2>
-      <p className="mt-1 text-xs leading-5 text-slate-500">{subtitle}</p>
-    </div>
-  );
+function readinessLabel(readiness: string) {
+  if (readiness === "Ready") return "✓ Ready";
+  if (readiness === "Needs Review") return "⚠ Needs Review";
+  return "✕ Not Ready";
+}
+
+function visitStatusClass(status: string) {
+  if (status === "รอตรวจ") return "visit-waiting";
+  if (status === "กำลังตรวจ") return "visit-consult";
+  if (status === "รอเอกสาร") return "visit-evidence";
+  if (status === "เสร็จสิ้น") return "visit-completed";
+  if (status === "ยกเลิก") return "visit-cancel";
+  return "neutral";
+}
+
+function visitStatusLabel(status: string) {
+  if (status === "รอตรวจ") return "🟡 รอตรวจ";
+  if (status === "กำลังตรวจ") return "🔵 กำลังตรวจ";
+  if (status === "รอเอกสาร") return "🟣 รอเอกสาร";
+  if (status === "เสร็จสิ้น") return "🟢 เสร็จสิ้น";
+  if (status === "ยกเลิก") return "🔴 ยกเลิก";
+  return status;
+}
+
+function riskBadge(risk: string) {
+  if (risk === "Low") return <span className="badge ready">✓ Low Risk</span>;
+  if (risk === "Medium") return <span className="badge review">⚠ Medium Risk</span>;
+  return <span className="badge notready">✕ High Risk</span>;
 }
 
 export function DashboardPage() {
   return (
-    <main className="min-h-screen bg-[#F8FAFC] text-slate-950">
-      <div className="grid min-h-screen lg:grid-cols-[276px_minmax(0,1fr)]">
-        <aside className="hidden bg-gradient-to-b from-[#0F2A5F] to-[#081B42] text-white lg:block">
-          <div className="flex h-full flex-col px-5 py-6">
-            <div className="flex items-center gap-3">
-              <div>
-                <div className="text-xl font-black">Med AI NexSure</div>
-                <div className="mt-1 max-w-[220px] text-xs leading-5 text-blue-200">
-                  Enterprise Healthcare & Insurance Intelligence Platform
-                </div>
-              </div>
-            </div>
+    <>
+      <style>{`
+        :root {
+          --primary:#1E3A8A;
+          --deep:#0F2A5F;
+          --ai:#2563EB;
+          --soft:#EFF6FF;
+          --blue-border:#BFDBFE;
+          --bg:#F8FAFC;
+          --surface:#FFFFFF;
+          --border:#E2E8F0;
+          --text:#0F172A;
+          --muted:#64748B;
+          --success:#16A34A;
+          --warning:#F59E0B;
+          --danger:#DC2626;
+          --success-bg:#ECFDF5;
+          --warning-bg:#FFFBEB;
+          --danger-bg:#FEF2F2;
+        }
 
-            <nav className="mt-8 flex-1 space-y-7" aria-label="Main navigation">
-              {navigationGroups.map((group) => (
-                <div key={group.title}>
-                  <div className="mb-3 text-[10px] font-bold uppercase tracking-[.18em] text-blue-200/80">
-                    {group.title}
-                  </div>
-                  <div className="space-y-1">
-                    {group.items.map((item) => (
-                      <a
-                        className={`block rounded-[14px] px-3.5 py-3 text-sm font-bold transition ${
-                          item === "Executive Dashboard"
-                            ? "bg-white/12 text-white"
-                            : "text-blue-100 hover:bg-white/10 hover:text-white"
-                        }`}
-                        href="#"
-                        key={item}
-                      >
-                        {item}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </nav>
+        * { box-sizing:border-box; }
+        body { margin:0; background:var(--bg); color:var(--text); }
+        .app { display:grid; grid-template-columns:280px minmax(0, 1fr); min-height:100vh; background:var(--bg); color:var(--text); font-family:Inter, Arial, sans-serif; }
+        .sidebar { background:linear-gradient(180deg, var(--deep), #081B42); color:white; padding:24px 18px; }
+        .logo { font-size:20px; font-weight:900; }
+        .logo-sub { color:#BFDBFE; font-size:12px; margin:6px 0 28px; line-height:1.5; }
+        .nav { display:grid; gap:8px; }
+        .nav a { color:#DBEAFE; text-decoration:none; padding:12px 14px; border-radius:14px; font-size:14px; font-weight:700; }
+        .nav a.active, .nav a:hover { background:rgba(255,255,255,.12); color:white; }
+        .security-card { margin-top:28px; padding:14px; border-radius:16px; background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.14); font-size:12px; color:#DBEAFE; line-height:1.6; }
+        .main { min-width:0; padding:24px; }
+        .command-bar { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:16px; display:grid; grid-template-columns:minmax(260px,1.5fr) minmax(220px,1fr) auto auto; gap:12px; align-items:center; box-shadow:0 12px 28px rgba(15,42,95,.05); margin-bottom:22px; }
+        .nex-input, .nex-select { width:100%; border:1px solid var(--border); border-radius:14px; padding:13px 14px; background:white; outline:none; color:var(--text); font:inherit; }
+        .nex-input:focus, .nex-select:focus { border-color:var(--ai); box-shadow:0 0 0 4px var(--soft); }
+        .pill { display:inline-flex; align-items:center; gap:6px; border-radius:999px; padding:8px 12px; font-size:12px; font-weight:900; border:1px solid var(--border); background:white; white-space:nowrap; }
+        .role { color:var(--primary); background:var(--soft); border-color:var(--blue-border); }
+        .header { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:18px; }
+        .header h1 { margin:0; font-size:32px; letter-spacing:-.04em; font-weight:900; }
+        .header p { margin:8px 0 0; color:var(--muted); font-size:14px; line-height:1.6; }
+        .btn { border:0; background:var(--primary); color:white; padding:12px 18px; border-radius:14px; font-weight:900; cursor:pointer; box-shadow:0 14px 28px rgba(30,58,138,.18); white-space:nowrap; }
+        .btn:hover { background:var(--deep); }
+        .kpis { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:16px; margin-bottom:18px; }
+        .card { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:18px; box-shadow:0 12px 30px rgba(15,42,95,.06); }
+        .kpi { position:relative; overflow:hidden; }
+        .kpi:before { content:""; position:absolute; top:0; left:18px; right:18px; height:3px; background:linear-gradient(90deg, var(--primary), #38BDF8); }
+        .kpi-label { color:var(--muted); font-size:13px; }
+        .kpi-value { font-size:30px; font-weight:900; color:var(--primary); margin-top:8px; }
+        .kpi-note { color:var(--muted); font-size:12px; margin-top:8px; line-height:1.5; }
+        .filters { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:12px; margin-bottom:18px; }
+        .content { display:grid; grid-template-columns:minmax(0, 1fr) 380px; gap:20px; align-items:start; }
+        .table-card { padding:0; overflow-x:auto; min-width:0; }
+        table { width:100%; min-width:1180px; border-collapse:collapse; font-size:14px; }
+        thead { background:var(--bg); color:var(--muted); }
+        th, td { padding:15px 16px; border-bottom:1px solid var(--border); text-align:left; vertical-align:middle; }
+        tbody tr:hover { background:rgba(239,246,255,.65); }
+        .patient-name { font-weight:900; color:var(--text); }
+        .sub { font-size:12px; color:var(--muted); margin-top:4px; }
+        .badge { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; font-size:12px; font-weight:900; border:1px solid transparent; white-space:nowrap; }
+        .ready { color:var(--success); background:var(--success-bg); border-color:rgba(22,163,74,.2); }
+        .review { color:var(--warning); background:var(--warning-bg); border-color:rgba(245,158,11,.28); }
+        .notready { color:var(--danger); background:var(--danger-bg); border-color:rgba(220,38,38,.22); }
+        .ai { color:var(--ai); background:var(--soft); border-color:var(--blue-border); }
+        .neutral { color:#475569; background:#F1F5F9; border-color:var(--border); }
+        .visit-waiting { color:#92400E; background:#FEF3C7; border-color:#FCD34D; }
+        .visit-consult { color:#1E3A8A; background:#DBEAFE; border-color:#93C5FD; }
+        .visit-evidence { color:#7C3AED; background:#F3E8FF; border-color:#C4B5FD; }
+        .visit-completed { color:#166534; background:#DCFCE7; border-color:#86EFAC; }
+        .actions { display:flex; gap:8px; flex-wrap:wrap; }
+        .link-btn { border:1px solid var(--border); background:white; color:var(--primary); padding:7px 10px; border-radius:10px; font-size:12px; font-weight:800; cursor:pointer; }
+        .link-btn:hover { background:var(--soft); border-color:var(--blue-border); }
+        .side { display:grid; gap:16px; align-self:start; position:sticky; top:24px; max-height:calc(100vh - 48px); overflow-y:auto; padding-right:4px; }
+        .section-title { font-size:15px; font-weight:900; color:var(--primary); margin-bottom:6px; }
+        .section-subtitle { font-size:12px; color:var(--muted); margin-bottom:14px; line-height:1.5; }
+        .ai-panel { width:100%; background:linear-gradient(180deg, #FFFFFF, #EFF6FF); border:1px solid var(--blue-border); z-index:1; }
+        .ai-title { font-weight:900; color:var(--ai); }
+        .ai-copy { color:#334155; font-size:13px; line-height:1.6; margin-bottom:8px; }
+        .row { display:flex; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); font-size:13px; }
+        .row:last-child { border-bottom:0; }
+        .critical { color:var(--danger); background:var(--danger-bg); margin:6px -8px; padding:10px 8px; border-radius:12px; }
+        .audit-item { position:relative; padding-left:18px; margin-bottom:12px; color:#334155; font-size:13px; line-height:1.5; }
+        .audit-item:before { content:""; position:absolute; left:0; top:5px; width:8px; height:8px; background:var(--ai); border-radius:999px; }
+        .audit-time { color:var(--muted); font-size:12px; margin-top:2px; }
+        .chart-box { height:96px; margin:0 0 8px; }
+        @media(max-width:1280px) { .content { grid-template-columns:1fr; } .side { position:relative; top:auto; max-height:none; overflow:visible; } }
+        @media(max-width:1100px) { .app { grid-template-columns:1fr; } .sidebar { display:none; } .command-bar, .filters { grid-template-columns:1fr 1fr; } .kpis { grid-template-columns:repeat(2, minmax(0,1fr)); } }
+        @media(max-width:760px) { .main { padding:18px; } .command-bar, .filters, .kpis { grid-template-columns:1fr; } .header { flex-direction:column; } }
+      `}</style>
 
-            <div className="rounded-2xl border border-white/15 bg-white/10 p-4">
-              <div className="text-xs font-bold text-blue-100">AI assists. Humans decide.</div>
-              <p className="mt-2 text-xs leading-5 text-blue-100/75">
-                รองรับ PDPA, RBAC, audit trail และ human approval workflow.
-              </p>
-            </div>
+      <div className="app">
+        <aside className="sidebar">
+          <div className="logo">Med AI NexSure</div>
+          <div className="logo-sub">Enterprise Healthcare & Insurance Intelligence Platform</div>
+          <nav className="nav">
+            <a href="#">Main Dashboard</a>
+            <a className="active" href="#">Patient Management</a>
+            <a href="#">Visit Management</a>
+            <a href="#">SOAP Note</a>
+            <a href="#">Prescription</a>
+            <a href="#">Claim Readiness</a>
+            <a href="#">Evidence Package</a>
+            <a href="#">Payer Rules</a>
+            <a href="#">Economic Intelligence</a>
+            <a href="#">AI Copilot</a>
+            <a href="#">Audit & Compliance</a>
+            <a href="#">Admin Settings</a>
+          </nav>
+          <div className="security-card">
+            <b>Secure Workspace</b>
+            <br />
+            พื้นที่ทำงานที่รองรับ PDPA, RBAC, audit trail และ human approval workflow
           </div>
         </aside>
 
-        <section className="min-w-0 px-4 py-5 sm:px-6 lg:px-8">
-          <section className="mb-5 grid gap-3 rounded-[20px] border border-slate-200 bg-white p-4 shadow-[0_12px_28px_rgba(15,42,95,.05)] xl:grid-cols-[minmax(260px,1.5fr)_minmax(220px,1fr)_auto_auto] xl:items-center">
-            <Input
-              aria-label="Global dashboard search"
-              className="h-[46px] rounded-[14px] border border-slate-200 bg-white px-3.5 text-sm outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-50"
-              placeholder="Global search: KPI, payer, facility, governance item..."
-            />
-            <select
-              aria-label="Organization"
-              className="h-[46px] rounded-[14px] border border-slate-200 bg-white px-3.5 text-sm text-slate-950 outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-50"
-            >
+        <main className="main">
+          <section className="command-bar">
+            <input className="nex-input" placeholder="Global search: HN, patient name, visit no, claim case..." />
+            <select className="nex-select" aria-label="Organization">
               <option>Med AI NexSure Clinic Group</option>
-              <option>Bangkok Executive Cluster</option>
+              <option>Bangkok Clinic Branch</option>
             </select>
-            <span className="inline-flex items-center justify-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-black text-[#1E3A8A]">
-              Role: Executive
-            </span>
-            <span className="inline-flex items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-700">
-              4 Board Alerts
-            </span>
+            <span className="pill role">● Role: Claim Reviewer</span>
+            <span className="pill">🔔 4 Alerts</span>
           </section>
 
-          <div className="px-0 py-0">
-            <header className="mb-5">
-              <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-                <div>
-                  <h1 className="text-3xl font-black tracking-tight text-slate-950">
-                    Executive Dashboard
-                  </h1>
-                  <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-                    Strategic overview for claim readiness, revenue assurance, AI governance, and compliance.
-                    ภาพรวมผู้บริหารสำหรับติดตามความพร้อมเคลม ความเสี่ยง และการกำกับดูแล AI
-                  </p>
-                </div>
-                <Button className="min-h-11 rounded-[14px] bg-[#1E3A8A] px-5 text-sm font-black text-white shadow-[0_14px_28px_rgba(30,58,138,.18)] hover:bg-[#0F2A5F] focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2">
-                  Run Executive Review
-                </Button>
-              </div>
-            </header>
-
-            <div className="mb-5 grid gap-3 lg:grid-cols-[2fr_1fr_1fr_1fr]">
-              <Input
-                aria-label="Search executive dashboard"
-                className="h-[46px] rounded-[14px] border border-slate-200 bg-white px-3.5 text-sm outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-50"
-                placeholder="Search by domain, payer, facility, risk owner..."
-              />
-              {executiveControls.slice(0, 3).map((control) => (
-                <select
-                  aria-label={control.label}
-                  className="h-[46px] rounded-[14px] border border-slate-200 bg-white px-3.5 text-sm text-slate-950 outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-50"
-                  key={control.label}
-                >
-                  <option>{control.value}</option>
-                </select>
-              ))}
+          <section className="header">
+            <div>
+              <h1>Patient Management</h1>
+              <p>บริหารข้อมูลผู้ป่วยและการเข้ารับบริการ พร้อมติดตามความพร้อมในการส่งเคลม</p>
             </div>
+            <button className="btn">+ Create Patient</button>
+          </section>
 
-            <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-4">
-              {kpiCards.map((card) => (
-                <article className="relative overflow-hidden rounded-[18px] border border-slate-200 bg-white p-5 shadow-[0_12px_30px_rgba(15,42,95,.06)] before:absolute before:left-5 before:right-5 before:top-0 before:h-[3px] before:bg-gradient-to-r before:from-[#1E3A8A] before:to-sky-400" key={card.label}>
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-[.12em] text-slate-500">{card.label}</p>
-                      <div className="mt-3 text-3xl font-bold tracking-tight text-slate-950">{card.value}</div>
-                    </div>
-                    <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ring-1 ${card.tone}`}>
-                      {card.trend}
-                    </span>
-                  </div>
-                  <p className="mt-2 text-xs font-semibold text-blue-700">{card.thai}</p>
-                  <p className="mt-2 text-xs leading-5 text-slate-500">{card.description}</p>
-                </article>
-              ))}
+          <section className="kpis" aria-label="Executive KPIs">
+            <div className="card kpi">
+              <div className="kpi-label">Today Visits</div>
+              <div className="kpi-value">4</div>
+              <div className="kpi-note">จำนวนผู้เข้ารับบริการวันนี้</div>
             </div>
+            <div className="card kpi">
+              <div className="kpi-label">Claim Ready %</div>
+              <div className="kpi-value">50%</div>
+              <div className="kpi-note">สัดส่วนเคสที่พร้อมส่งเคลม</div>
+            </div>
+            <div className="card kpi">
+              <div className="kpi-label">AI Assisted Cases</div>
+              <div className="kpi-value">3</div>
+              <div className="kpi-note">จำนวนเคสที่ AI ช่วยวิเคราะห์</div>
+            </div>
+            <div className="card kpi">
+              <div className="kpi-label">Average Readiness Score</div>
+              <div className="kpi-value">86</div>
+              <div className="kpi-note">คะแนนความพร้อมเฉลี่ย</div>
+            </div>
+          </section>
 
-            <div className="mt-5 grid gap-5 2xl:grid-cols-[minmax(0,1fr)_320px]">
-              <div className="min-w-0 space-y-5">
-                <section className="rounded-[18px] border border-slate-200 bg-white p-5 shadow-[0_12px_30px_rgba(15,42,95,.06)]" aria-label="Enterprise readiness trend chart">
-                  <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <SectionHeader
-                      title="Enterprise Readiness Trend"
-                      subtitle="Claim value, readiness, and audit coverage for executive monitoring"
-                    />
-                    <div className="text-xs font-bold text-slate-500">อัปเดตล่าสุด 10 Jul 2026</div>
-                  </div>
-                  <div className="h-72">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={readinessTrend} margin={{ left: -18, right: 12, top: 8, bottom: 0 }}>
-                        <CartesianGrid stroke="#E2E8F0" strokeDasharray="3 3" />
-                        <XAxis dataKey="month" tick={{ fill: "#64748B", fontSize: 12 }} tickLine={false} />
-                        <YAxis tick={{ fill: "#64748B", fontSize: 12 }} tickLine={false} />
-                        <Tooltip />
-                        <Area dataKey="audit" name="Audit coverage" stroke="#0F766E" fill="#CCFBF1" strokeWidth={2} />
-                        <Area dataKey="readiness" name="Readiness %" stroke="#2563EB" fill="#DBEAFE" strokeWidth={2} />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  </div>
-                </section>
+          <section className="filters">
+            <input className="nex-input" placeholder="Search patient by HN, Name, Phone or Visit No." />
+            <select className="nex-select" aria-label="Status filter">
+              <option>สถานะทั้งหมด</option>
+              <option>รอตรวจ</option>
+              <option>กำลังตรวจ</option>
+              <option>รอเอกสาร</option>
+              <option>เสร็จสิ้น</option>
+              <option>ยกเลิก</option>
+            </select>
+            <select className="nex-select" aria-label="Readiness filter">
+              <option>All Claim Readiness</option>
+              <option>Ready</option>
+              <option>Needs Review</option>
+              <option>Not Ready</option>
+            </select>
+            <input className="nex-input" type="date" aria-label="Date filter" />
+          </section>
 
-                <div className="grid gap-5 xl:grid-cols-[.9fr_1.1fr]">
-                  <section className="rounded-[18px] border border-slate-200 bg-white p-5 shadow-[0_12px_30px_rgba(15,42,95,.06)]" aria-label="Readiness mix chart">
-                    <SectionHeader title="Readiness Mix" subtitle="สัดส่วนสถานะงานระดับองค์กร" />
-                    <div className="mt-4 h-64">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie data={domainMix} dataKey="value" nameKey="name" innerRadius={58} outerRadius={88}>
-                            {domainMix.map((entry) => (
-                              <Cell fill={entry.fill} key={entry.name} />
-                            ))}
-                          </Pie>
-                          <Tooltip />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </div>
-                    <div className="grid gap-2 sm:grid-cols-2">
-                      {domainMix.map((item) => (
-                        <div className="flex items-center gap-2 text-xs font-semibold text-slate-600" key={item.name}>
-                          <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: item.fill }} />
-                          {item.name}: {item.value}%
+          <section className="content">
+            <div className="card table-card">
+              <table>
+                <thead><tr><th>Patient</th><th>Gender / Age</th><th>Phone</th><th>Visit Status</th><th>Claim Readiness</th><th>AI Support</th><th>Risk</th><th>Last Visit</th><th>Actions</th></tr></thead>
+                <tbody>
+                  {patients.map((patient) => (
+                    <tr key={patient.hn}>
+                      <td>
+                        <div className="patient-name">{patient.name}</div>
+                        <div className="sub">{patient.hn} · {patient.visitNo}</div>
+                      </td>
+                      <td>{patient.gender} / {patient.age}</td>
+                      <td>{patient.phone}</td>
+                      <td>
+                        <span className={`badge ${visitStatusClass(patient.visitStatus)}`}>{visitStatusLabel(patient.visitStatus)}</span>
+                      </td>
+                      <td>
+                        <span className={`badge ${readinessClass(patient.readiness)}`}>{readinessLabel(patient.readiness)}</span>
+                      </td>
+                      <td>{patient.ai ? <span className="badge ai">✨ AI Assisted</span> : <span className="badge neutral">Human Only</span>}</td>
+                      <td>{riskBadge(patient.risk)}</td>
+                      <td>{patient.lastVisit}</td>
+                      <td>
+                        <div className="actions">
+                          <button className="link-btn">View Detail</button>
+                          <button className="link-btn">Review</button>
+                          <button className="link-btn">Create</button>
                         </div>
-                      ))}
-                    </div>
-                  </section>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
-                  <section className="rounded-[18px] border border-slate-200 bg-white p-5 shadow-[0_12px_30px_rgba(15,42,95,.06)]" aria-label="Claim value pipeline chart">
-                    <SectionHeader title="Claim Value Pipeline" subtitle="Monthly executive view in THB millions" />
-                    <div className="mt-4 h-64">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={readinessTrend} margin={{ left: -18, right: 8, top: 8, bottom: 0 }}>
-                          <CartesianGrid stroke="#E2E8F0" strokeDasharray="3 3" />
-                          <XAxis dataKey="month" tick={{ fill: "#64748B", fontSize: 12 }} tickLine={false} />
-                          <YAxis tick={{ fill: "#64748B", fontSize: 12 }} tickLine={false} />
-                          <Tooltip />
-                          <Bar dataKey="claims" name="Claim value" fill="#1E3A8A" radius={[4, 4, 0, 0]} />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </section>
+            <aside className="side">
+              <div className="card ai-panel">
+                <div className="ai-title">AI Decision Support</div>
+                <div className="section-subtitle">AI ช่วยวิเคราะห์และแนะนำข้อมูล แต่การตัดสินใจสุดท้ายยังเป็นของแพทย์หรือผู้ตรวจเคลม</div>
+                <div className="ai-copy">3 cases require human review due to missing SOAP evidence, ICD-10 mismatch, or incomplete claim documentation.</div>
+                <div className="row">
+                  <span>Confidence Level</span>
+                  <b>87%</b>
                 </div>
-
-                <section className="rounded-[18px] border border-slate-200 bg-white p-5 shadow-[0_12px_30px_rgba(15,42,95,.06)]">
-                  <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <SectionHeader title="Executive Portfolio Table" subtitle="No patient identifiers. Aggregated governance and performance domains." />
-                    <Button className="min-h-10 rounded-[10px] border border-slate-200 bg-white px-4 text-sm font-bold text-[#1E3A8A] hover:border-blue-200 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2">
-                      Export Brief
-                    </Button>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full min-w-[820px] text-left text-sm">
-                      <thead>
-                        <tr className="border-b border-slate-100 text-xs uppercase tracking-[.12em] text-slate-500">
-                          <th className="py-3 pr-4">Domain</th>
-                          <th className="py-3 pr-4">Owner</th>
-                          <th className="py-3 pr-4">Readiness</th>
-                          <th className="py-3 pr-4">Value</th>
-                          <th className="py-3 pr-4">Risk</th>
-                          <th className="py-3">Status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {portfolioRows.map((item) => (
-                          <tr className="border-b border-slate-100 last:border-0" key={item.domain}>
-                            <td className="py-4 pr-4 font-bold text-slate-950">{item.domain}</td>
-                            <td className="py-4 pr-4 text-slate-600">{item.owner}</td>
-                            <td className="py-4 pr-4 font-bold text-slate-950">{item.readiness}</td>
-                            <td className="py-4 pr-4 text-slate-600">{item.value}</td>
-                            <td className="py-4 pr-4 text-slate-600">{item.risk}</td>
-                            <td className="py-4"><StatusBadge status={item.status} /></td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </section>
+                <div className="row">
+                  <span>Suggested Action</span>
+                  <b>Review Evidence</b>
+                </div>
+                <div className="row">
+                  <span>Human Review Status</span>
+                  <b>Required</b>
+                </div>
+                <div className="row">
+                  <span>Audit Record</span>
+                  <b>Enabled</b>
+                </div>
               </div>
 
-              <aside className="space-y-5 2xl:sticky 2xl:top-6 2xl:max-h-[calc(100vh-48px)] 2xl:self-start 2xl:overflow-y-auto" aria-label="Executive priority sidebar">
-                <section className="rounded-[18px] border border-blue-200 bg-gradient-to-b from-white to-blue-50 p-5 shadow-[0_12px_30px_rgba(15,42,95,.06)]">
-                  <SectionHeader title="Executive Actions" subtitle="คำแนะนำสำหรับผู้บริหาร" />
-                  <div className="mt-4 space-y-3">
-                    {rightSidebarItems.map((item) => (
-                      <article className="rounded-xl border border-blue-100 bg-blue-50/70 p-4" key={item.title}>
-                        <div className="text-xs font-bold uppercase tracking-[.12em] text-blue-700">{item.title}</div>
-                        <div className="mt-2 text-sm font-bold text-slate-950">{item.value}</div>
-                        <p className="mt-2 text-xs leading-5 text-slate-600">{item.detail}</p>
-                      </article>
-                    ))}
-                  </div>
-                </section>
+              <div className="card">
+                <div className="section-title">Claim Readiness</div>
+                <div className="section-subtitle">ตรวจสอบความพร้อมของข้อมูลก่อนส่งเคลมประกัน</div>
+                <div className="row">
+                  <span>✓ Ready</span>
+                  <b>2</b>
+                </div>
+                <div className="row">
+                  <span>⚠ Needs Review</span>
+                  <b>1</b>
+                </div>
+                <div className="row">
+                  <span>✕ Not Ready</span>
+                  <b>1</b>
+                </div>
+              </div>
 
-                <section className="rounded-[18px] border border-slate-200 bg-white p-5 shadow-[0_12px_30px_rgba(15,42,95,.06)]">
-                  <SectionHeader title="Recent Governance Activity" subtitle="Audit-safe operational record" />
-                  <div className="mt-4 space-y-3">
-                    {activities.map((activity) => (
-                      <div className="rounded-md border border-slate-100 bg-slate-50 p-3 text-xs font-semibold leading-5 text-slate-600" key={activity}>
-                        {activity}
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              </aside>
-            </div>
-          </div>
-        </section>
+              <div className="card">
+                <div className="section-title">Missing Evidence</div>
+                <div className="section-subtitle">เอกสารหรือข้อมูลที่ยังไม่ครบถ้วน</div>
+                <div className="row critical">
+                  <span>⚠ ข้อมูลยังไม่ครบถ้วน กรุณาตรวจสอบ SOAP Note, ICD-10 และ Prescription ก่อนส่งเคลมประกัน</span>
+                  <b>Critical</b>
+                </div>
+                <div className="row">
+                  <span>⚠ ICD-10 missing</span>
+                  <b>3</b>
+                </div>
+                <div className="row">
+                  <span>● PDPA consent pending</span>
+                  <b>2</b>
+                </div>
+              </div>
+
+              <div className="card">
+                <div className="section-title">Economic Intelligence</div>
+                <div className="section-subtitle">วิเคราะห์ต้นทุน ค่าใช้จ่าย และความผิดปกติของการรักษา</div>
+                <div className="row">
+                  <span>Average Visit Cost</span>
+                  <b>฿1,850</b>
+                </div>
+                <div className="row">
+                  <span>Cost Outlier</span>
+                  <b>2 Cases</b>
+                </div>
+                <div className="row">
+                  <span>Expected Range</span>
+                  <b>฿1,200-2,400</b>
+                </div>
+              </div>
+
+              <div className="card">
+                <div className="section-title">Audit & Compliance</div>
+                <div className="section-subtitle">ติดตามประวัติการใช้งาน รองรับ PDPA และการตรวจสอบย้อนหลัง</div>
+                <div className="audit-item">
+                  Opened patient profile
+                  <div className="audit-time">เปิดข้อมูลผู้ป่วย · 5 min ago</div>
+                </div>
+                <div className="audit-item">
+                  Viewed claim readiness
+                  <div className="audit-time">ตรวจสอบความพร้อมการเคลม · 18 min ago</div>
+                </div>
+                <div className="audit-item">
+                  Updated PDPA consent
+                  <div className="audit-time">ปรับปรุงข้อมูลการให้ความยินยอม · 32 min ago</div>
+                </div>
+              </div>
+            </aside>
+          </section>
+        </main>
       </div>
-    </main>
+    </>
   );
 }
