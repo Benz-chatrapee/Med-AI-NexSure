@@ -1,0 +1,29 @@
+{
+  "feature": "economic-intelligence",
+  "artifact": "epic-8-economic-intelligence-v1-5",
+  "type": "standalone-html",
+  "sourcePath": "public/epic-8-economic-intelligence-v1-5.html",
+  "frontendAgentStructure": {
+    "page": "Standalone HTML document shell",
+    "layout": ["sidebar", "topbar", "workspace", "drawer", "overlay", "toast"],
+    "features": [
+      "finance-performance",
+      "root-cause-analysis",
+      "insurance-payer-risk",
+      "operations-context",
+      "claim-control",
+      "action-center",
+      "economic-review-worklist"
+    ],
+    "sharedUi": ["kpi-card", "panel", "badge", "filter-bar", "data-table", "drawer", "toast"],
+    "mockData": ["worklistData", "heatmapData", "chartDatasets"],
+    "utilities": ["formatting", "chartDefaults", "domStateHelpers"],
+    "controllers": ["worklist", "filters", "drawer", "sidebar", "search", "export", "chartInteractions"]
+  },
+  "constraints": {
+    "preserveStandaloneHtml": true,
+    "preserveVisualLayout": true,
+    "decisionSupportOnly": true,
+    "humanReviewRequired": true
+  }
+}
