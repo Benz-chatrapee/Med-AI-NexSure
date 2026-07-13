@@ -166,7 +166,41 @@ function Toggle({ form, name, title, disabled, help }: { form: Form; name: Param
 }
 
 function ProfileSection({ form, disabled }: { form: Form; disabled: boolean }) {
-  return <SectionCard title="Organization Profile" thai="จัดการข้อมูลหลักขององค์กรและค่าเริ่มต้นที่ใช้ร่วมกันในทุก Clinic" badge={<Badge tone="green">Active</Badge>} cardTitle="Organization Identity" cardHelp="ข้อมูลอ้างอิงหลักสำหรับเอกสาร ระบบงาน และ Audit Trail" action={<Badge tone="blue">Organization Default</Badge>}><div className="org-grid two"><Field form={form} name="organizationProfile.organizationName" title="Organization Name" disabled={disabled} /><Field form={form} name="organizationProfile.organizationCode" title="Organization Code" disabled help="ไม่ควรเปลี่ยนหลังเริ่มมี Transaction" /><SelectField form={form} name="organizationProfile.organizationType" title="Organization Type" disabled={disabled} options={["clinic_group", "hospital", "insurer", "enterprise_network"]} /><SelectField form={form} name="organizationProfile.status" title="Status" disabled={disabled} options={["active", "implementation", "suspended"]} /><Field form={form} name="organizationProfile.registrationNumber" title="Registration Number" disabled={disabled} /><Field form={form} name="organizationProfile.taxId" title="Tax ID" disabled={disabled} /><Field form={form} name="organizationProfile.primaryContact" title="Primary Contact" disabled={disabled} /><Field form={form} name="organizationProfile.contactEmail" title="Contact Email" disabled={disabled} /><Field form={form} name="organizationProfile.phoneNumber" title="Phone Number" disabled={disabled} /><Field form={form} name="organizationProfile.logoFileName" title="Organization Logo" disabled={disabled} help="PNG, JPG หรือ SVG · สูงสุด 2 MB" /><Field form={form} name="organizationProfile.registeredOfficeAddress" title="Registered Office Address" disabled={disabled} /><Field form={form} name="organizationProfile.defaultTimezone" title="Default Timezone" disabled={disabled} /><SelectField form={form} name="organizationProfile.defaultLanguage" title="Default Language" disabled={disabled} options={["en", "th", "bilingual"]} /><SelectField form={form} name="organizationProfile.currency" title="Currency" disabled={disabled} options={["THB", "USD"]} /><SelectField form={form} name="organizationProfile.dateFormat" title="Date Format" disabled={disabled} options={["DD/MM/YYYY", "YYYY-MM-DD", "MM/DD/YYYY"]} /></div></SectionCard>;
+  return (
+    <section aria-labelledby="Organization-Profile">
+      <div className="org-section-head">
+        <div className="org-section-title-row"><h2 id="Organization-Profile" className="org-section-title">Organization Profile</h2><Badge tone="green">Active</Badge></div>
+        <p className="org-section-desc">จัดการข้อมูลหลักขององค์กรและค่าเริ่มต้นที่ใช้ร่วมกันในทุก Clinic</p>
+      </div>
+      <div className="org-card">
+        <div className="org-card-head"><div><div className="org-card-title">Organization Identity</div><div className="org-card-help">ข้อมูลอ้างอิงหลักสำหรับเอกสาร ระบบงาน และ Audit Trail</div></div><Badge tone="blue">Organization Default</Badge></div>
+        <div className="org-card-body">
+          <div className="org-grid two">
+            <Field form={form} name="organizationProfile.organizationName" title="Organization Name" disabled={disabled} />
+            <Field form={form} name="organizationProfile.organizationCode" title="Organization Code" disabled help="ไม่ควรเปลี่ยนหลังเริ่มมี Transaction" />
+            <SelectField form={form} name="organizationProfile.organizationType" title="Organization Type" disabled={disabled} options={["clinic_group", "hospital", "insurer", "enterprise_network"]} />
+            <SelectField form={form} name="organizationProfile.status" title="Status" disabled={disabled} options={["active", "implementation", "suspended"]} />
+            <Field form={form} name="organizationProfile.registrationNumber" title="Registration Number" disabled={disabled} />
+            <Field form={form} name="organizationProfile.taxId" title="Tax ID" disabled={disabled} />
+            <Field form={form} name="organizationProfile.primaryContact" title="Primary Contact" disabled={disabled} />
+            <Field form={form} name="organizationProfile.contactEmail" title="Contact Email" disabled={disabled} />
+            <Field form={form} name="organizationProfile.phoneNumber" title="Phone Number" disabled={disabled} />
+            <Field form={form} name="organizationProfile.logoFileName" title="Organization Logo" disabled={disabled} help="PNG, JPG หรือ SVG · สูงสุด 2 MB" />
+          </div>
+          <div className="org-field mt-4"><label>Registered Office Address</label><textarea disabled={disabled} className={input} {...form.register("organizationProfile.registeredOfficeAddress")} /></div>
+        </div>
+      </div>
+      <div className="org-card">
+        <div className="org-card-head"><div><div className="org-card-title">Locale & Regional Standards</div><div className="org-card-help">กำหนดมาตรฐานภาษา เวลา สกุลเงิน และรูปแบบวันที่ระดับองค์กร</div></div></div>
+        <div className="org-card-body org-grid two">
+          <Field form={form} name="organizationProfile.defaultTimezone" title="Default Timezone" disabled={disabled} />
+          <SelectField form={form} name="organizationProfile.defaultLanguage" title="Default Language" disabled={disabled} options={["en", "th", "bilingual"]} />
+          <SelectField form={form} name="organizationProfile.currency" title="Currency" disabled={disabled} options={["THB", "USD"]} />
+          <SelectField form={form} name="organizationProfile.dateFormat" title="Date Format" disabled={disabled} options={["DD/MM/YYYY", "YYYY-MM-DD", "MM/DD/YYYY"]} />
+        </div>
+      </div>
+    </section>
+  );
 }
 
 function SelectField({ form, name, title, disabled, options }: { form: Form; name: Parameters<Form["register"]>[0]; title: string; disabled: boolean; options: string[] }) {
