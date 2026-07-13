@@ -1,5 +1,5 @@
-import { PrescriptionManagementPage } from "@/components/features/prescription-management/prescription-management-page";
+import { PrescriptionPage } from "@/features/prescription/prescription-page";
 
 export default function Page() {
-  return <PrescriptionManagementPage />;
+  return <PrescriptionPage visitId="visit-2026-0712-019" />;
 }

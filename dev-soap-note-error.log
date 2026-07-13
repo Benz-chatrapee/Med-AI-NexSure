@@ -1,0 +1,130 @@
+⚠ Slow filesystem detected. The benchmark took 274ms. If D:\med-ai-nexsure-platform\.next/dev is a network drive, consider moving it to a local folder.
+See more: https://nextjs.org/docs/app/guides/local-development
+⚠ Blocked cross-origin request to Next.js dev resource /_next/webpack-hmr from "127.0.0.1".
+Cross-origin access to Next.js dev resources is blocked by default for safety.
+
+To allow this host in development, add it to "allowedDevOrigins" in next.config.js and restart the dev server:
+
+// next.config.js
+module.exports = {
+  allowedDevOrigins: ['127.0.0.1'],
+}
+
+Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+⨯ ./app/insurance-intelligence/page.tsx:3:25
+the name `InsuranceIntelligencePage` is defined multiple times
+  [90m1 |[0m [36mimport[0m { [33mInsuranceIntelligencePage[0m } [36mfrom[0m [32m"@/components/features/insurance-intelligence/ins...[0m
+  [90m2 |[0m
+[31m[1m>[0m [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mInsuranceIntelligencePage[0m() {
+  [90m  |[0m                         [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m   [36mreturn[0m <[33mInsuranceIntelligencePage[0m />;
+  [90m5 |[0m }
+  [90m6 |[0m
+
+Ecmascript file had an error
+
+
+⨯ ./app/insurance-intelligence/page.tsx:3:25
+the name `InsuranceIntelligencePage` is defined multiple times
+  [90m1 |[0m [36mimport[0m { [33mInsuranceIntelligencePage[0m } [36mfrom[0m [32m"@/components/features/insurance-intelligence/ins...[0m
+  [90m2 |[0m
+[31m[1m>[0m [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mInsuranceIntelligencePage[0m() {
+  [90m  |[0m                         [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m   [36mreturn[0m <[33mInsuranceIntelligencePage[0m />;
+  [90m5 |[0m }
+  [90m6 |[0m
+
+Ecmascript file had an error
+
+
+⨯ ./app/insurance-intelligence/page.tsx:3:25
+the name `InsuranceIntelligencePage` is defined multiple times
+  [90m1 |[0m [36mimport[0m { [33mInsuranceIntelligencePage[0m } [36mfrom[0m [32m"@/components/features/insurance-intelligence/ins...[0m
+  [90m2 |[0m
+[31m[1m>[0m [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mInsuranceIntelligencePage[0m() {
+  [90m  |[0m                         [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m   [36mreturn[0m <[33mInsuranceIntelligencePage[0m />;
+  [90m5 |[0m }
+  [90m6 |[0m
+
+Ecmascript file had an error
+
+
+⨯ ./app/insurance-intelligence/page.tsx:3:25
+the name `InsuranceIntelligencePage` is defined multiple times
+  [90m1 |[0m [36mimport[0m { [33mInsuranceIntelligencePage[0m } [36mfrom[0m [32m"@/components/features/insurance-intelligence/ins...[0m
+  [90m2 |[0m
+[31m[1m>[0m [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mInsuranceIntelligencePage[0m() {
+  [90m  |[0m                         [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m   [36mreturn[0m <[33mInsuranceIntelligencePage[0m />;
+  [90m5 |[0m }
+  [90m6 |[0m
+
+Ecmascript file had an error
+
+
+⨯ ./app/insurance-intelligence/page.tsx:3:25
+the name `InsuranceIntelligencePage` is defined multiple times
+  [90m1 |[0m [36mimport[0m { [33mInsuranceIntelligencePage[0m } [36mfrom[0m [32m"@/components/features/insurance-intelligence/ins...[0m
+  [90m2 |[0m
+[31m[1m>[0m [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mInsuranceIntelligencePage[0m() {
+  [90m  |[0m                         [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m   [36mreturn[0m <[33mInsuranceIntelligencePage[0m />;
+  [90m5 |[0m }
+  [90m6 |[0m
+
+Ecmascript file had an error
+
+
+[browser] Uncaught Error: ./app/insurance-intelligence/page.tsx:3:25
+the name `InsuranceIntelligencePage` is defined multiple times
+  1 | import { InsuranceIntelligencePage } from "@/components/features/insurance-intelligence/ins...
+  2 |
+> 3 | export default function InsuranceIntelligencePage() {
+    |                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  4 |   return <InsuranceIntelligencePage />;
+  5 | }
+  6 |
+
+Ecmascript file had an error
+
+
+    at <unknown> (Error: ./app/insurance-intelligence/page.tsx:3:25)
+    at <unknown> (Error: (./app/insurance-intelligence/page.tsx:3:25)
+[browser] Uncaught Error: ./app/insurance-intelligence/page.tsx:3:25
+the name `InsuranceIntelligencePage` is defined multiple times
+  1 | import { InsuranceIntelligencePage } from "@/components/features/insurance-intelligence/ins...
+  2 |
+> 3 | export default function InsuranceIntelligencePage() {
+    |                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  4 |   return <InsuranceIntelligencePage />;
+  5 | }
+  6 |
+
+Ecmascript file had an error
+
+
+    at <unknown> (Error: ./app/insurance-intelligence/page.tsx:3:25)
+    at <unknown> (Error: (./app/insurance-intelligence/page.tsx:3:25)
+[browser] Uncaught TypeError: Cannot set properties of null (setting 'onclick')
+    at HTMLDocument.<anonymous> (<anonymous>:45:2582)
+    at initializeOriginalInsuranceDashboard (components/features/insurance-intelligence/insurance-intelligence-scripts.ts:26:12)
+  24 |   script.textContent = inlineScript;
+  25 |   document.body.appendChild(script);
+> 26 |   document.dispatchEvent(new Event("DOMContentLoaded", { bubbles: true }));
+     |            ^
+  27 |   script.remove();
+  28 | }
+  29 |
+[browser] Invalid DOM property `stroke-width`. Did you mean `strokeWidth`? 
+[browser] Invalid DOM property `stroke-width`. Did you mean `strokeWidth`? 
+[browser] Uncaught TypeError: Cannot set properties of null (setting 'onclick')
+    at HTMLDocument.<anonymous> (<anonymous>:45:2582)
+    at initializeOriginalInsuranceDashboard (components/features/insurance-intelligence/insurance-intelligence-scripts.ts:26:12)
+  24 |   script.textContent = inlineScript;
+  25 |   document.body.appendChild(script);
+> 26 |   document.dispatchEvent(new Event("DOMContentLoaded", { bubbles: true }));
+     |            ^
+  27 |   script.remove();
+  28 | }
+  29 |

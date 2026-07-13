@@ -1,0 +1,187 @@
+⚠ Slow filesystem detected. The benchmark took 216ms. If D:\med-ai-nexsure-platform\.next/dev is a network drive, consider moving it to a local folder.
+See more: https://nextjs.org/docs/app/guides/local-development
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HTTPAccessFallbackBoundary notFound={{...}} forbidden={undefined} unauthorized={undefined}>
+      <HTTPAccessFallbackErrorBoundary pathname="/" notFound={{...}} forbidden={undefined} unauthorized={undefined} ...>
+        <RedirectBoundary>
+          <RedirectErrorBoundary router={{...}}>
+            <InnerLayoutRouter url="/" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>
+              <SegmentViewNode type="page" pagePath="page.tsx">
+                <SegmentTrieNode>
+                <Home>
+                  <LoginPage>
+                    <main className="page-fade ...">
+                      <section>
+                      <LoginForm>
+                        <section className="relative g...">
+                          <div>
+                          <div>
+                          <div>
+                          ...
+                            <form className="stagger sp..." aria-label="Med AI Nex...">
+                              <label className="block">
+                                <span>
+                                <div className="relative">
+                                  <span>
+                                  <Input>
+                                    <input
+                                      className="form-input"
+                                      aria-label="Organization"
+                                      placeholder="Med AI Group"
+-                                     fdprocessedid="v3nbyd"
+                                    >
+                              <label className="block">
+                                <span>
+                                <div className="relative">
+                                  <span>
+                                  <Input>
+                                    <input
+                                      className="form-input"
+                                      aria-label="Clinic or Hospital"
+                                      placeholder="NexSure Medical Center"
+-                                     fdprocessedid="ozi1oj"
+                                    >
+                              <label className="block">
+                                <span>
+                                <div className="relative">
+                                  <span>
+                                  <Input>
+                                    <input
+                                      className="form-input"
+                                      type="email"
+                                      aria-label="Email"
+                                      placeholder="name@organization.com"
+-                                     fdprocessedid="u3bt5l"
+                                    >
+                              <label className="block">
+                                <span>
+                                <PasswordField id="password">
+                                  <div className="relative">
+                                    <span>
+                                    <Input id="password" type="password" aria-label="Password" className="form-input..." ...>
+                                      <input
+                                        className="form-input pr-12"
+                                        id="password"
+                                        type="password"
+                                        aria-label="Password"
+                                        placeholder="Password"
+-                                       fdprocessedid="i5tgj"
+                                      >
+                                    <Button aria-label="Show password" onClick={function onClick} ...>
+                                      <button
+                                        type="button"
+                                        className="absolute right-2 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-..."
+                                        aria-label="Show password"
+                                        onClick={function onClick}
+-                                       fdprocessedid="cmsuf7"
+                                      >
+                              ...
+                          ...
+              ...
+            ...
+ 
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HTTPAccessFallbackBoundary notFound={{...}} forbidden={undefined} unauthorized={undefined}>
+      <HTTPAccessFallbackErrorBoundary pathname="/" notFound={{...}} forbidden={undefined} unauthorized={undefined} ...>
+        <RedirectBoundary>
+          <RedirectErrorBoundary router={{...}}>
+            <InnerLayoutRouter url="/" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>
+              <SegmentViewNode type="page" pagePath="page.tsx">
+                <SegmentTrieNode>
+                <Home>
+                  <LoginPage>
+                    <main className="page-fade ...">
+                      <section>
+                      <LoginForm>
+                        <section className="relative g...">
+                          <div>
+                          <div>
+                          <div>
+                          ...
+                            <form className="stagger sp..." aria-label="Med AI Nex...">
+                              <label className="block">
+                                <span>
+                                <div className="relative">
+                                  <span>
+                                  <Input>
+                                    <input
+                                      className="form-input"
+                                      aria-label="Organization"
+                                      placeholder="Med AI Group"
+-                                     fdprocessedid="9lrkl"
+                                    >
+                              <label className="block">
+                                <span>
+                                <div className="relative">
+                                  <span>
+                                  <Input>
+                                    <input
+                                      className="form-input"
+                                      aria-label="Clinic or Hospital"
+                                      placeholder="NexSure Medical Center"
+-                                     fdprocessedid="g5kr1l"
+                                    >
+                              <label className="block">
+                                <span>
+                                <div className="relative">
+                                  <span>
+                                  <Input>
+                                    <input
+                                      className="form-input"
+                                      type="email"
+                                      aria-label="Email"
+                                      placeholder="name@organization.com"
+-                                     fdprocessedid="rlqynl"
+                                    >
+                              <label className="block">
+                                <span>
+                                <PasswordField id="password">
+                                  <div className="relative">
+                                    <span>
+                                    <Input id="password" type="password" aria-label="Password" className="form-input..." ...>
+                                      <input
+                                        className="form-input pr-12"
+                                        id="password"
+                                        type="password"
+                                        aria-label="Password"
+                                        placeholder="Password"
+-                                       fdprocessedid="s0ukx3"
+                                      >
+                                    <Button aria-label="Show password" onClick={function onClick} ...>
+                                      <button
+                                        type="button"
+                                        className="absolute right-2 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-..."
+                                        aria-label="Show password"
+                                        onClick={function onClick}
+-                                       fdprocessedid="kuczqn"
+                                      >
+                              ...
+                          ...
+              ...
+            ...
+ 
+⚠ Fast Refresh had to perform a full reload when ./node_modules/next/dist/client/image-component.js changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload

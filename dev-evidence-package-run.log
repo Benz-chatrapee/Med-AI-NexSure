@@ -1,0 +1,22 @@
+
+> med-ai-nexsure-platform@0.1.0 dev
+> next dev
+
+▲ Next.js 16.2.10 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.1.157:3000
+- Environments: .env.local
+✓ Ready in 1065ms
+
+○ Compiling /evidence-package/[visitId] ...
+ GET /evidence-package 200 in 68ms (next.js: 5ms, application-code: 63ms)
+ GET /evidence-package/VIS-2026-0081 200 in 194ms (next.js: 131ms, application-code: 63ms)
+ GET /evidence-package 200 in 80ms (next.js: 6ms, application-code: 74ms)
+ GET /evidence-package 200 in 69ms (next.js: 7ms, application-code: 62ms)
+ GET /evidence-package/VIS-2026-0081 200 in 354ms (next.js: 118ms, application-code: 236ms)
+ GET /evidence-package/VIS-2026-0081 200 in 104ms (next.js: 16ms, application-code: 88ms)
+✓ Finished filesystem cache database compaction in 10.4s
+○ Compiling /visits/[visitId]/prescription ...
+ GET /visits/visit-2026-0712-019/prescription 200 in 10.6s (next.js: 10.4s, application-code: 150ms)
+✓ Compiled in 1150ms
+[?25h

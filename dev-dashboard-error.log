@@ -1,0 +1,2980 @@
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[browser] Uncaught Error: ./components/features/dashboard/dashboard-page.tsx:18:1
+Module not found: Can't resolve './dashboard-content'
+  16 | } from "recharts";
+  17 |
+> 18 | import {
+     | ^^^^^^^
+> 19 |   activities,
+     | ^^^^^^^^^^^^^
+> 20 |   domainMix,
+     | ^^^^^^^^^^^^
+> 21 |   executiveControls,
+     | ^^^^^^^^^^^^^^^^^^^^
+> 22 |   kpiCards,
+     | ^^^^^^^^^^^
+> 23 |   navigationGroups,
+     | ^^^^^^^^^^^^^^^^^^^
+> 24 |   portfolioRows,
+     | ^^^^^^^^^^^^^^^^
+> 25 |   readinessTrend,
+     | ^^^^^^^^^^^^^^^^^
+> 26 |   rightSidebarItems,
+     | ^^^^^^^^^^^^^^^^^^^^
+> 27 | } from "./dashboard-content";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  28 | import { Button } from "@/components/ui/button";
+  29 | import { Input } from "@/components/ui/input";
+  30 |
+
+
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+    at <unknown> (Error: ./components/features/dashboard/dashboard-page.tsx:18:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (Error: (./components/features/dashboard/dashboard-page.tsx:18:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+⨯ ./components/features/dashboard/dashboard-page.tsx:18:1
+Export activities doesn't exist in target module
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+The export activities was not found in module [project]/components/features/dashboard/dashboard-content.ts [app-client] (ecmascript).
+Did you mean to import auditEvents?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+
+
+./components/features/dashboard/dashboard-page.tsx:18:1
+Export activities doesn't exist in target module
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+The export activities was not found in module [project]/components/features/dashboard/dashboard-content.ts [app-ssr] (ecmascript).
+Did you mean to import auditEvents?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+
+
+./components/features/dashboard/dashboard-page.tsx:18:1
+Export domainMix doesn't exist in target module
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+The export domainMix was not found in module [project]/components/features/dashboard/dashboard-content.ts [app-client] (ecmascript).
+Did you mean to import readinessMix?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+
+
+./components/features/dashboard/dashboard-page.tsx:18:1
+Export domainMix doesn't exist in target module
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+The export domainMix was not found in module [project]/components/features/dashboard/dashboard-content.ts [app-ssr] (ecmascript).
+Did you mean to import readinessMix?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+
+
+./components/features/dashboard/dashboard-page.tsx:18:1
+Export executiveControls doesn't exist in target module
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+The export executiveControls was not found in module [project]/components/features/dashboard/dashboard-content.ts [app-client] (ecmascript).
+Did you mean to import auditEvents?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+
+
+./components/features/dashboard/dashboard-page.tsx:18:1
+Export executiveControls doesn't exist in target module
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+The export executiveControls was not found in module [project]/components/features/dashboard/dashboard-content.ts [app-ssr] (ecmascript).
+Did you mean to import auditEvents?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+
+
+./components/features/dashboard/dashboard-page.tsx:18:1
+Export rightSidebarItems doesn't exist in target module
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+The export rightSidebarItems was not found in module [project]/components/features/dashboard/dashboard-content.ts [app-client] (ecmascript).
+Did you mean to import insightSignals?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+
+
+./components/features/dashboard/dashboard-page.tsx:18:1
+Export rightSidebarItems doesn't exist in target module
+  [90m16 |[0m } [36mfrom[0m [32m"recharts"[0m;
+  [90m17 |[0m
+[31m[1m>[0m [90m18 |[0m [36mimport[0m {
+  [90m   |[0m [31m[1m^^^^^^^[0m
+[31m[1m>[0m [90m19 |[0m   activities,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m20 |[0m   domainMix,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m21 |[0m   executiveControls,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m22 |[0m   kpiCards,
+  [90m   |[0m [31m[1m^^^^^^^^^^^[0m
+[31m[1m>[0m [90m23 |[0m   navigationGroups,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m24 |[0m   portfolioRows,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m25 |[0m   readinessTrend,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m26 |[0m   rightSidebarItems,
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^[0m
+[31m[1m>[0m [90m27 |[0m } [36mfrom[0m [32m"./dashboard-content"[0m;
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m28 |[0m [36mimport[0m { [33mButton[0m } [36mfrom[0m [32m"@/components/ui/button"[0m;
+  [90m29 |[0m [36mimport[0m { [33mInput[0m } [36mfrom[0m [32m"@/components/ui/input"[0m;
+  [90m30 |[0m
+
+The export rightSidebarItems was not found in module [project]/components/features/dashboard/dashboard-content.ts [app-ssr] (ecmascript).
+Did you mean to import insightSignals?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+
+[browser] Uncaught Error: ./components/features/dashboard/dashboard-page.tsx:18:1
+Export activities doesn't exist in target module
+  16 | } from "recharts";
+  17 |
+> 18 | import {
+     | ^^^^^^^
+> 19 |   activities,
+     | ^^^^^^^^^^^^^
+> 20 |   domainMix,
+     | ^^^^^^^^^^^^
+> 21 |   executiveControls,
+     | ^^^^^^^^^^^^^^^^^^^^
+> 22 |   kpiCards,
+     | ^^^^^^^^^^^
+> 23 |   navigationGroups,
+     | ^^^^^^^^^^^^^^^^^^^
+> 24 |   portfolioRows,
+     | ^^^^^^^^^^^^^^^^
+> 25 |   readinessTrend,
+     | ^^^^^^^^^^^^^^^^^
+> 26 |   rightSidebarItems,
+     | ^^^^^^^^^^^^^^^^^^^^
+> 27 | } from "./dashboard-content";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  28 | import { Button } from "@/components/ui/button";
+  29 | import { Input } from "@/components/ui/input";
+  30 |
+
+The export activities was not found in module [project]/components/features/dashboard/dashboard-content.ts [app-client] (ecmascript).
+Did you mean to import auditEvents?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  Server Component:
+    ./components/features/dashboard/dashboard-page.tsx
+    ./app/dashboard/page.tsx
+
+
+    at <unknown> (Error: ./components/features/dashboard/dashboard-page.tsx:18:1)
+    at <unknown> (Error: (./components/features/dashboard/dashboard-page.tsx:18:1)
+⨯ ./app/dashboard/page.tsx:1:1
+Module not found: Can't resolve '@/components/features/dashboard/dashboard-page'
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { [33mDashboardPage[0m } [36mfrom[0m [32m"@/components/features/dashboard/dashboard-page"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m
+  [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboard[0m() {
+  [90m4 |[0m   [36mreturn[0m <[33mDashboardPage[0m />;
+
+Import map: aliased to relative './components/features/dashboard/dashboard-page' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./app/dashboard/page.tsx:1:1
+Module not found: Can't resolve '@/components/features/dashboard/dashboard-page'
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { [33mDashboardPage[0m } [36mfrom[0m [32m"@/components/features/dashboard/dashboard-page"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m
+  [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboard[0m() {
+  [90m4 |[0m   [36mreturn[0m <[33mDashboardPage[0m />;
+
+Import map: aliased to relative './components/features/dashboard/dashboard-page' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./app/dashboard/page.tsx:1:1
+Module not found: Can't resolve '@/components/features/dashboard/dashboard-page'
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { [33mDashboardPage[0m } [36mfrom[0m [32m"@/components/features/dashboard/dashboard-page"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m
+  [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboard[0m() {
+  [90m4 |[0m   [36mreturn[0m <[33mDashboardPage[0m />;
+
+Import map: aliased to relative './components/features/dashboard/dashboard-page' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[browser] Uncaught Error: ./app/dashboard/page.tsx:1:1
+Module not found: Can't resolve '@/components/features/dashboard/dashboard-page'
+> 1 | import { DashboardPage } from "@/components/features/dashboard/dashboard-page";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  2 |
+  3 | export default function Dashboard() {
+  4 |   return <DashboardPage />;
+
+Import map: aliased to relative './components/features/dashboard/dashboard-page' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+    at <unknown> (Error: ./app/dashboard/page.tsx:1:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (Error: (./app/dashboard/page.tsx:1:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+⨯ ./app/dashboard/page.tsx:1:1
+Module not found: Can't resolve '@/components/features/dashboard/dashboard-page'
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { [33mDashboardPage[0m } [36mfrom[0m [32m"@/components/features/dashboard/dashboard-page"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m
+  [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboard[0m() {
+  [90m4 |[0m   [36mreturn[0m <[33mDashboardPage[0m />;
+
+Import map: aliased to relative './components/features/dashboard/dashboard-page' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./app/dashboard/page.tsx:1:1
+Module not found: Can't resolve '@/components/features/dashboard/dashboard-page'
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { [33mDashboardPage[0m } [36mfrom[0m [32m"@/components/features/dashboard/dashboard-page"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m
+  [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboard[0m() {
+  [90m4 |[0m   [36mreturn[0m <[33mDashboardPage[0m />;
+
+Import map: aliased to relative './components/features/dashboard/dashboard-page' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./app/dashboard/page.tsx:1:1
+Module not found: Can't resolve '@/components/features/dashboard/dashboard-page'
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { [33mDashboardPage[0m } [36mfrom[0m [32m"@/components/features/dashboard/dashboard-page"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m
+  [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboard[0m() {
+  [90m4 |[0m   [36mreturn[0m <[33mDashboardPage[0m />;
+
+Import map: aliased to relative './components/features/dashboard/dashboard-page' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./app/dashboard/page.tsx:1:1
+Module not found: Can't resolve '@/components/features/dashboard/dashboard-page'
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { [33mDashboardPage[0m } [36mfrom[0m [32m"@/components/features/dashboard/dashboard-page"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m
+  [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboard[0m() {
+  [90m4 |[0m   [36mreturn[0m <[33mDashboardPage[0m />;
+
+Import map: aliased to relative './components/features/dashboard/dashboard-page' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./app/dashboard/page.tsx:1:1
+Module not found: Can't resolve '@/components/features/dashboard/dashboard-page'
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { [33mDashboardPage[0m } [36mfrom[0m [32m"@/components/features/dashboard/dashboard-page"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m
+  [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboard[0m() {
+  [90m4 |[0m   [36mreturn[0m <[33mDashboardPage[0m />;
+
+Import map: aliased to relative './components/features/dashboard/dashboard-page' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./app/dashboard/page.tsx:1:1
+Module not found: Can't resolve '@/components/features/dashboard/dashboard-page'
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { [33mDashboardPage[0m } [36mfrom[0m [32m"@/components/features/dashboard/dashboard-page"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m
+  [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboard[0m() {
+  [90m4 |[0m   [36mreturn[0m <[33mDashboardPage[0m />;
+
+Import map: aliased to relative './components/features/dashboard/dashboard-page' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./app/dashboard/page.tsx:1:1
+Module not found: Can't resolve '@/components/features/dashboard/dashboard-page'
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { [33mDashboardPage[0m } [36mfrom[0m [32m"@/components/features/dashboard/dashboard-page"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m
+  [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboard[0m() {
+  [90m4 |[0m   [36mreturn[0m <[33mDashboardPage[0m />;
+
+Import map: aliased to relative './components/features/dashboard/dashboard-page' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./app/dashboard/page.tsx:1:1
+Module not found: Can't resolve '@/components/features/dashboard/dashboard-page'
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { [33mDashboardPage[0m } [36mfrom[0m [32m"@/components/features/dashboard/dashboard-page"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m
+  [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboard[0m() {
+  [90m4 |[0m   [36mreturn[0m <[33mDashboardPage[0m />;
+
+Import map: aliased to relative './components/features/dashboard/dashboard-page' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[browser] Uncaught Error: ./app/dashboard/page.tsx:1:1
+Module not found: Can't resolve '@/components/features/dashboard/dashboard-page'
+> 1 | import { DashboardPage } from "@/components/features/dashboard/dashboard-page";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  2 |
+  3 | export default function Dashboard() {
+  4 |   return <DashboardPage />;
+
+Import map: aliased to relative './components/features/dashboard/dashboard-page' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+    at <unknown> (Error: ./app/dashboard/page.tsx:1:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (Error: (./app/dashboard/page.tsx:1:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+⨯ ./app/dashboard/page.tsx:1:1
+Module not found: Can't resolve '@/components/features/dashboard/dashboard-page'
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { [33mDashboardPage[0m } [36mfrom[0m [32m"@/components/features/dashboard/dashboard-page"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m
+  [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboard[0m() {
+  [90m4 |[0m   [36mreturn[0m <[33mDashboardPage[0m />;
+
+Import map: aliased to relative './components/features/dashboard/dashboard-page' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./app/dashboard/page.tsx:1:1
+Module not found: Can't resolve '@/components/features/dashboard/dashboard-page'
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { [33mDashboardPage[0m } [36mfrom[0m [32m"@/components/features/dashboard/dashboard-page"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m
+  [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboard[0m() {
+  [90m4 |[0m   [36mreturn[0m <[33mDashboardPage[0m />;
+
+Import map: aliased to relative './components/features/dashboard/dashboard-page' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./app/dashboard/page.tsx:1:1
+Module not found: Can't resolve '@/components/features/dashboard/dashboard-page'
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { [33mDashboardPage[0m } [36mfrom[0m [32m"@/components/features/dashboard/dashboard-page"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m
+  [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboard[0m() {
+  [90m4 |[0m   [36mreturn[0m <[33mDashboardPage[0m />;
+
+Import map: aliased to relative './components/features/dashboard/dashboard-page' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./app/dashboard/page.tsx:1:1
+Module not found: Can't resolve '@/components/features/dashboard/dashboard-page'
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { [33mDashboardPage[0m } [36mfrom[0m [32m"@/components/features/dashboard/dashboard-page"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m
+  [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboard[0m() {
+  [90m4 |[0m   [36mreturn[0m <[33mDashboardPage[0m />;
+
+Import map: aliased to relative './components/features/dashboard/dashboard-page' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./app/dashboard/page.tsx:1:1
+Module not found: Can't resolve '@/components/features/dashboard/dashboard-page'
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { [33mDashboardPage[0m } [36mfrom[0m [32m"@/components/features/dashboard/dashboard-page"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m
+  [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboard[0m() {
+  [90m4 |[0m   [36mreturn[0m <[33mDashboardPage[0m />;
+
+Import map: aliased to relative './components/features/dashboard/dashboard-page' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./app/dashboard/page.tsx:1:1
+Module not found: Can't resolve '@/components/features/dashboard/dashboard-page'
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { [33mDashboardPage[0m } [36mfrom[0m [32m"@/components/features/dashboard/dashboard-page"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m
+  [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboard[0m() {
+  [90m4 |[0m   [36mreturn[0m <[33mDashboardPage[0m />;
+
+Import map: aliased to relative './components/features/dashboard/dashboard-page' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./app/dashboard/page.tsx:1:1
+Module not found: Can't resolve '@/components/features/dashboard/dashboard-page'
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { [33mDashboardPage[0m } [36mfrom[0m [32m"@/components/features/dashboard/dashboard-page"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m
+  [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboard[0m() {
+  [90m4 |[0m   [36mreturn[0m <[33mDashboardPage[0m />;
+
+Import map: aliased to relative './components/features/dashboard/dashboard-page' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./app/dashboard/page.tsx:1:1
+Module not found: Can't resolve '@/components/features/dashboard/dashboard-page'
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { [33mDashboardPage[0m } [36mfrom[0m [32m"@/components/features/dashboard/dashboard-page"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m
+  [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboard[0m() {
+  [90m4 |[0m   [36mreturn[0m <[33mDashboardPage[0m />;
+
+Import map: aliased to relative './components/features/dashboard/dashboard-page' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./app/dashboard/page.tsx:1:1
+Module not found: Can't resolve '@/components/features/dashboard/dashboard-page'
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { [33mDashboardPage[0m } [36mfrom[0m [32m"@/components/features/dashboard/dashboard-page"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m
+  [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboard[0m() {
+  [90m4 |[0m   [36mreturn[0m <[33mDashboardPage[0m />;
+
+Import map: aliased to relative './components/features/dashboard/dashboard-page' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./app/dashboard/page.tsx:1:1
+Module not found: Can't resolve '@/components/features/dashboard/dashboard-page'
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { [33mDashboardPage[0m } [36mfrom[0m [32m"@/components/features/dashboard/dashboard-page"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m
+  [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboard[0m() {
+  [90m4 |[0m   [36mreturn[0m <[33mDashboardPage[0m />;
+
+Import map: aliased to relative './components/features/dashboard/dashboard-page' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[browser] Uncaught Error: ./app/dashboard/page.tsx:1:1
+Module not found: Can't resolve '@/components/features/dashboard/dashboard-page'
+> 1 | import { DashboardPage } from "@/components/features/dashboard/dashboard-page";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  2 |
+  3 | export default function Dashboard() {
+  4 |   return <DashboardPage />;
+
+Import map: aliased to relative './components/features/dashboard/dashboard-page' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+    at <unknown> (Error: ./app/dashboard/page.tsx:1:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (Error: (./app/dashboard/page.tsx:1:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+⨯ ./app/dashboard/page.tsx:1:1
+Module not found: Can't resolve '@/components/features/dashboard/dashboard-page'
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { [33mDashboardPage[0m } [36mfrom[0m [32m"@/components/features/dashboard/dashboard-page"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m
+  [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboard[0m() {
+  [90m4 |[0m   [36mreturn[0m <[33mDashboardPage[0m />;
+
+Import map: aliased to relative './components/features/dashboard/dashboard-page' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./app/dashboard/page.tsx:1:1
+Module not found: Can't resolve '@/components/features/dashboard/dashboard-page'
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { [33mDashboardPage[0m } [36mfrom[0m [32m"@/components/features/dashboard/dashboard-page"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m
+  [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboard[0m() {
+  [90m4 |[0m   [36mreturn[0m <[33mDashboardPage[0m />;
+
+Import map: aliased to relative './components/features/dashboard/dashboard-page' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./app/dashboard/page.tsx:1:1
+Module not found: Can't resolve '@/components/features/dashboard/dashboard-page'
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { [33mDashboardPage[0m } [36mfrom[0m [32m"@/components/features/dashboard/dashboard-page"[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m
+  [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mDashboard[0m() {
+  [90m4 |[0m   [36mreturn[0m <[33mDashboardPage[0m />;
+
+Import map: aliased to relative './components/features/dashboard/dashboard-page' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[browser] Uncaught Error: ./app/dashboard/page.tsx:1:1
+Module not found: Can't resolve '@/components/features/dashboard/dashboard-page'
+> 1 | import { DashboardPage } from "@/components/features/dashboard/dashboard-page";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  2 |
+  3 | export default function Dashboard() {
+  4 |   return <DashboardPage />;
+
+Import map: aliased to relative './components/features/dashboard/dashboard-page' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+    at <unknown> (Error: ./app/dashboard/page.tsx:1:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (Error: (./app/dashboard/page.tsx:1:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+[browser] Uncaught ReferenceError: portfolioRows is not defined
+    at DashboardPage (components/features/dashboard/dashboard-page.tsx:279:20)
+    at Dashboard (app\dashboard\page.tsx:4:10)
+  277 |                 <thead><tr><th>Patient</th><th>Gender / Age</th><th>Phone</th><th>Visit S...
+  278 |                 <tbody>
+> 279 |                   {portfolioRows.map((row) => (
+      |                    ^
+  280 |                     <tr key={row.id}>
+  281 |                       <td>
+  282 |                         <div className="patient-name">{row.domain}</div>
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.

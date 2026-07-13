@@ -1,0 +1,24 @@
+
+> med-ai-nexsure-platform@0.1.0 dev
+> next dev -p 3002
+
+▲ Next.js 16.2.10 (Turbopack)
+- Local:         http://localhost:3002
+- Network:       http://192.168.1.157:3002
+- Environments: .env.local
+✓ Ready in 1131ms
+
+○ Compiling /evidence-package ...
+ GET /evidence-package 200 in 9.0s (next.js: 8.8s, application-code: 226ms)
+○ Compiling /audit-compliance ...
+ GET /audit-compliance 200 in 6.3s (next.js: 6.2s, application-code: 92ms)
+ GET /audit-compliance 200 in 171ms (next.js: 9ms, application-code: 162ms)
+✓ Compiled in 14.9s
+ GET /evidence-package 200 in 457ms (next.js: 191ms, application-code: 266ms)
+ GET /ai-copilot-panel 200 in 2.3s (next.js: 2.1s, application-code: 139ms)
+ GET /evidence-package 200 in 104ms (next.js: 14ms, application-code: 89ms)
+ GET /evidence-package 200 in 121ms (next.js: 5ms, application-code: 117ms)
+✓ Compiled in 111ms
+ GET /evidence-package 200 in 134ms (next.js: 47ms, application-code: 87ms)
+ GET /evidence-package 200 in 46ms (next.js: 4ms, application-code: 41ms)
+[?25h
