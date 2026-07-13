@@ -1,19 +1,14 @@
 import { z } from "zod";
 
 export const inviteUserSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  email: z.email("Enter a valid email address"),
-  staffId: z.string().optional(),
-  organization: z.string().min(1, "Organization is required"),
-  clinicScope: z.string().min(1, "Select at least one clinic scope"),
-  department: z.string().min(1, "Department is required"),
-  primaryRole: z.string().min(1, "Select a primary role"),
-  additionalRoles: z.string().optional(),
-  aiPermissionProfile: z.enum(["enabled", "restricted", "not_allowed"]),
-  consentRequired: z.boolean(),
-  invitationExpiry: z.string().min(1, "Invitation expiry is required"),
-  message: z.string().max(300, "Message must be 300 characters or fewer").optional(),
+  name: z.string().min(2, "กรุณาระบุชื่อผู้ใช้งาน"),
+  email: z.email("กรุณาระบุอีเมลให้ถูกต้อง"),
+  role: z.string().min(1, "กรุณาเลือกบทบาท"),
+  department: z.string().min(1, "กรุณาเลือกแผนก"),
+  organizationId: z.string().min(1, "กรุณาเลือกหน่วยงาน"),
+  scope: z.string().min(1, "กรุณาเลือกขอบเขตการเข้าถึง"),
+  aiAccess: z.boolean(),
+  message: z.string().max(500, "ข้อความต้องไม่เกิน 500 ตัวอักษร").optional(),
 });
 
 export type InviteUserFormValues = z.infer<typeof inviteUserSchema>;

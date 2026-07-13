@@ -1,5 +1,5 @@
-import { InsuranceIntelligencePage } from "@/components/features/insurance-intelligence/insurance-intelligence-page";
+import { ExecutiveDashboard } from "@/features/executive-dashboard/components/executive-dashboard";
 
 export default function Dashboard() {
-  return <InsuranceIntelligencePage />;
+  return <ExecutiveDashboard />;
 }
