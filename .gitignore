@@ -42,3 +42,5 @@ next-env.d.ts
 
 # Superpowers visual brainstorming sessions
 .superpowers/
+*.log
+*.log
