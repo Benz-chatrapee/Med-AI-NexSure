@@ -1,5 +1,6 @@
-import { ExecutiveDashboard } from "@/features/executive-dashboard/components/executive-dashboard";
+import { DoctorDashboardPage } from "@/features/doctor-dashboard/components/doctor-dashboard-page";
+import { doctorDashboardMock } from "@/features/doctor-dashboard/data/doctor-dashboard.mock";
 
 export default function Dashboard() {
-  return <ExecutiveDashboard />;
+  return <DoctorDashboardPage initialData={doctorDashboardMock} />;
 }

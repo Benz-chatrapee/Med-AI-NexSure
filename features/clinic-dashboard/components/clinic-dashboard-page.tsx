@@ -5,14 +5,20 @@ import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 import {
   Activity,
+  AlertTriangle,
   Bell,
   BrainCircuit,
   Building2,
   CalendarClock,
+  CheckCircle2,
   CheckSquare2,
+  ChevronRight,
+  CircleDot,
+  Clock3,
   Download,
   FileBarChart,
   FileHeart,
+  FileWarning,
   Hospital,
   KeyRound,
   LayoutDashboard,
@@ -135,7 +141,7 @@ export function ClinicDashboardPage({ initialData }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-950">
+    <div className="min-h-screen overflow-x-hidden bg-[#F8FAFC] text-slate-950">
       <style>{`
         .btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;height:2.5rem;border-radius:.5rem;background:#1E3A8A;padding:0 .8rem;font-size:.75rem;font-weight:900;color:#fff;white-space:nowrap}
         .btn-primary:focus-visible,.btn-secondary:focus-visible,.icon-btn:focus-visible,.field:focus-visible{outline:3px solid rgba(37,99,235,.28);outline-offset:2px}
@@ -145,11 +151,11 @@ export function ClinicDashboardPage({ initialData }: Props) {
         .field{height:2.25rem;border-radius:.5rem;border:1px solid #E2E8F0;background:#fff;padding:0 .65rem;font-size:.75rem;color:#0F172A;outline:none}
         @media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
       `}</style>
-      <div className="grid min-h-screen grid-cols-1 xl:grid-cols-[276px_minmax(0,1fr)]">
+      <div className="grid min-h-screen w-full min-w-0 grid-cols-1 xl:grid-cols-[276px_minmax(0,1fr)]">
         <Sidebar open={mobileOpen} onClose={() => setMobileOpen(false)} />
-        <main className="min-w-0">
+        <main className="min-w-0 flex-1">
           <GlobalHeader data={initialData} onOpenMenu={() => setMobileOpen(true)} onAction={showToast} />
-          <div className="mx-auto max-w-[1920px] space-y-4 p-4 md:p-6">
+          <div className="w-full max-w-none space-y-4 p-4 md:p-6 xl:px-8">
             <PageHeader data={initialData} onAction={showToast} />
             <FilterBar
               data={initialData}
@@ -170,13 +176,13 @@ export function ClinicDashboardPage({ initialData }: Props) {
               onRemoveChip={removeChip}
             />
 
-            <section className="grid gap-3 md:grid-cols-3 2xl:grid-cols-6" aria-label="Clinic KPI summary">
+            <section className="grid w-full min-w-0 gap-3 md:grid-cols-2 xl:grid-cols-3 min-[1600px]:grid-cols-6" aria-label="Clinic KPI summary">
               {initialData.kpis.map((kpi) => (
                 <KpiCard key={kpi.id} kpi={kpi} onSelect={() => setSelectedKpi(kpi)} />
               ))}
             </section>
 
-            <section className="grid gap-4 lg:grid-cols-12">
+            <section className="grid w-full min-w-0 gap-4 lg:grid-cols-12">
               <Card className="lg:col-span-12" title="Clinic Flow" subtitle="Operational stage view · เลือก stage เพื่อกรองคิว">
                 <div className="mb-3 flex flex-wrap items-center gap-2">
                   <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-900">
@@ -205,7 +211,7 @@ export function ClinicDashboardPage({ initialData }: Props) {
                 </div>
               </Card>
 
-              <Card className="lg:col-span-5" title="Queue by Department" subtitle="Accessible department filter is available below the chart.">
+              <Card className="lg:col-span-4" title="Queue by Department" subtitle="Accessible department filter is available below the chart.">
                 <ChartBox summary="General Medicine has the largest active queue with 17 patients.">
                   <ResponsiveContainer>
                     <BarChart data={initialData.queueByDepartment} layout="vertical" margin={{ left: 18 }}>
@@ -235,7 +241,7 @@ export function ClinicDashboardPage({ initialData }: Props) {
               </Card>
 
               <QueueCommandCenter
-                className="lg:col-span-7"
+                className="lg:col-span-8"
                 queue={queue}
                 search={queueSearch}
                 sort={queueSort}
@@ -251,7 +257,7 @@ export function ClinicDashboardPage({ initialData }: Props) {
                 onOpenVisit={setSelectedVisit}
               />
 
-              <Card className="lg:col-span-6" title="Hourly Wait Time Trend" subtitle="Actual, previous day and SLA target">
+              <Card className="lg:col-span-8" title="Hourly Wait Time Trend" subtitle="Actual, previous day and SLA target">
                 <Segmented value={waitRange} values={[["today", "Today"], ["sevenDays", "7 Days"], ["thirtyDays", "30 Days"]]} onChange={(value) => setWaitRange(value as typeof waitRange)} />
                 <ChartBox summary="Actual wait time is above target around 10:00 and 11:00, then returns within SLA.">
                   <ResponsiveContainer>
@@ -269,7 +275,7 @@ export function ClinicDashboardPage({ initialData }: Props) {
                 </ChartBox>
               </Card>
 
-              <Card className="lg:col-span-6" title="Wait Time Distribution" subtitle="SLA-risk ranges include textual status labels.">
+              <Card className="lg:col-span-4" title="Wait Time Distribution" subtitle="SLA-risk ranges include textual status labels.">
                 <ChartBox summary="Six patients are in SLA-risk ranges above 30 minutes.">
                   <ResponsiveContainer>
                     <BarChart data={initialData.waitTime.distribution}>
@@ -489,7 +495,7 @@ function QueueCommandCenter(props: {
 
 function DepartmentHeatmap({ data, sort, onSort }: { data: ClinicDashboardData["departments"]; sort: string; onSort: (value: string) => void }) {
   return (
-    <Card className="lg:col-span-12" title="Department Performance Heatmap" subtitle="Cells include actual value, target and textual status.">
+    <Card className="lg:col-span-7" title="Department Performance Heatmap" subtitle="Cells include actual value, target and textual status.">
       <Select label="Sort department heatmap" value={sort} onChange={onSort} options={["Highest Risk", "Highest Volume", "Lowest Claim Readiness", "Highest Wait Time"]} />
       <div className="mt-3 overflow-x-auto">
         <div className="grid min-w-[820px] grid-cols-[160px_repeat(5,minmax(120px,1fr))] gap-2">
@@ -513,7 +519,7 @@ function DepartmentHeatmap({ data, sort, onSort }: { data: ClinicDashboardData["
 
 function DoctorPerformance({ data }: { data: ClinicDashboardData }) {
   return (
-    <Card className="lg:col-span-6" title="Doctor Performance" subtitle="Risk-adjusted comparison">
+    <Card className="lg:col-span-5" title="Doctor Performance" subtitle="Risk-adjusted comparison">
       <ChartBox summary="Dr. Araya leads clinical quality with 94 across 48 cases.">
         <ResponsiveContainer>
           <BarChart data={data.doctors} layout="vertical" margin={{ left: 20 }}>
@@ -534,7 +540,7 @@ function DoctorPerformance({ data }: { data: ClinicDashboardData }) {
 
 function PatientForecast({ data, range, onRange }: { data: ClinicDashboardData; range: "day" | "week" | "month"; onRange: (value: "day" | "week" | "month") => void }) {
   return (
-    <Card className="lg:col-span-6" title="Patient Trend and AI Forecast" subtitle="Forecast is advisory only">
+    <Card className="lg:col-span-8" title="Patient Trend and AI Forecast" subtitle="Forecast is advisory only">
       <Segmented value={range} values={[["day", "Day"], ["week", "Week"], ["month", "Month"]]} onChange={(value) => onRange(value as "day" | "week" | "month")} />
       <ChartBox summary="Forecast suggests peak demand may exceed capacity in the selected range.">
         <ResponsiveContainer>
@@ -574,7 +580,7 @@ function ClaimReadiness({ data, topEvidence }: { data: ClinicDashboardData; topE
         </ChartBox>
         <TextLegend items={[`${data.claimReadiness.overallPercentage}% overall readiness`, `${data.claimReadiness.readyVisits} ready visits`, `${data.claimReadiness.pendingEvidence} pending evidence`, `${formatBaht(data.claimReadiness.estimatedClaimValue)} estimated claim value`]} />
       </Card>
-      <Card className="lg:col-span-4" title="Claim Readiness by Department" subtitle="100% stacked status distribution">
+      <Card className="lg:col-span-8" title="Claim Readiness by Department" subtitle="100% stacked status distribution">
         <ChartBox height="h-60" summary="Orthopedics has the lowest readiness at 78%.">
           <ResponsiveContainer>
             <BarChart data={data.claimReadiness.byDepartment} layout="vertical" margin={{ left: 16 }}>
@@ -589,7 +595,7 @@ function ClaimReadiness({ data, topEvidence }: { data: ClinicDashboardData; topE
           </ResponsiveContainer>
         </ChartBox>
       </Card>
-      <Card className="lg:col-span-4" title="Top Missing Evidence" subtitle="Pareto view with calculated cumulative insight">
+      <Card className="lg:col-span-8" title="Top Missing Evidence" subtitle="Pareto view with calculated cumulative insight">
         <ChartBox height="h-60" summary={`Top evidence categories account for ${topEvidence}% of affected cases.`}>
           <ResponsiveContainer>
             <ComposedChart data={data.claimReadiness.missingEvidence}>
@@ -610,7 +616,7 @@ function ClaimReadiness({ data, topEvidence }: { data: ClinicDashboardData; topE
 
 function ClinicalScorecard({ data }: { data: ClinicDashboardData }) {
   return (
-    <Card className="lg:col-span-6" title="Clinical AI Scorecard" subtitle="Decision support quality metrics">
+    <Card className="lg:col-span-4" title="Clinical AI Scorecard" subtitle="Decision support quality metrics">
       <div className="grid gap-2 md:grid-cols-2">
         {data.clinicalAI.metrics.map((metric) => (
           <div key={metric.label} className="rounded-lg border border-slate-200 p-3">
@@ -642,7 +648,7 @@ function ClinicalScorecard({ data }: { data: ClinicDashboardData }) {
 function FinancialIntelligence({ data }: { data: ClinicDashboardData }) {
   return (
     <>
-      <Card className="lg:col-span-6" title="Revenue Performance" subtitle="Thai Baht formatting via Intl.NumberFormat">
+      <Card className="lg:col-span-7" title="Revenue Performance" subtitle="Thai Baht formatting via Intl.NumberFormat">
         <ChartBox summary="Revenue is above target during late morning and afternoon periods.">
           <ResponsiveContainer>
             <ComposedChart data={data.financial.revenueTrend}>
@@ -658,12 +664,12 @@ function FinancialIntelligence({ data }: { data: ClinicDashboardData }) {
           </ResponsiveContainer>
         </ChartBox>
       </Card>
-      <Card className="lg:col-span-6" title="Financial KPI Summary" subtitle="Revenue, claim value, cost and realizable revenue">
+      <Card className="lg:col-span-5" title="Financial KPI Summary" subtitle="Revenue, claim value, cost and realizable revenue">
         <div className="grid gap-2 md:grid-cols-3">
           {data.financial.metrics.map((metric) => <MiniMetric key={metric.label} label={metric.label} value={metric.value} helper={metric.helper} status={metric.status} />)}
         </div>
       </Card>
-      <Card className="lg:col-span-6" title="Visit Cost Distribution" subtitle="Cost ranges and outlier volumes">
+      <Card className="lg:col-span-5" title="Visit Cost Distribution" subtitle="Cost ranges and outlier volumes">
         <ChartBox summary="Eight visits are above ฿5,000 and require review.">
           <ResponsiveContainer>
             <BarChart data={data.financial.costDistribution}>
@@ -678,7 +684,7 @@ function FinancialIntelligence({ data }: { data: ClinicDashboardData }) {
           </ResponsiveContainer>
         </ChartBox>
       </Card>
-      <Card className="lg:col-span-6" title="Cost vs Clinical Complexity" subtitle="Outliers are marked by label and shape category">
+      <Card className="lg:col-span-7" title="Cost vs Clinical Complexity" subtitle="Outliers are marked by label and shape category">
         <ChartBox summary="Three visits are outliers above expected cost benchmark.">
           <ResponsiveContainer>
             <ScatterChart>
@@ -699,29 +705,125 @@ function FinancialIntelligence({ data }: { data: ClinicDashboardData }) {
 }
 
 function AlertsAndActivities({ data, acknowledged, onAcknowledge, onAction }: { data: ClinicDashboardData; acknowledged: string[]; onAcknowledge: (id: string) => void; onAction: (message: string) => void }) {
+  const criticalAlerts = data.alerts.filter((alert) => alert.severity === "critical").length;
+  const highAlerts = data.alerts.filter((alert) => alert.severity === "high").length;
+  const resolvedToday = 6;
+  const alertTrend = [
+    { label: "08:00", critical: 0, high: 1, resolved: 1 },
+    { label: "10:00", critical: 1, high: 1, resolved: 2 },
+    { label: "12:00", critical: 1, high: 2, resolved: 4 },
+    { label: "Now", critical: criticalAlerts, high: highAlerts, resolved: resolvedToday },
+  ];
+
   return (
     <>
-      <Card className="lg:col-span-4" title="AI Alert Center" subtitle="Critical 1 · High 1 · Resolved today 6">
-        {data.alerts.map((alert) => {
-          const done = acknowledged.includes(alert.id);
-          return (
-            <div key={alert.id} className={`mb-2 rounded-lg border border-l-4 p-3 ${alert.severity === "critical" ? "border-l-red-600" : "border-l-amber-500"}`}>
-              <div className="text-sm font-black">{alert.type} · {alert.affectedCase}</div>
-              <p className="mt-1 text-xs leading-5 text-slate-600">{alert.reason} {alert.confidence ? `Confidence ${alert.confidence}%` : ""}</p>
-              <p className="text-xs text-slate-500">Owner: {alert.owner} · Due {alert.dueTime}</p>
-              <button className="btn-secondary mt-2" disabled={done} onClick={() => onAcknowledge(alert.id)}>{done ? "Acknowledged" : "Review Alert"}</button>
+      <Card className="lg:col-span-12" title="AI Alert Center" subtitle={`${criticalAlerts} Critical · ${highAlerts} High · Resolved today ${resolvedToday} · Human review required`}>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <MiniMetric label="Critical" value={`${criticalAlerts}`} helper="Immediate staff review" status={criticalAlerts > 0 ? "critical" : "good"} />
+          <MiniMetric label="High" value={`${highAlerts}`} helper="Review within SLA" status={highAlerts > 0 ? "warning" : "good"} />
+          <MiniMetric label="Resolved Today" value={`${resolvedToday}`} helper="Acknowledged and reviewed" status="good" />
+        </div>
+        <div className="mt-4 grid min-w-0 gap-4 lg:grid-cols-5">
+          <div className="min-w-0 lg:col-span-2">
+            <h3 className="mb-2 text-sm font-black text-slate-900">Alert Trend</h3>
+            <ChartBox height="h-64" summary={`Alert trend shows ${criticalAlerts} critical, ${highAlerts} high and ${resolvedToday} resolved alerts today.`}>
+              <ResponsiveContainer>
+                <LineChart data={alertTrend}>
+                  <CartesianGrid stroke={colors.border} />
+                  <XAxis dataKey="label" />
+                  <YAxis allowDecimals={false} />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="critical" stroke={colors.danger} strokeWidth={2} />
+                  <Line type="monotone" dataKey="high" stroke={colors.warning} strokeWidth={2} />
+                  <Line type="monotone" dataKey="resolved" stroke={colors.success} strokeWidth={2} />
+                </LineChart>
+              </ResponsiveContainer>
+            </ChartBox>
+          </div>
+          <div className="min-w-0 lg:col-span-3">
+            <h3 className="mb-2 text-sm font-black text-slate-900">Alert Worklist</h3>
+            <div className="grid gap-3">
+              {data.alerts.map((alert) => {
+                const done = acknowledged.includes(alert.id);
+                const critical = alert.severity === "critical";
+                return (
+                  <article key={alert.id} className={`rounded-lg border border-l-4 bg-white p-3 shadow-sm transition hover:bg-slate-50 ${critical ? "border-l-red-600" : "border-l-amber-500"}`}>
+                    <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <StatusPill status={critical ? "critical" : "warning"} label={`${alert.severity.toUpperCase()} severity`} />
+                          {done ? <StatusPill status="good" label="Acknowledged" /> : <StatusPill status="neutral" label="Open Cases" />}
+                        </div>
+                        <div className="mt-2 flex items-start gap-2">
+                          <AlertTriangle className={critical ? "mt-0.5 h-4 w-4 shrink-0 text-red-700" : "mt-0.5 h-4 w-4 shrink-0 text-amber-700"} aria-hidden />
+                          <div>
+                            <h4 className="text-sm font-black text-slate-950">{alert.type} · {alert.affectedCase}</h4>
+                            <p className="mt-1 text-xs leading-5 text-slate-600">{alert.reason} {alert.confidence ? `Confidence ${alert.confidence}%` : ""}</p>
+                            <p className="mt-1 text-xs text-slate-500">Owner: {alert.owner} · Due {alert.dueTime} · Human review required</p>
+                          </div>
+                        </div>
+                      </div>
+                      <button className="btn-secondary w-full md:w-auto" disabled={done} onClick={() => onAcknowledge(alert.id)} aria-label={`${done ? "Acknowledged" : "Review alert"} ${alert.type} for ${alert.affectedCase}`}>
+                        {done ? "Acknowledged" : "Review Alert"}
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
-          );
-        })}
+          </div>
+        </div>
       </Card>
-      <Card className="lg:col-span-4" title="My Tasks" subtitle="งานที่รอดำเนินการของคุณ">
-        <div className="space-y-2">
-          {data.tasks.map((task) => <MiniMetric key={task.label} label={task.label} value={`${task.count}`} helper={`${task.overdue} overdue · ${task.priority}`} status={task.overdue > 0 ? "warning" : "good"} />)}
+      <Card className="lg:col-span-7" title="My Tasks" subtitle="Enterprise work queue · งานที่รอดำเนินการของคุณ">
+        <div className="grid gap-2">
+          {data.tasks.map((task) => {
+            const hasOverdue = task.overdue > 0;
+            return (
+              <button
+                key={task.label}
+                className="flex w-full items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 text-left transition hover:border-blue-200 hover:bg-blue-50 focus:outline-none focus:ring-4 focus:ring-blue-200"
+                onClick={() => onAction(`${task.label} task queue opened.`)}
+                aria-label={`Open ${task.label}, ${task.count} tasks, ${task.overdue} overdue, ${task.priority}`}
+              >
+                <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${hasOverdue ? "bg-amber-50 text-amber-700" : "bg-emerald-50 text-emerald-700"}`}>
+                  {hasOverdue ? <Clock3 size={17} aria-hidden /> : <CheckCircle2 size={17} aria-hidden />}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-black text-slate-950">{task.label}</span>
+                  <span className="mt-1 block text-xs text-slate-500">{task.overdue} overdue · {task.priority}</span>
+                </span>
+                <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-black text-blue-900" aria-label={`${task.count} tasks`}>{task.count}</span>
+                <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" aria-hidden />
+              </button>
+            );
+          })}
         </div>
         <button className="btn-primary mt-3 w-full" onClick={() => onAction("Task Center route is not connected; showing dashboard tasks.")}>View Tasks</button>
       </Card>
-      <Card className="lg:col-span-4" title="Notifications" subtitle="System and intelligence feed">
-        <Timeline items={data.notifications.map((item) => ({ title: item.title, meta: `${item.timestamp} · ${item.source}${item.unread ? " · Unread" : ""}` }))} />
+      <Card className="lg:col-span-5" title="Notifications" subtitle="System and intelligence feed">
+        <div className="max-h-[360px] space-y-2 overflow-y-auto pr-1">
+          {data.notifications.map((item) => (
+            <button
+              key={item.id}
+              className={`flex w-full items-start gap-3 rounded-lg border p-3 text-left transition hover:border-blue-200 hover:bg-blue-50 focus:outline-none focus:ring-4 focus:ring-blue-200 ${item.unread ? "border-blue-200 bg-blue-50/70" : "border-slate-200 bg-white"}`}
+              onClick={() => onAction(`${item.title} notification opened.`)}
+              aria-label={`${item.unread ? "Unread notification" : "Notification"}: ${item.title}, ${item.source}, ${item.timestamp}`}
+            >
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-slate-100 text-blue-800">
+                {item.source === "Compliance" ? <FileWarning size={17} aria-hidden /> : item.source === "AI" ? <Sparkles size={17} aria-hidden /> : <CircleDot size={17} aria-hidden />}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm font-black text-slate-950">{item.title}</span>
+                  {item.unread ? <span className="rounded-full border border-blue-200 bg-white px-2 py-0.5 text-[10px] font-black text-blue-800">Unread</span> : null}
+                </span>
+                <span className="mt-1 block text-xs text-slate-500">{item.source} · {item.timestamp}</span>
+              </span>
+            </button>
+          ))}
+        </div>
+        <button className="btn-secondary mt-3 w-full" onClick={() => onAction("Notification center opened.")}>View All Notifications</button>
       </Card>
       <Card className="lg:col-span-12" title="Recent Activities" subtitle="User and system audit activity">
         <div className="grid gap-2 md:grid-cols-4">
@@ -768,11 +870,11 @@ function VisitSheet({ visit, onClose }: { visit: QueueItem; onClose: () => void 
 }
 
 function Card({ title, subtitle, className = "", children }: { title: string; subtitle: string; className?: string; children: ReactNode }) {
-  return <section className={`rounded-lg border border-slate-200 bg-white shadow-sm ${className}`}><div className="p-4 pb-0"><h2 className="text-base font-black">{title}</h2><p className="mt-1 text-xs leading-5 text-slate-500">{subtitle}</p></div><div className="p-4">{children}</div></section>;
+  return <section className={`min-w-0 rounded-lg border border-slate-200 bg-white shadow-sm ${className}`}><div className="p-4 pb-0"><h2 className="text-base font-black">{title}</h2><p className="mt-1 text-xs leading-5 text-slate-500">{subtitle}</p></div><div className="min-w-0 p-4">{children}</div></section>;
 }
 
-function ChartBox({ children, summary, height = "h-72" }: { children: ReactNode; summary: string; height?: string }) {
-  return <div><div className={`${height} min-w-0`} aria-hidden>{children}</div><p className="sr-only">{summary}</p></div>;
+function ChartBox({ children, summary, height = "h-[280px] lg:h-[320px] xl:h-[360px]" }: { children: ReactNode; summary: string; height?: string }) {
+  return <div className="w-full min-w-0"><div className={`${height} w-full min-w-0`} aria-hidden>{children}</div><p className="sr-only">{summary}</p></div>;
 }
 
 function StatusPill({ status, label }: { status: MetricStatus; label: string }) {
@@ -800,10 +902,6 @@ function TextLegend({ items }: { items: string[] }) {
 
 function MiniMetric({ label, value, helper, status }: { label: string; value: string; helper: string; status: MetricStatus }) {
   return <div className="rounded-lg border border-slate-200 bg-slate-50 p-3"><div className="text-xs text-slate-500">{label}</div><div className={`mt-1 text-lg font-black ${status === "critical" ? "text-red-700" : status === "warning" ? "text-amber-700" : status === "good" ? "text-emerald-700" : "text-blue-800"}`}>{value}</div><div className="mt-1 text-xs text-slate-500">{helper}</div></div>;
-}
-
-function Timeline({ items }: { items: { title: string; meta: string }[] }) {
-  return <div className="space-y-3">{items.map((item) => <div key={item.title} className="border-l-2 border-blue-200 pl-3"><div className="text-sm font-black">{item.title}</div><div className="text-xs text-slate-500">{item.meta}</div></div>)}</div>;
 }
 
 function EmptyState({ title }: { title: string }) {

@@ -1,20 +1,40 @@
 "use client";
 
+import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  Activity,
   BadgeCheck,
+  Bell,
   Bot,
+  BrainCircuit,
+  Building2,
+  CalendarClock,
   Clock3,
   Download,
+  FileBarChart,
+  FileHeart,
   FileWarning,
   Gauge,
+  Hospital,
+  KeyRound,
+  LayoutDashboard,
   ListTodo,
+  Menu,
+  NotebookPen,
+  PackageCheck,
+  Pill,
   Presentation,
+  ScanSearch,
+  ScrollText,
   Search,
+  Settings,
   ShieldCheck,
   Sparkles,
+  Stethoscope,
   TimerOff,
   TriangleAlert,
+  UserCog,
   Users,
   WalletCards,
   X,
@@ -77,11 +97,18 @@ import type {
 } from "../types/executive-dashboard.types";
 import { formatCurrencyTHB, formatDateTime, formatPercentagePoint, formatRelativeTime } from "../utils/dashboard-formatters";
 
-const cardClass = "rounded-2xl border border-[#E2E8F0] bg-white shadow-[0_8px_28px_rgba(15,42,95,.06)]";
-const selectClass = "mt-1.5 min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-blue-100";
+const cardClass = "rounded-lg border border-[#E2E8F0] bg-white shadow-sm";
+const selectClass = "mt-1 h-9 w-full min-w-36 rounded-lg border border-slate-200 bg-white px-3 text-xs text-slate-950 outline-none focus:ring-4 focus:ring-blue-100";
 const iconMap = [Users, BadgeCheck, Gauge, TriangleAlert, FileWarning, WalletCards];
+const heatmapStyles: Record<RiskLevel, string> = {
+  low: "border-emerald-200 bg-emerald-100 text-emerald-900 hover:bg-emerald-200",
+  medium: "border-amber-200 bg-amber-100 text-amber-900 hover:bg-amber-200",
+  high: "border-orange-200 bg-orange-100 text-orange-900 hover:bg-orange-200",
+  critical: "border-red-200 bg-red-100 text-red-900 hover:bg-red-200",
+};
 
 export function ExecutiveDashboard() {
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [filters, setFilters] = useState<DashboardFilters>({ ...defaultDashboardFilters });
   const [draftFilters, setDraftFilters] = useState<DashboardFilters>({ ...defaultDashboardFilters });
   const [dashboard, setDashboard] = useState<ExecutiveDashboardResponse | null>(null);
@@ -168,33 +195,38 @@ export function ExecutiveDashboard() {
   }
 
   return (
-    <main className={`min-h-screen bg-[#F8FAFC] px-4 py-5 text-[#0F172A] sm:px-5 lg:px-7 xl:px-8 ${presentationMode ? "presentation-mode" : ""}`}>
-      {toast ? <div className="fixed right-4 top-4 z-50 max-w-sm rounded-xl bg-[#0F2A5F] px-4 py-3 text-sm font-semibold text-white shadow-xl" role="status">{toast}</div> : null}
+    <div className="min-h-screen w-full overflow-x-hidden bg-[#F8FAFC] text-[#0F172A]">
+      <DashboardStyle />
+      <div className="grid min-h-screen w-full grid-cols-1 xl:grid-cols-[276px_minmax(0,1fr)]">
+        <ExecutiveSidebar open={mobileOpen} onClose={() => setMobileOpen(false)} />
+        <main className={`w-full min-w-0 flex-1 ${presentationMode ? "presentation-mode" : ""}`}>
+          <ExecutiveGlobalHeader onOpenMenu={() => setMobileOpen(true)} onAction={showToast} />
+          <div className="w-full space-y-4 px-4 py-4 md:px-6 md:py-6 xl:px-8">
+      {toast ? <div className="fixed bottom-5 right-5 z-50 max-w-sm rounded-lg bg-slate-950 px-4 py-3 text-sm font-bold text-white shadow-xl" role="status">{toast}</div> : null}
 
-      <header className="rounded-2xl bg-[#0F2A5F] px-5 py-5 text-white shadow-[0_8px_28px_rgba(15,42,95,.16)] lg:px-7">
-        <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
+      <header className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
           <div className="min-w-0">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-sky-300/40 bg-white/10 px-3 py-1.5 text-xs font-semibold text-sky-200">
-              <Sparkles className="h-4 w-4" /> AI-Native Enterprise Healthcare Intelligence
-            </div>
-            <h1 className="text-3xl font-bold tracking-tight lg:text-4xl">Executive Healthcare & Insurance Intelligence</h1>
-            <p className="mt-2 max-w-4xl text-sm leading-6 text-blue-100 lg:text-base">
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">Executive Dashboard</p>
+            <h1 className="mt-1 text-3xl font-black tracking-tight text-slate-950">Executive Healthcare & Insurance Intelligence</h1>
+            <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-600">
               Unified executive view of operational performance, claim readiness, evidence quality, financial variance, AI impact, and compliance risk.
+              <br />
+              ภาพรวมสำหรับผู้บริหารเพื่อค้นหาความเสี่ยง สาเหตุ และงานที่ควรดำเนินการก่อน
             </p>
-            <p className="mt-1 text-sm text-blue-100/85">ภาพรวมสำหรับผู้บริหารเพื่อค้นหาความเสี่ยง สาเหตุ และงานที่ควรดำเนินการก่อน</p>
           </div>
-          <div className="flex flex-wrap items-center gap-2 xl:justify-end">
-            <div className="rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-xs">
-              <span className="block text-blue-200">Last updated</span>
+          <div className="flex flex-wrap items-center gap-2 lg:justify-end">
+            <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs shadow-sm">
+              <span className="block text-slate-500">Last updated</span>
               <strong className="text-sm">{formatDateTime(dashboard.generatedAt)}</strong>
             </div>
-            <div className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm ${health.className}`}>
+            <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-black ${health.className}`}>
               <span className="h-2.5 w-2.5 rounded-full bg-current" /> {health.label} <span className="sr-only">{health.thaiLabel}</span>
             </div>
-            <Button onClick={exportCases} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold hover:bg-white/20">
+            <Button onClick={exportCases} className="btn-secondary">
               <Download className="h-4 w-4" /> Export
             </Button>
-            <Button onClick={() => setPresentationMode((value) => !value)} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-[#0F2A5F] hover:bg-blue-50">
+            <Button onClick={() => setPresentationMode((value) => !value)} className="btn-primary">
               <Presentation className="h-4 w-4" /> {presentationMode ? "Exit" : "Presentation"}
             </Button>
           </div>
@@ -202,7 +234,7 @@ export function ExecutiveDashboard() {
       </header>
 
       {!presentationMode ? (
-        <section className={`${cardClass} mt-4 p-4 lg:p-5`} aria-label="Global filters">
+        <section className={`${cardClass} p-3`} aria-label="Global filters">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
             <FilterSelect label="Date Range" value={draftFilters.dateRange} onChange={(value) => updateFilter("dateRange", value)} options={["Last 30 Days", "Last 7 Days", "Last 90 Days", "Last 12 Months"].map((item) => [item, item])} />
             <FilterSelect label="Clinic" value={draftFilters.clinicId ?? ""} onChange={(value) => updateFilter("clinicId", value || null)} options={[["", "All Clinics"], ...dashboard.filters.clinics.map((item) => [item.id, item.name] as [string, string])]} />
@@ -212,13 +244,13 @@ export function ExecutiveDashboard() {
             <FilterSelect label="Risk Level" value={draftFilters.riskLevel ?? ""} onChange={(value) => updateFilter("riskLevel", (value || null) as RiskLevel | null)} options={[["", "All Risk Levels"], ["critical", "Critical"], ["high", "High"], ["medium", "Medium"], ["low", "Low"]]} />
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
-            <Button onClick={resetFilters} className="min-h-11 rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Reset</Button>
-            <Button onClick={() => applyFilters()} className="min-h-11 rounded-xl bg-[#1E3A8A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0F2A5F]">Apply Filters <span className="ml-1 rounded-full bg-white/20 px-2 py-0.5">{activeFilterCount}</span></Button>
+            <Button onClick={resetFilters} className="btn-secondary">Reset</Button>
+            <Button onClick={() => applyFilters()} className="btn-primary">Apply Filters <span className="ml-1 rounded-full bg-white/20 px-2 py-0.5">{activeFilterCount}</span></Button>
           </div>
         </section>
       ) : null}
 
-      <section className="mt-4 flex items-start gap-3 rounded-2xl border border-[#BFDBFE] bg-[#EFF6FF] px-4 py-3.5 text-[#1E3A8A]">
+      <section className="flex items-start gap-3 rounded-lg border border-[#BFDBFE] bg-[#EFF6FF] px-4 py-3.5 text-[#1E3A8A]">
         <div className="rounded-full bg-white p-2 shadow-sm"><ShieldCheck className="h-5 w-5" /></div>
         <div>
           <h2 className="font-bold">Decision-Support Boundary</h2>
@@ -227,14 +259,14 @@ export function ExecutiveDashboard() {
         </div>
       </section>
 
-      <section className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6" aria-label="Executive KPIs">
+      <section className="grid gap-3 md:grid-cols-3 2xl:grid-cols-6" aria-label="Executive KPI Overview">
         {dashboard.kpis.map((kpi, index) => {
           const Icon = iconMap[index] ?? Gauge;
           return <KpiCard key={kpi.id} kpi={kpi} icon={<Icon className="h-5 w-5" />} />;
         })}
       </section>
 
-      <section className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
+      <section className="grid grid-cols-1 gap-3 md:grid-cols-4">
         {[Bot, ListTodo, TimerOff, Clock3].map((Icon, index) => (
           <div key={dashboard.secondaryMetrics[index].id} className={`${cardClass} flex items-center gap-3 p-4`}>
             <span className="rounded-xl bg-blue-50 p-2 text-[#2563EB]"><Icon className="h-5 w-5" /></span>
@@ -320,13 +352,20 @@ export function ExecutiveDashboard() {
         <section className={`${cardClass} p-5 xl:col-span-5`}>
           <h2 className="text-xl font-bold">Risk & Compliance Heatmap</h2>
           <p className="mt-1 text-sm text-slate-500">Keyboard-accessible matrix by clinical severity and financial impact</p>
+          <div className="mt-3 flex flex-wrap gap-2" aria-label="Risk heatmap legend">
+            {(["low", "medium", "high", "critical"] as const).map((level) => (
+              <span key={level} className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-bold ${heatmapStyles[level]}`}>
+                {riskLevelConfig[level].label}
+              </span>
+            ))}
+          </div>
           <div className="mt-4 overflow-x-auto">
             <div className="grid min-w-[520px] grid-cols-4 gap-2">
               {dashboard.riskHeatmap.map((cell) => (
-                <button key={`${cell.clinicalSeverity}-${cell.financialImpact}`} type="button" onClick={() => drillDown({ riskLevel: cell.clinicalSeverity })} className="min-h-20 rounded-xl border p-3 text-left focus:outline-none focus:ring-4 focus:ring-blue-100" style={{ borderColor: riskLevelConfig[cell.clinicalSeverity].color }}>
+                <button key={`${cell.clinicalSeverity}-${cell.financialImpact}`} type="button" onClick={() => drillDown({ riskLevel: cell.clinicalSeverity })} title={`${riskLevelConfig[cell.clinicalSeverity].label} clinical severity, ${riskLevelConfig[cell.financialImpact].label} financial impact`} aria-label={`${cell.cases} cases. ${riskLevelConfig[cell.clinicalSeverity].label} clinical severity and ${riskLevelConfig[cell.financialImpact].label} financial impact`} className={`min-h-20 rounded-xl border p-3 text-left transition-colors focus:outline-none focus:ring-4 focus:ring-blue-100 ${heatmapStyles[cell.clinicalSeverity]}`}>
                   <strong className="text-lg">{cell.cases}</strong>
-                  <span className="block text-xs text-slate-500">{riskLevelConfig[cell.clinicalSeverity].label} clinical</span>
-                  <span className="block text-xs text-slate-500">{riskLevelConfig[cell.financialImpact].label} financial</span>
+                  <span className="block text-xs font-semibold opacity-85">{riskLevelConfig[cell.clinicalSeverity].label} clinical</span>
+                  <span className="block text-xs font-semibold opacity-85">{riskLevelConfig[cell.financialImpact].label} financial</span>
                 </button>
               ))}
             </div>
@@ -420,7 +459,74 @@ export function ExecutiveDashboard() {
       </footer>
 
       {dialogCaseIds.length ? <CreateTaskDialog caseIds={dialogCaseIds} onClose={() => setDialogCaseIds([])} onSuccess={(message) => showToast(message)} /> : null}
-    </main>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
+
+function DashboardStyle() {
+  return (
+    <style>{`
+      .btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;min-height:2.5rem;border-radius:.5rem;background:#1E3A8A;padding:.5rem .8rem;font-size:.75rem;font-weight:900;color:#fff;white-space:nowrap}
+      .btn-secondary{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;min-height:2.25rem;border-radius:.5rem;border:1px solid #E2E8F0;background:#fff;padding:.45rem .7rem;font-size:.75rem;font-weight:900;color:#334155;white-space:nowrap}
+      .icon-btn{display:inline-flex;height:2.5rem;width:2.5rem;align-items:center;justify-content:center;border-radius:.5rem;border:1px solid #E2E8F0;background:#fff;color:#475569}
+      .btn-primary:focus-visible,.btn-secondary:focus-visible,.icon-btn:focus-visible,button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid rgba(37,99,235,.28);outline-offset:2px}
+      @media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+    `}</style>
+  );
+}
+
+function ExecutiveSidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const groups = [
+    { title: "Workspace", links: [["/clinic-dashboard", "Clinic Dashboard", LayoutDashboard, ""], ["/dashboard", "Executive Dashboard", Users, "active"], ["/visit-management", "Visit Management", CalendarClock, ""], ["/soap-note", "SOAP Note", NotebookPen, ""], ["/ai-clinical-engine", "AI Clinical Insight", BrainCircuit, ""], ["/soap-note", "Diagnosis", Stethoscope, ""], ["/prescription", "Prescription", Pill, ""], ["/medical-certificate", "Medical Certificate", FileHeart, ""]] },
+    { title: "Insurance Intelligence", links: [["/claim-readiness", "Claim Readiness", ShieldCheck, ""], ["/evidence-package", "Evidence Package", PackageCheck, ""], ["/insurance-intelligence", "Insurance Intelligence", ScanSearch, ""], ["/economic-intelligence", "Economic Intelligence", FileBarChart, ""], ["/payer-rules", "Reports", FileBarChart, ""]] },
+    { title: "Administration", links: [["/admin/organizations", "Organization Management", Building2, ""], ["/admin/clinics", "Clinic Management", Hospital, ""], ["/admin/users", "User Management", UserCog, ""], ["/admin/roles", "Role Management", KeyRound, ""], ["/admin/settings", "Admin Settings", Settings, ""], ["/audit-compliance", "Audit & Compliance", ScrollText, ""]] },
+  ] as const;
+
+  return (
+    <>
+      <aside className={`${open ? "translate-x-0" : "-translate-x-full"} fixed inset-y-0 left-0 z-40 w-[276px] overflow-y-auto bg-gradient-to-b from-[#0F2A5F] to-[#1E3A8A] p-4 text-blue-100 transition xl:sticky xl:top-0 xl:h-screen xl:translate-x-0`}>
+        <div className="mb-4 flex items-center justify-between border-b border-white/10 pb-3">
+          <div className="flex items-center gap-3">
+            <div className="grid h-11 w-11 place-items-center rounded-lg bg-blue-600 text-white shadow-lg"><Activity /></div>
+            <div><div className="font-black text-white">Med AI NexSure</div><div className="text-xs font-bold text-sky-300">Enterprise Intelligence</div></div>
+          </div>
+          <button className="xl:hidden" aria-label="Close navigation" onClick={onClose}><X /></button>
+        </div>
+        {groups.map((group) => (
+          <nav key={group.title} aria-label={group.title}>
+            <div className="px-3 pb-2 pt-4 text-[10px] font-black uppercase tracking-[0.16em] text-blue-300">{group.title}</div>
+            {group.links.map(([href, label, Icon, badge]) => (
+              <Link key={`${href}-${label}`} href={href} className={`mb-1 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-bold ${badge === "active" ? "border border-white/15 bg-white/10 text-white" : "text-blue-100 hover:bg-white/10 hover:text-white"}`}>
+                <Icon size={17} /><span>{label}</span>
+              </Link>
+            ))}
+          </nav>
+        ))}
+      </aside>
+      {open ? <button className="fixed inset-0 z-30 bg-slate-950/40 xl:hidden" aria-label="Close navigation overlay" onClick={onClose} /> : null}
+    </>
+  );
+}
+
+function ExecutiveGlobalHeader({ onOpenMenu, onAction }: { onOpenMenu: () => void; onAction: (message: string) => void }) {
+  return (
+    <header className="sticky top-0 z-20 flex h-[72px] items-center gap-3 border-b border-slate-200 bg-white/95 px-4 backdrop-blur md:px-6">
+      <button className="icon-btn xl:hidden" aria-label="Open navigation" onClick={onOpenMenu}><Menu size={18} /></button>
+      <form className="flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2" onSubmit={(event) => { event.preventDefault(); onAction("Executive search is ready for backend connection."); }}>
+        <Search size={17} className="text-slate-500" />
+        <input aria-label="Global search" className="min-w-0 flex-1 text-sm outline-none" placeholder="Search clinic, visit, claim, payer or evidence..." />
+      </form>
+      <button className="icon-btn hidden md:inline-flex" aria-label="Open AI Copilot" onClick={() => onAction("AI Copilot opened.")}><Sparkles size={18} /></button>
+      <button className="icon-btn hidden md:inline-flex" aria-label="Open Executive Tasks" onClick={() => onAction("Executive task center opened.")}><ListTodo size={18} /></button>
+      <button className="icon-btn" aria-label="Open Notifications" onClick={() => onAction("Notification center opened.")}><Bell size={18} /></button>
+      <div className="hidden items-center gap-2 md:flex">
+        <div className="grid h-9 w-9 place-items-center rounded-lg bg-blue-100 text-xs font-black text-blue-800">EX</div>
+        <div><div className="text-xs font-black">Executive User</div><div className="text-[10px] text-slate-500">Enterprise Executive</div></div>
+      </div>
+    </header>
   );
 }
 
@@ -430,11 +536,24 @@ function FilterSelect({ label, value, options, onChange }: { label: string; valu
 
 function KpiCard({ kpi, icon }: { kpi: ExecutiveDashboardResponse["kpis"][number]; icon: React.ReactNode }) {
   const status = kpi.status === "danger" ? "text-red-700" : kpi.status === "warning" ? "text-amber-700" : kpi.status === "success" ? "text-emerald-700" : "text-[#1E3A8A]";
-  return <article className={`${cardClass} p-5`}><div className="flex items-start justify-between"><div><p className="text-sm font-semibold text-slate-500">{kpi.label}</p><div className={`mt-2 text-3xl font-bold ${status}`}>{kpi.value}</div></div><span className="rounded-xl bg-blue-50 p-2 text-[#2563EB]">{icon}</span></div>{kpi.comparison ? <p className={`mt-3 text-xs font-semibold ${kpi.comparison.sentiment === "positive" ? "text-emerald-700" : "text-red-700"}`}>{kpi.comparison.unit === "percentage_point" ? formatPercentagePoint(kpi.comparison.value) : `${kpi.comparison.value}%`} {kpi.comparison.label}</p> : null}<p className="mt-3 text-xs leading-5 text-slate-500">{kpi.helperText}</p></article>;
+  return (
+    <article className={`${cardClass} flex min-h-40 flex-col justify-between p-4`}>
+      <div>
+        <div className="flex items-center justify-between gap-3">
+          <span className="grid h-10 w-10 place-items-center rounded-lg bg-blue-50 text-[#2563EB]">{icon}</span>
+          {kpi.comparison ? <span className={`rounded-full px-2 py-1 text-[10px] font-black ${kpi.comparison.sentiment === "positive" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>{kpi.comparison.unit === "percentage_point" ? formatPercentagePoint(kpi.comparison.value) : `${kpi.comparison.value}%`}</span> : null}
+        </div>
+        <div className={`mt-3 text-3xl font-black tracking-tight ${status}`}>{kpi.value}</div>
+        <p className="mt-1 text-sm font-black text-slate-900">{kpi.label}</p>
+        <p className="mt-1 text-xs leading-5 text-slate-500">{kpi.helperText}</p>
+      </div>
+      {kpi.comparison ? <p className="mt-3 border-t border-slate-100 pt-2 text-[10px] font-bold text-slate-500">{kpi.comparison.label}</p> : null}
+    </article>
+  );
 }
 
 function ChartCard({ title, subtitle, summary, className = "", children }: { title: string; subtitle: string; summary: string; className?: string; children: React.ReactNode }) {
-  return <article className={`${cardClass} p-5 ${className}`}><h2 className="text-xl font-bold">{title}</h2><p className="mt-1 text-sm text-slate-500">{subtitle}</p><p className="sr-only">{summary}</p><div className="mt-4 space-y-4">{children}</div></article>;
+  return <article className={`${cardClass} ${className}`}><div className="p-4 pb-0"><h2 className="text-base font-black">{title}</h2><p className="mt-1 text-xs leading-5 text-slate-500">{subtitle}</p><p className="sr-only">{summary}</p></div><div className="space-y-4 p-4">{children}</div></article>;
 }
 
 function QueueList({ title, items, onClick }: { title: string; items: ExecutiveDashboardResponse["claimQueue"]; onClick: (filters: Partial<DashboardFilters>) => void }) {

@@ -18,6 +18,42 @@ body {
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
+.doctor-dashboard-theme {
+  --doctor-primary: #1E3A8A;
+  --doctor-ai-blue: #2563EB;
+  --doctor-accent-sky: #38BDF8;
+  --doctor-bg: #F8FAFC;
+  --doctor-card: #FFFFFF;
+  --doctor-border: #E2E8F0;
+  --doctor-text: #0F172A;
+  --doctor-muted: #64748B;
+  --doctor-success: #059669;
+  --doctor-warning: #D97706;
+  --doctor-danger: #DC2626;
+  --doctor-info: #2563EB;
+  --doctor-soft-blue: #EFF6FF;
+  --doctor-blue-border: #BFDBFE;
+  --doctor-shadow: 0 8px 24px rgba(15, 42, 95, .07);
+}
+
+.doctor-dashboard-theme {
+  --doctor-primary: #1E3A8A;
+  --doctor-ai-blue: #2563EB;
+  --doctor-accent-sky: #38BDF8;
+  --doctor-bg: #F8FAFC;
+  --doctor-card: #FFFFFF;
+  --doctor-border: #E2E8F0;
+  --doctor-text: #0F172A;
+  --doctor-muted: #64748B;
+  --doctor-success: #059669;
+  --doctor-warning: #D97706;
+  --doctor-danger: #DC2626;
+  --doctor-info: #2563EB;
+  --doctor-soft-blue: #EFF6FF;
+  --doctor-blue-border: #BFDBFE;
+  --doctor-shadow: 0 8px 24px rgba(15, 42, 95, .07);
+}
+
 @keyframes pageFade {
   from { opacity: 0; }
   to { opacity: 1; }

@@ -2,8 +2,13 @@ import { clinicDashboardMock } from "../data/clinic-dashboard.mock";
 import type { ClinicDashboardData, ClinicDashboardFilters } from "../types/clinic-dashboard.types";
 
 export async function getClinicDashboard(filters?: Partial<ClinicDashboardFilters>): Promise<ClinicDashboardData> {
-  void filters;
-  return clinicDashboardMock;
+  return {
+    ...clinicDashboardMock,
+    filters: {
+      ...clinicDashboardMock.filters,
+      ...filters,
+    },
+  };
 }
 
 export function buildAlertAuditPayload(alertId: string, actor: string) {
