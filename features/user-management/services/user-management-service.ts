@@ -1,154 +1,234 @@
+import { clinicUsersMock } from "../data/clinic-users.mock";
 import type {
-  AccessActivity,
-  CurrentUserPermissions,
-  GovernanceAlert,
-  PaginatedUsers,
-  UserAccount,
-  UserFilters,
-  UserRole,
-  UserSummary,
+  AuditMutationResult,
+  ClinicUser,
+  ClinicUserAuditEvent,
+  ClinicUsersQuery,
+  ClinicUsersResponse,
+  ClinicUsersSummary,
+  InviteClinicUserInput,
+  SuspendUserInput,
+  UpdateAiAccessInput,
+  UpdateClinicAccessInput,
+  UpdateClinicUserInput,
+  UpdateUserRolesInput,
 } from "../types/user-management.types";
+import { getAiAccessStatus } from "../constants/clinic-user-options";
 
-const roles: Record<string, UserRole> = {
-  organization_admin: { id: "role-org-admin", code: "organization_admin", name: "Organization Admin", isPrimary: true, isHighPrivilege: true },
-  clinic_admin: { id: "role-clinic-admin", code: "clinic_admin", name: "Clinic Admin", isPrimary: true, isHighPrivilege: true },
-  doctor: { id: "role-doctor", code: "doctor", name: "Doctor", isPrimary: true, isHighPrivilege: false },
-  nurse: { id: "role-nurse", code: "nurse", name: "Nurse", isPrimary: true, isHighPrivilege: false },
-  pharmacist: { id: "role-pharmacist", code: "pharmacist", name: "Pharmacist", isPrimary: true, isHighPrivilege: false },
-  claim_reviewer: { id: "role-claim-reviewer", code: "claim_reviewer", name: "Claim Reviewer", isPrimary: true, isHighPrivilege: false },
-  compliance_officer: { id: "role-compliance", code: "compliance_officer", name: "Compliance Officer", isPrimary: true, isHighPrivilege: true },
-  executive: { id: "role-executive", code: "executive", name: "Executive", isPrimary: true, isHighPrivilege: true },
-  auditor: { id: "role-auditor", code: "auditor", name: "Auditor", isPrimary: true, isHighPrivilege: true },
-};
-
-const users: UserAccount[] = [
-  createUser("usr-001", "Dr. Arisa Clinical", "arisa@medai.co", "DR", roles.doctor, "Clinical", "clinical", "Own Clinic", "active", "normal_access", "enabled", "Bangkok Clinic", ["bkk-clinic"], 0, true),
-  createUser("usr-002", "Mali Nurse", "mali@clinic.co", "NS", roles.nurse, "Clinical Operations", "clinical-operations", "Department", "pending", "invite_sent", "restricted", "Bangkok Clinic", ["bkk-clinic"], 0, false),
-  createUser("usr-003", "Narin ClaimOps", "narin@insurer.co", "CR", roles.claim_reviewer, "Claim Review", "claim-review", "Assigned Cases", "active", "phi_masked", "restricted", "Insurer HQ", ["insurer-hq"], 0, true),
-  createUser("usr-004", "Suda Compliance", "suda@hospital.co", "CO", roles.compliance_officer, "Compliance", "compliance", "Organization", "locked", "failed_login", "not_allowed", "Hospital Branch A", ["hospital-a"], 7, true),
-  createUser("usr-005", "Prasert Admin", "prasert@medai.co", "OA", roles.organization_admin, "Administration", "administration", "Organization", "active", "privileged_access", "enabled", "Bangkok Clinic", ["bkk-clinic", "hospital-a"], 0, true),
-  createUser("usr-006", "Kanda Pharmacy", "kanda@hospital.co", "PH", roles.pharmacist, "Pharmacy", "pharmacy", "Department", "suspended", "review_required", "not_allowed", "Hospital Branch A", ["hospital-a"], 1, true),
-  createUser("usr-007", "Viroj Executive", "viroj@insurer.co", "EX", roles.executive, "Executive", "executive", "Organization", "disabled", "unusual_login", "restricted", "Insurer HQ", ["insurer-hq"], 2, true),
-];
+let clinicUsers = [...clinicUsersMock];
 
 export const userManagementService = {
-  async getCurrentUserPermissions(): Promise<CurrentUserPermissions> {
+  async getClinicUsers(query: ClinicUsersQuery): Promise<ClinicUsersResponse> {
     await wait();
+    const search = query.search?.trim().toLowerCase() ?? "";
+    const filtered = clinicUsers
+      .filter((user) => {
+        const searchable = `${user.fullName} ${user.email} ${user.employeeId} ${user.professionalLicense ?? ""}`.toLowerCase();
+        return !search || searchable.includes(search);
+      })
+      .filter((user) => !query.role || user.primaryRole === query.role || user.additionalRoles.includes(query.role))
+      .filter((user) => !query.status || user.status === query.status)
+      .filter((user) => !query.departmentId || user.departmentId === query.departmentId)
+      .filter((user) => !query.aiAccessStatus || user.aiAccessStatus === query.aiAccessStatus)
+      .filter((user) => !query.clinicId || user.clinicScopes.some((scope) => scope.clinicId === query.clinicId));
+
+    const pageSize = query.pageSize;
+    const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+    const page = Math.min(Math.max(query.page, 1), totalPages);
+    const start = (page - 1) * pageSize;
+
     return {
-      canView: true,
-      canInvite: true,
-      canEdit: true,
-      canExportAudit: true,
-      canExportAccessReport: true,
-      canReviewSecurity: true,
-      canManageAi: true,
-      canSuspendUsers: true,
-      canUnlockUsers: true,
-      canViewAuditLog: true,
-      canPerformDestructiveActions: true,
+      data: filtered.slice(start, start + pageSize),
+      total: filtered.length,
+      page,
+      pageSize,
+      totalPages,
+      summary: getSummary(clinicUsers),
     };
   },
-  async getUserSummary(): Promise<UserSummary> {
+
+  async getClinicUserById(userId: string): Promise<ClinicUser | undefined> {
     await wait();
-    return { totalUsers: 248, activeUsers: 219, pendingInvites: 14, lockedAccounts: 5, adminUsers: 11, last24hLogin: 137 };
+    return clinicUsers.find((user) => user.id === userId);
   },
-  async getUsers(filters: UserFilters): Promise<PaginatedUsers> {
+
+  async inviteClinicUser(payload: InviteClinicUserInput): Promise<AuditMutationResult> {
     await wait();
-    const search = filters.search.trim().toLowerCase();
-    const filtered = users
-      .filter((user) => !search || `${user.displayName} ${user.email} ${user.roles[0]?.name ?? ""} ${user.department?.name ?? ""}`.toLowerCase().includes(search))
-      .filter((user) => filters.status === "all" || user.status === filters.status)
-      .filter((user) => filters.role === "all" || user.roles.some((role) => role.code === filters.role))
-      .filter((user) => filters.departmentId === "all" || user.department?.id === filters.departmentId)
-      .filter((user) => filters.clinicId === "all" || user.accessScope.some((scope) => scope.clinicIds.includes(filters.clinicId)))
-      .filter((user) => filters.aiAccess === "all" || user.aiAccessLevel === filters.aiAccess);
-    const sorted = filtered.toSorted((a, b) => getSortValue(a, filters.sortBy).localeCompare(getSortValue(b, filters.sortBy)) * (filters.sortOrder === "asc" ? 1 : -1));
-    const start = (filters.page - 1) * filters.pageSize;
-    return { users: sorted.slice(start, start + filters.pageSize), total: filtered.length === users.length ? 248 : sorted.length };
+    const now = new Date().toISOString();
+    const initials = payload.fullName
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join("");
+    const user: ClinicUser = {
+      id: `usr-${Date.now()}`,
+      fullName: payload.fullName,
+      initials: initials || "CU",
+      employeeId: payload.employeeId || `EMP-${String(clinicUsers.length + 1200)}`,
+      email: payload.email,
+      phone: payload.phone,
+      jobTitle: payload.jobTitle,
+      professionalLicense: payload.professionalLicense,
+      primaryRole: payload.primaryRole,
+      additionalRoles: payload.additionalRole && payload.additionalRole !== "none" ? [payload.additionalRole] : [],
+      departmentId: payload.departmentId,
+      departmentName: departmentNameFor(payload.departmentId),
+      clinicScopes: [
+        {
+          clinicId: payload.clinicId,
+          clinicName: clinicNameFor(payload.clinicId),
+          departmentIds: payload.departmentId ? [payload.departmentId] : [],
+          dataAccessLevel: payload.dataAccessLevel,
+        },
+      ],
+      aiAccessStatus: getAiAccessStatus(payload.aiAccessLevel),
+      aiAccessLevel: payload.aiAccessLevel,
+      aiPermissions: {
+        viewAiSummary: payload.aiAccessLevel !== "disabled",
+        generateSoapDraft: payload.aiAccessLevel === "clinical_assist" || payload.aiAccessLevel === "clinical_review" || payload.aiAccessLevel === "ai_administrator",
+        viewIcdSuggestions: payload.aiAccessLevel !== "disabled",
+        acceptAiRecommendation: payload.aiAccessLevel === "clinical_review" || payload.aiAccessLevel === "ai_administrator",
+        overrideAiWarning: false,
+      },
+      status: "invited",
+      mfaEnabled: false,
+      createdAt: now,
+      updatedAt: now,
+      security: {
+        failedAttempts: 0,
+        activeSessions: 0,
+        currentSession: "No active session",
+        browserDevice: "Pending invitation",
+        location: "Pending",
+        maskedIpAddress: "Masked",
+        mfaVerified: false,
+      },
+      auditTrail: [createAuditEvent("User invitation sent", "Clinic Admin", payload.auditReason, "Invite Dialog")],
+    };
+    clinicUsers = [user, ...clinicUsers];
+    return { auditId: user.auditTrail[0].id, message: `Invitation sent to ${payload.fullName}` };
   },
-  async getUserById(userId: string): Promise<UserAccount | undefined> {
+
+  async updateClinicUser(userId: string, payload: UpdateClinicUserInput): Promise<AuditMutationResult> {
     await wait();
-    return users.find((user) => user.id === userId);
+    updateUser(userId, (user) => ({ ...user, ...payload, updatedAt: new Date().toISOString(), auditTrail: [createAuditEvent("User profile updated", "Clinic Admin", payload.auditReason, "User Detail"), ...user.auditTrail] }));
+    return createResult("profile-updated");
   },
-  async getGovernanceAlerts(): Promise<GovernanceAlert[]> {
+
+  async updateUserRoles(userId: string, payload: UpdateUserRolesInput): Promise<AuditMutationResult> {
     await wait();
-    return [
-      { id: "safety-1", severity: "critical", title: "Critical Risk - Allergy Conflict", description: "Prescription action must be blocked until doctor or pharmacist review is completed.", affectedUserCount: 1, createdAt: "2026-07-13T03:30:00Z", recommendedAction: "Block prescription action" },
-      { id: "safety-2", severity: "warning", title: "Missing Evidence - Needs Review", description: "SOAP incomplete and ICD code missing for claim readiness.", affectedUserCount: 8, createdAt: "2026-07-13T02:15:00Z", recommendedAction: "Complete SOAP and coding evidence" },
-      { id: "safety-3", severity: "success", title: "Claim Ready - Completed", description: "Evidence package complete and ready for PDF export.", affectedUserCount: 31, createdAt: "2026-07-13T01:00:00Z", recommendedAction: "Proceed with controlled export" },
-    ];
+    updateUser(userId, (user) => ({ ...user, primaryRole: payload.primaryRole, additionalRoles: payload.additionalRoles, auditTrail: [createAuditEvent("Role assigned", "Clinic Admin", payload.reason, "Role Manager"), ...user.auditTrail] }));
+    return createResult("roles-updated");
   },
-  async getRecentActivity(): Promise<AccessActivity[]> {
+
+  async updateUserClinicAccess(userId: string, payload: UpdateClinicAccessInput): Promise<AuditMutationResult> {
     await wait();
-    return [
-      { id: "evt-1", eventType: "role_change", title: "Role changed: Nurse -> Clinic Admin", actor: "By Organization Admin", timestamp: "10:42", severity: "info", detail: "Privileged change logged with reason and before/after role metadata.", auditHref: "/audit-compliance?event=evt-1" },
-      { id: "evt-2", eventType: "export", title: "Evidence Package exported", actor: "Claim Reviewer", timestamp: "09:20", severity: "success", detail: "PDF export logged", auditHref: "/audit-compliance?event=evt-2" },
-      { id: "evt-3", eventType: "access_blocked", title: "Unauthorized access blocked", actor: "Reception attempted User Management route", timestamp: "08:55", severity: "warning", detail: "Route protection denied access outside approved role scope.", auditHref: "/audit-compliance?event=evt-3" },
-    ];
+    updateUser(userId, (user) => ({ ...user, clinicScopes: payload.clinicScopes, auditTrail: [createAuditEvent("Clinic access changed", "Clinic Admin", payload.reason, "Access Scope"), ...user.auditTrail] }));
+    return createResult("clinic-access-updated");
   },
-  async recordSensitiveAction(action: string, reason: string): Promise<{ auditId: string }> {
+
+  async updateUserAiAccess(userId: string, payload: UpdateAiAccessInput): Promise<AuditMutationResult> {
     await wait();
-    if (!reason.trim()) throw new Error("Audit reason is required for sensitive actions.");
-    return { auditId: `audit-${action}-${Date.now()}` };
+    updateUser(userId, (user) => ({
+      ...user,
+      aiAccessLevel: payload.aiAccessLevel,
+      aiAccessStatus: getAiAccessStatus(payload.aiAccessLevel),
+      aiPermissions: payload.permissions,
+      auditTrail: [createAuditEvent("AI permission changed", "Clinic Admin", payload.reason, "AI Permissions"), ...user.auditTrail],
+    }));
+    return createResult("ai-access-updated");
+  },
+
+  async suspendClinicUser(userId: string, payload: SuspendUserInput): Promise<AuditMutationResult> {
+    await wait();
+    if (!payload.reason.trim()) throw new Error("Suspend reason is required.");
+    updateUser(userId, (user) => ({ ...user, status: "suspended", auditTrail: [createAuditEvent("Account suspended", "Clinic Admin", payload.reason, "Bulk User Management"), ...user.auditTrail] }));
+    return createResult("user-suspended");
+  },
+
+  async reactivateClinicUser(userId: string): Promise<AuditMutationResult> {
+    await wait();
+    updateUser(userId, (user) => ({ ...user, status: "active", auditTrail: [createAuditEvent("Account reactivated", "Clinic Admin", "Authorized reactivation", "User Action Menu"), ...user.auditTrail] }));
+    return createResult("user-reactivated");
+  },
+
+  async unlockClinicUser(userId: string): Promise<AuditMutationResult> {
+    await wait();
+    updateUser(userId, (user) => ({ ...user, status: "active", security: { ...user.security, failedAttempts: 0 }, auditTrail: [createAuditEvent("Account unlocked", "Clinic Admin", "Security review completed", "Security Tab"), ...user.auditTrail] }));
+    return createResult("user-unlocked");
+  },
+
+  async resendUserInvitation(userId: string): Promise<AuditMutationResult> {
+    await wait();
+    updateUser(userId, (user) => ({ ...user, auditTrail: [createAuditEvent("Invitation resent", "Clinic Admin", "User did not receive first invitation", "User Action Menu"), ...user.auditTrail] }));
+    return createResult("invitation-resent");
+  },
+
+  async revokeUserSessions(userId: string): Promise<AuditMutationResult> {
+    await wait();
+    updateUser(userId, (user) => ({ ...user, security: { ...user.security, activeSessions: 0 }, auditTrail: [createAuditEvent("Session revoked", "Clinic Admin", "Security action confirmed", "Security Tab"), ...user.auditTrail] }));
+    return createResult("sessions-revoked");
+  },
+
+  async exportClinicUsers(query: ClinicUsersQuery): Promise<AuditMutationResult> {
+    await wait();
+    return { auditId: `audit-export-${Date.now()}`, message: `Export generated for page ${query.page}` };
   },
 };
 
-function createUser(
-  id: string,
-  displayName: string,
-  email: string,
-  initials: string,
-  role: UserRole,
-  departmentName: string,
-  departmentId: string,
-  scope: string,
-  status: UserAccount["status"],
-  riskSignal: UserAccount["riskSignal"],
-  aiAccessLevel: UserAccount["aiAccessLevel"],
-  organizationName: string,
-  clinicIds: string[],
-  failedLoginAttempts: number,
-  mfaEnabled: boolean,
-): UserAccount {
-  const [firstName = "", ...rest] = displayName.replace("Dr. ", "").split(" ");
+function updateUser(userId: string, updater: (user: ClinicUser) => ClinicUser) {
+  clinicUsers = clinicUsers.map((user) => (user.id === userId ? updater(user) : user));
+}
+
+function getSummary(users: ClinicUser[]): ClinicUsersSummary {
   return {
-    id,
-    firstName,
-    lastName: rest.join(" "),
-    displayName,
-    email,
-    initials,
-    staffId: id.replace("usr", "STAFF"),
-    roles: [role],
-    department: { id: departmentId, name: departmentName },
-    scope,
-    accessScope: [{ organizationId: organizationName.toLowerCase().replaceAll(" ", "-"), organizationName, clinicIds, clinicNames: [organizationName], departmentIds: [departmentId] }],
-    aiAccessLevel,
-    status,
-    riskSignal,
-    claimAccess: role.code === "claim_reviewer" ? "Assigned cases" : role.isHighPrivilege ? "Organization oversight" : "View only",
-    clinicalAccess: riskSignal === "phi_masked" ? "PHI masked" : role.code === "doctor" || role.code === "nurse" ? "Clinical workflow" : "Limited",
-    auditAccessLevel: role.code === "compliance_officer" || role.code === "auditor" ? "Full" : role.isHighPrivilege ? "Summary" : "None",
-    consentRequired: aiAccessLevel !== "not_allowed",
-    mfaEnabled,
-    lastLoginAt: status === "pending" ? undefined : "2026-07-13T03:20:00Z",
-    createdAt: "2026-01-18T08:00:00Z",
-    updatedAt: "2026-07-13T03:30:00Z",
-    updatedBy: "Security Admin",
-    failedLoginAttempts,
-    activeSessions: status === "active" ? 1 : 0,
-    securityReviewDue: status === "locked" || riskSignal === "review_required" || riskSignal === "unusual_login",
+    totalUsers: users.length,
+    activeUsers: users.filter((user) => user.status === "active").length,
+    pendingInvitations: users.filter((user) => user.status === "invited").length,
+    suspendedUsers: users.filter((user) => user.status === "suspended").length,
+    aiEnabledUsers: users.filter((user) => user.aiAccessStatus === "enabled").length,
   };
 }
 
-function wait() {
-  return new Promise((resolve) => setTimeout(resolve, 120));
+function createAuditEvent(event: string, actor: string, reason: string, source: string): ClinicUserAuditEvent {
+  return {
+    id: `audit-${Date.now()}-${Math.round(Math.random() * 1000)}`,
+    event,
+    actor,
+    occurredAt: new Date().toISOString(),
+    reason,
+    source,
+    result: "success",
+  };
 }
 
-function getSortValue(user: UserAccount, sortBy: UserFilters["sortBy"]) {
-  if (sortBy === "role") return user.roles[0]?.name ?? "";
-  if (sortBy === "department") return user.department?.name ?? "";
-  if (sortBy === "status") return user.status;
-  if (sortBy === "lastLoginAt") return user.lastLoginAt ?? "";
-  return user.displayName;
+function createResult(action: string): AuditMutationResult {
+  return { auditId: `audit-${action}-${Date.now()}`, message: "Action completed successfully" };
+}
+
+function departmentNameFor(departmentId?: string) {
+  const names: Record<string, string> = {
+    "general-medicine": "General Medicine",
+    nursing: "Nursing",
+    pharmacy: "Pharmacy",
+    claims: "Claims",
+    compliance: "Compliance",
+    administration: "Administration",
+    executive: "Executive",
+  };
+  return departmentId ? names[departmentId] ?? "Unassigned" : "Unassigned";
+}
+
+function clinicNameFor(clinicId: string) {
+  const names: Record<string, string> = {
+    "clinic-bangkok": "NexSure Medical Center - Bangkok",
+    "clinic-sukhumvit": "Sukhumvit Clinic",
+    "clinic-rama9": "Rama 9 Clinic",
+  };
+  return names[clinicId] ?? "Assigned Clinic";
+}
+
+function wait() {
+  return new Promise((resolve) => setTimeout(resolve, 180));
 }

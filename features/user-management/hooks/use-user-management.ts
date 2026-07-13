@@ -4,19 +4,28 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { userManagementService } from "../services/user-management-service";
-import type { UserFilters } from "../types/user-management.types";
+import type {
+  AiAccessStatus,
+  AuditMutationResult,
+  ClinicUserRole,
+  ClinicUserStatus,
+  ClinicUsersQuery,
+  InviteClinicUserInput,
+  SuspendUserInput,
+  UpdateAiAccessInput,
+} from "../types/user-management.types";
 
-const defaultFilters: UserFilters = {
-  search: "",
-  status: "all",
-  role: "all",
-  departmentId: "all",
-  clinicId: "all",
-  aiAccess: "all",
-  sortBy: "displayName",
-  sortOrder: "asc",
+export const clinicUserKeys = {
+  all: ["clinic-users"] as const,
+  lists: () => [...clinicUserKeys.all, "list"] as const,
+  list: (query: ClinicUsersQuery) => [...clinicUserKeys.lists(), query] as const,
+  details: () => [...clinicUserKeys.all, "detail"] as const,
+  detail: (userId: string) => [...clinicUserKeys.details(), userId] as const,
+};
+
+const defaultQuery: ClinicUsersQuery = {
   page: 1,
-  pageSize: 10,
+  pageSize: 8,
 };
 
 export function useUserManagement() {
@@ -24,70 +33,131 @@ export function useUserManagement() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
-  const filters = useMemo(() => parseFilters(searchParams), [searchParams]);
+  const query = useMemo(() => parseQuery(searchParams), [searchParams]);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
-  const [actionMessage, setActionMessage] = useState("");
+  const [toast, setToast] = useState<{ title: string; tone: "success" | "error" | "info" } | null>(null);
 
-  const permissionsQuery = useQuery({ queryKey: ["user-management", "permissions"], queryFn: userManagementService.getCurrentUserPermissions });
-  const summaryQuery = useQuery({ queryKey: ["user-management", "summary"], queryFn: userManagementService.getUserSummary });
-  const usersQuery = useQuery({ queryKey: ["user-management", "users", filters], queryFn: () => userManagementService.getUsers(filters) });
-  const alertsQuery = useQuery({ queryKey: ["user-management", "alerts"], queryFn: userManagementService.getGovernanceAlerts });
-  const activityQuery = useQuery({ queryKey: ["user-management", "activity"], queryFn: userManagementService.getRecentActivity });
-  const selectedUserQuery = useQuery({ queryKey: ["user-management", "detail", selectedUserId], queryFn: () => (selectedUserId ? userManagementService.getUserById(selectedUserId) : undefined), enabled: Boolean(selectedUserId) });
-  const sensitiveActionMutation = useMutation({
-    mutationFn: ({ action, reason }: { action: string; reason: string }) => userManagementService.recordSensitiveAction(action, reason),
-    onSuccess: (result) => {
-      setActionMessage(`Audit recorded: ${result.auditId}`);
-      void queryClient.invalidateQueries({ queryKey: ["user-management", "activity"] });
-    },
-    onError: (error) => setActionMessage(error instanceof Error ? error.message : "Action failed"),
+  const usersQuery = useQuery({
+    queryKey: clinicUserKeys.list(query),
+    queryFn: () => userManagementService.getClinicUsers(query),
   });
 
-  function updateFilters(patch: Partial<UserFilters>) {
-    const next = { ...filters, ...patch };
+  const selectedUserQuery = useQuery({
+    queryKey: selectedUserId ? clinicUserKeys.detail(selectedUserId) : clinicUserKeys.details(),
+    queryFn: () => (selectedUserId ? userManagementService.getClinicUserById(selectedUserId) : undefined),
+    enabled: Boolean(selectedUserId),
+  });
+
+  const inviteMutation = useMutation({
+    mutationFn: (payload: InviteClinicUserInput) => userManagementService.inviteClinicUser(payload),
+    onSuccess: (result) => handleSuccess(result),
+    onError: handleError,
+  });
+
+  const suspendMutation = useMutation({
+    mutationFn: ({ userId, payload }: { userId: string; payload: SuspendUserInput }) => userManagementService.suspendClinicUser(userId, payload),
+    onSuccess: (result) => handleSuccess(result),
+    onError: handleError,
+  });
+
+  const aiAccessMutation = useMutation({
+    mutationFn: ({ userId, payload }: { userId: string; payload: UpdateAiAccessInput }) => userManagementService.updateUserAiAccess(userId, payload),
+    onSuccess: (result) => handleSuccess(result),
+    onError: handleError,
+  });
+
+  const actionMutation = useMutation({
+    mutationFn: ({ userId, action }: { userId: string; action: "unlock" | "reactivate" | "resend" | "revoke_sessions" }) => {
+      if (action === "unlock") return userManagementService.unlockClinicUser(userId);
+      if (action === "reactivate") return userManagementService.reactivateClinicUser(userId);
+      if (action === "resend") return userManagementService.resendUserInvitation(userId);
+      return userManagementService.revokeUserSessions(userId);
+    },
+    onSuccess: (result) => handleSuccess(result),
+    onError: handleError,
+  });
+
+  const exportMutation = useMutation({
+    mutationFn: () => userManagementService.exportClinicUsers(query),
+    onSuccess: (result) => handleSuccess(result),
+    onError: handleError,
+  });
+
+  function updateQuery(patch: Partial<ClinicUsersQuery>) {
+    const next = { ...query, ...patch };
     const params = new URLSearchParams();
-    (Object.keys(next) as (keyof UserFilters)[]).forEach((key) => {
-      if (String(next[key]) !== String(defaultFilters[key])) params.set(key, String(next[key]));
-    });
+    setParam(params, "search", next.search);
+    setParam(params, "role", next.role);
+    setParam(params, "status", next.status);
+    setParam(params, "departmentId", next.departmentId);
+    setParam(params, "aiAccessStatus", next.aiAccessStatus);
+    setParam(params, "clinicId", next.clinicId);
+    if (next.page !== defaultQuery.page) params.set("page", String(next.page));
+    if (next.pageSize !== defaultQuery.pageSize) params.set("pageSize", String(next.pageSize));
     router.replace(`${pathname}${params.size ? `?${params.toString()}` : ""}`, { scroll: false });
   }
 
+  function clearFilters() {
+    router.replace(pathname, { scroll: false });
+  }
+
+  function handleSuccess(result: AuditMutationResult) {
+    setToast({ title: `${result.message} - Audit ${result.auditId}`, tone: "success" });
+    void queryClient.invalidateQueries({ queryKey: clinicUserKeys.all });
+  }
+
+  function handleError(error: Error) {
+    setToast({ title: error.message || "Action failed", tone: "error" });
+  }
+
   return {
-    filters,
-    updateFilters,
-    clearFilters: () => router.replace(pathname, { scroll: false }),
+    query,
+    updateQuery,
+    clearFilters,
+    usersQuery,
     selectedUserId,
     setSelectedUserId,
     selectedUserQuery,
     inviteOpen,
     setInviteOpen,
-    actionMessage,
-    permissionsQuery,
-    summaryQuery,
-    usersQuery,
-    alertsQuery,
-    activityQuery,
-    sensitiveActionMutation,
+    inviteMutation,
+    suspendMutation,
+    aiAccessMutation,
+    actionMutation,
+    exportMutation,
+    toast,
+    setToast,
   };
 }
 
-function parseFilters(params: URLSearchParams): UserFilters {
+function parseQuery(params: URLSearchParams): ClinicUsersQuery {
   return {
-    ...defaultFilters,
-    search: params.get("search") ?? "",
-    status: parseOption(params.get("status"), ["all", "active", "pending", "locked", "suspended", "disabled"], "all"),
-    role: params.get("role") ?? "all",
-    departmentId: params.get("departmentId") ?? "all",
-    clinicId: params.get("clinicId") ?? "all",
-    aiAccess: parseOption(params.get("aiAccess"), ["all", "enabled", "restricted", "not_allowed"], "all"),
-    sortBy: parseOption(params.get("sortBy"), ["displayName", "role", "department", "status", "lastLoginAt"], "displayName"),
-    sortOrder: parseOption(params.get("sortOrder"), ["asc", "desc"], "asc"),
-    page: Number(params.get("page") ?? 1),
-    pageSize: Number(params.get("pageSize") ?? 10),
+    search: params.get("search") || undefined,
+    role: parseOption(params.get("role"), ["clinic_admin", "clinic_manager", "doctor", "nurse", "pharmacist", "clinic_staff", "claim_reviewer", "compliance_officer", "executive"]),
+    status: parseOption(params.get("status"), ["active", "invited", "locked", "suspended", "inactive"]),
+    departmentId: params.get("departmentId") || undefined,
+    aiAccessStatus: parseOption(params.get("aiAccessStatus"), ["enabled", "restricted", "disabled"]),
+    clinicId: params.get("clinicId") || undefined,
+    page: parsePositiveNumber(params.get("page"), defaultQuery.page),
+    pageSize: parsePositiveNumber(params.get("pageSize"), defaultQuery.pageSize),
   };
 }
 
-function parseOption<const T extends string>(value: string | null, allowed: readonly T[], fallback: T): T {
-  return value && allowed.includes(value as T) ? (value as T) : fallback;
+function parseOption<const T extends string>(value: string | null, allowed: readonly T[]): T | undefined {
+  return value && allowed.includes(value as T) ? (value as T) : undefined;
 }
+
+function parsePositiveNumber(value: string | null, fallback: number) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function setParam<T extends string>(params: URLSearchParams, key: string, value?: T | string) {
+  if (value) params.set(key, value);
+}
+
+export type UserManagementWorkspace = ReturnType<typeof useUserManagement>;
+export type UserManagementRoleFilter = ClinicUserRole | undefined;
+export type UserManagementStatusFilter = ClinicUserStatus | undefined;
+export type UserManagementAiFilter = AiAccessStatus | undefined;

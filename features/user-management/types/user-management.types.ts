@@ -1,137 +1,173 @@
-export type UserAccountStatus = "active" | "pending" | "locked" | "suspended" | "disabled";
-export type AIAccessLevel = "enabled" | "restricted" | "not_allowed";
-export type GovernanceSeverity = "critical" | "warning" | "success" | "info";
-export type SortOrder = "asc" | "desc";
-export type AccessRiskSignal =
-  | "normal_access"
-  | "invite_sent"
-  | "phi_masked"
-  | "failed_login"
-  | "privileged_access"
-  | "unusual_login"
-  | "review_required";
-export type PermissionLevel =
-  | "none"
-  | "view"
-  | "edit"
-  | "create"
-  | "verify"
-  | "review"
-  | "masked"
-  | "history"
-  | "audit"
-  | "full"
-  | "export_log"
-  | "evidence"
-  | "view_edit"
-  | "version";
+import type { LucideIcon } from "lucide-react";
 
-export interface OrganizationScope {
-  organizationId: string;
-  organizationName: string;
-  clinicIds: string[];
-  clinicNames: string[];
+export type ClinicUserStatus = "active" | "invited" | "locked" | "suspended" | "inactive";
+export type ClinicUserRole =
+  | "clinic_admin"
+  | "clinic_manager"
+  | "doctor"
+  | "nurse"
+  | "pharmacist"
+  | "clinic_staff"
+  | "claim_reviewer"
+  | "compliance_officer"
+  | "executive";
+export type AiAccessStatus = "enabled" | "restricted" | "disabled";
+export type AiAccessLevel = "disabled" | "view_only" | "clinical_assist" | "clinical_review" | "ai_administrator";
+export type DataAccessLevel = "assigned_department" | "assigned_clinic" | "cross_clinic_view_only";
+export type AuditResult = "success" | "warning" | "blocked";
+export type PermissionTemplate = "role_recommended" | "custom_permissions" | "claim_review";
+
+export interface ClinicAccessScope {
+  clinicId: string;
+  clinicName: string;
   departmentIds: string[];
+  dataAccessLevel: DataAccessLevel;
 }
 
-export interface UserRole {
-  id: string;
-  code: string;
-  name: string;
-  isPrimary: boolean;
-  isHighPrivilege: boolean;
+export interface ClinicUserSecurity {
+  failedAttempts: number;
+  activeSessions: number;
+  currentSession: string;
+  browserDevice: string;
+  location: string;
+  maskedIpAddress: string;
+  mfaVerified: boolean;
 }
 
-export interface UserAccount {
+export interface ClinicUserAuditEvent {
   id: string;
-  firstName: string;
-  lastName: string;
-  displayName: string;
-  email: string;
+  event: string;
+  actor: string;
+  occurredAt: string;
+  reason: string;
+  source: string;
+  result: AuditResult;
+}
+
+export interface ClinicUserAiPermissions {
+  viewAiSummary: boolean;
+  generateSoapDraft: boolean;
+  viewIcdSuggestions: boolean;
+  acceptAiRecommendation: boolean;
+  overrideAiWarning: boolean;
+}
+
+export interface ClinicUser {
+  id: string;
+  fullName: string;
   initials: string;
-  staffId?: string;
-  roles: UserRole[];
-  department?: { id: string; name: string };
-  scope: string;
-  accessScope: OrganizationScope[];
-  aiAccessLevel: AIAccessLevel;
-  status: UserAccountStatus;
-  riskSignal: AccessRiskSignal;
-  claimAccess: string;
-  clinicalAccess: string;
-  auditAccessLevel: string;
-  consentRequired: boolean;
+  employeeId: string;
+  email: string;
+  phone?: string;
+  jobTitle?: string;
+  professionalLicense?: string;
+  primaryRole: ClinicUserRole;
+  additionalRoles: ClinicUserRole[];
+  departmentId?: string;
+  departmentName?: string;
+  clinicScopes: ClinicAccessScope[];
+  aiAccessStatus: AiAccessStatus;
+  aiAccessLevel: AiAccessLevel;
+  aiPermissions: ClinicUserAiPermissions;
+  status: ClinicUserStatus;
   mfaEnabled: boolean;
   lastLoginAt?: string;
+  lastActiveAt?: string;
   createdAt: string;
   updatedAt: string;
-  updatedBy: string;
-  failedLoginAttempts: number;
-  activeSessions: number;
-  securityReviewDue: boolean;
-  systemManaged?: boolean;
+  security: ClinicUserSecurity;
+  auditTrail: ClinicUserAuditEvent[];
 }
 
-export interface UserSummary {
-  totalUsers: number;
-  activeUsers: number;
-  pendingInvites: number;
-  lockedAccounts: number;
-  adminUsers: number;
-  last24hLogin: number;
-}
-
-export interface UserFilters {
-  search: string;
-  status: "all" | UserAccountStatus;
-  role: string;
-  departmentId: string;
-  clinicId: string;
-  aiAccess: "all" | AIAccessLevel;
-  sortBy: "displayName" | "role" | "department" | "status" | "lastLoginAt";
-  sortOrder: SortOrder;
+export interface ClinicUsersQuery {
+  search?: string;
+  role?: ClinicUserRole;
+  status?: ClinicUserStatus;
+  departmentId?: string;
+  aiAccessStatus?: AiAccessStatus;
+  clinicId?: string;
   page: number;
   pageSize: number;
 }
 
-export interface PaginatedUsers {
-  users: UserAccount[];
+export interface ClinicUsersSummary {
+  totalUsers: number;
+  activeUsers: number;
+  pendingInvitations: number;
+  suspendedUsers: number;
+  aiEnabledUsers: number;
+}
+
+export interface ClinicUsersResponse {
+  data: ClinicUser[];
   total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  summary: ClinicUsersSummary;
 }
 
-export interface GovernanceAlert {
-  id: string;
-  severity: GovernanceSeverity;
-  title: string;
-  description: string;
-  affectedUserCount: number;
-  createdAt: string;
-  recommendedAction: string;
+export interface InviteClinicUserInput {
+  fullName: string;
+  email: string;
+  employeeId?: string;
+  phone?: string;
+  jobTitle?: string;
+  professionalLicense?: string;
+  primaryRole: ClinicUserRole;
+  departmentId?: string;
+  clinicId: string;
+  dataAccessLevel: DataAccessLevel;
+  accessExpiresAt?: string;
+  additionalRole?: ClinicUserRole | "none";
+  aiAccessLevel: AiAccessLevel;
+  permissionTemplate: PermissionTemplate;
+  auditReason: string;
 }
 
-export interface AccessActivity {
-  id: string;
-  eventType: "role_change" | "export" | "access_blocked" | "permission_update" | "account_lock" | "invite";
-  actor: string;
-  title: string;
-  timestamp: string;
-  severity: GovernanceSeverity;
-  detail: string;
-  reason?: string;
-  auditHref: string;
+export interface UpdateClinicUserInput {
+  fullName?: string;
+  jobTitle?: string;
+  phone?: string;
+  auditReason: string;
 }
 
-export interface CurrentUserPermissions {
-  canView: boolean;
-  canInvite: boolean;
-  canEdit: boolean;
-  canExportAudit: boolean;
-  canExportAccessReport: boolean;
-  canReviewSecurity: boolean;
-  canManageAi: boolean;
-  canSuspendUsers: boolean;
-  canUnlockUsers: boolean;
-  canViewAuditLog: boolean;
-  canPerformDestructiveActions: boolean;
-  readOnlyReason?: string;
+export interface UpdateUserRolesInput {
+  primaryRole: ClinicUserRole;
+  additionalRoles: ClinicUserRole[];
+  reason: string;
+}
+
+export interface UpdateClinicAccessInput {
+  clinicScopes: ClinicAccessScope[];
+  reason: string;
+}
+
+export interface UpdateAiAccessInput {
+  aiAccessLevel: AiAccessLevel;
+  permissions: ClinicUserAiPermissions;
+  reason: string;
+}
+
+export interface SuspendUserInput {
+  reason: string;
+  effectiveAt?: string;
+}
+
+export interface AuditMutationResult {
+  auditId: string;
+  message: string;
+}
+
+export interface SelectOption<TValue extends string = string> {
+  value: TValue;
+  label: string;
+}
+
+export interface KpiCardDefinition {
+  label: string;
+  value: number;
+  helper: string;
+  semantic: "info" | "success" | "warning" | "danger";
+  icon: LucideIcon;
 }
