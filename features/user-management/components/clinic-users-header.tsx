@@ -1,13 +1,12 @@
+import Link from "next/link";
 import { Bell, BrainCircuit, Building2, Download, Search, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { clinicOptions, governanceHighlights } from "../constants/clinic-user-options";
 
 export function ClinicUsersHeader({
-  onInvite,
   onExport,
   exportPending,
 }: {
-  onInvite: () => void;
   onExport: () => void;
   exportPending: boolean;
 }) {
@@ -77,10 +76,10 @@ export function ClinicUsersHeader({
               <Download size={16} aria-hidden="true" />
               {exportPending ? "Exporting..." : "Export"}
             </Button>
-            <Button onClick={onInvite} className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-blue-800 bg-[#1E3A8A] px-3 text-sm font-black text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <Link href="/admin/users/new" className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-blue-800 bg-[#1E3A8A] px-3 text-sm font-black text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
               <UserPlus size={16} aria-hidden="true" />
-              Invite User
-            </Button>
+              New User
+            </Link>
           </div>
         </div>
       </div>

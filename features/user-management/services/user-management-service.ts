@@ -6,6 +6,7 @@ import type {
   ClinicUsersQuery,
   ClinicUsersResponse,
   ClinicUsersSummary,
+  CreateUserFormValues,
   InviteClinicUserInput,
   SuspendUserInput,
   UpdateAiAccessInput,
@@ -108,6 +109,74 @@ export const userManagementService = {
     };
     clinicUsers = [user, ...clinicUsers];
     return { auditId: user.auditTrail[0].id, message: `Invitation sent to ${payload.fullName}` };
+  },
+
+  async createUser(payload: CreateUserFormValues): Promise<AuditMutationResult> {
+    await wait();
+    const now = new Date().toISOString();
+    const fullName = payload.displayName.trim() || `${payload.firstName.trim()} ${payload.lastName.trim()}`.trim();
+    const user: ClinicUser = {
+      id: `usr-${Date.now()}`,
+      fullName,
+      initials: getInitials(payload.firstName, payload.lastName),
+      employeeId: payload.employeeId || `EMP-${String(clinicUsers.length + 1200)}`,
+      email: payload.email,
+      phone: payload.mobile || undefined,
+      jobTitle: payload.jobTitle || undefined,
+      professionalLicense: payload.licenseNumber || undefined,
+      primaryRole: payload.primaryRole || "clinic_staff",
+      additionalRoles: payload.additionalRoles,
+      departmentId: payload.departmentId || undefined,
+      departmentName: payload.departmentId || "Unassigned",
+      clinicScopes: [
+        {
+          clinicId: payload.clinicId,
+          clinicName: clinicNameFor(payload.clinicId),
+          departmentIds: payload.departmentId ? [payload.departmentId] : [],
+          dataAccessLevel: accessScopeToDataAccess(payload.accessScope),
+        },
+      ],
+      aiAccessStatus: "restricted",
+      aiAccessLevel: "view_only",
+      aiPermissions: {
+        viewAiSummary: true,
+        generateSoapDraft: false,
+        viewIcdSuggestions: true,
+        acceptAiRecommendation: false,
+        overrideAiWarning: false,
+      },
+      status: payload.sendInvitation ? "invited" : "inactive",
+      mfaEnabled: payload.requireMfa,
+      createdAt: now,
+      updatedAt: now,
+      security: {
+        failedAttempts: 0,
+        activeSessions: 0,
+        currentSession: "Pending first sign in",
+        browserDevice: "Pending activation",
+        location: "Pending",
+        maskedIpAddress: "Masked",
+        mfaVerified: false,
+      },
+      auditTrail: [
+        createAuditEvent(
+          payload.sendInvitation ? "User created and invitation sent" : "User created without invitation",
+          "Clinic Admin",
+          "New user management frontend",
+          "Create User Page",
+        ),
+      ],
+    };
+    clinicUsers = [user, ...clinicUsers];
+    return { auditId: user.auditTrail[0].id, message: `User created for ${fullName}` };
+  },
+
+  async saveDraft(payload: CreateUserFormValues): Promise<AuditMutationResult> {
+    await wait();
+    return {
+      auditId: `audit-user-draft-${Date.now()}`,
+      message: `Draft saved for ${payload.email || "new user"}`,
+    };
   },
 
   async updateClinicUser(userId: string, payload: UpdateClinicUserInput): Promise<AuditMutationResult> {
@@ -225,8 +294,24 @@ function clinicNameFor(clinicId: string) {
     "clinic-bangkok": "NexSure Medical Center - Bangkok",
     "clinic-sukhumvit": "Sukhumvit Clinic",
     "clinic-rama9": "Rama 9 Clinic",
+    central: "NexSure Central Clinic",
+    sathorn: "NexSure Sathorn Clinic",
+    rama9: "NexSure Rama 9 Clinic",
+    main: "Sukhumvit Main Hospital",
+    wellness: "Sukhumvit Wellness Center",
   };
   return names[clinicId] ?? "Assigned Clinic";
+}
+
+function accessScopeToDataAccess(scope: CreateUserFormValues["accessScope"]) {
+  if (scope === "organization_wide") return "cross_clinic_view_only";
+  if (scope === "assigned_clinics") return "assigned_clinic";
+  return "assigned_clinic";
+}
+
+function getInitials(firstName: string, lastName: string) {
+  const initials = `${firstName.trim()[0] ?? ""}${lastName.trim()[0] ?? ""}`.toUpperCase();
+  return initials || "NU";
 }
 
 function wait() {

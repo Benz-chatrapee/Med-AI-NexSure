@@ -99,7 +99,7 @@ function ClinicUsersWorkspace() {
       <div className="grid min-h-screen grid-cols-1 min-[1040px]:grid-cols-[248px_minmax(0,1fr)]">
         <Sidebar />
         <div className="min-w-0">
-          <ClinicUsersHeader onInvite={() => workspace.setInviteOpen(true)} onExport={() => workspace.exportMutation.mutate()} exportPending={workspace.exportMutation.isPending} />
+          <ClinicUsersHeader onExport={() => workspace.exportMutation.mutate()} exportPending={workspace.exportMutation.isPending} />
           <div className="px-4 py-6 sm:px-7">
             <ClinicUsersKpis summary={data?.summary} loading={workspace.usersQuery.isLoading} />
             <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm" aria-labelledby="clinic-users-directory-title">
