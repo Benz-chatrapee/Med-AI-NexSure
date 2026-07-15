@@ -1,0 +1,2634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0F2A5F" />
+  <title>Med AI NexSure | Healthcare Economic & Insurance Intelligence</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+
+  <style>
+    :root {
+      --primary-blue:#1E3A8A;
+      --deep-blue:#0F2A5F;
+      --ai-blue:#2563EB;
+      --soft-blue:#EFF6FF;
+      --blue-border:#BFDBFE;
+      --azure:#38BDF8;
+      --bg:#F8FAFC;
+      --surface:#FFFFFF;
+      --surface-soft:#F1F5F9;
+      --border:#E2E8F0;
+      --text:#0F172A;
+      --text-2:#334155;
+      --muted:#64748B;
+      --muted-2:#94A3B8;
+      --success:#059669;
+      --success-soft:#ECFDF5;
+      --warning:#D97706;
+      --warning-soft:#FFFBEB;
+      --danger:#DC2626;
+      --danger-soft:#FEF2F2;
+      --info-soft:#EFF6FF;
+      --shadow-sm:0 4px 14px rgba(15,42,95,.06);
+      --shadow:0 12px 32px rgba(15,42,95,.08);
+      --shadow-lg:0 20px 48px rgba(15,42,95,.12);
+      --radius-xl:18px;
+      --radius-lg:16px;
+      --radius-md:14px;
+      --sidebar-width:280px;
+      --topbar-height:76px;
+    }
+
+    * { box-sizing:border-box; }
+
+    html { scroll-behavior:smooth; }
+
+    body {
+      margin:0;
+      min-width:320px;
+      min-height:100vh;
+      background:var(--bg);
+      color:var(--text);
+      font-family:Inter,"Noto Sans Thai","Segoe UI",sans-serif;
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
+    }
+
+    button,
+    input,
+    select {
+      font:inherit;
+    }
+
+    button {
+      cursor:pointer;
+    }
+
+    a {
+      color:inherit;
+    }
+
+    .app-shell {
+      min-height:100vh;
+      display:grid;
+      grid-template-columns:var(--sidebar-width) minmax(0,1fr);
+    }
+
+    .sidebar {
+      position:fixed;
+      inset:0 auto 0 0;
+      z-index:60;
+      width:var(--sidebar-width);
+      height:100vh;
+      overflow-y:auto;
+      padding:24px 18px;
+      color:#FFFFFF;
+      background:var(--deep-blue);
+      border-right:1px solid rgba(255,255,255,.08);
+      transition:transform .24s ease;
+    }
+
+    .brand {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:0 8px 24px;
+      border-bottom:1px solid rgba(191,219,254,.14);
+    }
+
+    .brand-mark {
+      width:44px;
+      height:44px;
+      display:grid;
+      place-items:center;
+      border-radius:14px;
+      background:var(--ai-blue);
+      color:#FFFFFF;
+      box-shadow:0 12px 28px rgba(37,99,235,.28);
+      font-size:14px;
+      font-weight:700;
+      letter-spacing:-.03em;
+    }
+
+    .brand-copy strong {
+      display:block;
+      font-size:19px;
+      font-weight:700;
+      letter-spacing:-.03em;
+    }
+
+    .brand-copy span {
+      display:block;
+      margin-top:4px;
+      color:#BFDBFE;
+      font-size:14px;
+      line-height:1.45;
+    }
+
+    .nav-group {
+      margin-top:22px;
+    }
+
+    .nav-label {
+      padding:0 12px;
+      margin-bottom:9px;
+      color:#7EA6D8;
+      font-size:14px;
+      font-weight:700;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+    }
+
+    .nav-list {
+      display:grid;
+      gap:6px;
+    }
+
+    .nav-item {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-height:46px;
+      padding:11px 13px;
+      border:1px solid transparent;
+      border-radius:14px;
+      color:#DBEAFE;
+      text-decoration:none;
+      font-size:14px;
+      font-weight:500;
+      transition:background-color .18s ease,border-color .18s ease,color .18s ease,transform .18s ease;
+    }
+
+    .nav-item svg {
+      width:18px;
+      height:18px;
+      flex:0 0 auto;
+    }
+
+    .nav-item:hover {
+      color:#FFFFFF;
+      background:rgba(255,255,255,.08);
+      transform:translateX(2px);
+    }
+
+    .nav-item.active {
+      color:#FFFFFF;
+      border-color:rgba(191,219,254,.18);
+      background:rgba(37,99,235,.38);
+    }
+
+    .nav-item.active::after {
+      content:"";
+      width:7px;
+      height:7px;
+      margin-left:auto;
+      border-radius:999px;
+      background:var(--azure);
+      box-shadow:0 0 12px rgba(56,189,248,.72);
+    }
+
+    .sidebar-status {
+      margin-top:24px;
+      padding:15px;
+      border:1px solid rgba(191,219,254,.16);
+      border-radius:16px;
+      background:rgba(255,255,255,.06);
+    }
+
+    .sidebar-status-head {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:14px;
+      font-weight:600;
+    }
+
+    .health-dot {
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:#34D399;
+      box-shadow:0 0 0 4px rgba(52,211,153,.12);
+    }
+
+    .sidebar-status p {
+      margin:8px 0 0;
+      color:#BFDBFE;
+      font-size:14px;
+      line-height:1.6;
+    }
+
+    .workspace {
+      grid-column:2;
+      min-width:0;
+    }
+
+    .topbar {
+      position:sticky;
+      top:0;
+      z-index:40;
+      min-height:var(--topbar-height);
+      display:flex;
+      align-items:center;
+      gap:16px;
+      padding:14px 24px;
+      border-bottom:1px solid var(--border);
+      background:rgba(255,255,255,.96);
+      backdrop-filter:blur(16px);
+    }
+
+    .menu-button {
+      display:none;
+      width:42px;
+      height:42px;
+      align-items:center;
+      justify-content:center;
+      color:var(--deep-blue);
+      border:1px solid var(--border);
+      border-radius:12px;
+      background:var(--surface);
+    }
+
+    .page-title {
+      min-width:250px;
+    }
+
+    .page-title h1 {
+      margin:0;
+      color:var(--deep-blue);
+      font-size:25px;
+      font-weight:700;
+      letter-spacing:-.04em;
+    }
+
+    .page-title p {
+      margin:5px 0 0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.45;
+    }
+
+    .top-actions {
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:10px;
+    }
+
+    .search-field {
+      width:min(330px,30vw);
+      height:44px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:0 13px;
+      border:1px solid var(--border);
+      border-radius:13px;
+      background:var(--surface-soft);
+    }
+
+    .search-field svg {
+      width:17px;
+      color:var(--muted);
+    }
+
+    .search-field input {
+      width:100%;
+      border:0;
+      outline:0;
+      color:var(--text);
+      background:transparent;
+      font-size:14px;
+    }
+
+    .top-button,
+    .icon-button,
+    .primary-button {
+      height:44px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      border-radius:13px;
+      font-size:14px;
+      font-weight:600;
+      transition:transform .18s ease,border-color .18s ease,background-color .18s ease;
+    }
+
+    .top-button {
+      padding:0 13px;
+      color:var(--deep-blue);
+      border:1px solid var(--border);
+      background:var(--surface);
+    }
+
+    .icon-button {
+      width:44px;
+      color:var(--deep-blue);
+      border:1px solid var(--border);
+      background:var(--surface);
+    }
+
+    .primary-button {
+      padding:0 15px;
+      color:#FFFFFF;
+      border:1px solid var(--ai-blue);
+      background:var(--ai-blue);
+      box-shadow:0 10px 22px rgba(37,99,235,.20);
+    }
+
+    .top-button:hover,
+    .icon-button:hover,
+    .primary-button:hover {
+      transform:translateY(-2px);
+      border-color:var(--azure);
+    }
+
+    .profile {
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .profile-avatar {
+      width:38px;
+      height:38px;
+      display:grid;
+      place-items:center;
+      border-radius:12px;
+      color:#FFFFFF;
+      background:var(--deep-blue);
+      font-size:14px;
+      font-weight:700;
+    }
+
+    .profile strong {
+      display:block;
+      font-size:14px;
+      font-weight:600;
+    }
+
+    .profile span {
+      color:var(--muted);
+      font-size:10px;
+    }
+
+    .content {
+      padding:22px;
+    }
+
+    .breadcrumb {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom:14px;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .breadcrumb strong {
+      color:var(--deep-blue);
+      font-weight:600;
+    }
+
+    .hero {
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 280px;
+      gap:22px;
+      align-items:center;
+      padding:24px 26px;
+      margin-bottom:18px;
+      border:1px solid var(--border);
+      border-radius:var(--radius-xl);
+      background:var(--surface);
+      box-shadow:var(--shadow);
+    }
+
+    .hero-copy {
+      max-width:800px;
+    }
+
+    .hero-eyebrow {
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      margin-bottom:9px;
+      color:var(--ai-blue);
+      font-size:14px;
+      font-weight:700;
+      letter-spacing:.13em;
+      text-transform:uppercase;
+    }
+
+    .hero h2 {
+      margin:0;
+      color:var(--deep-blue);
+      font-size:33px;
+      line-height:1.24;
+      font-weight:700;
+      letter-spacing:-.045em;
+    }
+
+    .hero p {
+      margin:11px 0 0;
+      max-width:760px;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.75;
+    }
+
+    .hero-summary {
+      padding:18px;
+      border:1px solid var(--blue-border);
+      border-radius:16px;
+      background:var(--soft-blue);
+    }
+
+    .hero-summary-label {
+      color:var(--ai-blue);
+      font-size:10px;
+      font-weight:700;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .hero-summary strong {
+      display:block;
+      margin-top:7px;
+      color:var(--deep-blue);
+      font-size:31px;
+      font-weight:700;
+      letter-spacing:-.045em;
+    }
+
+    .hero-summary p {
+      margin:6px 0 0;
+      color:var(--text-2);
+      font-size:10px;
+      line-height:1.55;
+    }
+
+    .safety-banner {
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      gap:12px;
+      align-items:center;
+      padding:14px 16px;
+      margin-bottom:18px;
+      border:1px solid #FECACA;
+      border-left:4px solid var(--danger);
+      border-radius:14px;
+      background:var(--danger-soft);
+    }
+
+    .safety-icon {
+      width:38px;
+      height:38px;
+      display:grid;
+      place-items:center;
+      border-radius:12px;
+      color:var(--danger);
+      background:#FFFFFF;
+      border:1px solid #FECACA;
+    }
+
+    .safety-banner strong {
+      display:block;
+      color:#991B1B;
+      font-size:14px;
+      font-weight:700;
+    }
+
+    .safety-banner p {
+      margin:4px 0 0;
+      color:#7F1D1D;
+      font-size:10.5px;
+      line-height:1.55;
+    }
+
+    .safety-action {
+      min-height:34px;
+      padding:0 11px;
+      border:1px solid #FCA5A5;
+      border-radius:10px;
+      color:#991B1B;
+      background:#FFFFFF;
+      font-size:9px;
+      font-weight:700;
+    }
+
+    .filter-bar {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      padding:12px;
+      margin-bottom:18px;
+      border:1px solid var(--border);
+      border-radius:16px;
+      background:var(--surface);
+      box-shadow:var(--shadow-sm);
+    }
+
+    .filter-label {
+      padding:0 7px;
+      color:var(--muted);
+      font-size:14px;
+      font-weight:600;
+    }
+
+    .filter-select {
+      height:38px;
+      min-width:145px;
+      padding:0 30px 0 11px;
+      border:1px solid var(--border);
+      border-radius:11px;
+      color:var(--text);
+      background:var(--surface-soft);
+      outline:0;
+      font-size:14px;
+      font-weight:500;
+    }
+
+    .filter-spacer {
+      flex:1;
+    }
+
+    .last-updated {
+      color:var(--muted);
+      font-size:10px;
+    }
+
+    .kpi-grid {
+      display:grid;
+      grid-template-columns:repeat(6,minmax(0,1fr));
+      gap:14px;
+      margin-bottom:18px;
+    }
+
+    .kpi-card,
+    .panel {
+      border:1px solid var(--border);
+      background:var(--surface);
+      box-shadow:var(--shadow-sm);
+    }
+
+    .kpi-card {
+      min-height:154px;
+      padding:16px;
+      border-radius:var(--radius-lg);
+      transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+    }
+
+    .kpi-card:hover {
+      transform:translateY(-3px);
+      border-color:var(--blue-border);
+      box-shadow:var(--shadow);
+    }
+
+    .kpi-head {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .kpi-icon {
+      width:34px;
+      height:34px;
+      display:grid;
+      place-items:center;
+      border:1px solid var(--blue-border);
+      border-radius:11px;
+      color:var(--ai-blue);
+      background:var(--soft-blue);
+    }
+
+    .kpi-icon.success {
+      color:var(--success);
+      border-color:#A7F3D0;
+      background:var(--success-soft);
+    }
+
+    .kpi-icon.warning {
+      color:var(--warning);
+      border-color:#FDE68A;
+      background:var(--warning-soft);
+    }
+
+    .kpi-icon.danger {
+      color:var(--danger);
+      border-color:#FECACA;
+      background:var(--danger-soft);
+    }
+
+    .kpi-icon svg {
+      width:17px;
+      height:17px;
+    }
+
+    .trend {
+      padding:5px 7px;
+      border-radius:999px;
+      font-size:9px;
+      font-weight:700;
+    }
+
+    .trend.positive {
+      color:var(--success);
+      background:var(--success-soft);
+    }
+
+    .trend.warning {
+      color:var(--warning);
+      background:var(--warning-soft);
+    }
+
+    .trend.negative {
+      color:var(--danger);
+      background:var(--danger-soft);
+    }
+
+    .kpi-label {
+      margin-top:12px;
+      color:var(--muted);
+      font-size:14px;
+      font-weight:600;
+    }
+
+    .kpi-value {
+      margin-top:6px;
+      color:var(--deep-blue);
+      font-size:31px;
+      line-height:1;
+      font-weight:700;
+      letter-spacing:-.045em;
+    }
+
+    .kpi-note {
+      margin-top:7px;
+      color:var(--muted-2);
+      font-size:10.5px;
+      line-height:1.5;
+    }
+
+    .grid-2 {
+      display:grid;
+      grid-template-columns:minmax(0,1.55fr) minmax(320px,.75fr);
+      gap:18px;
+      margin-bottom:18px;
+    }
+
+    .grid-3 {
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:18px;
+      margin-bottom:18px;
+    }
+
+    .panel {
+      min-width:0;
+      padding:18px;
+      border-radius:var(--radius-xl);
+    }
+
+    .panel.ai-panel {
+      border-color:var(--blue-border);
+      background:var(--soft-blue);
+    }
+
+    .panel-header {
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:16px;
+    }
+
+    .panel-title h3 {
+      margin:0;
+      color:var(--deep-blue);
+      font-size:19px;
+      font-weight:700;
+      letter-spacing:-.025em;
+    }
+
+    .panel-title p {
+      margin:5px 0 0;
+      color:var(--muted);
+      font-size:10.5px;
+      line-height:1.5;
+    }
+
+    .badge {
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      flex:0 0 auto;
+      padding:6px 9px;
+      border:1px solid var(--blue-border);
+      border-radius:999px;
+      color:var(--ai-blue);
+      background:var(--soft-blue);
+      font-size:9px;
+      font-weight:700;
+    }
+
+    .badge.success {
+      color:var(--success);
+      border-color:#A7F3D0;
+      background:var(--success-soft);
+    }
+
+    .badge.warning {
+      color:var(--warning);
+      border-color:#FDE68A;
+      background:var(--warning-soft);
+    }
+
+    .badge.danger {
+      color:var(--danger);
+      border-color:#FECACA;
+      background:var(--danger-soft);
+    }
+
+    .chart-box {
+      position:relative;
+      height:300px;
+    }
+
+    .chart-box.small {
+      height:270px;
+    }
+
+    .chart-box.compact {
+      height:245px;
+    }
+
+    .priority-list {
+      display:grid;
+      gap:10px;
+    }
+
+    .priority-item {
+      display:grid;
+      grid-template-columns:40px 1fr auto;
+      gap:11px;
+      align-items:center;
+      padding:12px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background:var(--surface-soft);
+      transition:transform .18s ease,border-color .18s ease,background-color .18s ease;
+    }
+
+    .priority-item:hover {
+      transform:translateX(3px);
+      border-color:var(--blue-border);
+      background:var(--soft-blue);
+    }
+
+    .priority-rank {
+      width:36px;
+      height:36px;
+      display:grid;
+      place-items:center;
+      border-radius:11px;
+      color:var(--ai-blue);
+      background:var(--soft-blue);
+      font-size:14px;
+      font-weight:700;
+    }
+
+    .priority-copy strong {
+      display:block;
+      color:var(--text);
+      font-size:14px;
+      font-weight:600;
+    }
+
+    .priority-copy span {
+      display:block;
+      margin-top:4px;
+      color:var(--muted);
+      font-size:10.5px;
+      line-height:1.45;
+    }
+
+    .priority-value {
+      text-align:right;
+    }
+
+    .priority-value strong {
+      color:var(--deep-blue);
+      font-size:14px;
+      font-weight:700;
+    }
+
+    .priority-value span {
+      display:block;
+      margin-top:3px;
+      font-size:9px;
+      font-weight:700;
+    }
+
+    .checklist {
+      display:grid;
+      gap:10px;
+    }
+
+    .check-item {
+      display:grid;
+      grid-template-columns:30px 1fr auto;
+      gap:10px;
+      align-items:center;
+      padding:11px 0;
+      border-bottom:1px solid var(--border);
+    }
+
+    .check-item:last-child {
+      border-bottom:0;
+    }
+
+    .check-icon {
+      width:28px;
+      height:28px;
+      display:grid;
+      place-items:center;
+      border-radius:9px;
+      font-size:14px;
+      font-weight:700;
+    }
+
+    .check-icon.done {
+      color:var(--success);
+      background:var(--success-soft);
+    }
+
+    .check-icon.review {
+      color:var(--warning);
+      background:var(--warning-soft);
+    }
+
+    .check-icon.missing {
+      color:var(--danger);
+      background:var(--danger-soft);
+    }
+
+    .check-copy strong {
+      display:block;
+      font-size:14px;
+      font-weight:600;
+    }
+
+    .check-copy span {
+      display:block;
+      margin-top:3px;
+      color:var(--muted);
+      font-size:10.5px;
+    }
+
+    .check-status {
+      font-size:9px;
+      font-weight:700;
+    }
+
+    .alert-list {
+      display:grid;
+      gap:10px;
+    }
+
+    .alert-row {
+      display:grid;
+      grid-template-columns:9px 1fr auto;
+      gap:11px;
+      padding:12px 0;
+      border-bottom:1px solid var(--border);
+    }
+
+    .alert-row:last-child {
+      border-bottom:0;
+    }
+
+    .alert-dot {
+      width:9px;
+      height:9px;
+      margin-top:3px;
+      border-radius:50%;
+      background:var(--danger);
+      box-shadow:0 0 0 5px var(--danger-soft);
+    }
+
+    .alert-dot.warning {
+      background:var(--warning);
+      box-shadow:0 0 0 5px var(--warning-soft);
+    }
+
+    .alert-copy strong {
+      display:block;
+      font-size:14px;
+      font-weight:600;
+    }
+
+    .alert-copy p {
+      margin:5px 0 0;
+      color:var(--muted);
+      font-size:10.5px;
+      line-height:1.55;
+    }
+
+    .alert-meta {
+      color:var(--muted-2);
+      font-size:9px;
+      text-align:right;
+    }
+
+    .ai-recommendation {
+      padding:14px;
+      border:1px solid var(--blue-border);
+      border-radius:15px;
+      background:#FFFFFF;
+    }
+
+    .ai-recommendation + .ai-recommendation {
+      margin-top:10px;
+    }
+
+    .ai-recommendation strong {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      color:var(--deep-blue);
+      font-size:14px;
+      font-weight:600;
+    }
+
+    .ai-recommendation p {
+      margin:7px 0 0;
+      color:var(--text-2);
+      font-size:9.7px;
+      line-height:1.6;
+    }
+
+    .ai-actions {
+      display:flex;
+      gap:8px;
+      margin-top:10px;
+      flex-wrap:wrap;
+    }
+
+    .small-button {
+      min-height:32px;
+      padding:0 10px;
+      border:1px solid var(--blue-border);
+      border-radius:9px;
+      color:var(--ai-blue);
+      background:#FFFFFF;
+      font-size:9px;
+      font-weight:700;
+    }
+
+    .audit-timeline {
+      position:relative;
+      display:grid;
+      gap:12px;
+    }
+
+    .audit-timeline::before {
+      content:"";
+      position:absolute;
+      top:10px;
+      bottom:10px;
+      left:10px;
+      width:1px;
+      background:var(--blue-border);
+    }
+
+    .audit-item {
+      position:relative;
+      display:grid;
+      grid-template-columns:22px 1fr auto;
+      gap:11px;
+      align-items:start;
+    }
+
+    .audit-dot {
+      width:22px;
+      height:22px;
+      z-index:1;
+      display:grid;
+      place-items:center;
+      border-radius:50%;
+      color:var(--ai-blue);
+      background:var(--soft-blue);
+      border:4px solid #FFFFFF;
+      font-size:8px;
+      font-weight:700;
+    }
+
+    .audit-copy strong {
+      display:block;
+      font-size:14px;
+      font-weight:600;
+    }
+
+    .audit-copy p {
+      margin:4px 0 0;
+      color:var(--muted);
+      font-size:10.5px;
+      line-height:1.5;
+    }
+
+    .audit-time {
+      color:var(--muted-2);
+      font-size:9px;
+      text-align:right;
+    }
+
+    .table-tools {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .table-search {
+      height:36px;
+      min-width:220px;
+      padding:0 11px;
+      border:1px solid var(--border);
+      border-radius:10px;
+      background:var(--surface-soft);
+      outline:0;
+      font-size:10px;
+    }
+
+    .table-wrap {
+      overflow-x:auto;
+      border:1px solid var(--border);
+      border-radius:16px;
+    }
+
+    table {
+      width:100%;
+      min-width:1060px;
+      border-collapse:collapse;
+    }
+
+    th {
+      padding:12px 13px;
+      text-align:left;
+      color:var(--muted);
+      background:var(--surface-soft);
+      border-bottom:1px solid var(--border);
+      font-size:9px;
+      font-weight:700;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+
+    td {
+      padding:13px;
+      border-bottom:1px solid #EDF2F7;
+      color:var(--text-2);
+      font-size:10px;
+      white-space:nowrap;
+    }
+
+    tbody tr {
+      transition:background-color .16s ease;
+    }
+
+    tbody tr:hover {
+      background:var(--soft-blue);
+    }
+
+    tbody tr:last-child td {
+      border-bottom:0;
+    }
+
+    .patient-cell {
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .patient-avatar {
+      width:30px;
+      height:30px;
+      display:grid;
+      place-items:center;
+      border:1px solid var(--blue-border);
+      border-radius:10px;
+      color:var(--deep-blue);
+      background:var(--soft-blue);
+      font-size:9px;
+      font-weight:700;
+    }
+
+    .patient-cell strong {
+      display:block;
+      color:var(--text);
+      font-size:10px;
+      font-weight:600;
+    }
+
+    .patient-cell span {
+      display:block;
+      margin-top:3px;
+      color:var(--muted);
+      font-size:8.5px;
+    }
+
+    .status-chip {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:82px;
+      gap:5px;
+      padding:6px 9px;
+      border-radius:999px;
+      font-size:8.5px;
+      font-weight:700;
+    }
+
+    .status-chip.normal {
+      color:var(--success);
+      background:var(--success-soft);
+    }
+
+    .status-chip.review {
+      color:var(--warning);
+      background:var(--warning-soft);
+    }
+
+    .status-chip.alert {
+      color:var(--danger);
+      background:var(--danger-soft);
+    }
+
+    .variance {
+      font-weight:700;
+    }
+
+    .variance.high {
+      color:var(--danger);
+    }
+
+    .variance.low {
+      color:var(--success);
+    }
+
+    .score {
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      font-weight:700;
+    }
+
+    .score::before {
+      content:"";
+      width:7px;
+      height:7px;
+      border-radius:50%;
+      background:currentColor;
+    }
+
+    .row-action {
+      min-height:31px;
+      padding:0 10px;
+      border:1px solid var(--blue-border);
+      border-radius:9px;
+      color:var(--ai-blue);
+      background:#FFFFFF;
+      font-size:8.5px;
+      font-weight:700;
+    }
+
+    .disclaimer {
+      margin-top:12px;
+      color:var(--muted);
+      font-size:9px;
+      line-height:1.55;
+    }
+
+    .overlay {
+      position:fixed;
+      inset:0;
+      z-index:50;
+      display:none;
+      background:rgba(15,23,42,.42);
+    }
+
+    .toast {
+      position:fixed;
+      right:22px;
+      bottom:22px;
+      z-index:100;
+      max-width:340px;
+      padding:13px 15px;
+      border:1px solid var(--blue-border);
+      border-radius:13px;
+      color:var(--deep-blue);
+      background:#FFFFFF;
+      box-shadow:var(--shadow-lg);
+      font-size:10px;
+      font-weight:600;
+      opacity:0;
+      transform:translateY(22px);
+      pointer-events:none;
+      transition:.22s ease;
+    }
+
+    .toast.show {
+      opacity:1;
+      transform:translateY(0);
+    }
+
+    @media(max-width:1500px) {
+      .kpi-grid {
+        grid-template-columns:repeat(3,1fr);
+      }
+    }
+
+    @media(max-width:1220px) {
+      .search-field {
+        display:none;
+      }
+
+      .grid-3 {
+        grid-template-columns:1fr 1fr;
+      }
+
+      .grid-3 > :last-child {
+        grid-column:span 2;
+      }
+    }
+
+    @media(max-width:980px) {
+      .app-shell {
+        grid-template-columns:1fr;
+      }
+
+      .workspace {
+        grid-column:1;
+      }
+
+      .sidebar {
+        transform:translateX(-105%);
+      }
+
+      .sidebar.open {
+        transform:translateX(0);
+      }
+
+      .overlay.show {
+        display:block;
+      }
+
+      .menu-button {
+        display:inline-flex;
+      }
+
+      .topbar {
+        padding-inline:15px;
+      }
+
+      .profile-copy,
+      .top-button.date-button,
+      .primary-button {
+        display:none;
+      }
+
+      .content {
+        padding:15px;
+      }
+
+      .hero {
+        grid-template-columns:1fr;
+      }
+
+      .grid-2,
+      .grid-3 {
+        grid-template-columns:1fr;
+      }
+
+      .grid-3 > :last-child {
+        grid-column:auto;
+      }
+    }
+
+    @media(max-width:680px) {
+      .page-title h1 {
+        font-size:19px;
+      }
+
+      .page-title p {
+        display:none;
+      }
+
+      .hero {
+        padding:20px;
+      }
+
+      .hero h2 {
+        font-size:27px;
+      }
+
+      .safety-banner {
+        grid-template-columns:auto 1fr;
+      }
+
+      .safety-action {
+        grid-column:1 / -1;
+      }
+
+      .filter-spacer,
+      .last-updated {
+        display:none;
+      }
+
+      .filter-select {
+        flex:1;
+        min-width:120px;
+      }
+
+      .kpi-grid {
+        grid-template-columns:1fr;
+      }
+
+      .panel {
+        padding:14px;
+      }
+
+      .chart-box,
+      .chart-box.small,
+      .chart-box.compact {
+        height:260px;
+      }
+
+      .table-tools {
+        width:100%;
+      }
+
+      .table-search {
+        width:100%;
+      }
+
+      .icon-button.notification-button {
+        display:none;
+      }
+    }
+  
+
+    /* ===== Enhanced Enterprise Intelligence Layer ===== */
+    :root{--purple:#7C3AED;--purple-soft:#F5F3FF;--teal:#0F766E;--teal-soft:#F0FDFA}
+    .content{padding:26px;max-width:none}
+    .page-title h1{font-size:29px}.page-title p{font-size:13px}
+    .hero{grid-template-columns:minmax(0,1fr) 330px;padding:30px}.hero h2{font-size:39px}.hero p{font-size:15px}
+    .hero-summary-label,.hero-summary p{font-size:12px}.panel-title h3{font-size:22px}.panel-title p{font-size:13px;line-height:1.65}
+    .kpi-card{min-height:174px;padding:18px}.kpi-label{font-size:15px}.kpi-value{font-size:35px}.kpi-note{font-size:12px}.trend{font-size:11px}
+    .section-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin:30px 0 14px}
+    .section-heading h2{margin:0;color:var(--deep-blue);font-size:25px;letter-spacing:-.035em}
+    .section-heading p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.6}
+    .section-index{font-size:11px;font-weight:800;letter-spacing:.12em;color:var(--ai-blue);text-transform:uppercase}
+    .executive-insight{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;padding:20px 22px;margin-bottom:18px;border:1px solid var(--blue-border);border-radius:18px;background:linear-gradient(135deg,#fff,#EFF6FF);box-shadow:var(--shadow-sm)}
+    .executive-insight h3{margin:0 0 7px;color:var(--deep-blue);font-size:20px}.executive-insight p{margin:0;color:var(--text-2);font-size:14px;line-height:1.7}
+    .action-row{display:flex;gap:9px;flex-wrap:wrap}.secondary-button{height:40px;padding:0 13px;border:1px solid var(--blue-border);border-radius:11px;background:#fff;color:var(--ai-blue);font-weight:700;font-size:12px}
+    .governance-row{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}.governance-chip{padding:7px 10px;border:1px solid var(--border);border-radius:999px;background:#fff;color:var(--text-2);font-size:11px;font-weight:700}
+    .metric-strip{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:18px}.metric-mini{padding:12px 14px;border:1px solid var(--border);border-radius:14px;background:#fff}.metric-mini span{display:block;color:var(--muted);font-size:11px}.metric-mini strong{display:block;margin-top:5px;color:var(--deep-blue);font-size:18px}
+    .grid-equal{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-bottom:18px}.grid-3-equal{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-bottom:18px}
+    .panel-insight{margin-top:10px;padding:10px 12px;border-left:3px solid var(--ai-blue);border-radius:8px;background:var(--soft-blue);color:var(--text-2);font-size:12px;line-height:1.6}
+    .control-select{height:34px;padding:0 28px 0 10px;border:1px solid var(--border);border-radius:9px;background:var(--surface-soft);color:var(--text);font-size:11px;font-weight:600}
+    .heatmap-wrap{overflow:auto}.heatmap{display:grid;grid-template-columns:140px repeat(5,minmax(90px,1fr));gap:7px;min-width:700px}.heat-label,.heat-cell{min-height:48px;display:flex;align-items:center;justify-content:center;border-radius:10px;font-size:11px;font-weight:700}.heat-label{justify-content:flex-start;color:var(--text-2)}.heat-header{color:var(--muted);font-size:10px}.heat-cell{border:1px solid rgba(255,255,255,.7);cursor:pointer;transition:.18s}.heat-cell:hover{transform:translateY(-2px);box-shadow:var(--shadow-sm)}
+    .calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}.calendar-head{text-align:center;color:var(--muted);font-size:10px;font-weight:700}.calendar-day{min-height:48px;padding:7px;border:1px solid var(--border);border-radius:9px;background:#fff;font-size:10px;cursor:pointer}.calendar-day strong{display:block;color:var(--deep-blue);font-size:11px}.calendar-day span{display:block;margin-top:6px;color:var(--text-2);font-weight:700}.level-1{background:#EFF6FF}.level-2{background:#DBEAFE}.level-3{background:#FEF3C7}.level-4{background:#FDE68A}.level-5{background:#FECACA}
+    .summary-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:18px}.summary-card{padding:14px;border:1px solid var(--border);border-radius:14px;background:#fff}.summary-card span{color:var(--muted);font-size:11px}.summary-card strong{display:block;margin-top:6px;color:var(--deep-blue);font-size:21px}
+    .recommendation-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}.recommendation-meta div{padding:8px;border-radius:9px;background:var(--surface-soft)}.recommendation-meta span{display:block;color:var(--muted);font-size:9px}.recommendation-meta strong{display:block;margin-top:3px;font-size:11px!important}
+    .drawer{position:fixed;top:0;right:0;z-index:120;width:min(520px,94vw);height:100vh;padding:22px;overflow:auto;background:#fff;box-shadow:-20px 0 55px rgba(15,42,95,.2);transform:translateX(105%);transition:.25s}.drawer.open{transform:translateX(0)}.drawer-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding-bottom:14px}.drawer h2{margin:0;color:var(--deep-blue);font-size:23px}.drawer-close{width:38px;height:38px;border:1px solid var(--border);border-radius:10px;background:#fff}.drawer-section{padding:16px 0;border-bottom:1px solid var(--border)}.drawer-section h4{margin:0 0 8px;color:var(--deep-blue)}.drawer-section p{margin:0;color:var(--text-2);font-size:13px;line-height:1.7}
+    .active-filter-bar{display:none;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;margin-bottom:18px;border:1px solid var(--blue-border);border-radius:12px;background:var(--soft-blue);font-size:12px}.active-filter-bar.show{display:flex}.filter-token{padding:5px 8px;border-radius:999px;background:#fff;color:var(--ai-blue);font-weight:700}.clear-filter{margin-left:auto;border:0;background:transparent;color:var(--danger);font-weight:700;font-size:11px}
+    #case-worklist table{min-width:1900px}#case-worklist th{position:sticky;top:0;z-index:2;font-size:11px}#case-worklist td{font-size:12px}.empty-row{text-align:center;padding:34px!important;color:var(--muted)}
+    @media(max-width:1500px){.metric-strip{grid-template-columns:repeat(3,1fr)}.summary-cards{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:1100px){.grid-equal,.grid-3-equal{grid-template-columns:1fr}.executive-insight{grid-template-columns:1fr}.metric-strip,.summary-cards{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:680px){.content{padding:14px}.hero h2{font-size:30px}.metric-strip,.summary-cards{grid-template-columns:1fr}.section-heading h2{font-size:22px}.recommendation-meta{grid-template-columns:1fr 1fr}}
+
+  </style>
+
+<style id="economic-worklist-enterprise-font">
+/* Enterprise typography enhancement - Economic Review Worklist */
+.panel:has(#caseTableBody) .panel-title h3{
+    font-size:24px !important;
+    font-weight:700 !important;
+    letter-spacing:-0.02em;
+}
+.panel:has(#caseTableBody) .panel-title p{
+    font-size:14px !important;
+    line-height:1.7 !important;
+}
+.panel:has(#caseTableBody) th{
+    font-size:12px !important;
+    font-weight:700 !important;
+}
+.panel:has(#caseTableBody) td{
+    font-size:13px !important;
+    line-height:1.7 !important;
+}
+.panel:has(#caseTableBody) .patient-cell strong{
+    font-size:14px !important;
+}
+.panel:has(#caseTableBody) .patient-cell span{
+    font-size:12px !important;
+}
+.panel:has(#caseTableBody) .status-chip{
+    font-size:11px !important;
+    min-width:110px !important;
+    padding:8px 12px !important;
+}
+.panel:has(#caseTableBody) .row-action{
+    font-size:11px !important;
+    min-height:38px !important;
+    padding:0 14px !important;
+}
+.panel:has(#caseTableBody) .table-search,
+.panel:has(#caseTableBody) .table-filter{
+    font-size:13px !important;
+    height:42px !important;
+}
+.panel:has(#caseTableBody) .disclaimer{
+    font-size:12px !important;
+    line-height:1.8 !important;
+}
+</style>
+
+</head>
+
+<body>
+  <div class="overlay" id="overlay" aria-hidden="true"></div>
+
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Primary navigation">
+      <div class="brand">
+        <div class="brand-mark">NX</div>
+        <div class="brand-copy">
+          <strong>Med AI NexSure</strong>
+          <span>Enterprise Healthcare & Insurance Intelligence Platform</span>
+        </div>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-label">Core Workspace</div>
+        <nav class="nav-list" aria-label="Core workspace navigation">
+          <a class="nav-item" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>
+            Main Dashboard
+          </a>
+          <a class="nav-item" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Patient Management
+          </a>
+          <a class="nav-item" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+            Visit Management
+          </a>
+          <a class="nav-item" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M4 4h16v16H6.5A2.5 2.5 0 0 0 4 22Z"/></svg>
+            Enterprise SOAP Note
+          </a>
+          <a class="nav-item" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3 4 7v5c0 5 3.5 8 8 9 4.5-1 8-4 8-9V7l-8-4Z"/><path d="M9 12l2 2 4-4"/></svg>
+            Claim Readiness
+          </a>
+          <a class="nav-item active" href="#economic-intelligence">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M12 6v12M16 8.5H10a2.5 2.5 0 0 0 0 5h4a2.5 2.5 0 0 1 0 5H8"/></svg>
+            Economic Intelligence
+          </a>
+          <a class="nav-item" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg>
+            Evidence Package
+          </a>
+        </nav>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-label">Governance & Operations</div>
+        <nav class="nav-list" aria-label="Governance and operations navigation">
+          <a class="nav-item" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            Audit & Compliance
+          </a>
+          <a class="nav-item" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+            Task Management
+          </a>
+          <a class="nav-item" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
+            Notification Center
+          </a>
+          <a class="nav-item" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19V5"/><path d="M4 19h16"/><path d="m7 15 4-4 3 3 5-7"/></svg>
+            Executive Dashboard
+          </a>
+        </nav>
+      </div>
+
+      <div class="sidebar-status">
+        <div class="sidebar-status-head">
+          <span class="health-dot"></span>
+          AI & Economic Engine Active
+        </div>
+        <p>Cost benchmark, outlier detection, payer-rule evaluation, and audit logging are operating normally. ระบบพร้อมใช้งาน</p>
+      </div>
+    </aside>
+
+    <main class="workspace" id="economic-intelligence">
+      <header class="topbar">
+        <button class="menu-button" id="menuButton" type="button" aria-label="Open navigation" aria-controls="sidebar" aria-expanded="false">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+
+        <div class="page-title">
+          <h1>Healthcare Economic & Insurance Intelligence</h1>
+          <p>Finance 55% · Insurance Risk 30% · Hospital Operations 15% · Audit-ready decision intelligence</p>
+        </div>
+
+        <div class="top-actions">
+          <label class="search-field">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+            <input id="globalSearch" type="search" placeholder="Search visit, patient, payer, diagnosis..." aria-label="Search visit, patient, payer, diagnosis" />
+          </label>
+
+          <button class="top-button date-button" id="dateButton" type="button">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>
+            Last 30 Days
+          </button>
+
+          <button class="icon-button" id="refreshButton" type="button" aria-label="Refresh dashboard">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 11a8 8 0 1 0 2 5"/><path d="M20 4v7h-7"/></svg>
+          </button>
+
+          <button class="primary-button" id="exportButton" type="button">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+            Export Insight
+          </button>
+
+          <button class="icon-button notification-button" type="button" aria-label="Notifications">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
+          </button>
+
+          <div class="profile">
+            <div class="profile-avatar">CJ</div>
+            <div class="profile-copy">
+              <strong>Chatrapee J.</strong>
+              <span>Economic Reviewer</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="content">
+        <div class="breadcrumb">
+          <span>Intelligence Workspace</span>
+          <span>/</span>
+          <strong>Economic Intelligence</strong>
+        </div>
+
+        <section class="hero">
+          <div class="hero-copy">
+            <div class="hero-eyebrow">Enterprise Healthcare Financial Intelligence</div>
+            <h2>Control medical cost, claim risk, and operational variance—without compromising clinical necessity.</h2>
+            <p>
+              Analyze visit cost against benchmark, payer rules, and clinical context to identify outliers and reduce claim leakage.
+              ช่วยให้ผู้มีอำนาจตรวจสอบเหตุผลและตัดสินใจจากข้อมูลที่ตรวจสอบย้อนหลังได้
+            </p>
+          </div>
+
+          <div class="hero-summary">
+            <div class="hero-summary-label">Potential Leakage Identified</div>
+            <strong>฿1.84M</strong>
+            <p>Potential avoidable cost and claim leakage identified across 426 visits. ต้องผ่าน Human Review ก่อนดำเนินการ</p>
+          </div>
+        </section>
+
+        <section class="safety-banner">
+          <div class="safety-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m12 3 9 16H3L12 3Z"/><path d="M12 9v4M12 17h.01"/></svg>
+          </div>
+          <div>
+            <strong>Clinical Safety Priority</strong>
+            <p>Economic alerts must never override clinical necessity, patient safety, or authorized clinical judgment. กรุณาตรวจสอบ Allergy, Critical Condition, Treatment Rationale และ Missing Clinical Evidence ก่อนดำเนินการด้านการเงิน</p>
+          </div>
+          <button class="safety-action action-trigger" type="button" data-message="Clinical Safety Review Queue opened.">Review Safety Signals</button>
+        </section>
+
+        <section class="executive-insight">
+          <div>
+            <h3>Executive Insight Summary</h3>
+            <p>Medical cost remains <strong>7.4% above</strong> the adjusted benchmark. Medication, laboratory, and imaging contribute <strong>73%</strong> of positive variance. The platform identified <strong>฿1.84M</strong> in potential leakage, with <strong>฿986K</strong> already prevented or resolved. ข้อมูลนี้ใช้เพื่อช่วยจัดลำดับการตรวจสอบร่วมกับ Clinical Necessity, Payer Policy และ Evidence Completeness</p>
+          </div>
+          <div class="action-row">
+            <button class="secondary-button chart-filter" data-filter="High Risk">Review High-impact Cases</button>
+            <button class="secondary-button" id="payerRiskButton" type="button">View Payer Risk</button>
+            <button class="primary-button" id="executiveExport" type="button">Export Executive Report</button>
+          </div>
+        </section>
+
+        <div class="governance-row">
+          <span class="governance-chip">Decision Support Only</span><span class="governance-chip">Human Review Required</span><span class="governance-chip">Audit Logged</span><span class="governance-chip">Explainable Recommendation</span><span class="governance-chip">Clinical Safety Protected</span>
+        </div>
+
+        <section class="filter-bar">
+          <span class="filter-label">View by</span>
+          <select class="filter-select" id="clinicFilter">
+            <option>All Clinics</option>
+            <option>NexSure Medical Center</option>
+            <option>Bangkok Prime Clinic</option>
+            <option>Chiang Mai Care</option>
+          </select>
+          <select class="filter-select" id="payerFilter">
+            <option>All Payers</option>
+            <option>AIA</option>
+            <option>Muang Thai Life</option>
+            <option>Allianz Ayudhya</option>
+            <option>Self Pay</option>
+          </select>
+          <select class="filter-select" id="visitFilter">
+            <option>All Visit Types</option>
+            <option>OPD</option>
+            <option>IPD</option>
+            <option>Telemedicine</option>
+          </select>
+          <div class="filter-spacer"></div>
+          <span class="last-updated" id="updatedText">Last updated: 11 Jul 2026 · 13:32</span>
+        </section>
+        <div class="active-filter-bar" id="activeFilterBar"><strong>Active Filters:</strong><span id="activeFilterTokens"></span><button class="clear-filter" id="clearFilters" type="button">Clear all</button></div>
+
+        <section class="kpi-grid">
+          <article class="kpi-card">
+            <div class="kpi-head">
+              <div class="kpi-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19V5"/><path d="M4 19h16"/><path d="m7 15 4-4 3 3 5-7"/></svg>
+              </div>
+              <span class="trend positive">-3.8%</span>
+            </div>
+            <div class="kpi-label">Total Medical Cost</div>
+            <div class="kpi-value">฿10.25M</div>
+            <div class="kpi-note">Total clinical service cost · เทียบกับช่วงก่อนหน้า -3.8%</div>
+          </article>
+
+          <article class="kpi-card">
+            <div class="kpi-head">
+              <div class="kpi-icon danger">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m12 3 9 16H3L12 3Z"/><path d="M12 9v4M12 17h.01"/></svg>
+              </div>
+              <span class="trend negative">+12.6%</span>
+            </div>
+            <div class="kpi-label">Average Visit Cost</div>
+            <div class="kpi-value" id="alertCount">฿2,840</div>
+            <div class="kpi-note">Average cost per completed visit · ต้องพิจารณาร่วมกับ Case Mix</div>
+          </article>
+
+          <article class="kpi-card">
+            <div class="kpi-head">
+              <div class="kpi-icon success">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 6 9 17l-5-5"/></svg>
+              </div>
+              <span class="trend positive">+4.1%</span>
+            </div>
+            <div class="kpi-label">Realized Savings</div>
+            <div class="kpi-value">฿986K</div>
+            <div class="kpi-note">Confirmed value recovered or prevented after Human Review</div>
+          </article>
+
+          <article class="kpi-card">
+            <div class="kpi-head">
+              <div class="kpi-icon warning">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </div>
+              <span class="trend warning">+8.9%</span>
+            </div>
+            <div class="kpi-label">Potential Cost Leakage</div>
+            <div class="kpi-value">฿1.84M</div>
+            <div class="kpi-note">Estimated avoidable cost from cases pending review · ประเมินจากคิวที่ต้องตรวจสอบ</div>
+          </article>
+
+          <article class="kpi-card">
+            <div class="kpi-head">
+              <div class="kpi-icon warning">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+              </div>
+              <span class="trend warning">Moderate</span>
+            </div>
+            <div class="kpi-label">Average Cost Variance</div>
+            <div class="kpi-value">+7.4%</div>
+            <div class="kpi-note">Compared with clinical and payer-adjusted benchmark · เทียบกับเกณฑ์ที่ปรับตามบริบท</div>
+          </article>
+
+          <article class="kpi-card">
+            <div class="kpi-head">
+              <div class="kpi-icon success">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="m9 12 2 2 4-4"/></svg>
+              </div>
+              <span class="trend positive">+2.3%</span>
+            </div>
+            <div class="kpi-label">Benchmark Compliance</div>
+            <div class="kpi-value">91.6%</div>
+            <div class="kpi-note">Visits aligned with expected cost and documentation · ข้อมูลและต้นทุนเป็นไปตามเกณฑ์</div>
+          </article>
+        </section>
+        <section class="metric-strip">
+          <div class="metric-mini"><span>Cost Alert Cases</span><strong>426</strong></div><div class="metric-mini"><span>Normal Cost Cases</span><strong>3,184</strong></div><div class="metric-mini"><span>Cost per Claim</span><strong>฿3,120</strong></div><div class="metric-mini"><span>High-value Outliers</span><strong>126</strong></div><div class="metric-mini"><span>Reviewed Opportunity</span><strong>68.4%</strong></div><div class="metric-mini"><span>Payer Threshold Compliance</span><strong>89.7%</strong></div>
+        </section>
+
+        <div class="section-heading"><div><div class="section-index">Section 02 · Finance Performance</div><h2>Cost Performance and Benchmark Trend</h2><p>Track actual medical cost against risk-adjusted benchmark, prior period, upper range, and forecast.</p></div></div>
+
+        <section class="grid-2">
+          <article class="panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <h3>Visit Cost Trend vs Benchmark</h3>
+                <p>Monthly average cost compared with expected benchmark and upper range · ใช้ติดตามแนวโน้มต้นทุน</p>
+              </div>
+              <span class="badge">12-Month Trend</span>
+            </div>
+            <div class="chart-box">
+              <canvas id="costTrendChart"></canvas>
+            </div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <h3>Cost Status Distribution</h3>
+                <p>Current visit distribution across economic review statuses · แสดงสัดส่วนตามสถานะการตรวจสอบ</p>
+              </div>
+              <span class="badge success">3,610 Visits</span>
+            </div>
+            <div class="chart-box small">
+              <canvas id="costDistributionChart"></canvas>
+            </div>
+          </article>
+        </section>
+
+        <section class="grid-2">
+          <article class="panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <h3>Top Cost Drivers</h3>
+                <p>Service categories contributing most to total medical cost · ระบุหมวดค่าใช้จ่ายหลัก</p>
+              </div>
+              <span class="badge">Cost Contribution</span>
+            </div>
+            <div class="chart-box">
+              <canvas id="costDriverChart"></canvas>
+            </div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <h3>Priority Economic Insights</h3>
+                <p>Actionable findings with context, ownership, and explanation · ใช้จัดลำดับประเด็นที่ต้องดำเนินการ</p>
+              </div>
+              <span class="badge warning">Needs Review</span>
+            </div>
+
+            <div class="priority-list">
+              <div class="priority-item">
+                <div class="priority-rank">01</div>
+                <div class="priority-copy">
+                  <strong>Laboratory cost above benchmark</strong>
+                  <span>Respiratory OPD cases show repeated panels without matching clinical justification. ควรตรวจสอบเหตุผลทางคลินิก</span>
+                </div>
+                <div class="priority-value">
+                  <strong>฿486K</strong>
+                  <span style="color:var(--danger)">+18.4%</span>
+                </div>
+              </div>
+
+              <div class="priority-item">
+                <div class="priority-rank">02</div>
+                <div class="priority-copy">
+                  <strong>High-cost medication concentration</strong>
+                  <span>Three medication groups account for 42% of pharmacy variance. ควรตรวจสอบรายการยาต้นทุนสูง</span>
+                </div>
+                <div class="priority-value">
+                  <strong>฿394K</strong>
+                  <span style="color:var(--warning)">+14.2%</span>
+                </div>
+              </div>
+
+              <div class="priority-item">
+                <div class="priority-rank">03</div>
+                <div class="priority-copy">
+                  <strong>Procedure coding inconsistency</strong>
+                  <span>Cost justification and procedure code are not aligned in 74 visits. กรุณาตรวจสอบ Coding Consistency</span>
+                </div>
+                <div class="priority-value">
+                  <strong>74 cases</strong>
+                  <span style="color:var(--danger)">Review</span>
+                </div>
+              </div>
+
+              <div class="priority-item">
+                <div class="priority-rank">04</div>
+                <div class="priority-copy">
+                  <strong>Payer threshold nearing limit</strong>
+                  <span>Allianz OPD portfolio is within 4.8% of the monthly benefit threshold. ควรติดตาม Benefit Utilization</span>
+                </div>
+                <div class="priority-value">
+                  <strong>95.2%</strong>
+                  <span style="color:var(--warning)">Utilized</span>
+                </div>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section class="grid-3">
+          <article class="panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <h3>Cost Variance by Payer</h3>
+                <p>Variance against payer-adjusted expected cost · เปรียบเทียบตามเงื่อนไข Payer</p>
+              </div>
+              <span class="badge">Payer View</span>
+            </div>
+            <div class="chart-box compact">
+              <canvas id="payerVarianceChart"></canvas>
+            </div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <h3>Missing Evidence Checklist</h3>
+                <p>Evidence completeness checklist for required actions · แสดงรายการที่ต้องดำเนินการให้ครบถ้วน</p>
+              </div>
+              <span class="badge danger">18 Missing</span>
+            </div>
+
+            <div class="checklist">
+              <div class="check-item">
+                <div class="check-icon done">✓</div>
+                <div class="check-copy">
+                  <strong>SOAP Note</strong>
+                  <span>Clinical assessment and treatment plan completed · ข้อมูลครบถ้วน</span>
+                </div>
+                <span class="check-status" style="color:var(--success)">Complete</span>
+              </div>
+
+              <div class="check-item">
+                <div class="check-icon review">!</div>
+                <div class="check-copy">
+                  <strong>ICD Support</strong>
+                  <span>Diagnosis support requires reviewer confirmation · กรุณายืนยันความสอดคล้อง</span>
+                </div>
+                <span class="check-status" style="color:var(--warning)">Review</span>
+              </div>
+
+              <div class="check-item">
+                <div class="check-icon missing">×</div>
+                <div class="check-copy">
+                  <strong>Treatment Justification</strong>
+                  <span>Required for high-cost imaging and laboratory services · ต้องแนบเหตุผลสนับสนุน</span>
+                </div>
+                <span class="check-status" style="color:var(--danger)">Missing</span>
+              </div>
+
+              <div class="check-item">
+                <div class="check-icon review">!</div>
+                <div class="check-copy">
+                  <strong>Payer Attachment</strong>
+                  <span>Benefit confirmation document is pending · รอเอกสารยืนยันสิทธิ์</span>
+                </div>
+                <span class="check-status" style="color:var(--warning)">Pending</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel ai-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <h3>AI Economic Recommendations</h3>
+                <p>AI-generated decision support with clear Human-in-the-Loop governance · ผู้ใช้งานเป็นผู้ตัดสินใจขั้นสุดท้าย</p>
+              </div>
+              <span class="badge">AI Assisted</span>
+            </div>
+
+            <div class="ai-recommendation">
+              <strong>Prioritize 126 high-value outliers</strong>
+              <p>Review visits where variance exceeds 30% and potential saving is greater than ฿3,000 per case. ควรจัดลำดับตรวจสอบก่อน</p><div class="recommendation-meta"><div><span>Impact</span><strong>฿486K</strong></div><div><span>Cases</span><strong>126</strong></div><div><span>Confidence</span><strong>89%</strong></div><div><span>Model</span><strong>NX-ECO-1.5</strong></div></div>
+              <div class="ai-actions">
+                <button class="small-button chart-filter" data-filter="High Risk">Open Queue</button><button class="small-button drawer-trigger" data-drawer="ai">View Explanation</button>
+                <button class="small-button drawer-trigger" data-drawer="assign">Assign Task</button><button class="small-button action-trigger" data-message="AI recommendation accepted and audit logged.">Accept</button>
+              </div>
+            </div>
+
+            <div class="ai-recommendation">
+              <strong>Validate laboratory ordering pattern</strong>
+              <p>AI found a repeat-test pattern across 3 clinics. กรุณาตรวจสอบ Clinical Protocol ก่อนปรับ Rule</p>
+              <div class="ai-actions">
+                <button class="small-button action-trigger" data-message="Laboratory pattern analysis opened.">View Analysis</button>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <div class="section-heading"><div><div class="section-index">Section 03 · Finance Root Cause</div><h2>Cost Variance Bridge and Cost Drivers</h2><p>Explain how expected cost becomes actual cost and identify the few categories producing most variance.</p></div></div>
+        <section class="grid-equal">
+          <article class="panel"><div class="panel-header"><div class="panel-title"><h3>Cost Variance Bridge</h3><p>Expected Medical Cost → positive/negative drivers → Actual Medical Cost · แสดงที่มาของ Cost Variance</p></div><span class="badge">Waterfall</span></div><div class="chart-box"><canvas id="waterfallChart"></canvas></div><div class="panel-insight">Medication, laboratory, and imaging explain the majority of positive variance; discounts and approved clinical exceptions offset ฿230K.</div></article>
+          <article class="panel"><div class="panel-header"><div class="panel-title"><h3>Cost Driver Pareto</h3><p>Variance value with cumulative contribution and 80% reference · ใช้จัดลำดับ Root Cause</p></div><span class="badge">Pareto 80/20</span></div><div class="chart-box"><canvas id="paretoChart"></canvas></div><div class="panel-insight">Medication, laboratory, and imaging account for approximately 73% of total positive cost variance.</div></article>
+        </section>
+
+        <div class="section-heading" id="payer-risk-section"><div><div class="section-index">Section 04 · Insurance Intelligence</div><h2>Insurance and Payer Risk Intelligence</h2><p>Connect financial exposure to payer rules, claim risk, exceptions, and review priority.</p></div></div>
+        <section class="grid-equal">
+          <article class="panel"><div class="panel-header"><div class="panel-title"><h3>Payer Risk Heatmap</h3><p>Payer × cost category risk concentration · คลิก Cell เพื่อกรอง Worklist</p></div><select class="control-select" id="heatMetric"><option>Cost Variance %</option><option>Potential Leakage</option><option>Alert Count</option><option>Rule Exceptions</option></select></div><div class="heatmap-wrap"><div class="heatmap" id="payerHeatmap"></div></div></article>
+          <article class="panel"><div class="panel-header"><div class="panel-title"><h3>Financial Impact vs Claim Risk</h3><p>Quadrant analysis for immediate review, finance optimization, compliance review, and monitoring.</p></div><span class="badge warning">Risk Matrix</span></div><div class="chart-box"><canvas id="riskScatterChart"></canvas></div><div class="panel-insight">Cases in the upper-right quadrant combine high claim risk and high financial impact and should receive immediate authorized review.</div></article>
+        </section>
+
+        <div class="section-heading"><div><div class="section-index">Section 05 · Hospital Operations Context</div><h2>Operational Context</h2><p>Use volume, timing, clinic, and department context to avoid misleading financial conclusions.</p></div></div>
+        <section class="grid-3-equal">
+          <article class="panel"><div class="panel-header"><div class="panel-title"><h3>Visit Volume vs Average Cost</h3><p>Separate volume-driven growth from unit-cost variance.</p></div></div><div class="chart-box compact"><canvas id="volumeCostChart"></canvas></div></article>
+          <article class="panel"><div class="panel-header"><div class="panel-title"><h3>Economic Alert Calendar</h3><p>Daily alert intensity · คลิกวันที่เพื่อกรองคิวงาน</p></div><select class="control-select"><option>Cost Alert Count</option><option>Total Cost</option><option>Cost Variance</option><option>Missing Evidence</option></select></div><div class="calendar-grid" id="alertCalendar"></div></article>
+          <article class="panel"><div class="panel-header"><div class="panel-title"><h3>Clinic & Department Benchmark</h3><p>Risk-adjusted comparison by operational unit.</p></div></div><div class="chart-box compact"><canvas id="clinicBenchmarkChart"></canvas></div><div class="panel-insight">ต้นทุนสูงไม่ได้หมายถึงความผิดปกติโดยอัตโนมัติ ต้องพิจารณา Case Mix และ Clinical Necessity ร่วมด้วย</div></article>
+        </section>
+
+        <div class="section-heading"><div><div class="section-index">Section 06 · Claim Control</div><h2>Evidence, Claim Control, and Leakage Prevention</h2><p>Measure missing evidence, payer exceptions, prevented leakage, and unresolved exposure.</p></div></div>
+        <section class="summary-cards"><div class="summary-card"><span>Detected Leakage</span><strong>฿1.84M</strong></div><div class="summary-card"><span>Prevented Leakage</span><strong>฿986K</strong></div><div class="summary-card"><span>Clinically Justified</span><strong>฿512K</strong></div><div class="summary-card"><span>Unresolved Leakage</span><strong>฿342K</strong></div><div class="summary-card"><span>Review Completion</span><strong>81.4%</strong></div></section>
+        <section class="grid-3-equal">
+          <article class="panel"><div class="panel-header"><div class="panel-title"><h3>Top Missing Evidence</h3><p>Portfolio-level evidence gaps by case count.</p></div><select class="control-select"><option>Missing Case Count</option><option>Financial Impact</option><option>Readiness Impact</option></select></div><div class="chart-box compact"><canvas id="missingEvidenceChart"></canvas></div></article>
+          <article class="panel"><div class="panel-header"><div class="panel-title"><h3>Claim Leakage Control Trend</h3><p>Detected, prevented, clinically justified, and unresolved value.</p></div></div><div class="chart-box compact"><canvas id="leakageTrendChart"></canvas></div></article>
+          <article class="panel"><div class="panel-header"><div class="panel-title"><h3>Payer Rule Exception Summary</h3><p>Ranked exception categories requiring reviewer attention.</p></div></div><div class="chart-box compact"><canvas id="ruleExceptionChart"></canvas></div></article>
+        </section>
+
+        <div class="section-heading"><div><div class="section-index">Section 07 · Action Center</div><h2>AI Recommendations and Action Center</h2><p>Prioritized, explainable, audit-logged actions with Human-in-the-Loop governance.</p></div></div>
+
+        <section class="grid-2">
+          <article class="panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <h3>Economic Alert Queue</h3>
+                <p>Recent alerts with urgency, reason, and owner · ใช้ติดตามประเด็นที่ต้องดำเนินการเร่งด่วน</p>
+              </div>
+              <span class="badge danger">Live Alerts</span>
+            </div>
+
+            <div class="alert-list">
+              <div class="alert-row">
+                <div class="alert-dot"></div>
+                <div class="alert-copy">
+                  <strong>Critical cost outlier detected</strong>
+                  <p>Visit OPD-2026-7841 is 86% above the expected range after risk adjustment. กรุณาตรวจสอบรายละเอียด</p>
+                </div>
+                <div class="alert-meta">4 min<br>Unassigned</div>
+              </div>
+
+              <div class="alert-row">
+                <div class="alert-dot warning"></div>
+                <div class="alert-copy">
+                  <strong>Missing treatment justification</strong>
+                  <p>High-cost imaging requires supporting clinical rationale before claim submission. กรุณาแนบเหตุผลทางคลินิก</p>
+                </div>
+                <div class="alert-meta">11 min<br>K. Anan</div>
+              </div>
+
+              <div class="alert-row">
+                <div class="alert-dot warning"></div>
+                <div class="alert-copy">
+                  <strong>Payer threshold exceeded</strong>
+                  <p>Medication cost exceeds the Muang Thai Life OPD threshold by ฿2,450. กรุณาตรวจสอบ Payer Rule</p>
+                </div>
+                <div class="alert-meta">18 min<br>S. Nicha</div>
+              </div>
+
+              <div class="alert-row">
+                <div class="alert-dot"></div>
+                <div class="alert-copy">
+                  <strong>Duplicate diagnostic service signal</strong>
+                  <p>A similar laboratory service was recorded twice within the same episode. กรุณาตรวจสอบรายการซ้ำ</p>
+                </div>
+                <div class="alert-meta">27 min<br>AI Review</div>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <h3>Audit & Compliance Activity</h3>
+                <p>Access, AI recommendations, review actions, and evidence changes are retained for audit · รองรับการตรวจสอบย้อนหลัง</p>
+              </div>
+              <span class="badge success">Audit Ready</span>
+            </div>
+
+            <div class="audit-timeline">
+              <div class="audit-item">
+                <div class="audit-dot">1</div>
+                <div class="audit-copy">
+                  <strong>Economic Reviewer opened cost outlier case</strong>
+                  <p>Role permission verified · Patient data masked · บันทึก Access Log แล้ว</p>
+                </div>
+                <div class="audit-time">09:42</div>
+              </div>
+
+              <div class="audit-item">
+                <div class="audit-dot">2</div>
+                <div class="audit-copy">
+                  <strong>AI recommendation generated</strong>
+                  <p>Recommendation stored with model version, reason, confidence, and Human Review requirement · พร้อมตรวจสอบย้อนหลัง</p>
+                </div>
+                <div class="audit-time">09:38</div>
+              </div>
+
+              <div class="audit-item">
+                <div class="audit-dot">3</div>
+                <div class="audit-copy">
+                  <strong>Missing evidence task assigned</strong>
+                  <p>Treatment Justification requested from Clinic Operations · กรุณาดำเนินการตาม Task</p>
+                </div>
+                <div class="audit-time">09:21</div>
+              </div>
+
+              <div class="audit-item">
+                <div class="audit-dot">4</div>
+                <div class="audit-copy">
+                  <strong>Executive report exported</strong>
+                  <p>No unnecessary PHI included · บันทึก Export Event เพื่อรองรับ Compliance</p>
+                </div>
+                <div class="audit-time">08:55</div>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section class="panel" id="case-worklist">
+          <div class="panel-header">
+            <div class="panel-title">
+              <h3>Economic Review Worklist</h3>
+              <p>Searchable operational records for review, assignment, evidence completion, and audit traceability · ใช้บริหารคิวงานและติดตามสถานะ</p>
+            </div>
+
+            <div class="table-tools">
+              <input class="table-search" id="tableSearch" type="search" placeholder="Search patient, visit, payer, diagnosis..." aria-label="Search economic review worklist" />
+              <select class="filter-select" id="statusFilter">
+                <option value="all">All Statuses</option>
+                <option value="Cost Alert">Cost Alert</option>
+                <option value="Needs Review">Needs Review</option>
+                <option value="Normal">Normal</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Patient / Visit</th><th>Clinic</th><th>Department</th><th>Payer</th><th>Diagnosis</th><th>Actual Cost</th><th>Expected Range</th><th>Variance</th><th>Potential Saving</th><th>Risk Score</th><th>Claim Readiness</th><th>Evidence</th><th>Clinical Exception</th><th>SLA</th><th>Status</th><th>Owner</th><th>Last Activity</th><th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="worklistBody"></tbody>
+            </table>
+          </div>
+
+          <div class="disclaimer">
+            Economic Intelligence is decision support, not an automatic claim approval, denial, or treatment decision mechanism.
+            ทุก Alert ต้องพิจารณาร่วมกับ Clinical Necessity, Payer Policy, Evidence Completeness และ Authorized Human Judgment
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" aria-hidden="true"><div class="drawer-head"><h2 id="drawerTitle">Case Review</h2><button class="drawer-close" id="drawerClose" type="button" aria-label="Close drawer">×</button></div><div id="drawerContent"></div></aside>
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <script>
+    (()=>{
+    'use strict';
+
+    /*
+      Frontend Agent Structure Map
+      - Page Shell: existing HTML document, sidebar, topbar, and content regions
+      - Layout: app shell, navigation, workspace, drawer, overlay, and toast
+      - Feature Sections: economic KPIs, finance charts, payer risk, operations, claim control, action center
+      - Shared UI: badges, KPI cards, panels, tables, buttons, drawer, toast, filters
+      - Mock Data: worklistData, heatmap dimensions, chart datasets
+      - Utilities: formatting, chart defaults, DOM state helpers
+      - Controllers: worklist, filters, drawer, sidebar, export, search, chart interactions
+    */
+    // ===== Constants / Design Tokens =====
+    const palette = {
+      deep:"#0F2A5F",
+      primary:"#1E3A8A",
+      blue:"#2563EB",
+      azure:"#38BDF8",
+      green:"#059669",
+      orange:"#D97706",
+      red:"#DC2626",
+      grid:"rgba(148,163,184,.18)",
+      text:"#64748B"
+    };
+
+    // ===== Chart Service Configuration =====
+    Chart.defaults.font.family = "Inter";
+    Chart.defaults.font.size = 12;
+    Chart.defaults.color = palette.text;
+    Chart.defaults.animation.duration = 900;
+    Chart.defaults.plugins.legend.labels.usePointStyle = true;
+    Chart.defaults.plugins.legend.labels.boxWidth = 7;
+    Chart.defaults.plugins.legend.labels.boxHeight = 7;
+
+    // ===== Utilities =====
+    const money = new Intl.NumberFormat("th-TH", {
+      style:"currency",
+      currency:"THB",
+      maximumFractionDigits:0
+    });
+
+    const tooltipStyle = {
+      backgroundColor:"rgba(15,42,95,.96)",
+      titleColor:"#FFFFFF",
+      bodyColor:"#E0F2FE",
+      borderColor:"rgba(191,219,254,.26)",
+      borderWidth:1,
+      padding:10
+    };
+
+    function verticalGradient(ctx, topColor, bottomColor) {
+      const gradient = ctx.createLinearGradient(0,0,0,300);
+      gradient.addColorStop(0,topColor);
+      gradient.addColorStop(1,bottomColor);
+      return gradient;
+    }
+
+    // ===== Feature: Finance Performance Charts =====
+    const costTrendContext = document.getElementById("costTrendChart").getContext("2d");
+
+    new Chart(costTrendContext, {
+      type:"line",
+      data:{
+        labels:["Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar","Apr","May","Jun"],
+        datasets:[
+          {
+            label:"Average Visit Cost",
+            data:[2920,2860,3010,2980,3120,3050,2960,2910,2870,2820,2790,2840],
+            borderColor:palette.blue,
+            backgroundColor:verticalGradient(costTrendContext,"rgba(37,99,235,.18)","rgba(37,99,235,0)"),
+            fill:true,
+            tension:.38,
+            pointRadius:0,
+            borderWidth:2.2
+          },
+          {
+            label:"Expected Benchmark",
+            data:[2760,2780,2790,2810,2830,2840,2820,2810,2800,2790,2780,2790],
+            borderColor:palette.green,
+            borderDash:[6,5],
+            tension:.34,
+            pointRadius:0,
+            borderWidth:1.8
+          },
+          {
+            label:"Upper Expected Range",
+            data:[3180,3200,3210,3230,3250,3260,3240,3230,3220,3210,3200,3210],
+            borderColor:"rgba(217,119,6,.62)",
+            borderDash:[3,4],
+            pointRadius:0,
+            borderWidth:1.3
+          }
+        ]
+      },
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        interaction:{intersect:false,mode:"index"},
+        plugins:{
+          legend:{position:"top",align:"end"},
+          tooltip:{
+            ...tooltipStyle,
+            callbacks:{
+              label:(context)=>`${context.dataset.label}: ${money.format(context.raw)}`
+            }
+          }
+        },
+        scales:{
+          x:{
+            grid:{display:false},
+            border:{display:false}
+          },
+          y:{
+            grid:{color:palette.grid},
+            border:{display:false},
+            ticks:{
+              callback:(value)=>`฿${(value/1000).toFixed(1)}K`
+            }
+          }
+        }
+      }
+    });
+
+    new Chart(document.getElementById("costDistributionChart"), {
+      type:"doughnut",
+      data:{
+        labels:["Normal Cost","Needs Review","Cost Alert","Low Outlier"],
+        datasets:[{
+          data:[3184,214,152,60],
+          backgroundColor:[palette.green,palette.orange,palette.red,palette.azure],
+          borderWidth:0,
+          hoverOffset:8
+        }]
+      },
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        cutout:"70%",
+        plugins:{
+          legend:{position:"bottom",labels:{padding:15}},
+          tooltip:{...tooltipStyle}
+        }
+      },
+      plugins:[{
+        id:"distributionCenter",
+        afterDraw(chart) {
+          const {ctx,chartArea:{left,right,top,bottom}} = chart;
+          ctx.save();
+          ctx.textAlign="center";
+          ctx.fillStyle=palette.deep;
+          ctx.font="700 25px Inter";
+          ctx.fillText("88.2%",(left+right)/2,(top+bottom)/2-2);
+          ctx.fillStyle=palette.text;
+          ctx.font="600 8px Inter";
+          ctx.fillText("WITHIN RANGE",(left+right)/2,(top+bottom)/2+16);
+          ctx.restore();
+        }
+      }]
+    });
+
+    new Chart(document.getElementById("costDriverChart"), {
+      type:"bar",
+      data:{
+        labels:["Medication","Laboratory","Imaging","Procedure","Medical Supplies","Consultation","Other"],
+        datasets:[{
+          label:"Total Cost",
+          data:[4250000,3180000,2460000,2210000,1640000,1420000,910000],
+          backgroundColor:[
+            "rgba(37,99,235,.82)",
+            "rgba(56,189,248,.82)",
+            "rgba(30,58,138,.80)",
+            "rgba(15,42,95,.78)",
+            "rgba(217,119,6,.76)",
+            "rgba(5,150,105,.76)",
+            "rgba(100,116,139,.66)"
+          ],
+          borderRadius:8,
+          borderSkipped:false
+        }]
+      },
+      options:{
+        indexAxis:"y",
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{
+          legend:{display:false},
+          tooltip:{
+            ...tooltipStyle,
+            callbacks:{
+              label:(context)=>money.format(context.raw)
+            }
+          }
+        },
+        scales:{
+          x:{
+            grid:{color:palette.grid},
+            border:{display:false},
+            ticks:{
+              callback:(value)=>`฿${(value/1000000).toFixed(1)}M`
+            }
+          },
+          y:{
+            grid:{display:false},
+            border:{display:false}
+          }
+        }
+      }
+    });
+
+    new Chart(document.getElementById("payerVarianceChart"), {
+      type:"bar",
+      data:{
+        labels:["AIA","Muang Thai","Allianz","FWD","Self Pay"],
+        datasets:[{
+          label:"Cost Variance %",
+          data:[5.2,11.8,8.6,-2.4,4.1],
+          backgroundColor:[
+            "rgba(217,119,6,.74)",
+            "rgba(220,38,38,.78)",
+            "rgba(217,119,6,.74)",
+            "rgba(5,150,105,.74)",
+            "rgba(37,99,235,.74)"
+          ],
+          borderRadius:7,
+          borderSkipped:false
+        }]
+      },
+      options:{
+        responsive:true,
+        maintainAspectRatio:false,
+        plugins:{
+          legend:{display:false},
+          tooltip:{
+            ...tooltipStyle,
+            callbacks:{
+              label:(context)=>`${context.raw > 0 ? "+" : ""}${context.raw}%`
+            }
+          }
+        },
+        scales:{
+          x:{
+            grid:{display:false},
+            border:{display:false}
+          },
+          y:{
+            grid:{color:palette.grid},
+            border:{display:false},
+            ticks:{
+              callback:(value)=>`${value}%`
+            }
+          }
+        }
+      }
+    });
+
+
+    // ===== Feature: Root Cause, Insurance, Operations, and Claim Control Charts =====
+    const baseGrid = {color:palette.grid};
+    new Chart(document.getElementById("waterfallChart"),{type:"bar",data:{labels:["Expected Cost","Medication","Laboratory","Imaging","Procedure","Supplies","Discount","Clinical Exception","Actual Cost"],datasets:[{label:"Bridge",data:[[0,8400000],[8400000,8820000],[8820000,9130000],[9130000,9350000],[9350000,9520000],[9520000,9630000],[9490000,9630000],[9400000,9490000],[0,9400000]],backgroundColor:[palette.deep,palette.orange,palette.orange,palette.orange,palette.orange,palette.orange,palette.green,palette.green,palette.deep],borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...tooltipStyle,callbacks:{label:c=>`${money.format(c.raw[0])} → ${money.format(c.raw[1])}`}}},scales:{x:{grid:{display:false}},y:{grid:baseGrid,ticks:{callback:v=>`฿${(v/1000000).toFixed(1)}M`}}}}});
+    const paretoValues=[425000,318000,246000,221000,164000,142000,91000], paretoTotal=paretoValues.reduce((a,b)=>a+b,0); let run=0;
+    new Chart(document.getElementById("paretoChart"),{data:{labels:["Medication","Laboratory","Imaging","Procedure","Medical Supplies","Consultation","Other"],datasets:[{type:"bar",label:"Variance Value",data:paretoValues,backgroundColor:"rgba(37,99,235,.78)",borderRadius:7,yAxisID:"y"},{type:"line",label:"Cumulative %",data:paretoValues.map(v=>{run+=v;return +(run/paretoTotal*100).toFixed(1)}),borderColor:palette.orange,backgroundColor:palette.orange,tension:.25,yAxisID:"y1"},{type:"line",label:"80% Reference",data:Array(7).fill(80),borderColor:palette.red,borderDash:[5,5],pointRadius:0,yAxisID:"y1"}]},options:{responsive:true,maintainAspectRatio:false,onClick:(e,els)=>{if(els.length) applyChartFilter('category',e.chart.data.labels[els[0].index])},plugins:{tooltip:tooltipStyle},scales:{x:{grid:{display:false}},y:{grid:baseGrid,ticks:{callback:v=>`฿${v/1000}K`}},y1:{position:"right",min:0,max:100,grid:{display:false},ticks:{callback:v=>`${v}%`}}}}});
+    new Chart(document.getElementById("riskScatterChart"),{type:"bubble",data:{datasets:[{label:"Payer / Category",data:[{x:88,y:486000,r:18,label:"Muang Thai · Lab"},{x:76,y:394000,r:16,label:"AIA · Medication"},{x:69,y:272000,r:13,label:"Allianz · Imaging"},{x:42,y:190000,r:11,label:"FWD · Procedure"},{x:31,y:98000,r:8,label:"Self Pay · Supplies"}],backgroundColor:"rgba(37,99,235,.65)",borderColor:palette.blue}]},options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{...tooltipStyle,callbacks:{label:c=>`${c.raw.label}: Risk ${c.raw.x}, Impact ${money.format(c.raw.y)}`}}},scales:{x:{min:0,max:100,title:{display:true,text:"Claim Risk Score"},grid:baseGrid},y:{title:{display:true,text:"Financial Impact"},ticks:{callback:v=>`฿${v/1000}K`},grid:baseGrid}}}});
+    new Chart(document.getElementById("volumeCostChart"),{data:{labels:["Jan","Feb","Mar","Apr","May","Jun"],datasets:[{type:"bar",label:"Visit Volume",data:[540,575,610,598,632,655],backgroundColor:"rgba(56,189,248,.55)",yAxisID:"y"},{type:"line",label:"Average Cost",data:[2960,2910,2870,2820,2790,2840],borderColor:palette.blue,tension:.35,yAxisID:"y1"},{type:"line",label:"Benchmark",data:[2820,2810,2800,2790,2780,2790],borderColor:palette.green,borderDash:[5,5],pointRadius:0,yAxisID:"y1"}]},options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:tooltipStyle},scales:{y:{position:"left",grid:baseGrid},y1:{position:"right",grid:{display:false},ticks:{callback:v=>`฿${v}`}}}}});
+    new Chart(document.getElementById("clinicBenchmarkChart"),{type:"bar",data:{labels:["Internal Med","Orthopedics","Neurology","Pulmonology","General Practice"],datasets:[{label:"Actual",data:[3320,3580,3240,3460,2680],backgroundColor:"rgba(37,99,235,.72)",borderRadius:6},{label:"Benchmark",data:[2890,3120,2950,3010,2720],backgroundColor:"rgba(5,150,105,.55)",borderRadius:6}]},options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,plugins:{tooltip:tooltipStyle},scales:{x:{grid:baseGrid,ticks:{callback:v=>`฿${v}`}},y:{grid:{display:false}}}}});
+    new Chart(document.getElementById("missingEvidenceChart"),{type:"bar",data:{labels:["Treatment Justification","ICD Support","Lab Result","Benefit Confirmation","Medical Certificate","Prescription Detail"],datasets:[{data:[126,94,82,71,53,42],backgroundColor:"rgba(220,38,38,.68)",borderRadius:6}]},options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,onClick:(e,els)=>{if(els.length) applyChartFilter('evidence',e.chart.data.labels[els[0].index])},plugins:{legend:{display:false},tooltip:tooltipStyle},scales:{x:{grid:baseGrid},y:{grid:{display:false}}}}});
+    new Chart(document.getElementById("leakageTrendChart"),{type:"line",data:{labels:["Jan","Feb","Mar","Apr","May","Jun"],datasets:[{label:"Detected",data:[1280000,1420000,1510000,1640000,1720000,1840000],borderColor:palette.red,tension:.3},{label:"Prevented",data:[520000,610000,704000,792000,886000,986000],borderColor:palette.green,tension:.3},{label:"Clinically Justified",data:[310000,350000,390000,430000,475000,512000],borderColor:palette.blue,tension:.3},{label:"Unresolved",data:[450000,460000,416000,418000,359000,342000],borderColor:palette.orange,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{...tooltipStyle,callbacks:{label:c=>`${c.dataset.label}: ${money.format(c.raw)}`}}},scales:{x:{grid:{display:false}},y:{grid:baseGrid,ticks:{callback:v=>`฿${v/1000000}M`}}}}});
+    new Chart(document.getElementById("ruleExceptionChart"),{type:"bar",data:{labels:["Cost Threshold","Missing Document","ICD Mismatch","Benefit Limit","Duplicate Service","Waiting Period","Unsupported Treatment"],datasets:[{data:[142,126,96,81,63,42,31],backgroundColor:"rgba(217,119,6,.7)",borderRadius:6}]},options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:tooltipStyle},scales:{x:{grid:baseGrid},y:{grid:{display:false}}}}});
+
+    // ===== Mock Data: Payer Risk Heatmap =====
+    const payers=["AIA","Muang Thai","Allianz","FWD","Self Pay"], cats=["Medication","Laboratory","Imaging","Procedure","Medical Supplies"], heatValues=[[8,19,6,3,4],[14,12,21,4,7],[5,25,10,3,6],[7,9,16,1,5],[4,11,8,2,3]];
+    function renderHeatmap(){const root=document.getElementById('payerHeatmap');root.innerHTML='<div></div>'+payers.map(p=>`<div class="heat-label heat-header">${p}</div>`).join('')+cats.map((c,i)=>`<div class="heat-label">${c}</div>`+heatValues[i].map((v,j)=>{const a=Math.min(.15+v/32,.92);return `<div class="heat-cell" data-payer="${payers[j]}" data-category="${c}" style="background:rgba(220,38,38,${a});color:${a>.55?'#fff':'#7F1D1D'}">+${v}%</div>`}).join('')).join('');}
+    renderHeatmap();
+    document.getElementById('payerHeatmap').addEventListener('click',e=>{const cell=e.target.closest('.heat-cell');if(cell){applyChartFilter('payer',cell.dataset.payer);document.getElementById('payerFilter').value=[...document.getElementById('payerFilter').options].find(o=>o.text.includes(cell.dataset.payer))?.value||document.getElementById('payerFilter').value;}});
+    const cal=document.getElementById('alertCalendar');cal.innerHTML=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<div class="calendar-head">${d}</div>`).join('')+Array.from({length:28},(_,i)=>{const v=[2,4,7,10,13][(i*7)%5];const l=v>11?5:v>8?4:v>5?3:v>3?2:1;return `<div class="calendar-day level-${l}" data-day="${i+1}"><strong>${i+1} Jul</strong><span>${v} alerts</span></div>`}).join('');
+    cal.addEventListener('click',e=>{const d=e.target.closest('.calendar-day');if(d) applyChartFilter('date',`${d.dataset.day} Jul 2026`)});
+
+    // ===== Mock Data: Economic Review Worklist =====
+    const worklistData = [
+      {initials:"PS",name:"P****** S.",hn:"HN-284193",visit:"OPD-2026-7841",clinic:"NexSure Medical Center",department:"Internal Medicine",payer:"AIA",diagnosis:"J06.9 Acute URI",category:"Laboratory",actual:8650,min:3200,max:4650,variance:86,saving:3100,score:94,readiness:58,evidence:62,exception:"No",sla:"1h 42m",status:"Cost Alert",owner:"Unassigned",last:"4 min"},
+      {initials:"NK",name:"N****** K.",hn:"HN-552018",visit:"OPD-2026-7836",clinic:"Bangkok Prime Clinic",department:"Orthopedics",payer:"Muang Thai Life",diagnosis:"M54.5 Low back pain",category:"Imaging",actual:6240,min:3000,max:4100,variance:52,saving:2140,score:87,readiness:64,evidence:70,exception:"Pending",sla:"3h 10m",status:"Cost Alert",owner:"K. Anan",last:"11 min"},
+      {initials:"ST",name:"S****** T.",hn:"HN-193245",visit:"OPD-2026-7829",clinic:"Chiang Mai Care",department:"General Practice",payer:"Allianz Ayudhya",diagnosis:"R10.9 Abdominal pain",category:"Laboratory",actual:4950,min:3200,max:4300,variance:15,saving:650,score:68,readiness:76,evidence:81,exception:"Review",sla:"6h 25m",status:"Needs Review",owner:"S. Nicha",last:"18 min"},
+      {initials:"KW",name:"K****** W.",hn:"HN-449261",visit:"OPD-2026-7824",clinic:"NexSure Medical Center",department:"Endocrinology",payer:"Self Pay",diagnosis:"E11.9 Type 2 diabetes",category:"Medication",actual:2850,min:2600,max:3400,variance:2,saving:0,score:31,readiness:92,evidence:96,exception:"Approved",sla:"Met",status:"Normal",owner:"Auto Cleared",last:"24 min"},
+      {initials:"AR",name:"A****** R.",hn:"HN-671824",visit:"OPD-2026-7818",clinic:"Bangkok Prime Clinic",department:"Cardiology",payer:"FWD",diagnosis:"I10 Hypertension",category:"Medication",actual:2680,min:2500,max:3300,variance:-3,saving:0,score:27,readiness:94,evidence:98,exception:"Approved",sla:"Met",status:"Normal",owner:"Auto Cleared",last:"31 min"},
+      {initials:"CC",name:"C****** C.",hn:"HN-308715",visit:"OPD-2026-7812",clinic:"NexSure Medical Center",department:"Neurology",payer:"AIA",diagnosis:"G43.9 Migraine",category:"Medication",actual:5480,min:2800,max:3900,variance:41,saving:1580,score:81,readiness:72,evidence:74,exception:"Pending",sla:"4h 18m",status:"Needs Review",owner:"P. Rada",last:"42 min"},
+      {initials:"PL",name:"P****** L.",hn:"HN-228610",visit:"OPD-2026-7807",clinic:"Chiang Mai Care",department:"General Practice",payer:"Allianz Ayudhya",diagnosis:"K21.9 GERD",category:"Consultation",actual:3120,min:2700,max:3500,variance:4,saving:0,score:36,readiness:88,evidence:91,exception:"No",sla:"Met",status:"Normal",owner:"Auto Cleared",last:"51 min"},
+      {initials:"TT",name:"T****** T.",hn:"HN-884216",visit:"OPD-2026-7801",clinic:"Bangkok Prime Clinic",department:"Pulmonology",payer:"Muang Thai Life",diagnosis:"J45.9 Asthma",category:"Medication",actual:7140,min:3600,max:4700,variance:52,saving:2440,score:89,readiness:61,evidence:67,exception:"No",sla:"2h 05m",status:"Cost Alert",owner:"J. Malee",last:"58 min"}
+    ];
+
+    // ===== Shared State / DOM Registry =====
+    const worklistBody = document.getElementById("worklistBody");
+    const activeFilters = {};
+
+    // ===== Section Renderer: Worklist Table =====
+    function statusClass(status) {
+      if(status === "Cost Alert") return "alert";
+      if(status === "Needs Review") return "review";
+      return "normal";
+    }
+
+    function renderWorklist() {
+      const query = document.getElementById("tableSearch").value.toLowerCase().trim();
+      const statusFilter = document.getElementById("statusFilter").value;
+
+      worklistBody.innerHTML = worklistData
+        .filter(item=>{
+          const textMatch = Object.values(item).join(" ").toLowerCase().includes(query);
+          const statusMatch = statusFilter === "all" || item.status === statusFilter;
+          const payerMatch = !activeFilters.payer || item.payer.toLowerCase().includes(activeFilters.payer.toLowerCase());
+          const categoryMatch = !activeFilters.category || item.category === activeFilters.category;
+          const riskMatch = !activeFilters.risk || item.score >= 80;
+          return textMatch && statusMatch && payerMatch && categoryMatch && riskMatch;
+        })
+        .map(item=>{
+          const varianceClass = item.variance > 0 ? "high" : "low";
+          const scoreColor = item.score >= 80 ? "var(--danger)" : item.score >= 60 ? "var(--warning)" : "var(--success)";
+
+          return `
+            <tr>
+              <td><div class="patient-cell"><div class="patient-avatar">${item.initials}</div><div><strong>${item.name}</strong><span>${item.hn} · ${item.visit}</span></div></div></td>
+              <td>${item.clinic}</td><td>${item.department}</td><td>${item.payer}</td><td>${item.diagnosis}</td><td><strong>${money.format(item.actual)}</strong></td><td>${money.format(item.min)}–${money.format(item.max)}</td>
+              <td><span class="variance ${varianceClass}">${item.variance > 0 ? "+" : ""}${item.variance}%</span></td><td>${money.format(item.saving)}</td><td><span class="score" style="color:${scoreColor}">${item.score}</span></td>
+              <td>${item.readiness}%</td><td>${item.evidence}%</td><td>${item.exception}</td><td>${item.sla}</td><td><span class="status-chip ${statusClass(item.status)}">${item.status}</span></td><td>${item.owner}</td><td>${item.last}</td>
+              <td><button class="row-action drawer-trigger" data-drawer="review" data-visit="${item.visit}">Review Case</button></td>
+            </tr>
+          `;
+        })
+        .join("");
+      if(!worklistBody.innerHTML) worklistBody.innerHTML='<tr><td colspan="18" class="empty-row">No matching economic review cases · ไม่พบข้อมูลตามตัวกรองที่เลือก</td></tr>';
+    }
+
+    renderWorklist();
+
+    document.getElementById("tableSearch").addEventListener("input",renderWorklist);
+    document.getElementById("statusFilter").addEventListener("change",renderWorklist);
+
+    // ===== Layout Controller: Sidebar, Overlay, Drawer =====
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("overlay");
+    const drawer = document.getElementById("drawer");
+    const drawerTitle = document.getElementById("drawerTitle");
+    const drawerContent = document.getElementById("drawerContent");
+    const menuButton = document.getElementById("menuButton");
+
+    function isOverlayNeeded() {
+      return sidebar.classList.contains("open") || drawer.classList.contains("open");
+    }
+
+    function syncOverlayState() {
+      overlay.classList.toggle("show", isOverlayNeeded());
+      overlay.setAttribute("aria-hidden", String(!isOverlayNeeded()));
+    }
+
+    function setSidebarOpen(isOpen) {
+      sidebar.classList.toggle("open", isOpen);
+      menuButton.setAttribute("aria-expanded", String(isOpen));
+      syncOverlayState();
+    }
+
+    function setDrawerOpen(isOpen) {
+      drawer.classList.toggle("open", isOpen);
+      drawer.setAttribute("aria-hidden", String(!isOpen));
+      syncOverlayState();
+    }
+
+    menuButton.addEventListener("click",()=>{
+      setSidebarOpen(!sidebar.classList.contains("open"));
+    });
+
+    overlay.addEventListener("click",()=>{
+      setSidebarOpen(false);
+      setDrawerOpen(false);
+    });
+
+    document.querySelectorAll(".nav-item").forEach(item=>{
+      item.addEventListener("click",()=>{
+        document.querySelectorAll(".nav-item").forEach(nav=>nav.classList.remove("active"));
+        item.classList.add("active");
+        setSidebarOpen(false);
+      });
+    });
+
+    // ===== Shared UI Controller: Toast =====
+    const toast = document.getElementById("toast");
+    let toastTimer;
+
+    function showToast(message) {
+      clearTimeout(toastTimer);
+      toast.textContent = message;
+      toast.classList.add("show");
+      toastTimer = setTimeout(()=>toast.classList.remove("show"),2500);
+    }
+
+    // ===== Interaction Controller: Global Actions =====
+    document.addEventListener("click",event=>{
+      const button = event.target.closest(".action-trigger");
+      if(button) showToast(button.dataset.message);
+    });
+
+    document.getElementById("refreshButton").addEventListener("click",event=>{
+      event.currentTarget.style.transform = "rotate(180deg)";
+      setTimeout(()=>event.currentTarget.style.transform = "",350);
+
+      const now = new Date();
+      document.getElementById("updatedText").textContent =
+        `Last updated: ${now.toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"})} · ${now.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}`;
+
+      document.getElementById("alertCount").textContent = money.format(2780 + Math.floor(Math.random()*140));
+      showToast("Economic Intelligence data refreshed successfully.");
+    });
+
+    document.getElementById("dateButton").addEventListener("click",event=>{
+      const ranges = ["Last 7 Days","Last 30 Days","Last 90 Days","Year to Date"];
+      const current = ranges.findIndex(range=>event.currentTarget.textContent.includes(range));
+      const next = ranges[(current+1)%ranges.length];
+      event.currentTarget.lastChild.textContent = ` ${next}`;
+      showToast(`Dashboard date range changed to ${next}.`);
+    });
+
+    document.getElementById("exportButton").addEventListener("click",()=>{
+      const rows = [
+        ["Economic Intelligence Metric","Value"],
+        ["Average Visit Cost","2840 THB"],
+        ["Cost Alert Cases","426"],
+        ["Normal Cost Cases","3184"],
+        ["Potential Cost Leakage","1840000 THB"],
+        ["Average Cost Variance","7.4%"],
+        ["Benchmark Compliance","91.6%"]
+      ];
+
+      const csv = rows.map(row=>row.join(",")).join("\n");
+      const blob = new Blob([csv],{type:"text/csv"});
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = "med-ai-nexsure-economic-intelligence.csv";
+      anchor.click();
+      URL.revokeObjectURL(url);
+      showToast("Economic Intelligence report exported successfully.");
+    });
+
+    ["clinicFilter","payerFilter","visitFilter"].forEach(id=>{
+      document.getElementById(id).addEventListener("change",()=>{
+        showToast("Dashboard filters applied successfully.");
+      });
+    });
+
+    document.getElementById("globalSearch").addEventListener("input",event=>{
+      const query = event.target.value.toLowerCase().trim();
+
+      document.querySelectorAll(".priority-item,.alert-row,.check-item,.audit-item").forEach(item=>{
+        item.style.display = item.textContent.toLowerCase().includes(query) ? "" : "none";
+      });
+
+      document.getElementById("tableSearch").value = query;
+      renderWorklist();
+    });
+
+    // ===== Feature Controller: Dashboard Filters =====
+    function renderActiveFilters() {
+      const bar = document.getElementById('activeFilterBar');
+      const tokens = document.getElementById('activeFilterTokens');
+      const entries = Object.entries(activeFilters);
+
+      tokens.innerHTML = entries
+        .map(([key,value])=>`<span class="filter-token">${key}: ${value}</span>`)
+        .join('');
+      bar.classList.toggle('show', entries.length > 0);
+    }
+
+    function applyChartFilter(key,value) {
+      activeFilters[key] = value;
+      renderActiveFilters();
+
+      if(key === 'payer' || key === 'category') {
+        document.getElementById('tableSearch').value = value;
+      } else {
+        document.getElementById('tableSearch').value = '';
+      }
+
+      renderWorklist();
+      document.getElementById('case-worklist').scrollIntoView({behavior:'smooth'});
+      showToast(`Filtered worklist by ${value}.`);
+    }
+    document.querySelectorAll('.chart-filter').forEach(b=>b.addEventListener('click',()=>applyChartFilter('risk',b.dataset.filter)));
+    document.getElementById('clearFilters').addEventListener('click',()=>{
+      Object.keys(activeFilters).forEach(key=>delete activeFilters[key]);
+      renderActiveFilters();
+      document.getElementById('tableSearch').value = '';
+      document.getElementById('statusFilter').value = 'all';
+      renderWorklist();
+      showToast('All dashboard filters cleared.');
+    });
+    document.getElementById('payerRiskButton').addEventListener('click',()=>document.getElementById('payer-risk-section').scrollIntoView({behavior:'smooth'}));
+    document.getElementById('executiveExport').addEventListener('click',()=>document.getElementById('exportButton').click());
+    // ===== Layout Controller: Drawer Content =====
+    function openDrawer(type,visit='') {
+      const content = {
+        review:['Economic Case Review',`<div class="drawer-section"><h4>${visit||'Selected Visit'}</h4><p>Review actual cost, benchmark, payer rule, missing evidence, claim readiness, clinical exception, and audit history.</p></div><div class="drawer-section"><h4>Required actions</h4><p>Validate Clinical Necessity → Review Evidence Completeness → Confirm Payer Rule → Record authorized decision.</p></div><div class="action-row"><button class="primary-button action-trigger" data-message="Case assigned and audit logged.">Assign Owner</button><button class="secondary-button action-trigger" data-message="Missing evidence request created.">Request Evidence</button></div>`],
+        ai:['AI Explanation',`<div class="drawer-section"><h4>Recommendation</h4><p>Prioritize 126 cases where variance exceeds 30% and potential saving is above ฿3,000.</p></div><div class="drawer-section"><h4>Evidence basis</h4><p>Repeated laboratory panels, payer threshold exceptions, missing treatment rationale, and diagnosis-to-service inconsistency.</p></div><div class="drawer-section"><h4>Governance</h4><p>Confidence 89% · Model NX-ECO-1.5 · Decision Support Only · Human Review Required · Limitations: benchmark sensitivity and incomplete external payer data.</p></div>`],
+        assign:['Assign Review Task',`<div class="drawer-section"><h4>Economic Review Team</h4><p>Assign owner, due date, priority, and review reason. This mock action creates an audit event.</p></div><div class="action-row"><button class="primary-button action-trigger" data-message="Task assigned to Economic Review Team and audit logged.">Confirm Assignment</button></div>`]
+      };
+      const selectedContent = content[type] || content.review;
+      drawerTitle.textContent = selectedContent[0];
+      drawerContent.innerHTML = selectedContent[1];
+      setDrawerOpen(true);
+    }
+    document.addEventListener('click',event=>{
+      const button = event.target.closest('.drawer-trigger');
+      if(button) openDrawer(button.dataset.drawer,button.dataset.visit);
+    });
+    document.getElementById('drawerClose').addEventListener('click',()=>setDrawerOpen(false));
+    document.addEventListener('keydown',event=>{
+      if(event.key === 'Escape') {
+        setSidebarOpen(false);
+        setDrawerOpen(false);
+      }
+    });
+
+    })();
+  </script>
+</body>
+</html>

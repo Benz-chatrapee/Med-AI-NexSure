@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Med AI NexSure | Payer Rules</title>
+
+  <style>
+    :root {
+      --navy: #0F2A5F;
+      --blue: #1E3A8A;
+      --accent: #2563EB;
+      --bg: #F8FAFC;
+      --soft-blue: #EFF6FF;
+      --border: #DBEAFE;
+      --card: #FFFFFF;
+      --text: #0F172A;
+      --muted: #64748B;
+      --success: #16A34A;
+      --warning: #F59E0B;
+      --danger: #DC2626;
+      --purple: #7C3AED;
+      --shadow: 0 18px 50px rgba(15, 42, 95, .08);
+      --radius: 20px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      min-height: 100vh;
+    }
+
+    aside {
+      background: linear-gradient(180deg, #0F2A5F 0%, #06172F 100%);
+      color: #fff;
+      padding: 28px 22px;
+    }
+
+    .brand {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -.03em;
+    }
+
+    .brand-sub {
+      color: #BFDBFE;
+      font-size: 12px;
+      margin: 6px 0 28px;
+      line-height: 1.5;
+    }
+
+    .nav a {
+      display: block;
+      color: #DCEBFF;
+      text-decoration: none;
+      padding: 12px 14px;
+      border-radius: 14px;
+      margin-bottom: 7px;
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .nav a.active,
+    .nav a:hover {
+      background: rgba(255,255,255,.14);
+      color: #fff;
+    }
+
+    main {
+      padding: 28px;
+      overflow-x: hidden;
+    }
+
+    .breadcrumb {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--navy);
+      font-size: 34px;
+      letter-spacing: -.04em;
+    }
+
+    .thai {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+
+    .meta-strip {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .meta {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 7px 11px;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    button {
+      border: 0;
+      border-radius: 13px;
+      padding: 11px 15px;
+      font-weight: 800;
+      cursor: pointer;
+      background: #E2E8F0;
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 14px 28px rgba(37,99,235,.24);
+    }
+
+    .btn-dark { background: var(--navy); color: #fff; }
+    .btn-outline { background: #fff; border: 1px solid var(--border); }
+    .btn-soft { background: var(--soft-blue); color: var(--blue); }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(8, minmax(160px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .card, .kpi, .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .kpi {
+      padding: 17px;
+      min-width: 160px;
+    }
+
+    .kpi-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .kpi-value {
+      color: var(--navy);
+      font-size: 26px;
+      font-weight: 950;
+      margin-top: 9px;
+    }
+
+    .trend {
+      margin-top: 8px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .up { color: var(--success); }
+    .down { color: var(--danger); }
+    .flat { color: var(--muted); }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr) 380px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .card {
+      padding: 18px;
+    }
+
+    .section-title {
+      color: var(--navy);
+      font-size: 15px;
+      font-weight: 950;
+      letter-spacing: -.01em;
+    }
+
+    .search {
+      margin-top: 14px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid #D8E3F5;
+      border-radius: 13px;
+      padding: 11px 12px;
+      background: #fff;
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 78px;
+      resize: vertical;
+    }
+
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      margin-bottom: 7px;
+    }
+
+    .payer {
+      margin-top: 12px;
+      border: 1px solid #E2E8F0;
+      border-radius: 16px;
+      padding: 14px;
+      background: #fff;
+    }
+
+    .payer.active {
+      background: var(--soft-blue);
+      border-color: var(--accent);
+    }
+
+    .payer-name {
+      color: var(--navy);
+      font-weight: 950;
+      font-size: 14px;
+    }
+
+    .payer-code {
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 4px;
+      font-weight: 700;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 11px;
+      font-weight: 900;
+      white-space: nowrap;
+      margin-top: 7px;
+    }
+
+    .green { background: #DCFCE7; color: #166534; }
+    .amber { background: #FEF3C7; color: #92400E; }
+    .red { background: #FEE2E2; color: #991B1B; }
+    .blue { background: #DBEAFE; color: #1E40AF; }
+    .purple { background: #EDE9FE; color: #5B21B6; }
+    .gray { background: #F1F5F9; color: #475569; }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+      overflow-x: auto;
+      padding-bottom: 3px;
+    }
+
+    .tab {
+      background: #fff;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 9px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .tab.active {
+      background: var(--navy);
+      color: #fff;
+      border-color: var(--navy);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .rule-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      margin-top: 16px;
+    }
+
+    .rule-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .toggle {
+      width: 48px;
+      height: 26px;
+      border-radius: 999px;
+      background: var(--accent);
+      position: relative;
+      flex: none;
+    }
+
+    .toggle::after {
+      content: "";
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #fff;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 170px;
+      gap: 12px;
+      align-items: center;
+      border-top: 1px solid #EEF2F7;
+      padding: 11px 0;
+      font-size: 13px;
+    }
+
+    .risk-row {
+      grid-template-columns: 1fr 110px 150px;
+    }
+
+    .summary {
+      margin-top: 14px;
+      padding: 13px;
+      background: #F8FAFC;
+      border: 1px dashed #CBD5E1;
+      border-radius: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .sticky {
+      position: sticky;
+      top: 20px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .impact-grid {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .impact {
+      display: grid;
+      grid-template-columns: 1fr 70px 70px 70px;
+      gap: 8px;
+      align-items: center;
+      padding: 12px;
+      border-radius: 14px;
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      font-size: 12px;
+    }
+
+    .impact strong {
+      color: var(--navy);
+      font-size: 13px;
+    }
+
+    .num {
+      font-weight: 950;
+      color: var(--navy);
+      text-align: right;
+    }
+
+    .alert {
+      border-left: 5px solid var(--warning);
+      background: #FFFBEB;
+      color: #78350F;
+      padding: 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      line-height: 1.55;
+      margin-top: 14px;
+    }
+
+    .ai-panel {
+      background: linear-gradient(180deg, #FFFFFF 0%, #F5F3FF 100%);
+      border: 1px solid #DDD6FE;
+    }
+
+    .ai-chip {
+      display: inline-flex;
+      background: #EDE9FE;
+      color: #5B21B6;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 11px;
+      font-weight: 950;
+      margin-bottom: 10px;
+    }
+
+    .ai-item {
+      padding: 12px 0;
+      border-top: 1px solid #E9D5FF;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .ai-title {
+      color: var(--navy);
+      font-weight: 950;
+    }
+
+    .table-card {
+      margin-top: 18px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1100px;
+      margin-top: 14px;
+      background: #fff;
+    }
+
+    th, td {
+      padding: 13px 12px;
+      border-bottom: 1px solid #EEF2F7;
+      text-align: left;
+      font-size: 12px;
+      vertical-align: top;
+    }
+
+    th {
+      background: #F8FAFC;
+      color: var(--muted);
+      font-weight: 950;
+    }
+
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .timeline {
+      margin-top: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .event {
+      border-left: 3px solid var(--accent);
+      padding-left: 12px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .event strong {
+      color: var(--navy);
+    }
+
+    .savebar {
+      position: sticky;
+      bottom: 0;
+      margin-top: 20px;
+      padding: 14px 0 0;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      background: rgba(248,250,252,.9);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border);
+      z-index: 20;
+    }
+
+    .save-note {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 1400px) {
+      .workspace {
+        grid-template-columns: 280px 1fr;
+      }
+      .sticky {
+        grid-column: 1 / -1;
+        position: static;
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 1000px) {
+      .app { grid-template-columns: 1fr; }
+      aside { display: none; }
+      .workspace, .bottom-grid, .sticky, .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .header {
+        flex-direction: column;
+      }
+      .actions {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 640px) {
+      main { padding: 18px; }
+      h1 { font-size: 28px; }
+      .row, .risk-row, .impact {
+        grid-template-columns: 1fr;
+      }
+      .savebar {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <aside>
+      <div class="brand">Med AI NexSure</div>
+      <div class="brand-sub">Enterprise Healthcare & Insurance Intelligence Platform</div>
+
+      <nav class="nav">
+        <a href="#">Main Dashboard</a>
+        <a href="#">Patient Management</a>
+        <a href="#">Visit Management</a>
+        <a href="#">SOAP Note</a>
+        <a href="#">Prescription</a>
+        <a href="#">Claim Readiness</a>
+        <a href="#">Evidence Package</a>
+        <a class="active" href="#">Payer Rules</a>
+        <a href="#">Economic Intelligence</a>
+        <a href="#">AI Copilot</a>
+        <a href="#">Audit & Compliance</a>
+        <a href="#">Admin Settings</a>
+      </nav>
+    </aside>
+
+    <main>
+      <div class="breadcrumb">Insurance Intelligence / Rule Governance / Payer Rules</div>
+
+      <header class="header">
+        <div>
+          <h1>Payer Rules</h1>
+          <div class="thai">ตั้งค่ากฎประกันจำลองสำหรับประเมิน Claim Readiness, Coverage, Evidence และ Cost Governance</div>
+
+          <div class="meta-strip">
+            <span class="meta">Current Payer: AIA Mock</span>
+            <span class="meta">Active Rule Set: OPD Standard Claim Rule</span>
+            <span class="meta">Version: v3.2</span>
+            <span class="meta">Updated By: Product Owner</span>
+            <span class="meta">Last Updated: Today 10:42</span>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn-outline">Import</button>
+          <button class="btn-outline">Export</button>
+          <button class="btn-soft">Clone</button>
+          <button class="btn-dark">Test Rule</button>
+          <button class="btn-primary">Save Changes</button>
+        </div>
+      </header>
+
+      <section class="kpis">
+        <div class="kpi">
+          <div class="kpi-label">Today Visits</div>
+          <div class="kpi-value">128</div>
+          <div class="trend flat">Evaluated by active rule</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Claim Ready %</div>
+          <div class="kpi-value">72%</div>
+          <div class="trend up">+8% rule impact</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">AI Assisted Cases</div>
+          <div class="kpi-value">94</div>
+          <div class="trend up">AI evidence review</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Average Readiness Score</div>
+          <div class="kpi-value">86</div>
+          <div class="trend up">+4 from previous rule</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Pending Evidence</div>
+          <div class="kpi-value">27</div>
+          <div class="trend down">-6 after ICD rule update</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">High Risk Claims</div>
+          <div class="kpi-value">9</div>
+          <div class="trend down">Requires human review</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Cost Alert Cases</div>
+          <div class="kpi-value">18</div>
+          <div class="trend flat">Above threshold</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Active Rule Sets</div>
+          <div class="kpi-value">5</div>
+          <div class="trend flat">Across mock payers</div>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <div class="card">
+          <div class="section-title">Payer List</div>
+          <div class="thai">เลือกบริษัทประกันและ Rule Set สำหรับจำลองการประเมินเคลม</div>
+
+          <div class="search">
+            <input placeholder="Search payer or rule set" />
+          </div>
+
+          <div class="payer active">
+            <div class="payer-name">AIA Mock</div>
+            <div class="payer-code">PAYER_AIA_MOCK / OPD Rule v3.2</div>
+            <span class="badge green">Active</span>
+            <span class="badge blue">Default</span>
+          </div>
+
+          <div class="payer">
+            <div class="payer-name">Muang Thai Mock</div>
+            <div class="payer-code">PAYER_MTL_MOCK / Procedure Rule v2.1</div>
+            <span class="badge amber">Needs Review</span>
+          </div>
+
+          <div class="payer">
+            <div class="payer-name">Generic Payer</div>
+            <div class="payer-code">PAYER_GENERIC / Template v1.0</div>
+            <span class="badge gray">Draft</span>
+          </div>
+
+          <div class="payer">
+            <div class="payer-name">Enterprise TPA Mock</div>
+            <div class="payer-code">PAYER_TPA_MOCK / Claim Governance v1.4</div>
+            <span class="badge purple">Simulation</span>
+          </div>
+
+          <div style="margin-top:16px; display:grid; gap:10px;">
+            <button class="btn-primary">Create</button>
+            <button class="btn-outline">Clone Rule</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="tabs">
+            <div class="tab active">Profile</div>
+            <div class="tab">Evidence</div>
+            <div class="tab">ICD</div>
+            <div class="tab">Coverage</div>
+            <div class="tab">Cost</div>
+            <div class="tab">Risk Matrix</div>
+            <div class="tab">Advanced</div>
+          </div>
+
+          <div class="card">
+            <div class="section-title">Payer Profile</div>
+            <div class="thai">กำหนดข้อมูลบริษัทประกันจำลองและสถานะ Rule ที่ใช้ประเมินเคลม</div>
+
+            <div class="form-grid">
+              <div>
+                <label>Payer Name</label>
+                <input value="AIA Mock" />
+              </div>
+              <div>
+                <label>Payer Code</label>
+                <input value="PAYER_AIA_MOCK" />
+              </div>
+              <div>
+                <label>Status</label>
+                <select>
+                  <option>Active</option>
+                  <option>Inactive</option>
+                  <option>Draft</option>
+                </select>
+              </div>
+              <div>
+                <label>Default Rule Set</label>
+                <select>
+                  <option>OPD Standard Claim Rule v3.2</option>
+                  <option>Procedure Claim Rule v2.1</option>
+                </select>
+              </div>
+              <div>
+                <label>Effective Date</label>
+                <input value="2026-07-07" />
+              </div>
+              <div>
+                <label>Governance Owner</label>
+                <input value="Product Owner / Claim Governance" />
+              </div>
+              <div style="grid-column:1/-1;">
+                <label>Description</label>
+                <textarea>Mock payer rule configuration for MVP insurance intelligence demo. This rule set controls required evidence, ICD validation, coverage simulation, cost threshold, risk matrix and claim readiness impact.</textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="rule-card">
+            <div class="rule-head">
+              <div>
+                <div class="section-title">Required Evidence Builder</div>
+                <div class="thai">กำหนดเอกสารและข้อมูลที่ต้องครบก่อนส่งเคลม</div>
+              </div>
+              <div class="toggle"></div>
+            </div>
+
+            <div class="row"><strong>SOAP Note</strong><select><option>Required</option></select></div>
+            <div class="row"><strong>Diagnosis</strong><select><option>Required</option></select></div>
+            <div class="row"><strong>ICD-10</strong><select><option>Required</option></select></div>
+            <div class="row"><strong>ICD-9 / Procedure Code</strong><select><option>Required if Procedure</option></select></div>
+            <div class="row"><strong>Prescription</strong><select><option>Required if Medication</option></select></div>
+            <div class="row"><strong>Medical Certificate</strong><select><option>Required for Reimbursement</option></select></div>
+            <div class="row"><strong>Attachments</strong><select><option>Required if Cost Above Threshold</option></select></div>
+            <div class="row"><strong>Cost Justification</strong><select><option>Required if Cost Alert</option></select></div>
+
+            <div class="summary">
+              Rule Summary: Missing SOAP, Diagnosis, ICD-10 or Claim Summary will reduce Claim Readiness Score. Cost Justification is required when total visit cost exceeds configured threshold.
+            </div>
+          </div>
+
+          <div class="rule-card">
+            <div class="rule-head">
+              <div>
+                <div class="section-title">ICD Rule Builder</div>
+                <div class="thai">ควบคุม ICD Requirement, ICD Coverage Group และ High-risk ICD</div>
+              </div>
+              <div class="toggle"></div>
+            </div>
+
+            <div class="form-grid">
+              <div>
+                <label>Require ICD-10</label>
+                <select><option>Enabled</option><option>Disabled</option></select>
+              </div>
+              <div>
+                <label>Require ICD-9 if Procedure</label>
+                <select><option>Enabled</option><option>Disabled</option></select>
+              </div>
+              <div>
+                <label>Block Missing ICD</label>
+                <select><option>Enabled - Mark Not Ready</option><option>Warning Only</option></select>
+              </div>
+              <div>
+                <label>Diagnosis-ICD Match</label>
+                <select><option>Enabled</option><option>Disabled</option></select>
+              </div>
+              <div>
+                <label>High-risk ICD Groups</label>
+                <input value="CARDIO, NEURO, SURGERY" />
+              </div>
+              <div>
+                <label>Excluded ICD Groups</label>
+                <input value="COSMETIC, NON_COVERED_OPD" />
+              </div>
+            </div>
+          </div>
+
+          <div class="rule-card">
+            <div class="rule-head">
+              <div>
+                <div class="section-title">Coverage Rule Builder</div>
+                <div class="thai">จำลอง Coverage, Exclusion, Waiting Period และ Benefit Limit</div>
+              </div>
+              <div class="toggle"></div>
+            </div>
+
+            <div class="form-grid">
+              <div>
+                <label>Default Coverage Status</label>
+                <select>
+                  <option>Likely Covered</option>
+                  <option>Need Review</option>
+                  <option>Not Covered</option>
+                </select>
+              </div>
+              <div>
+                <label>Waiting Period Mock</label>
+                <select><option>Enabled</option><option>Disabled</option></select>
+              </div>
+              <div>
+                <label>Benefit Limit Mock</label>
+                <input value="5,000 THB" />
+              </div>
+              <div>
+                <label>Required Evidence by Coverage</label>
+                <input value="Medical Certificate, Attachment" />
+              </div>
+            </div>
+          </div>
+
+          <div class="rule-card">
+            <div class="rule-head">
+              <div>
+                <div class="section-title">Cost Threshold Configuration</div>
+                <div class="thai">ตั้งค่าเพดานค่าใช้จ่ายและเงื่อนไข Cost Governance</div>
+              </div>
+              <div class="toggle"></div>
+            </div>
+
+            <div class="form-grid">
+              <div>
+                <label>Expected Min Cost</label>
+                <input value="500" />
+              </div>
+              <div>
+                <label>Expected Max Cost</label>
+                <input value="2,500" />
+              </div>
+              <div>
+                <label>Cost Alert Threshold</label>
+                <input value="3,000" />
+              </div>
+              <div>
+                <label>Cost Block Threshold</label>
+                <input value="8,000" />
+              </div>
+              <div>
+                <label>Require Justification Above</label>
+                <input value="3,000" />
+              </div>
+              <div>
+                <label>Currency</label>
+                <select><option>THB</option></select>
+              </div>
+            </div>
+          </div>
+
+          <div class="rule-card">
+            <div class="section-title">Risk Matrix Configuration</div>
+            <div class="thai">กำหนด Risk Level และ Action เมื่อ Rule ไม่ผ่าน</div>
+
+            <div class="row risk-row"><strong>SOAP Incomplete</strong><span class="badge amber">Medium Risk</span><select><option>Needs Review</option></select></div>
+            <div class="row risk-row"><strong>ICD Missing</strong><span class="badge red">High Risk</span><select><option>Not Ready</option></select></div>
+            <div class="row risk-row"><strong>Diagnosis-ICD Mismatch</strong><span class="badge red">High Risk</span><select><option>Review</option></select></div>
+            <div class="row risk-row"><strong>Cost Alert</strong><span class="badge amber">Medium Risk</span><select><option>Needs Review</option></select></div>
+            <div class="row risk-row"><strong>Coverage Not Covered</strong><span class="badge red">High Risk</span><select><option>Not Ready</option></select></div>
+            <div class="row risk-row"><strong>Drug Interaction Override</strong><span class="badge red">High Risk</span><select><option>Review</option></select></div>
+          </div>
+        </div>
+
+        <div class="sticky">
+          <div class="card">
+            <div class="section-title">Rule Impact Preview</div>
+            <div class="thai">วิเคราะห์ผลกระทบของ Rule ก่อนบันทึก</div>
+
+            <div class="impact-grid">
+              <div class="impact">
+                <strong>Metric</strong><span class="num">Before</span><span class="num">After</span><span class="num">Δ</span>
+              </div>
+              <div class="impact">
+                <strong>Ready</strong><span class="num">64%</span><span class="num">72%</span><span class="num up">+8%</span>
+              </div>
+              <div class="impact">
+                <strong>Needs Review</strong><span class="num">28%</span><span class="num">21%</span><span class="num up">-7%</span>
+              </div>
+              <div class="impact">
+                <strong>Not Ready</strong><span class="num">8%</span><span class="num">7%</span><span class="num up">-1%</span>
+              </div>
+              <div class="impact">
+                <strong>Cost Alert</strong><span class="num">22</span><span class="num">18</span><span class="num up">-4</span>
+              </div>
+            </div>
+
+            <div class="alert">
+              ข้อมูลยังไม่ครบถ้วน กรุณาตรวจสอบ SOAP Note, ICD-10, Prescription และ Required Evidence ก่อนบันทึก Rule
+            </div>
+          </div>
+
+          <div class="card ai-panel">
+            <div class="ai-chip">AI Recommendation</div>
+            <div class="section-title">Suggested Rule Optimization</div>
+            <div class="thai">AI ให้คำแนะนำเท่านั้น ต้องได้รับการยืนยันจากผู้ใช้งานก่อนนำไปใช้</div>
+
+            <div class="ai-item">
+              <div class="ai-title">Missing Evidence Pattern</div>
+              ICD-10 and Cost Justification are the top drivers of Pending Evidence across OPD cases.
+            </div>
+
+            <div class="ai-item">
+              <div class="ai-title">Predicted Claim Impact</div>
+              Enabling conditional attachment rules may improve readiness clarity while avoiding unnecessary document burden.
+            </div>
+
+            <div class="ai-item">
+              <div class="ai-title">Cost Governance Insight</div>
+              Current Cost Alert Threshold detects 18 cases. Suggested review band: 3,000–8,000 THB.
+            </div>
+
+            <button class="btn-primary" style="width:100%; margin-top:14px;">Review</button>
+          </div>
+
+          <div class="card">
+            <div class="section-title">Export Readiness</div>
+            <div class="thai">ตรวจสอบความพร้อมก่อน Export Rule Configuration</div>
+            <div style="margin-top:12px;">
+              <span class="badge green">No PHI Detected</span>
+              <span class="badge blue">Audit Ready</span>
+              <span class="badge purple">Human Approved</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card table-card">
+        <div class="section-title">Case List</div>
+        <div class="thai">รายการเคสที่ถูกประเมินด้วย Active Payer Rule</div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>HN</th>
+              <th>Visit</th>
+              <th>Patient</th>
+              <th>Payer</th>
+              <th>Rule Set</th>
+              <th>Readiness Score</th>
+              <th>Coverage</th>
+              <th>Risk</th>
+              <th>Missing Evidence</th>
+              <th>Rule Failures</th>
+              <th>Cost Status</th>
+              <th>Updated</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>HN-10291</td>
+              <td>OPD-24071</td>
+              <td>Masked Patient</td>
+              <td>AIA Mock</td>
+              <td>OPD v3.2</td>
+              <td>92</td>
+              <td><span class="badge green">Likely Covered</span></td>
+              <td><span class="badge green">Low Risk</span></td>
+              <td>-</td>
+              <td>-</td>
+              <td><span class="badge green">Ready</span></td>
+              <td>Today 11:10</td>
+              <td><button class="btn-outline">View Detail</button></td>
+            </tr>
+            <tr>
+              <td>HN-10304</td>
+              <td>OPD-24072</td>
+              <td>Masked Patient</td>
+              <td>AIA Mock</td>
+              <td>OPD v3.2</td>
+              <td>68</td>
+              <td><span class="badge green">Likely Covered</span></td>
+              <td><span class="badge amber">Medium Risk</span></td>
+              <td>Cost Justification</td>
+              <td>Cost Alert</td>
+              <td><span class="badge amber">Needs Review</span></td>
+              <td>Today 10:58</td>
+              <td><button class="btn-outline">Test Rule</button></td>
+            </tr>
+            <tr>
+              <td>HN-10318</td>
+              <td>OPD-24073</td>
+              <td>Masked Patient</td>
+              <td>AIA Mock</td>
+              <td>OPD v3.2</td>
+              <td>41</td>
+              <td><span class="badge amber">Need Review</span></td>
+              <td><span class="badge red">High Risk</span></td>
+              <td>ICD-10</td>
+              <td>ICD Missing</td>
+              <td><span class="badge red">Not Ready</span></td>
+              <td>Today 10:21</td>
+              <td><button class="btn-outline">Review</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="bottom-grid">
+        <div class="card">
+          <div class="section-title">Version History</div>
+          <div class="thai">ติดตาม Version และ Before / After Snapshot ของ Rule</div>
+
+          <div class="timeline">
+            <div class="event">
+              <strong>v3.2 — Updated Cost Threshold</strong><br />
+              Product Owner changed Cost Alert Threshold from 2,800 THB to 3,000 THB.
+            </div>
+            <div class="event">
+              <strong>v3.1 — Enabled ICD Block Rule</strong><br />
+              Admin enabled Block Missing ICD for OPD Claim Readiness.
+            </div>
+            <div class="event">
+              <strong>v3.0 — Created OPD Standard Claim Rule</strong><br />
+              Initial rule set created for MVP payer simulation.
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">Audit & Governance</div>
+          <div class="thai">รองรับการตรวจสอบ Rule Change, Access History และ Compliance Events</div>
+
+          <div class="timeline">
+            <div class="event">
+              <strong>Rule Test Executed</strong><br />
+              QA Tester ran simulation with CASE-MOCK-001. No PHI exported.
+            </div>
+            <div class="event">
+              <strong>Rule Export Requested</strong><br />
+              Compliance Officer exported JSON configuration for review.
+            </div>
+            <div class="event">
+              <strong>Access History Logged</strong><br />
+              Claim Reviewer viewed rule impact summary in read-only mode.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="savebar">
+        <div class="save-note">
+          AI Recommendation cannot modify payer rules automatically. Human approval is required before saving governance-impacting rules.
+        </div>
+        <div class="actions">
+          <button class="btn-outline">Import</button>
+          <button class="btn-outline">Export</button>
+          <button class="btn-soft">Clone</button>
+          <button class="btn-dark">Run Simulation</button>
+          <button class="btn-primary">Save Changes</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

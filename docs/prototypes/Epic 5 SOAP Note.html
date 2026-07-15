@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Med AI NexSure Enterprise Platform</title>
+
+<style>
+:root{
+  --primary:#1E3A8A;
+  --deep:#0F2A5F;
+  --ai:#2563EB;
+  --soft-blue:#EFF6FF;
+  --blue-border:#BFDBFE;
+  --white:#FFFFFF;
+  --bg:#F8FAFC;
+  --border:#E2E8F0;
+  --text:#0F172A;
+  --muted:#64748B;
+  --success:#16A34A;
+  --warning:#F59E0B;
+  --danger:#DC2626;
+  --shadow:0 8px 24px rgba(15,42,95,.06);
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Inter,"IBM Plex Sans",Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+.app{
+  display:grid;
+  grid-template-columns:280px 1fr;
+  min-height:100vh;
+}
+
+.sidebar{
+  background:var(--deep);
+  color:white;
+  padding:24px 18px;
+}
+
+.logo{
+  font-size:23px;
+  font-weight:800;
+}
+
+.logo span{color:#38BDF8}
+
+.sidebar-sub{
+  font-size:12px;
+  color:#BFDBFE;
+  margin-top:4px;
+}
+
+.nav-title{
+  margin:26px 0 8px;
+  font-size:11px;
+  text-transform:uppercase;
+  color:#93C5FD;
+  letter-spacing:.08em;
+}
+
+.nav-item{
+  padding:11px 12px;
+  border-radius:12px;
+  color:#DBEAFE;
+  font-size:14px;
+  margin-bottom:5px;
+}
+
+.nav-item.active{
+  background:var(--ai);
+  color:white;
+}
+
+.main{
+  display:flex;
+  flex-direction:column;
+}
+
+.topbar{
+  height:76px;
+  background:white;
+  border-bottom:1px solid var(--border);
+  padding:14px 24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+.breadcrumb{
+  font-size:13px;
+  color:var(--muted);
+}
+
+.title{
+  font-size:22px;
+  font-weight:800;
+  margin-top:4px;
+}
+
+.command{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+
+.search{
+  width:260px;
+  padding:10px 12px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  color:var(--muted);
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+}
+
+.ai-badge{
+  background:var(--soft-blue);
+  color:var(--ai);
+  border:1px solid var(--blue-border);
+}
+
+.ready{background:#ECFDF5;color:#047857}
+.review{background:#FFFBEB;color:#92400E}
+.risk{background:#FEF2F2;color:#991B1B}
+
+.content{
+  padding:22px 24px 90px;
+}
+
+.kpis{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+  margin-bottom:18px;
+}
+
+.card{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:18px;
+  box-shadow:var(--shadow);
+}
+
+.kpi-card{
+  border-top:4px solid var(--primary);
+}
+
+.kpi-label{
+  font-size:13px;
+  color:var(--muted);
+}
+
+.kpi-value{
+  margin-top:8px;
+  font-size:30px;
+  font-weight:800;
+  color:var(--deep);
+}
+
+.kpi-note{
+  margin-top:6px;
+  font-size:12px;
+  color:var(--muted);
+}
+
+.dashboard{
+  display:grid;
+  grid-template-columns:1.25fr .9fr .85fr;
+  gap:16px;
+}
+
+.section-title{
+  font-size:16px;
+  font-weight:800;
+  color:var(--deep);
+  margin-bottom:14px;
+}
+
+.table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+}
+
+.table th{
+  text-align:left;
+  color:var(--muted);
+  font-weight:700;
+  padding:10px;
+  border-bottom:1px solid var(--border);
+}
+
+.table td{
+  padding:12px 10px;
+  border-bottom:1px solid #F1F5F9;
+}
+
+.progress-ring{
+  width:118px;
+  height:118px;
+  border-radius:50%;
+  background:conic-gradient(var(--warning) 0 86%, #E2E8F0 86% 100%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.progress-inner{
+  width:82px;
+  height:82px;
+  background:white;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
+  font-size:25px;
+  color:var(--deep);
+}
+
+.score-row{
+  display:flex;
+  gap:16px;
+  align-items:center;
+}
+
+.alert{
+  padding:13px;
+  border-radius:14px;
+  margin-bottom:10px;
+  font-size:13px;
+  line-height:1.45;
+}
+
+.alert-ai{
+  background:#F8FBFF;
+  border:1px solid var(--blue-border);
+  border-left:5px solid var(--ai);
+  color:#1D4ED8;
+}
+
+.alert-risk{
+  background:white;
+  border:1px solid #FECACA;
+  border-left:5px solid var(--danger);
+  color:#991B1B;
+}
+
+.alert-econ{
+  background:#F0FDFA;
+  border:1px solid #99F6E4;
+  border-left:5px solid #0F766E;
+  color:#115E59;
+}
+
+.list{
+  list-style:none;
+  padding:0;
+  margin:0;
+}
+
+.list li{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:11px;
+  background:#F8FAFC;
+  border-radius:12px;
+  margin-bottom:8px;
+  font-size:13px;
+}
+
+.grid-2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  margin-top:16px;
+}
+
+.timeline{
+  border-left:2px solid var(--border);
+  padding-left:14px;
+  font-size:13px;
+  color:#334155;
+}
+
+.timeline p{
+  margin:0 0 14px;
+}
+
+.soap-layout{
+  display:grid;
+  grid-template-columns:24% 46% 30%;
+  gap:16px;
+  margin-top:16px;
+}
+
+details{
+  border:1px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;
+  background:white;
+  margin-bottom:12px;
+}
+
+summary{
+  padding:14px 16px;
+  font-weight:800;
+  color:var(--deep);
+  border-left:4px solid var(--ai);
+  cursor:pointer;
+}
+
+.form-body{
+  padding:16px;
+}
+
+label{
+  font-size:13px;
+  font-weight:700;
+  color:#334155;
+  display:block;
+  margin-top:12px;
+}
+
+input,textarea{
+  width:100%;
+  padding:11px;
+  border:1px solid #CBD5E1;
+  border-radius:12px;
+  margin-top:6px;
+  font-size:14px;
+}
+
+textarea{
+  min-height:80px;
+}
+
+.action-bar{
+  position:fixed;
+  left:280px;
+  right:0;
+  bottom:0;
+  background:white;
+  border-top:1px solid var(--border);
+  padding:14px 24px;
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+}
+
+button{
+  border:0;
+  border-radius:12px;
+  padding:10px 14px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.btn-primary{
+  background:var(--primary);
+  color:white;
+}
+
+.btn-ai{
+  background:var(--soft-blue);
+  color:var(--ai);
+  border:1px solid var(--blue-border);
+}
+
+.btn-secondary{
+  background:white;
+  color:#334155;
+  border:1px solid #CBD5E1;
+}
+
+@media(max-width:1200px){
+  .app{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .dashboard,.soap-layout,.grid-2{grid-template-columns:1fr}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .action-bar{left:0}
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<aside class="sidebar">
+  <div class="logo">Med AI <span>NexSure</span></div>
+  <div class="sidebar-sub">Healthcare & Insurance Intelligence</div>
+
+  <div class="nav-title">Command Center</div>
+  <div class="nav-item active">Executive Dashboard</div>
+  <div class="nav-item">Queue Snapshot</div>
+  <div class="nav-item">Case List</div>
+
+  <div class="nav-title">Clinical Operations</div>
+  <div class="nav-item">Patient List</div>
+  <div class="nav-item">Visit Detail</div>
+  <div class="nav-item">Enterprise SOAP Note</div>
+  <div class="nav-item">Prescription</div>
+
+  <div class="nav-title">Insurance Intelligence</div>
+  <div class="nav-item">Claim Readiness</div>
+  <div class="nav-item">Evidence Package</div>
+  <div class="nav-item">Coverage Review</div>
+
+  <div class="nav-title">Governance</div>
+  <div class="nav-item">Audit & Compliance</div>
+  <div class="nav-item">Access History</div>
+  <div class="nav-item">PDPA Control</div>
+</aside>
+
+<main class="main">
+
+<header class="topbar">
+  <div>
+    <div class="breadcrumb">Enterprise / Healthcare Intelligence / Command Center</div>
+    <div class="title">Med AI NexSure Command Center</div>
+  </div>
+
+  <div class="command">
+    <input class="search" value="Search patient, visit, claim..." />
+    <span class="badge ai-badge">✦ AI Decision Support</span>
+    <span class="badge ready">✓ PDPA Ready</span>
+    <span class="badge review">Role: Doctor</span>
+  </div>
+</header>
+
+<section class="content">
+
+  <div class="kpis">
+    <div class="card kpi-card">
+      <div class="kpi-label">Today Visits</div>
+      <div class="kpi-value">128</div>
+      <div class="kpi-note">+12% from yesterday</div>
+    </div>
+
+    <div class="card kpi-card">
+      <div class="kpi-label">Claim Ready</div>
+      <div class="kpi-value">74%</div>
+      <div class="kpi-note">32 cases need review</div>
+    </div>
+
+    <div class="card kpi-card">
+      <div class="kpi-label">AI Assisted Cases</div>
+      <div class="kpi-value">91</div>
+      <div class="kpi-note">Decision support only</div>
+    </div>
+
+    <div class="card kpi-card">
+      <div class="kpi-label">Average Readiness Score</div>
+      <div class="kpi-value">86%</div>
+      <div class="kpi-note">Insurance evidence quality</div>
+    </div>
+  </div>
+
+  <div class="dashboard">
+
+    <div class="card">
+      <div class="section-title">Enterprise Case List</div>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Visit</th>
+            <th>Patient</th>
+            <th>Clinical</th>
+            <th>Claim</th>
+            <th>Risk</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>VST-00045</td>
+            <td>สมชาย ใจดี</td>
+            <td>SOAP In Progress</td>
+            <td><span class="badge review">⚠ Needs Review</span></td>
+            <td><span class="badge risk">Critical Allergy</span></td>
+          </tr>
+          <tr>
+            <td>VST-00046</td>
+            <td>กมลวรรณ สีดี</td>
+            <td>Completed</td>
+            <td><span class="badge ready">✓ Ready</span></td>
+            <td><span class="badge ready">Low</span></td>
+          </tr>
+          <tr>
+            <td>VST-00047</td>
+            <td>ธนพล เมฆา</td>
+            <td>Pending ICD</td>
+            <td><span class="badge review">⚠ Missing ICD</span></td>
+            <td><span class="badge review">Medium</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Claim Readiness Overview</div>
+      <div class="score-row">
+        <div class="progress-ring"><div class="progress-inner">86%</div></div>
+        <div>
+          <span class="badge review">⚠ Needs Review</span>
+          <p style="font-size:13px;color:var(--muted)">
+            Missing ICD-10 and medical certificate before insurance export.
+          </p>
+        </div>
+      </div>
+      <ul class="list" style="margin-top:14px">
+        <li><span>✓ SOAP Note</span><strong>Completed</strong></li>
+        <li><span>⚠ ICD Code</span><strong>Required</strong></li>
+        <li><span>⚠ Medical Certificate</span><strong>Required</strong></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="section-title">AI Intelligence Panel</div>
+      <div class="alert alert-ai">
+        <strong>✦ AI Clinical Summary</strong><br>
+        Patient symptoms suggest Acute URI. ICD-10 J06.9 recommended with 93% confidence.
+      </div>
+      <div class="alert alert-ai">
+        <strong>Human Review Status</strong><br>
+        Awaiting physician confirmation before final diagnosis and claim use.
+      </div>
+    </div>
+
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="section-title">Economic Intelligence</div>
+      <div class="alert alert-econ">
+        <strong>Cost Benchmark</strong><br>
+        Expected visit cost ฿1,420 vs clinic benchmark ฿1,350. Variance +5%.
+      </div>
+      <ul class="list">
+        <li><span>Average Visit Cost</span><strong>฿1,420</strong></li>
+        <li><span>Expected Cost Range</span><strong>฿1,200–1,600</strong></li>
+        <li><span>Outlier Detection</span><strong>No outlier</strong></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Audit & Compliance Timeline</div>
+      <div class="timeline">
+        <p><strong>10:45</strong><br>SOAP edited by Dr. Ananda · Audit logged</p>
+        <p><strong>10:41</strong><br>AI summary generated · Human review required</p>
+        <p><strong>10:30</strong><br>Vital signs added by Nurse Mali</p>
+        <p><strong>10:20</strong><br>PDPA consent verified</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="soap-layout">
+
+    <aside class="card">
+      <div class="section-title">Patient 360°</div>
+      <ul class="list">
+        <li><span>HN</span><strong>HN-000123</strong></li>
+        <li><span>PDPA</span><strong>✓ Active</strong></li>
+        <li><span>Allergy</span><strong>Penicillin</strong></li>
+        <li><span>Insurance</span><strong>Gold Care</strong></li>
+      </ul>
+
+      <div class="alert alert-risk" style="margin-top:14px">
+        <strong>⚠ Critical Safety Alert</strong><br>
+        Penicillin allergy detected. Medication review required.
+      </div>
+    </aside>
+
+    <section class="card">
+      <div class="section-title">Enterprise SOAP Note</div>
+
+      <details open>
+        <summary>Subjective · Completion 100%</summary>
+        <div class="form-body">
+          <label>Chief Complaint</label>
+          <input value="ไข้ ไอ เจ็บคอ 2 วัน">
+          <label>History of Present Illness</label>
+          <textarea>ผู้ป่วยมีไข้ต่ำ ไอแห้ง เจ็บคอ ไม่มีหอบเหนื่อย</textarea>
+        </div>
+      </details>
+
+      <details open>
+        <summary>Objective · Completion 80%</summary>
+        <div class="form-body">
+          <label>Vital Signs</label>
+          <input value="BP 130/80, HR 88, Temp 37.8, SpO₂ 98%">
+          <label>Physical Exam</label>
+          <textarea>Throat mildly injected, lungs clear</textarea>
+        </div>
+      </details>
+
+      <details open>
+        <summary>Assessment · Completion 60%</summary>
+        <div class="form-body">
+          <label>Clinical Impression</label>
+          <textarea>Acute upper respiratory infection</textarea>
+          <div class="alert alert-ai">
+            ✦ AI ICD Suggestion: J06.9 · Confidence 93% · Requires physician approval.
+          </div>
+        </div>
+      </details>
+
+      <details open>
+        <summary>Plan · Completion 70%</summary>
+        <div class="form-body">
+          <label>Medication Plan</label>
+          <textarea>Paracetamol, Antihistamine, cough syrup</textarea>
+          <div class="alert alert-risk">
+            ⚠ Safety Check: Avoid Penicillin-class antibiotics.
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <aside class="card">
+      <div class="section-title">Evidence Package</div>
+      <ul class="list">
+        <li><span>SOAP Note</span><strong>Ready</strong></li>
+        <li><span>ICD Code</span><strong>Missing</strong></li>
+        <li><span>Prescription</span><strong>Ready</strong></li>
+        <li><span>Medical Certificate</span><strong>Missing</strong></li>
+        <li><span>Attachments</span><strong>2 files</strong></li>
+      </ul>
+      <button class="btn-ai" style="margin-top:12px;width:100%">Generate Evidence Package</button>
+      <button class="btn-secondary" style="margin-top:8px;width:100%">Export PDF</button>
+    </aside>
+
+  </div>
+
+</section>
+
+<div class="action-bar">
+  <button class="btn-secondary">Save Draft</button>
+  <button class="btn-ai">AI Assist</button>
+  <button class="btn-secondary">Generate Evidence</button>
+  <button class="btn-primary">Finalize & Sign</button>
+</div>
+
+</main>
+</div>
+</body>
+</html>

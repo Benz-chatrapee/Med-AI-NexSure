@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Med AI NexSure — Doctor Operational & Claim Readiness Dashboard</title>
+<script>
+(function(){
+  if (window.Chart) return;
+  const charts=[];
+  function color(v,fallback){return typeof v==='string'?v:fallback}
+  function arr(v,n){return Array.isArray(v)?v:Array(n).fill(v)}
+  function text(ctx,s,x,y,opt={}){ctx.save();ctx.fillStyle=opt.color||'#64748B';ctx.font=`${opt.weight||400} ${opt.size||12}px Inter,Arial,sans-serif`;ctx.textAlign=opt.align||'left';ctx.textBaseline=opt.base||'middle';ctx.fillText(String(s),x,y);ctx.restore()}
+  function niceMax(v){if(v<=5)return 5;if(v<=10)return 10;if(v<=20)return 20;if(v<=50)return 50;if(v<=100)return 100;return Math.ceil(v/100)*100}
+  class LiteChart{
+    constructor(canvas,config){this.canvas=canvas;this.config=config||{};this._clickHandler=this._click.bind(this);canvas.addEventListener('click',this._clickHandler);charts.push(this);this.resize()}
+    destroy(){this.canvas.removeEventListener('click',this._clickHandler);const i=charts.indexOf(this);if(i>=0)charts.splice(i,1);const c=this.canvas.getContext('2d');c.clearRect(0,0,this.canvas.width,this.canvas.height)}
+    resize(){const r=this.canvas.getBoundingClientRect();const d=Math.min(window.devicePixelRatio||1,2);const w=Math.max(320,Math.floor(r.width||this.canvas.parentElement.clientWidth||600));const h=Math.max(220,Math.floor(r.height||this.canvas.parentElement.clientHeight||320));this.canvas.width=Math.floor(w*d);this.canvas.height=Math.floor(h*d);this.canvas.style.width=w+'px';this.canvas.style.height=h+'px';const ctx=this.canvas.getContext('2d');ctx.setTransform(d,0,0,d,0,0);this.w=w;this.h=h;this.draw()}
+    _click(e){const opt=this.config.options||{};if(typeof opt.onClick!=='function'||!this._regions)return;const r=this.canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;let idx=-1;for(let i=0;i<this._regions.length;i++){const q=this._regions[i];if(x>=q.x&&x<=q.x+q.w&&y>=q.y&&y<=q.y+q.h){idx=i;break}}if(idx>=0)opt.onClick(e,[{index:idx}])}
+    draw(){const ctx=this.canvas.getContext('2d'),cfg=this.config,typ=cfg.type||'bar';ctx.clearRect(0,0,this.w,this.h);this._regions=[];if(typ==='doughnut')return this.drawDonut(ctx);if(typ==='line')return this.drawLine(ctx);return this.drawCartesian(ctx)}
+    drawAxes(ctx,p,left,bottom,maxY,horizontal){ctx.strokeStyle='#E2E8F0';ctx.lineWidth=1;if(horizontal){for(let i=0;i<=5;i++){let x=left+(p.w-left-20)*i/5;ctx.beginPath();ctx.moveTo(x,20);ctx.lineTo(x,bottom);ctx.stroke();text(ctx,Math.round(maxY*i/5),x,bottom+18,{align:'center'})}}else{for(let i=0;i<=5;i++){let y=bottom-(bottom-20)*i/5;ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(p.w-15,y);ctx.stroke();text(ctx,Math.round(maxY*i/5)+(maxY===100?'%':''),left-10,y,{align:'right'})}}}
+    drawCartesian(ctx){const cfg=this.config,opt=cfg.options||{},labels=cfg.data.labels||[],ds=cfg.data.datasets||[],horizontal=opt.indexAxis==='y',p={w:this.w,h:this.h},left=horizontal?190:52,bottom=this.h-42,top=22,right=this.w-18;const vals=ds.flatMap(d=>(d.data||[]).map(Number).filter(Number.isFinite));let maxY=niceMax(Math.max(1,...vals));if(opt.scales){const sc=horizontal?(opt.scales.xCases||opt.scales.x||{}):(opt.scales.y||{});if(Number.isFinite(sc.max))maxY=sc.max}
+      this.drawAxes(ctx,p,left,bottom,maxY,horizontal);
+      if(horizontal){const row=(bottom-top)/Math.max(1,labels.length),barH=Math.min(26,row*.56);labels.forEach((lab,i)=>{const y=top+i*row+row/2;text(ctx,lab,left-10,y,{align:'right',size:11});let x0=left;ds.forEach((d,di)=>{if((d.type||cfg.type)==='line')return;const v=Number(d.data[i]||0),bw=(right-left)*v/maxY,bgs=arr(d.backgroundColor,labels.length);ctx.fillStyle=color(bgs[i],'#2563EB');ctx.beginPath();ctx.roundRect(x0,y-barH/2,bw,barH,6);ctx.fill();if(di===0)this._regions[i]={x:x0,y:y-barH/2,w:bw,h:barH};text(ctx,v,x0+bw+7,y,{size:11,weight:700})});});
+        const lineDs=ds.find(d=>(d.type||'')==='line');if(lineDs){const pts=[];(lineDs.data||[]).forEach((v,i)=>{const y=top+i*row+row/2,x=left+(right-left)*Number(v)/100;pts.push([x,y])});ctx.strokeStyle=color(lineDs.borderColor,'#D97706');ctx.lineWidth=2;ctx.beginPath();pts.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));ctx.stroke();pts.forEach(q=>{ctx.fillStyle=ctx.strokeStyle;ctx.beginPath();ctx.arc(q[0],q[1],4,0,Math.PI*2);ctx.fill()})}
+      }else{const n=labels.length,slot=(right-left)/Math.max(1,n),bars=ds.filter(d=>(d.type||cfg.type)==='bar'),barW=Math.min(34,slot/(Math.max(1,bars.length)+.5));labels.forEach((lab,i)=>text(ctx,lab,left+slot*i+slot/2,bottom+18,{align:'center',size:11}));bars.forEach((d,di)=>{(d.data||[]).forEach((v,i)=>{const x=left+slot*i+slot/2+(di-(bars.length-1)/2)*barW,y=bottom-(bottom-top)*Number(v)/maxY,h=bottom-y,bgs=arr(d.backgroundColor,labels.length);ctx.fillStyle=color(bgs[i],'#2563EB');ctx.beginPath();ctx.roundRect(x-barW*.4,y,barW*.8,h,6);ctx.fill();if(di===0)this._regions[i]={x:x-barW*.5,y,w:barW,h}})});ds.filter(d=>(d.type||cfg.type)==='line').forEach(d=>this.drawLineDataset(ctx,d,labels,left,right,top,bottom,maxY));}
+      this.drawLegend(ctx,ds)
+    }
+    drawLineDataset(ctx,d,labels,left,right,top,bottom,maxY){const n=Math.max(1,labels.length-1),pts=(d.data||[]).map((v,i)=>[left+(right-left)*i/n,bottom-(bottom-top)*Number(v)/maxY]);ctx.strokeStyle=color(d.borderColor,'#2563EB');ctx.lineWidth=d.borderWidth||2;if(d.borderDash)ctx.setLineDash(d.borderDash);ctx.beginPath();pts.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));ctx.stroke();ctx.setLineDash([]);pts.forEach((q,i)=>{ctx.fillStyle=ctx.strokeStyle;ctx.beginPath();ctx.arc(q[0],q[1],d.pointRadius===0?0:3,0,Math.PI*2);ctx.fill();if(!this._regions[i])this._regions[i]={x:q[0]-12,y:q[1]-12,w:24,h:24}})}
+    drawLine(ctx){const cfg=this.config,opt=cfg.options||{},labels=cfg.data.labels||[],ds=cfg.data.datasets||[],left=52,right=this.w-20,top=24,bottom=this.h-42;let maxY=Math.max(1,...ds.flatMap(d=>(d.data||[]).map(Number)));if(opt.scales&&opt.scales.y&&Number.isFinite(opt.scales.y.max))maxY=opt.scales.y.max;else maxY=niceMax(maxY);this.drawAxes(ctx,{w:this.w},left,bottom,maxY,false);const slot=(right-left)/Math.max(1,labels.length-1);labels.forEach((lab,i)=>text(ctx,lab,left+slot*i,bottom+18,{align:'center',size:11}));ds.forEach(d=>this.drawLineDataset(ctx,d,labels,left,right,top,bottom,maxY));this.drawLegend(ctx,ds)}
+    drawDonut(ctx){const d=(this.config.data.datasets||[])[0]||{},vals=d.data||[],labels=this.config.data.labels||[],sum=vals.reduce((a,b)=>a+Number(b),0)||1,cx=this.w/2,cy=this.h/2,r=Math.min(this.w,this.h)*.32,inner=r*.68,colors=arr(d.backgroundColor,vals.length);let a=-Math.PI/2;vals.forEach((v,i)=>{const da=Math.PI*2*Number(v)/sum;ctx.beginPath();ctx.arc(cx,cy,r,a,a+da);ctx.arc(cx,cy,inner,a+da,a,true);ctx.closePath();ctx.fillStyle=color(colors[i],['#059669','#D97706','#DC2626'][i%3]);ctx.fill();a+=da});text(ctx,sum,cx,cy-7,{align:'center',size:28,weight:700,color:'#0F2A5F'});text(ctx,'Evaluated Visits',cx,cy+20,{align:'center',size:12});this._regions=vals.map((_,i)=>({x:cx-r,y:cy-r,w:r*2,h:r*2,index:i}))}
+    drawLegend(ctx,ds){const visible=ds.filter(d=>d.label);if(!visible.length)return;let x=16,y=10;visible.forEach(d=>{ctx.fillStyle=color(d.borderColor||d.backgroundColor,'#2563EB');ctx.fillRect(x,y,10,10);text(ctx,d.label,x+15,y+5,{size:11});x+=Math.min(170,25+String(d.label).length*6.2)})}
+  }
+  window.Chart=LiteChart;
+  window.addEventListener('resize',()=>charts.forEach(c=>c.resize()));
+})();
+</script>
+
+<style>
+:root{--deep:#0F2A5F;--primary:#1E3A8A;--ai:#2563EB;--accent:#38BDF8;--soft:#EFF6FF;--blue-border:#BFDBFE;--bg:#F8FAFC;--surface:#fff;--border:#E2E8F0;--border-strong:#CBD5E1;--text:#0F172A;--muted:#64748B;--success:#059669;--success-soft:#ECFDF5;--warning:#D97706;--warning-soft:#FFFBEB;--danger:#DC2626;--danger-soft:#FEF2F2;--shadow:0 8px 24px rgba(15,42,95,.07)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--text);font-size:14px}button,input,select,textarea{font:inherit}button{cursor:pointer}.app{min-height:100vh;display:grid;grid-template-columns:260px minmax(0,1fr)}
+.sidebar{position:sticky;top:0;height:100vh;overflow:auto;padding:22px 18px;background:var(--deep);color:#fff}.brand{display:flex;align-items:center;gap:12px;margin-bottom:26px}.brand-mark{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--ai);font-weight:800;font-size:18px}.brand-title{font-weight:800}.brand-sub{font-size:12px;color:#BFDBFE;margin-top:2px}.nav-section{margin:22px 8px 8px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#93C5FD}.nav-item{width:100%;border:1px solid transparent;color:#DBEAFE;background:transparent;border-radius:11px;padding:11px 12px;display:flex;align-items:center;gap:11px;margin:4px 0;text-align:left}.nav-item:hover{background:rgba(37,99,235,.2)}.nav-item.active{background:var(--primary);box-shadow:inset 3px 0 0 var(--accent)}.nav-icon{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:rgba(255,255,255,.08)}.sidebar-footer{margin-top:28px;padding:14px;border:1px solid rgba(191,219,254,.16);border-radius:14px;background:rgba(255,255,255,.05);font-size:12px;line-height:1.5}
+.main{min-width:0}.topbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:10px;min-height:72px;padding:10px 22px;background:#fff;border-bottom:1px solid var(--border);box-shadow:0 1px 8px rgba(15,42,95,.04)}.search{position:relative;flex:1;max-width:500px}.search span{position:absolute;left:13px;top:11px;color:var(--muted)}.search input{width:100%;padding:11px 14px 11px 38px}.control,input,select,textarea{border:1px solid var(--border-strong);border-radius:10px;background:#fff;color:var(--text);outline:0}.control,select{padding:10px 11px}.control:focus,input:focus,select:focus,textarea:focus{border-color:var(--ai);box-shadow:0 0 0 3px rgba(37,99,235,.12)}.top-filters{display:flex;gap:8px;align-items:center;margin-left:auto}.icon-btn,.btn{min-height:42px;border-radius:10px;border:1px solid var(--border);background:#fff;color:var(--primary);font-weight:700;padding:9px 13px}.icon-btn{width:42px;padding:0}.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}.btn.secondary{background:#fff;border-color:var(--blue-border)}.btn.soft{background:var(--soft);border-color:var(--blue-border)}.btn:disabled{opacity:.55;cursor:not-allowed}.avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--primary);color:#fff;font-weight:800;border:2px solid #DBEAFE}
+.content{padding:24px;max-width:1900px;margin:auto}.page-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:16px}.eyebrow{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ai)}h1{font-size:clamp(28px,3vw,38px);line-height:1.1;margin:6px 0 7px;letter-spacing:-.03em}.subtitle{color:var(--muted);line-height:1.55;max-width:900px}.head-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.last-updated{font-size:12px;color:var(--muted);margin-top:8px;text-align:right}.safety-banner{display:flex;gap:12px;padding:15px 17px;border:1px solid var(--blue-border);border-left:4px solid var(--ai);border-radius:14px;background:var(--soft);color:var(--deep);margin-bottom:18px;line-height:1.55}.grid{display:grid;gap:18px}.kpi-grid{grid-template-columns:repeat(6,minmax(0,1fr));margin-bottom:18px}.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);min-width:0}.card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 20px 10px}.card-title{font-size:18px;font-weight:800;margin:0}.card-sub{font-size:13px;color:var(--muted);line-height:1.5;margin-top:4px}.card-body{padding:12px 20px 20px}.kpi{position:relative;min-height:300px;padding:18px;display:flex;flex-direction:column;border-top:3px solid var(--primary);overflow:hidden}.kpi.warning{border-top-color:var(--warning)}.kpi.danger{border-top-color:var(--danger)}.kpi.success{border-top-color:var(--success)}.kpi-icon{position:absolute;right:14px;top:13px;width:34px;height:34px;border-radius:10px;background:var(--soft);display:grid;place-items:center;color:var(--primary);font-weight:800}.kpi-label{font-size:13px;font-weight:700;color:#475569;padding-right:0}.kpi-value{font-size:38px;font-weight:800;color:var(--deep);margin:16px 0 13px;text-align:center;line-height:1.1}.kpi-trend{font-size:12px;color:var(--muted);line-height:1.45}.positive{color:var(--success);font-weight:800}.negative{color:var(--danger);font-weight:800}.spark{display:none!important}.kpi-visits{min-height:300px}.kpi-value-centered{text-align:center;font-size:38px;margin:16px 0 13px}.kpi-trend-primary{font-size:13px;padding-bottom:14px;border-bottom:1px solid var(--border)}.kpi-progress-section{margin-top:14px}.kpi-progress-label,.kpi-status-label{font-size:12px;font-weight:700;color:#475569;margin-bottom:8px}.kpi-progress-track{height:10px;border-radius:999px;background:#E2E8F0;overflow:hidden;box-shadow:inset 0 1px 2px rgba(15,42,95,.08)}.kpi-progress-track>span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--primary),var(--ai))}.kpi-progress-meta{display:flex;gap:5px;align-items:baseline;margin-top:7px;font-size:12px;color:var(--muted)}.kpi-progress-meta strong{font-size:13px;color:var(--deep)}.kpi-status-section{margin-top:14px;padding-top:12px;border-top:1px solid var(--border)}.kpi-status-value{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:800;color:var(--deep)}.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block}.status-normal{background:var(--success);box-shadow:0 0 0 4px var(--success-soft)}
+.two-col{grid-template-columns:minmax(0,1.45fr) minmax(340px,.75fr);margin-bottom:18px}.trend-grid{grid-template-columns:minmax(0,1.5fr) minmax(340px,.7fr);margin-bottom:18px}.analysis-grid{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);margin-bottom:18px}.chart-wrap{position:relative;width:100%;height:340px;min-height:280px;overflow:hidden}.chart-wrap.small{height:300px;min-height:260px}.chart-wrap>canvas{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;display:block}.card-body{min-width:0}.two-col>*,.trend-grid>*,.analysis-grid>*{min-width:0}.chart-actions{display:flex;gap:7px;flex-wrap:wrap}.toggle{padding:7px 10px;border:1px solid var(--border);background:#fff;border-radius:8px;color:var(--muted);font-weight:700}.toggle.active{background:var(--soft);color:var(--primary);border-color:var(--blue-border)}.legend-list{display:grid;gap:10px;margin-top:8px}.legend-row{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px}.legend-left{display:flex;align-items:center;gap:8px}.dot{width:10px;height:10px;border-radius:50%}.insight{padding:11px 13px;border:1px solid var(--blue-border);background:var(--soft);border-radius:11px;color:var(--deep);font-size:13px;line-height:1.5;margin-top:12px}
+.heatmap-wrap,.table-wrap{overflow:auto}.heatmap{width:100%;border-collapse:separate;border-spacing:5px;min-width:720px}.heatmap th{font-size:12px;color:var(--muted);padding:7px;text-align:center}.heatmap th:first-child{text-align:left}.heatmap td{padding:0}.risk-cell{width:100%;border:0;border-radius:8px;padding:10px 7px;font-size:11px;font-weight:800;min-width:78px}.risk-low{background:var(--success-soft);color:#047857}.risk-medium{background:var(--soft);color:#1D4ED8}.risk-high{background:var(--warning-soft);color:#B45309}.risk-critical{background:var(--danger-soft);color:#B91C1C}.visit-link{border:0;background:transparent;color:var(--primary);font-weight:800;text-align:left;white-space:nowrap}
+.worklist-card{margin-bottom:18px}.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:0 20px 14px}.toolbar .control{min-width:145px}.toolbar-search{min-width:260px;flex:1}.active-filters{display:flex;gap:7px;flex-wrap:wrap;padding:0 20px 12px}.filter-chip,.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 9px;border:1px solid var(--border);font-size:12px;font-weight:700;background:#fff}.filter-chip button{border:0;background:transparent;color:inherit;padding:0}.chip-blue{color:#1D4ED8;background:var(--soft);border-color:var(--blue-border)}.chip-green{color:#047857;background:var(--success-soft);border-color:#A7F3D0}.chip-yellow{color:#B45309;background:var(--warning-soft);border-color:#FDE68A}.chip-red{color:#B91C1C;background:var(--danger-soft);border-color:#FECACA}.chip-gray{color:#475569;background:#F8FAFC}.table-wrap{border-top:1px solid var(--border)}table.data{width:100%;border-collapse:collapse;min-width:1500px;font-size:13px}table.data th{position:sticky;top:0;z-index:2;background:#F8FAFC;color:#475569;text-align:left;padding:11px 10px;border-bottom:1px solid var(--border);white-space:nowrap;font-size:11px;text-transform:uppercase;letter-spacing:.06em}table.data td{padding:11px 10px;border-bottom:1px solid var(--border);vertical-align:middle}table.data tbody tr{cursor:pointer}table.data tbody tr:hover,table.data tbody tr.selected{background:#F8FBFF}.score-mini{font-weight:800;color:var(--deep)}.table-footer{display:flex;justify-content:space-between;align-items:center;padding:13px 20px;color:var(--muted);font-size:13px}.empty-state{text-align:center;padding:42px 20px;color:var(--muted);display:none}
+.patient-bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:15px 18px;border-bottom:1px solid var(--border);background:#FBFDFF}.patient-primary{flex:1;min-width:260px}.patient-name{font-size:19px;font-weight:800}.patient-meta{font-size:13px;color:var(--muted);margin-top:4px}.detail-grid{grid-template-columns:minmax(0,1.35fr) minmax(350px,.65fr);align-items:start}.readiness-layout{display:grid;grid-template-columns:260px 1fr;gap:24px}.score-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;border-right:1px solid var(--border);padding-right:20px;min-height:340px}.score-ring{--score:78;width:180px;height:180px;border-radius:50%;display:grid;place-items:center;position:relative;background:conic-gradient(var(--ai) calc(var(--score)*1%),#DBEAFE 0)}.score-ring:before{content:"";position:absolute;inset:14px;background:#fff;border-radius:50%;box-shadow:inset 0 0 0 1px var(--border)}.score-value{position:relative;text-align:center}.score-value strong{display:block;font-size:44px;letter-spacing:-.05em;color:var(--deep)}.score-value span{font-size:12px;color:var(--muted)}.score-status{margin-top:14px;font-size:17px;font-weight:800}.threshold{width:100%;margin-top:16px}.threshold-scale{height:9px;background:linear-gradient(90deg,var(--danger) 0 59%,var(--warning) 59% 84%,var(--success) 84%);border-radius:999px;position:relative}.threshold-marker{position:absolute;top:-5px;width:3px;height:19px;background:var(--text);left:78%}.threshold-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:5px}.score-facts{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;width:100%;margin-top:13px}.fact{padding:8px;border:1px solid var(--border);border-radius:9px;text-align:center;font-size:11px;color:var(--muted)}.fact strong{display:block;color:var(--text);font-size:14px}.breakdown{display:grid;gap:14px}.metric{padding:12px;border:1px solid var(--border);border-radius:12px}.metric.blocking{border-color:#FDE68A;background:#FFFCF5}.metric-head{display:flex;justify-content:space-between;gap:10px;font-size:13px;font-weight:800}.bullet{height:12px;background:#E2E8F0;border-radius:999px;margin:9px 0 7px;position:relative;overflow:visible}.bullet-fill{height:100%;border-radius:999px;background:var(--ai)}.bullet-target{position:absolute;top:-4px;width:2px;height:20px;background:var(--warning)}.metric-meta{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:var(--muted)}
+.waterfall{display:grid;gap:9px}.wf-row{display:grid;grid-template-columns:190px 1fr 55px;gap:10px;align-items:center}.wf-bar{height:18px;background:#EDF2F7;border-radius:5px;overflow:hidden}.wf-fill{height:100%;background:var(--success)}.wf-zero{height:100%;width:4px;background:var(--warning)}.wf-value{text-align:right;font-weight:800}.section-tabs{display:flex;gap:7px;flex-wrap:wrap;padding:0 20px 14px;border-bottom:1px solid var(--border)}.tab{border:1px solid transparent;background:transparent;padding:9px 12px;border-radius:9px;color:var(--muted);font-weight:700}.tab.active{background:var(--soft);border-color:var(--blue-border);color:var(--primary)}.tab-panel{display:none}.tab-panel.active{display:block}.issue-list{display:grid;gap:10px}.issue{display:grid;grid-template-columns:36px 1fr auto;gap:12px;padding:13px;border:1px solid var(--border);border-radius:12px}.issue-icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-weight:900}.issue-title{font-weight:800}.issue-desc{font-size:12px;color:var(--muted);line-height:1.5;margin-top:4px}.issue-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.right-stack{display:grid;gap:18px}.gate{border-left:4px solid var(--warning)}.gate .card-header{background:var(--warning-soft);border-bottom:1px solid #FDE68A}.gate-steps{display:grid;gap:14px}.gate-step{display:flex;gap:11px}.step-dot{width:27px;height:27px;border-radius:50%;display:grid;place-items:center;background:var(--warning);color:#fff;font-weight:900;flex:0 0 27px}.step-title{font-weight:800}.step-meta{font-size:12px;color:var(--muted);line-height:1.5;margin-top:2px}.uncertainty{padding:11px 13px;border:1px solid var(--border-strong);border-radius:11px;background:#F8FAFC;color:#475569;font-size:12px;line-height:1.55}.source-list{margin:10px 0 0;padding-left:18px;color:#475569;font-size:12px;line-height:1.7}.activity{display:grid;gap:0}.activity-item{display:grid;grid-template-columns:12px 1fr;gap:10px;padding:11px 0;border-bottom:1px dashed var(--border)}.activity-dot{width:9px;height:9px;border-radius:50%;background:var(--ai);margin-top:5px}.activity-title{font-weight:800}.activity-meta{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.45}.sticky-actions{position:sticky;bottom:0;z-index:20;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;margin-top:18px;background:rgba(255,255,255,.97);border:1px solid var(--border-strong);border-radius:15px;box-shadow:0 -8px 24px rgba(15,42,95,.08)}.action-note{font-size:12px;color:var(--muted);margin-top:3px}.action-group{display:flex;gap:8px;flex-wrap:wrap}
+.modal-backdrop{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;background:rgba(15,23,42,.55);padding:20px}.modal-backdrop.open{display:flex}.modal{width:min(600px,100%);background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 28px 80px rgba(15,23,42,.3)}.modal-head,.modal-foot{display:flex;justify-content:space-between;align-items:center;padding:16px 18px}.modal-head{background:#F8FAFC;border-bottom:1px solid var(--border)}.modal-body{padding:18px}.modal-foot{border-top:1px solid var(--border);justify-content:flex-end}.field{margin-bottom:14px}.field label{display:block;font-size:12px;font-weight:800;color:var(--muted);margin-bottom:6px}.field textarea,.field select{width:100%;padding:11px}.field textarea{min-height:110px;resize:vertical}.toast{position:fixed;right:24px;bottom:24px;z-index:200;background:var(--deep);color:#fff;padding:14px 16px;border-radius:11px;box-shadow:0 20px 60px rgba(15,23,42,.25);transform:translateY(100px);opacity:0;transition:.22s}.toast.show{transform:translateY(0);opacity:1}.loading-overlay{position:fixed;inset:0;z-index:150;background:rgba(248,250,252,.8);display:none;place-items:center}.loading-overlay.show{display:grid}.loader{padding:18px 22px;background:#fff;border:1px solid var(--border);border-radius:13px;box-shadow:var(--shadow);font-weight:800;color:var(--primary)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid rgba(56,189,248,.45);outline-offset:2px}@media(max-width:1450px){.kpi-grid{grid-template-columns:repeat(3,1fr)}}@media(max-width:1180px){.app{grid-template-columns:82px minmax(0,1fr)}.brand-copy,.nav-item span:last-child,.nav-section,.sidebar-footer{display:none}.sidebar{padding-inline:12px}.brand,.nav-item{justify-content:center}.top-filters select:nth-of-type(n+2){display:none}.two-col,.trend-grid,.analysis-grid,.detail-grid{grid-template-columns:1fr}}@media(max-width:800px){.app{display:block}.sidebar{display:none}.topbar{padding:10px 14px}.search{display:none}.top-filters select{display:none!important}.content{padding:15px}.page-head{flex-direction:column}.head-actions{justify-content:flex-start}.last-updated{text-align:left}.kpi-grid{grid-template-columns:1fr}.readiness-layout{grid-template-columns:1fr}.score-panel{border-right:0;border-bottom:1px solid var(--border);padding:0 0 20px}.issue{grid-template-columns:36px 1fr}.issue>.btn{grid-column:2;justify-self:start}.sticky-actions{align-items:stretch;flex-direction:column}.action-group{display:grid}.toolbar .control,.toolbar-search{min-width:100%;width:100%}.wf-row{grid-template-columns:135px 1fr 45px}.card-title{font-size:17px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+@media (max-width:1400px){.chart-wrap{height:320px}.chart-wrap.small{height:285px}}
+@media (max-width:900px){.chart-wrap,.chart-wrap.small{height:330px;min-height:300px}}
+@media (max-width:600px){.chart-wrap,.chart-wrap.small{height:300px;min-height:280px}.card-header{flex-direction:column}.chart-actions{width:100%}}
+
+.kpi-trend-primary{font-size:13px;padding-bottom:14px;border-bottom:1px solid var(--border);min-height:34px}
+.kpi-progress-section{margin-top:14px}
+.kpi-progress-label,.kpi-status-label{font-size:12px;font-weight:700;color:#475569;margin-bottom:8px}
+.kpi-progress-track{height:10px;border-radius:999px;background:#E2E8F0;overflow:hidden;box-shadow:inset 0 1px 2px rgba(15,42,95,.08)}
+.kpi-progress-track>span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--primary),var(--ai))}
+.kpi.warning .kpi-progress-track>span{background:linear-gradient(90deg,#B45309,var(--warning))}
+.kpi.danger .kpi-progress-track>span{background:linear-gradient(90deg,#B91C1C,var(--danger))}
+.kpi.success .kpi-progress-track>span{background:linear-gradient(90deg,#047857,var(--success))}
+.kpi-progress-meta{display:flex;gap:5px;align-items:baseline;margin-top:7px;font-size:12px;color:var(--muted)}
+.kpi-progress-meta strong{font-size:13px;color:var(--deep)}
+.kpi-status-section{margin-top:auto;padding-top:14px;border-top:1px solid var(--border)}
+.kpi-status-value{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:800;color:var(--deep)}
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:0 0 8px}
+.status-normal{background:var(--success);box-shadow:0 0 0 4px var(--success-soft)}
+.status-warning{background:var(--warning);box-shadow:0 0 0 4px var(--warning-soft)}
+.status-danger{background:var(--danger);box-shadow:0 0 0 4px var(--danger-soft)}
+.status-info{background:var(--ai);box-shadow:0 0 0 4px var(--soft)}
+
+
+@media (max-width:1600px){.kpi-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:980px){.kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:620px){.kpi-grid{grid-template-columns:1fr}.kpi{min-height:285px}}
+
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar" aria-label="Main navigation">
+  <div class="brand"><div class="brand-mark">N</div><div class="brand-copy"><div class="brand-title">Med AI NexSure</div><div class="brand-sub">Doctor Workspace</div></div></div>
+  <div class="nav-section">Clinical Workspace</div>
+  <button class="nav-item active"><span class="nav-icon">⌂</span><span>Doctor Dashboard</span></button>
+  <button class="nav-item"><span class="nav-icon">👥</span><span>Patients</span></button>
+  <button class="nav-item"><span class="nav-icon">✚</span><span>Visits</span></button>
+  <button class="nav-item"><span class="nav-icon">✎</span><span>SOAP Notes</span></button>
+  <button class="nav-item"><span class="nav-icon">Rx</span><span>Prescriptions</span></button>
+  <div class="nav-section">Insurance Intelligence</div>
+  <button class="nav-item"><span class="nav-icon">✓</span><span>Claim Readiness</span></button>
+  <button class="nav-item"><span class="nav-icon">▤</span><span>Evidence Package</span></button>
+  <button class="nav-item"><span class="nav-icon">⌁</span><span>Audit & Compliance</span></button>
+  <div class="sidebar-footer"><strong>AI Safety Mode</strong><br>Decision support only. Human review is always required.<br><span style="color:#BFDBFE">ระบบไม่อนุมัติหรือส่งเคลมอัตโนมัติ</span></div>
+</aside>
+<main class="main">
+<header class="topbar">
+  <div class="search"><span>⌕</span><input id="globalSearch" aria-label="Global search" placeholder="Search patient, HN, visit, diagnosis, payer…"></div>
+  <div class="top-filters">
+    <select id="topDate" aria-label="Date range"><option>Today</option><option>Last 7 Days</option><option>Last 14 Days</option></select>
+    <select id="clinicFilter" aria-label="Clinic"><option>Bangkok Medical Center</option><option>Sukhumvit Clinic</option></select>
+    <select id="departmentFilter" aria-label="Department"><option>Internal Medicine</option><option>General Practice</option></select>
+    <select id="doctorFilter" aria-label="Doctor"><option>Dr. Ananda</option><option>All Doctors</option></select>
+    <button class="icon-btn" id="copilotBtn" title="AI Copilot">✦</button><button class="icon-btn" id="notificationBtn" title="Notifications">●</button><div class="avatar">DA</div>
+  </div>
+</header>
+<div class="content">
+<section class="page-head"><div><div class="eyebrow">Doctor Workspace / Operational Intelligence</div><h1>Doctor Operational & Claim Readiness Dashboard</h1><div class="subtitle">Monitor today’s clinical workload, resolve documentation gaps, and prepare visits for authorized human claim review.<br>ติดตามงานประจำวัน แก้ไขข้อมูลที่ไม่ครบถ้วน และเตรียมเคสสำหรับการตรวจสอบโดยผู้มีอำนาจ</div></div><div><div class="head-actions"><button class="btn secondary" id="refreshBtn">↻ Refresh</button><button class="btn primary" id="exportBtn">Export Summary</button></div><div class="last-updated" id="lastUpdated">Last updated: 10 Jul 2026, 10:18</div></div></section>
+<div class="safety-banner"><div style="font-size:21px">🛡</div><div><strong>Human decision required.</strong> AI provides decision support only. The system does not approve, reject, or submit claims automatically.<br><span style="font-size:12px">AI ช่วยวิเคราะห์และแนะนำเท่านั้น ผู้มีอำนาจต้องเป็นผู้ตรวจสอบและตัดสินใจทุกครั้ง</span></div></div>
+<section class="grid kpi-grid" id="kpiGrid">
+  <!-- KPI 1: Today's Visits -->
+  <article class="card kpi kpi-visits" data-kpi="all" aria-label="Today's Visits: 18 visits, up 12 percent versus yesterday, 90 percent of daily target, normal volume">
+    <div class="kpi-label">Today's Visits</div>
+    <div class="kpi-value">18</div>
+    <div class="kpi-trend kpi-trend-primary"><span class="positive">▲ +12%</span> vs Yesterday</div>
+    <div class="kpi-progress-section">
+      <div class="kpi-progress-label">Progress to Daily Target</div>
+      <div class="kpi-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="20" aria-valuenow="18" aria-valuetext="90%, 18 of 20 visits">
+        <span style="width:90%"></span>
+      </div>
+      <div class="kpi-progress-meta"><strong>90%</strong><span>(18 / 20 Visits)</span></div>
+    </div>
+    <div class="kpi-status-section">
+      <div class="kpi-status-label">Status</div>
+      <div class="kpi-status-value"><span class="status-dot status-normal"></span>Normal Volume</div>
+    </div>
+  </article>
+
+  <!-- KPI 2: Clinical Notes Pending -->
+  <article class="card kpi warning" data-kpi="Clinical Notes Pending" aria-label="Clinical Notes Pending: 4 notes, down 20 percent versus yesterday, 60 percent resolution target, attention required">
+    <div class="kpi-label">Clinical Notes Pending</div>
+    <div class="kpi-value">4</div>
+    <div class="kpi-trend kpi-trend-primary"><span class="positive">▼ -20%</span> vs Yesterday</div>
+    <div class="kpi-progress-section">
+      <div class="kpi-progress-label">Progress to Resolution Target</div>
+      <div class="kpi-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="6" aria-valuetext="60%, 6 of 10 notes resolved">
+        <span style="width:60%"></span>
+      </div>
+      <div class="kpi-progress-meta"><strong>60%</strong><span>(6 / 10 Notes Resolved)</span></div>
+    </div>
+    <div class="kpi-status-section">
+      <div class="kpi-status-label">Status</div>
+      <div class="kpi-status-value"><span class="status-dot status-warning"></span>Attention Required</div>
+    </div>
+  </article>
+
+  <!-- KPI 3: Ready for Human Review -->
+  <article class="card kpi success" data-kpi="Ready for Human Review" aria-label="Ready for Human Review: 9 visits, 3 more than yesterday, 90 percent of daily target, on track">
+    <div class="kpi-label">Ready for Human Review</div>
+    <div class="kpi-value">9</div>
+    <div class="kpi-trend kpi-trend-primary"><span class="positive">▲ +3 Visits</span> vs Yesterday</div>
+    <div class="kpi-progress-section">
+      <div class="kpi-progress-label">Progress to Daily Target</div>
+      <div class="kpi-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="9" aria-valuetext="90%, 9 of 10 visits">
+        <span style="width:90%"></span>
+      </div>
+      <div class="kpi-progress-meta"><strong>90%</strong><span>(9 / 10 Visits)</span></div>
+    </div>
+    <div class="kpi-status-section">
+      <div class="kpi-status-label">Status</div>
+      <div class="kpi-status-value"><span class="status-dot status-normal"></span>On Track</div>
+    </div>
+  </article>
+
+  <!-- KPI 4: High-Risk Gaps -->
+  <article class="card kpi danger" data-kpi="High" aria-label="High-Risk Gaps: 2 visits, down 33 percent versus yesterday, 80 percent risk-free target, needs attention">
+    <div class="kpi-label">High-Risk Gaps</div>
+    <div class="kpi-value">2</div>
+    <div class="kpi-trend kpi-trend-primary"><span class="positive">▼ -33%</span> vs Yesterday</div>
+    <div class="kpi-progress-section">
+      <div class="kpi-progress-label">Progress to Risk-Free Target</div>
+      <div class="kpi-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="8" aria-valuetext="80%, 8 of 10 visits without high-risk gaps">
+        <span style="width:80%"></span>
+      </div>
+      <div class="kpi-progress-meta"><strong>80%</strong><span>(8 / 10 Visits Risk-Free)</span></div>
+    </div>
+    <div class="kpi-status-section">
+      <div class="kpi-status-label">Status</div>
+      <div class="kpi-status-value"><span class="status-dot status-danger"></span>Needs Attention</div>
+    </div>
+  </article>
+
+  <!-- KPI 5: Overdue Actions -->
+  <article class="card kpi warning" data-kpi="Overdue" aria-label="Overdue Actions: 3 actions, down 25 percent versus yesterday, 83 percent SLA compliance, action required">
+    <div class="kpi-label">Overdue Actions</div>
+    <div class="kpi-value">3</div>
+    <div class="kpi-trend kpi-trend-primary"><span class="positive">▼ -25%</span> vs Yesterday</div>
+    <div class="kpi-progress-section">
+      <div class="kpi-progress-label">Progress to SLA Compliance</div>
+      <div class="kpi-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="18" aria-valuenow="15" aria-valuetext="83%, 15 of 18 actions completed on time">
+        <span style="width:83%"></span>
+      </div>
+      <div class="kpi-progress-meta"><strong>83%</strong><span>(15 / 18 On Time)</span></div>
+    </div>
+    <div class="kpi-status-section">
+      <div class="kpi-status-label">Status</div>
+      <div class="kpi-status-value"><span class="status-dot status-warning"></span>Action Required</div>
+    </div>
+  </article>
+
+  <!-- KPI 6: Average Time to Readiness -->
+  <article class="card kpi success" data-kpi="Average Time to Readiness" aria-label="Average Time to Readiness: 2 hours 18 minutes, improved 14 percent, within target">
+    <div class="kpi-label">Average Time to Readiness</div>
+    <div class="kpi-value" style="font-size:32px">2h 18m</div>
+    <div class="kpi-trend kpi-trend-primary"><span class="positive">▼ Improved 14%</span> vs Previous Period</div>
+    <div class="kpi-progress-section">
+      <div class="kpi-progress-label">Progress to SLA Target</div>
+      <div class="kpi-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="180" aria-valuenow="138" aria-valuetext="Within target, 2 hours 18 minutes against a target below 3 hours">
+        <span style="width:100%"></span>
+      </div>
+      <div class="kpi-progress-meta"><strong>Within Target</strong><span>(2h 18m / &lt; 3h)</span></div>
+    </div>
+    <div class="kpi-status-section">
+      <div class="kpi-status-label">Status</div>
+      <div class="kpi-status-value"><span class="status-dot status-normal"></span>SLA Achieved</div>
+    </div>
+  </article>
+</section>
+<section class="grid two-col"><article class="card"><div class="card-header"><div><h2 class="card-title">Today’s Visit Workflow</h2><div class="card-sub">แสดงจำนวน Visit ในแต่ละขั้นตอนของกระบวนการรักษาและเตรียมเคลม</div></div><button class="btn secondary" data-clear="visitStatus">Reset Filter</button></div><div class="card-body"><div class="chart-wrap"><canvas id="workflowChart" aria-label="Visit workflow horizontal bar chart"></canvas></div></div></article><article class="card"><div class="card-header"><div><h2 class="card-title">Claim Readiness Status</h2><div class="card-sub">สัดส่วนสถานะความพร้อมของ Visit ที่ผ่านการประเมินแล้ว</div></div><button class="btn secondary" data-clear="readiness">Reset</button></div><div class="card-body"><div class="chart-wrap small"><canvas id="readinessChart"></canvas></div><div class="legend-list" id="readinessLegend"></div></div></article></section>
+<section class="grid trend-grid"><article class="card"><div class="card-header"><div><h2 class="card-title">Claim Readiness Trend</h2><div class="card-sub">แนวโน้มอัตรา Visit ที่พร้อมสำหรับการตรวจสอบโดยผู้มีอำนาจ</div></div><div class="chart-actions"><button class="toggle active" data-range="7">7 Days</button><button class="toggle" data-range="14">14 Days</button></div></div><div class="card-body"><div class="chart-wrap"><canvas id="trendChart"></canvas></div></div></article><article class="card"><div class="card-header"><div><h2 class="card-title">Average Time to Readiness</h2><div class="card-sub">ระยะเวลาเฉลี่ยตั้งแต่ Visit Completed จนพร้อมสำหรับ Human Review</div></div></div><div class="card-body"><div class="chart-wrap"><canvas id="tatChart"></canvas></div><div class="insight"><strong>Current average: 2h 18m</strong><br>Target: &lt; 3h · Trend: Improving</div></div></article></section>
+<section class="grid analysis-grid"><article class="card"><div class="card-header"><div><h2 class="card-title">Top Missing Evidence</h2><div class="card-sub">สาเหตุหลักที่ทำให้เคสยังไม่พร้อมสำหรับการตรวจสอบโดยผู้มีอำนาจ</div></div><button class="btn secondary" data-clear="gap">Reset</button></div><div class="card-body"><div class="chart-wrap"><canvas id="paretoChart"></canvas></div><div class="insight">SOAP rationale and imaging evidence account for <strong>54%</strong> of current readiness gaps.<br>ปัญหา 2 ประเภทแรกเป็นสาเหตุหลักของงานค้างในวันนี้</div></div></article><article class="card"><div class="card-header"><div><h2 class="card-title">Clinical & Claim Risk Heatmap</h2><div class="card-sub">เปรียบเทียบระดับความเสี่ยงของแต่ละ Visit ตามหมวดสำคัญ</div></div></div><div class="card-body heatmap-wrap"><table class="heatmap" id="heatmapTable"></table></div></article></section>
+<article class="card worklist-card" id="worklistSection"><div class="card-header"><div><h2 class="card-title">Doctor Action Worklist</h2><div class="card-sub">รายการ Visit ที่ต้องดำเนินการ เรียงตามความเร่งด่วนและผลกระทบ</div></div><div class="card-sub" id="worklistCount">Showing 10 of 10 visits</div></div><div class="toolbar"><input class="control toolbar-search" id="worklistSearch" placeholder="Search patient, HN, Visit ID…"><select class="control" id="readinessFilter"><option value="">All Readiness</option><option>Ready for Human Review</option><option>Needs Review</option><option>Not Ready</option></select><select class="control" id="riskFilter"><option value="">All Risk Levels</option><option>Critical</option><option>High</option><option>Medium</option><option>Low</option></select><select class="control" id="statusFilter"><option value="">All Visit Status</option><option>Waiting</option><option>In Consultation</option><option>Pharmacy</option><option>Pending Evidence</option><option>Ready for Human Review</option><option>Completed</option></select><select class="control" id="priorityFilter"><option value="">All Priorities</option><option>Critical</option><option>High</option><option>Medium</option><option>Low</option></select><button class="btn secondary" id="clearFiltersBtn">Clear All Filters</button></div><div class="active-filters" id="activeFilters"></div><div class="table-wrap"><table class="data"><thead><tr><th>Priority</th><th>Patient</th><th>HN</th><th>Visit ID</th><th>Visit Status</th><th>Score</th><th>Readiness Status</th><th>Blocking Gaps</th><th>Risk</th><th>Time Pending</th><th>Payer</th><th>Next Action</th><th>Action</th></tr></thead><tbody id="worklistBody"></tbody></table><div class="empty-state" id="emptyState"><strong>No visits match the current filters.</strong><br>ไม่พบ Visit ตามตัวกรองที่เลือก กรุณาปรับตัวกรองหรือกด Clear All Filters</div></div><div class="table-footer"><span id="tableSummary">Showing 10 visits</span><button class="btn secondary" id="showMoreBtn">Show More</button></div></article>
+<section class="grid detail-grid" id="selectedDetail"><div class="grid"><article class="card"><div class="patient-bar"><div class="patient-primary"><div class="patient-name" id="patientName">Anan Prasert</div><div class="patient-meta" id="patientMeta">HN 104582 · Male · 54 years · OPD · Visit VST-2026-0710-018 · Dr. Ananda · Internal Medicine</div></div><span class="chip chip-blue" id="payerChip">Payer: AIA Health</span><span class="chip chip-gray" id="diagnosisChip">Diagnosis: J18.9</span><span class="chip chip-yellow" id="confidenceChip">Confidence: 82%</span></div><div class="card-header"><div><h2 class="card-title">Selected Visit Readiness Review</h2><div class="card-sub" id="evaluationMeta">Version 1.4 · Evaluated 10 Jul 2026, 10:18 · Source Linked</div></div><button class="btn secondary" id="reEvaluateBtn">↻ Re-evaluate</button></div><div class="card-body readiness-layout"><div class="score-panel"><div class="score-ring" id="scoreRing"><div class="score-value"><strong id="scoreValue">78</strong><span>out of 100</span></div></div><div class="score-status" id="scoreStatus">Needs Review</div><span class="chip chip-yellow" id="statusChip" style="margin-top:8px">Human Review Required</span><div class="threshold"><div class="threshold-scale"><span class="threshold-marker" id="thresholdMarker"></span></div><div class="threshold-labels"><span>0 Not Ready</span><span>60 Review</span><span>85 Ready</span><span>100</span></div></div><div class="score-facts"><div class="fact"><strong id="pointsRemaining">7</strong>Points to Ready</div><div class="fact"><strong id="blockingCount">2</strong>Blocking Gaps</div><div class="fact"><strong id="scoreChange">+6</strong>Since Previous</div><div class="fact"><strong>85</strong>Ready Threshold</div></div></div><div class="breakdown" id="breakdown"></div></div></article>
+<article class="card"><div class="card-header"><div><h2 class="card-title">Why Did the Score Change?</h2><div class="card-sub">อธิบายปัจจัยที่ทำให้คะแนนเพิ่มขึ้นหรือลดลงจากการประเมินครั้งก่อน</div></div></div><div class="card-body"><div class="waterfall" id="waterfall"></div></div></article>
+<article class="card"><div class="card-header"><div><h2 class="card-title">Readiness Review</h2><div class="card-sub">Prioritized issues, recommendations, sources, and audit traceability.</div></div><span class="chip chip-red" id="blockingChip">2 blocking gaps</span></div><div class="section-tabs"><button class="tab active" data-tab="gaps">Priority Gaps</button><button class="tab" data-tab="soap">SOAP Check</button><button class="tab" data-tab="coding">Coding & Payer</button><button class="tab" data-tab="sources">Sources</button><button class="tab" data-tab="audit">Audit Trail</button></div><div class="card-body"><div class="tab-panel active" id="tab-gaps"></div><div class="tab-panel" id="tab-soap"></div><div class="tab-panel" id="tab-coding"></div><div class="tab-panel" id="tab-sources"></div><div class="tab-panel" id="tab-audit"></div></div></article></div>
+<aside class="right-stack"><article class="card gate"><div class="card-header"><div><h2 class="card-title">Human Review Gate</h2><div class="card-sub">Submission remains disabled until authorized review is complete.</div></div><span class="chip chip-yellow" id="gateStatus">Pending</span></div><div class="card-body"><div class="gate-steps"><div class="gate-step"><div class="step-dot">1</div><div><div class="step-title">Doctor resolves clinical gaps</div><div class="step-meta">Status: In Progress · Owner: Dr. Ananda<br>Due: Today, 15:00 · SLA: 4h<br><span id="gateBlockReason">2 blocking actions remain</span></div></div></div><div class="gate-step"><div class="step-dot">2</div><div><div class="step-title">Claim reviewer validates evidence</div><div class="step-meta">Status: Not Started · Owner: Unassigned<br>Audit status: Pending</div></div></div><div class="gate-step"><div class="step-dot">3</div><div><div class="step-title">Authorized user decides next step</div><div class="step-meta">System cannot approve or submit claims.</div></div></div></div><button class="btn primary" id="markReviewBtn" style="width:100%;margin-top:16px">Mark Ready for Human Review</button><button class="btn secondary" id="assignReviewerBtn" style="width:100%;margin-top:8px">Assign Reviewer</button><button class="btn secondary" id="overrideBtn" style="width:100%;margin-top:8px">Request Manual Override</button><button class="btn secondary" id="viewAuditBtn" style="width:100%;margin-top:8px">View Audit Trail</button></div></article>
+<article class="card"><div class="card-header"><div><h2 class="card-title">Explainable Recommendation</h2><div class="card-sub">Why the current status was assigned</div></div><span class="chip chip-blue">AI Assisted — Human Verification Required</span></div><div class="card-body"><div id="recommendation" style="line-height:1.65"></div><ul class="source-list"><li>SOAP Note v3</li><li>Diagnosis Record v2</li><li>Payer Rule PR-AIA-OPD-017</li><li>Visit Cost Summary v1</li></ul><div class="uncertainty" id="uncertainty" style="margin-top:12px"></div></div></article>
+<article class="card"><div class="card-header"><div><h2 class="card-title">Recent Audit Activity</h2><div class="card-sub">Traceable readiness actions</div></div><button class="btn secondary" id="exportAuditBtn">Export</button></div><div class="card-body"><div class="activity" id="auditActivity"></div></div></article></aside></section>
+<div class="sticky-actions"><div><strong id="stickyStatus">2 readiness actions remain</strong><div class="action-note">แก้ไขข้อมูลจากแหล่งจริงเท่านั้น ระบบจะบันทึกทุกการเปลี่ยนแปลง</div></div><div class="action-group"><button class="btn secondary" data-action="Save Draft">Save Draft</button><button class="btn secondary" data-action="Open Visit Detail">Open Visit Detail</button><button class="btn primary" id="handoffBtn">Send to Claim Review Queue</button></div></div>
+</div></main></div>
+<div class="modal-backdrop" id="overrideModal"><div class="modal"><div class="modal-head"><div><strong>Manual Override Request</strong><div class="card-sub">Authorized role and factual reason are required. This action will be audited.</div></div><button class="icon-btn" data-close="overrideModal">×</button></div><div class="modal-body"><div class="field"><label>Authorized role</label><select id="overrideRole"><option value="">Select role</option><option>Doctor</option><option>Claim Reviewer</option><option>Compliance Officer</option></select></div><div class="field"><label>Override outcome</label><select id="overrideOutcome"><option>Keep Needs Review and record exception</option><option>Request secondary clinical review</option><option>Request payer-rule exception review</option></select></div><div class="field"><label>Reason</label><textarea id="overrideReason" placeholder="Enter a factual reason. Do not add unsupported clinical or payer information."></textarea></div></div><div class="modal-foot"><button class="btn secondary" data-close="overrideModal">Cancel</button><button class="btn primary" id="submitOverride">Submit Override Request</button></div></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div><div class="loading-overlay" id="loading"><div class="loader">Loading approved clinical and claim readiness sources…</div></div>
+<script>
+(() => {
+const COLORS={deep:'#0F2A5F',primary:'#1E3A8A',ai:'#2563EB',accent:'#38BDF8',success:'#059669',warning:'#D97706',danger:'#DC2626',muted:'#64748B',grid:'#E2E8F0'};
+const worklist=[
+{id:'VST-2026-0710-018',patient:'Anan Prasert',hn:'104582',gender:'Male',age:54,type:'OPD',status:'Pending Evidence',score:78,readiness:'Needs Review',gaps:2,risk:'Critical',priority:'Critical',pending:204,payer:'AIA Health',diagnosis:'J18.9',next:'Upload Imaging Report',gap:'Imaging report missing',confidence:82,change:6},
+{id:'VST-2026-0710-014',patient:'Mali Suthida',hn:'103218',gender:'Female',age:42,type:'OPD',status:'Ready for Human Review',score:91,readiness:'Ready for Human Review',gaps:0,risk:'Low',priority:'Low',pending:35,payer:'Muang Thai Life',diagnosis:'K29.7',next:'Ready for Human Review',gap:'',confidence:93,change:8},
+{id:'VST-2026-0710-009',patient:'Somchai Thongdee',hn:'100897',gender:'Male',age:67,type:'OPD',status:'Pending Evidence',score:56,readiness:'Not Ready',gaps:3,risk:'Critical',priority:'Critical',pending:188,payer:'Self-pay / Pending',diagnosis:'M54.5',next:'Complete SOAP Plan',gap:'SOAP Plan rationale incomplete',confidence:71,change:1},
+{id:'VST-2026-0710-006',patient:'Nok Kanya',hn:'106112',gender:'Female',age:35,type:'OPD',status:'In Consultation',score:72,readiness:'Needs Review',gaps:1,risk:'High',priority:'High',pending:96,payer:'Allianz Ayudhya',diagnosis:'J06.9',next:'Confirm ICD Code',gap:'ICD specificity insufficient',confidence:79,change:4},
+{id:'VST-2026-0710-003',patient:'Preecha Boon',hn:'101032',gender:'Male',age:59,type:'OPD',status:'Pharmacy',score:81,readiness:'Needs Review',gaps:1,risk:'High',priority:'High',pending:82,payer:'AIA Health',diagnosis:'E11.9',next:'Review Prescription',gap:'Prescription linkage incomplete',confidence:85,change:3},
+{id:'VST-2026-0710-021',patient:'Suda Meesuk',hn:'108845',gender:'Female',age:48,type:'OPD',status:'Waiting',score:64,readiness:'Needs Review',gaps:2,risk:'Medium',priority:'Medium',pending:48,payer:'Muang Thai Life',diagnosis:'R10.9',next:'Complete SOAP Plan',gap:'SOAP Plan rationale incomplete',confidence:74,change:0},
+{id:'VST-2026-0710-022',patient:'Thanawat K.',hn:'107712',gender:'Male',age:31,type:'OPD',status:'Completed',score:88,readiness:'Ready for Human Review',gaps:0,risk:'Low',priority:'Low',pending:22,payer:'AXA',diagnosis:'S93.4',next:'No Action Required',gap:'',confidence:90,change:7},
+{id:'VST-2026-0710-024',patient:'Pimchanok R.',hn:'109036',gender:'Female',age:27,type:'OPD',status:'Pending Evidence',score:69,readiness:'Needs Review',gaps:1,risk:'High',priority:'High',pending:126,payer:'FWD',diagnosis:'N39.0',next:'Add Cost Rationale',gap:'Cost justification missing',confidence:77,change:2},
+{id:'VST-2026-0710-025',patient:'Wichai L.',hn:'104013',gender:'Male',age:63,type:'OPD',status:'Completed',score:87,readiness:'Ready for Human Review',gaps:0,risk:'Low',priority:'Low',pending:18,payer:'Bangkok Insurance',diagnosis:'I10',next:'Ready for Human Review',gap:'',confidence:92,change:5},
+{id:'VST-2026-0710-027',patient:'Arisa N.',hn:'105566',gender:'Female',age:39,type:'OPD',status:'In Consultation',score:58,readiness:'Not Ready',gaps:2,risk:'High',priority:'High',pending:76,payer:'AIA Health',diagnosis:'G43.9',next:'Verify Payer Rule',gap:'Medical certificate missing',confidence:70,change:-2}
+];
+const state={filters:{search:'',readiness:'',risk:'',status:'',priority:'',gap:''},selected:worklist[0],charts:{},visible:10};
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');clearTimeout(window.__tt);window.__tt=setTimeout(()=>el.classList.remove('show'),2600)}
+function chipClass(value){if(['Ready for Human Review','Low'].includes(value))return'chip-green';if(['Critical','Not Ready'].includes(value))return'chip-red';if(['High','Needs Review','Pending Evidence'].includes(value))return'chip-yellow';return'chip-blue'}
+function formatPending(m){return m>=60?`${Math.floor(m/60)}h ${m%60}m`:`${m}m`}
+function filtered(){return worklist.filter(v=>{const q=state.filters.search.toLowerCase();return(!q||[v.patient,v.hn,v.id,v.payer,v.diagnosis].join(' ').toLowerCase().includes(q))&&(!state.filters.readiness||v.readiness===state.filters.readiness)&&(!state.filters.risk||v.risk===state.filters.risk)&&(!state.filters.status||v.status===state.filters.status)&&(!state.filters.priority||v.priority===state.filters.priority)&&(!state.filters.gap||v.gap===state.filters.gap)}).sort((a,b)=>({Critical:4,High:3,Medium:2,Low:1}[b.risk]-({Critical:4,High:3,Medium:2,Low:1}[a.risk])||b.gaps-a.gaps||b.pending-a.pending||a.score-b.score))}
+function renderFilters(){const area=$('#activeFilters');area.innerHTML='';Object.entries(state.filters).forEach(([k,v])=>{if(v){const c=document.createElement('span');c.className='filter-chip chip-blue';c.innerHTML=`${v}<button aria-label="Remove ${v}">×</button>`;c.querySelector('button').onclick=()=>{state.filters[k]='';syncFilterControls();renderAll()};area.appendChild(c)}})}
+function syncFilterControls(){$('#worklistSearch').value=state.filters.search;$('#readinessFilter').value=state.filters.readiness;$('#riskFilter').value=state.filters.risk;$('#statusFilter').value=state.filters.status;$('#priorityFilter').value=state.filters.priority}
+function renderWorklist(){const rows=filtered(),body=$('#worklistBody');body.innerHTML='';rows.slice(0,state.visible).forEach(v=>{const tr=document.createElement('tr');if(v.id===state.selected.id)tr.classList.add('selected');tr.innerHTML=`<td><span class="chip ${chipClass(v.priority)}">${v.priority}</span></td><td><strong>${v.patient}</strong></td><td>${v.hn}</td><td>${v.id}</td><td><span class="chip ${chipClass(v.status)}">${v.status}</span></td><td class="score-mini">${v.score}</td><td><span class="chip ${chipClass(v.readiness)}">${v.readiness}</span></td><td>${v.gaps}</td><td><span class="chip ${chipClass(v.risk)}">${v.risk}</span></td><td>${formatPending(v.pending)}</td><td>${v.payer}</td><td>${v.next}</td><td><button class="btn secondary row-action">Open</button></td>`;tr.onclick=e=>{if(!e.target.classList.contains('row-action'))selectVisit(v)};tr.querySelector('.row-action').onclick=e=>{e.stopPropagation();selectVisit(v);$('#selectedDetail').scrollIntoView({behavior:'smooth'});toast('Selected visit detail opened.')};body.appendChild(tr)});$('#emptyState').style.display=rows.length?'none':'block';$('#worklistCount').textContent=`Showing ${Math.min(rows.length,state.visible)} of ${rows.length} visits`;$('#tableSummary').textContent=`Showing ${Math.min(rows.length,state.visible)} visits`;$('#showMoreBtn').style.display=rows.length>state.visible?'inline-flex':'none';renderFilters()}
+function setFilter(key,value){state.filters[key]=state.filters[key]===value?'':value;syncFilterControls();renderAll();$('#worklistSection').scrollIntoView({behavior:'smooth',block:'start'})}
+function selectVisit(v){state.selected=v;renderDetail();renderWorklist()}
+function components(v){const base=[['Clinical Documentation',25,21,20],['Diagnosis & Coding',20,16,16],['Treatment & Prescription',15,13,12],['Evidence Completeness',20,14,17],['Payer Rule Alignment',10,8,8],['Cost Justification',10,6,8]];const factor=v.score/78;return base.map((x,i)=>{let cur=Math.min(x[1],Math.max(0,Math.round(x[2]*factor+(i%2?0:1))));return{name:x[0],max:x[1],current:cur,target:x[3],blocking:cur<x[3]}})}
+function renderDetail(){const v=state.selected;$('#patientName').textContent=v.patient;$('#patientMeta').textContent=`HN ${v.hn} · ${v.gender} · ${v.age} years · ${v.type} · Visit ${v.id} · Dr. Ananda · Internal Medicine`;$('#payerChip').textContent=`Payer: ${v.payer}`;$('#diagnosisChip').textContent=`Diagnosis: ${v.diagnosis}`;$('#confidenceChip').textContent=`Confidence: ${v.confidence}%`;$('#scoreValue').textContent=v.score;$('#scoreStatus').textContent=v.readiness;$('#scoreRing').style.setProperty('--score',v.score);$('#thresholdMarker').style.left=`${v.score}%`;$('#pointsRemaining').textContent=Math.max(0,85-v.score);$('#blockingCount').textContent=v.gaps;$('#scoreChange').textContent=(v.change>=0?'+':'')+v.change;const sc=$('#statusChip');sc.className=`chip ${chipClass(v.readiness)}`;sc.textContent=v.readiness==='Ready for Human Review'?'Prepared for Review':'Human Review Required';$('#blockingChip').textContent=`${v.gaps} blocking gaps`;$('#blockingChip').className=`chip ${v.gaps?'chip-red':'chip-green'}`;$('#stickyStatus').textContent=v.gaps?`${v.gaps} readiness actions remain`:'No blocking readiness actions';$('#gateBlockReason').textContent=v.gaps?`${v.gaps} blocking actions remain`:'Clinical gaps resolved';$('#markReviewBtn').disabled=v.gaps>0;$('#handoffBtn').disabled=v.gaps>0;$('#gateStatus').textContent=v.gaps?'Pending':'Prepared';$('#gateStatus').className=`chip ${v.gaps?'chip-yellow':'chip-green'}`;$('#recommendation').innerHTML=v.gaps?`This visit is <strong>${v.readiness}</strong> because ${v.gap||'one or more readiness conditions are incomplete'} and authorized human verification is required.`:`This visit is <strong>Ready for Human Review</strong>. Configured readiness checks are complete, but an authorized reviewer must verify evidence and decide the next step.`;$('#uncertainty').textContent=`Confidence is ${v.confidence}%. Payer-rule coverage is limited to configured MVP rules and must be verified by an authorized reviewer.`;const c=components(v);$('#breakdown').innerHTML=c.map(x=>`<div class="metric ${x.blocking?'blocking':''}"><div class="metric-head"><span>${x.name}</span><span>${x.current}/${x.max}</span></div><div class="bullet"><div class="bullet-fill" style="width:${x.current/x.max*100}%"></div><span class="bullet-target" style="left:${x.target/x.max*100}%"></span></div><div class="metric-meta"><span>${Math.round(x.current/x.max*100)}% · Minimum ${x.target}</span><span>${x.blocking?`Gap ${x.target-x.current} · Action required`:'Threshold met'}</span></div></div>`).join('');renderWaterfall(v);renderTabs(v);renderAudit(v)}
+function renderWaterfall(v){const prev=v.score-v.change,items=[['Previous Score',prev,prev],['SOAP Note completed',v.change>2?Math.min(6,v.change):0,Math.max(0,Math.min(6,v.change))],['ICD code confirmed',v.change>6?v.change-6:0,Math.max(0,v.change-6)],['Unresolved evidence',0,0],['Current Score',v.score,v.score]];$('#waterfall').innerHTML=items.map((x,i)=>`<div class="wf-row"><span>${x[0]}</span><div class="wf-bar"><div class="${x[1]===0?'wf-zero':'wf-fill'}" style="width:${x[2]}%"></div></div><span class="wf-value">${i===1||i===2?(x[1]>0?'+':'')+x[1]:x[1]}</span></div>`).join('')}
+function issue(title,desc,severity,action){return`<div class="issue"><div class="issue-icon ${severity==='Blocking'?'risk-critical':severity==='Warning'?'risk-high':'risk-medium'}">${severity==='Blocking'?'!':'i'}</div><div><div class="issue-title">${title}</div><div class="issue-desc">${desc}</div><div class="issue-meta"><span class="chip ${severity==='Blocking'?'chip-red':'chip-yellow'}">${severity}</span><span class="chip chip-gray">Owner: Doctor</span><span class="chip chip-blue">Audit Recorded</span></div></div><button class="btn secondary" data-action="${action}">${action}</button></div>`}
+function renderTabs(v){$('#tab-gaps').innerHTML=`<div class="issue-list">${v.gaps?issue(v.gap||'Readiness evidence incomplete','Required source evidence or clinical rationale must be completed using approved source data.',v.risk==='Critical'?'Blocking':'Warning',v.next):issue('No blocking gaps detected','Configured readiness checks are complete. Human verification remains required.','Information','Open Sources')}</div>`;$('#tab-soap').innerHTML=`<div class="issue-list">${issue('Subjective and Objective sections reviewed','Symptoms, relevant history, vital signs, and examination are source-linked.','Information','Open SOAP Note')}${v.score<75?issue('Plan requires additional rationale','Add documented clinical reasoning without inventing facts.','Warning','Complete SOAP Plan'):''}</div>`;$('#tab-coding').innerHTML=`<div class="issue-list">${issue('Diagnosis-to-code consistency requires verification',`${v.diagnosis} is based on the current diagnosis record. Specificity must be confirmed by an authorized clinician.`,v.score<70?'Warning':'Information','Review Coding')}</div>`;$('#tab-sources').innerHTML=`<table class="data" style="min-width:700px"><thead><tr><th>Source</th><th>Version</th><th>Used For</th><th>Status</th></tr></thead><tbody><tr><td>SOAP Note</td><td>v3</td><td>Clinical completeness</td><td><span class="chip chip-green">Verified</span></td></tr><tr><td>Diagnosis Record</td><td>v2</td><td>ICD consistency</td><td><span class="chip chip-green">Verified</span></td></tr><tr><td>Payer Rule</td><td>2026.06</td><td>Evidence requirement</td><td><span class="chip chip-blue">Configured</span></td></tr><tr><td>Visit Cost Summary</td><td>v1</td><td>Cost threshold</td><td><span class="chip chip-yellow">Review</span></td></tr></tbody></table>`;$('#tab-audit').innerHTML='<div id="auditTabList"></div>';bindActions()}
+function renderAudit(v){const events=[['Readiness evaluation completed','10:18 · System · Rule set 1.4'],[v.gaps?'Readiness gap flagged':'Readiness checks completed','10:17 · Source-linked validation'],['SOAP note updated','10:12 · Dr. Ananda · v3']];$('#auditActivity').innerHTML=events.map((e,i)=>`<div class="activity-item"><div class="activity-dot" style="background:${i===1&&v.gaps?COLORS.warning:i===2?COLORS.success:COLORS.ai}"></div><div><div class="activity-title">${e[0]}</div><div class="activity-meta">${e[1]} · Audit status: Recorded</div></div></div>`).join('');const tab=$('#auditTabList');if(tab)tab.innerHTML=$('#auditActivity').innerHTML}
+function renderHeatmap(){const cats=['Clinical','Documentation','Coding','Evidence','Payer Rule','Cost'];const visits=worklist.slice(0,5);let html='<thead><tr><th>Visit</th>'+cats.map(c=>`<th>${c}</th>`).join('')+'</tr></thead><tbody>';visits.forEach((v,ri)=>{html+=`<tr><td><button class="visit-link" data-visit="${v.id}">${v.id.split('-').slice(-1)}</button></td>`;cats.forEach((c,ci)=>{let levels=['Low','Medium','High','Critical'];let idx=Math.min(3,Math.max(0,({Low:0,Medium:1,High:2,Critical:3}[v.risk]+((ci+ri)%3===0?0:-1))));let level=levels[idx],reason=ci===3&&v.gap?v.gap:`${c} review status: ${level}`;html+=`<td><button class="risk-cell risk-${level.toLowerCase()}" data-visit="${v.id}" title="${c} Risk: ${level}. ${reason}. Action owner: Doctor">${level}</button></td>`});html+='</tr>'});$('#heatmapTable').innerHTML=html+'</tbody>';$$('[data-visit]').forEach(b=>b.onclick=()=>{const v=worklist.find(x=>x.id===b.dataset.visit);selectVisit(v);state.filters.search=v.id;syncFilterControls();renderAll();$('#selectedDetail').scrollIntoView({behavior:'smooth'})})}
+function baseOptions(){return{responsive:true,maintainAspectRatio:false,resizeDelay:120,animation:{duration:250},interaction:{mode:'nearest',intersect:true},layout:{padding:{top:6,right:10,bottom:4,left:4}},plugins:{legend:{labels:{boxWidth:11,usePointStyle:true,padding:14,color:COLORS.muted,font:{size:12}}},tooltip:{backgroundColor:COLORS.deep,padding:10,titleColor:'#fff',bodyColor:'#fff'}},scales:{x:{grid:{color:COLORS.grid},ticks:{color:COLORS.muted,autoSkip:false,maxRotation:0}},y:{grid:{color:COLORS.grid},ticks:{color:COLORS.muted,autoSkip:false}}}}}
+function chart(id,config){const canvas=$(id);if(!canvas)return null;if(typeof Chart==='undefined'){canvas.parentElement.innerHTML='<div style="height:100%;display:grid;place-items:center;padding:24px;text-align:center;color:#64748B;border:1px dashed #CBD5E1;border-radius:12px"><div><strong style="color:#0F2A5F">Chart library could not be loaded.</strong><br>กราฟไม่สามารถเริ่มทำงานได้ กรุณาเปิดไฟล์ใหม่อีกครั้ง</div></div>';return null}if(state.charts[id])state.charts[id].destroy();const instance=new Chart(canvas,config);state.charts[id]=instance;requestAnimationFrame(()=>instance.resize());return instance}
+function spark(id,data,color){chart('#'+id,{type:'line',data:{labels:data.map((_,i)=>i),datasets:[{data,borderColor:color,backgroundColor:'transparent',pointRadius:0,borderWidth:2,tension:.35}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{display:false},y:{display:false}},events:[]}})}
+function renderCharts(){
+const workflowLabels=['Waiting','In Consultation','Pharmacy','Pending Evidence','Ready for Human Review','Completed'],workflowData=[6,3,2,4,9,13];let o=baseOptions();o.indexAxis='y';o.plugins.legend.display=false;o.scales.x={beginAtZero:true,suggestedMax:15,ticks:{stepSize:2,color:COLORS.muted},grid:{color:COLORS.grid},title:{display:true,text:'Number of visits',color:COLORS.muted}};o.scales.y={grid:{display:false},ticks:{color:COLORS.muted,font:{size:12},autoSkip:false}};o.onClick=(e,els)=>{if(els.length)setFilter('status',workflowLabels[els[0].index])};chart('#workflowChart',{type:'bar',data:{labels:workflowLabels,datasets:[{label:'Visits',data:workflowData,backgroundColor:['#93C5FD','#60A5FA','#38BDF8','#F59E0B','#10B981','#1E3A8A'],borderRadius:7}]},options:o});
+let donut=chart('#readinessChart',{type:'doughnut',data:{labels:['Ready for Human Review','Needs Review','Not Ready'],datasets:[{data:[9,6,3],backgroundColor:[COLORS.success,COLORS.warning,COLORS.danger],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.label}: ${c.raw} (${Math.round(c.raw/18*100)}%)`}}},onClick:(e,els)=>{if(els.length)setFilter('readiness',['Ready for Human Review','Needs Review','Not Ready'][els[0].index])}}});$('#readinessLegend').innerHTML=[['Ready for Human Review',9,50,COLORS.success],['Needs Review',6,33,COLORS.warning],['Not Ready',3,17,COLORS.danger]].map(x=>`<div class="legend-row"><div class="legend-left"><span class="dot" style="background:${x[3]}"></span><span>${x[0]}</span></div><strong>${x[1]} · ${x[2]}%</strong></div>`).join('');renderTrend(7);
+let to=baseOptions();to.plugins.legend.display=true;to.scales.y={beginAtZero:true,max:5,ticks:{stepSize:1,color:COLORS.muted},grid:{color:COLORS.grid},title:{display:true,text:'Hours',color:COLORS.muted}};to.scales.x={grid:{display:false},ticks:{color:COLORS.muted,autoSkip:false}};chart('#tatChart',{type:'bar',data:{labels:['4 Jul','5 Jul','6 Jul','7 Jul','8 Jul','9 Jul','10 Jul'],datasets:[{label:'Average hours',data:[3.8,3.4,3.1,2.9,3.2,2.6,2.3],backgroundColor:[COLORS.warning,COLORS.warning,COLORS.warning,COLORS.success,COLORS.warning,COLORS.success,COLORS.success],borderRadius:6},{type:'line',label:'Target',data:[3,3,3,3,3,3,3],borderColor:COLORS.danger,borderDash:[6,5],pointRadius:0,borderWidth:2}]},options:to});
+let po=baseOptions();po.indexAxis='y';po.scales={xCases:{type:'linear',position:'bottom',beginAtZero:true,max:10,ticks:{stepSize:2,color:COLORS.muted},grid:{color:COLORS.grid},title:{display:true,text:'Case count',color:COLORS.muted}},xPercent:{type:'linear',position:'top',beginAtZero:true,max:100,ticks:{stepSize:20,callback:v=>v+'%',color:COLORS.warning},grid:{drawOnChartArea:false},title:{display:true,text:'Cumulative percentage',color:COLORS.warning}},y:{type:'category',grid:{display:false},ticks:{color:COLORS.muted,autoSkip:false,font:{size:12}}}};po.plugins.legend.labels={boxWidth:11,usePointStyle:true,padding:14};po.onClick=(e,els)=>{if(els.length){const map=['SOAP Plan rationale incomplete','Imaging report missing','ICD specificity insufficient','Medical certificate missing','Prescription linkage incomplete','Cost justification missing'];setFilter('gap',map[els[0].index])}};chart('#paretoChart',{type:'bar',data:{labels:['SOAP Plan rationale','Imaging report','ICD specificity','Medical certificate','Prescription linkage','Cost justification'],datasets:[{type:'bar',label:'Case count',data:[8,6,5,3,2,2],xAxisID:'xCases',backgroundColor:COLORS.ai,borderRadius:6,barPercentage:.66,categoryPercentage:.78},{type:'line',label:'Cumulative %',data:[31,54,73,85,92,100],xAxisID:'xPercent',borderColor:COLORS.warning,backgroundColor:COLORS.warning,pointRadius:4,pointHoverRadius:6,borderWidth:2,tension:.22,fill:false}]},options:po})}
+function renderTrend(days){const labels14=['27 Jun','28 Jun','29 Jun','30 Jun','1 Jul','2 Jul','3 Jul','4 Jul','5 Jul','6 Jul','7 Jul','8 Jul','9 Jul','10 Jul'],actual14=[61,63,64,66,65,67,68,68,70,72,74,71,76,78],prev14=[58,59,60,61,62,62,63,64,65,66,68,69,70,71],labels=days===7?labels14.slice(-7):labels14,actual=days===7?actual14.slice(-7):actual14,prev=days===7?prev14.slice(-7):prev14;let o=baseOptions();o.scales.y={min:0,max:100,ticks:{stepSize:20,callback:v=>v+'%',color:COLORS.muted},grid:{color:COLORS.grid},title:{display:true,text:'Readiness rate',color:COLORS.muted}};o.scales.x={grid:{display:false},ticks:{color:COLORS.muted,autoSkip:false,maxRotation:0}};o.onClick=(e,els)=>{if(els.length)toast(`Worklist context set to ${labels[els[0].index]}.`)};chart('#trendChart',{type:'line',data:{labels,datasets:[{label:'Actual Readiness Rate',data:actual,borderColor:COLORS.ai,backgroundColor:'rgba(37,99,235,.08)',fill:true,tension:.3},{label:'Target Readiness Rate',data:labels.map(()=>85),borderColor:COLORS.success,borderDash:[6,5],pointRadius:0},{label:'Previous Period',data:prev,borderColor:'#94A3B8',borderDash:[3,4],pointRadius:2,tension:.3}]},options:o})}
+function renderAll(){
+  renderWorklist();
+  renderDetail();
+}
+function bindActions(){
+  $$('[data-action]').forEach(button=>{
+    button.onclick=()=>toast(`${button.dataset.action} opened.`);
+  });
+}
+function openModal(id){ $('#'+id).classList.add('open'); }
+function closeModal(id){ $('#'+id).classList.remove('open'); }
+
+const filterMap={readinessFilter:'readiness',riskFilter:'risk',statusFilter:'status',priorityFilter:'priority'};
+Object.keys(filterMap).forEach(id=>{
+  const element=$('#'+id);
+  if(element){
+    element.onchange=event=>{
+      state.filters[filterMap[id]]=event.target.value;
+      renderAll();
+    };
+  }
+});
+
+$('#worklistSearch').oninput=event=>{
+  state.filters.search=event.target.value;
+  renderAll();
+};
+$('#globalSearch').onkeydown=event=>{
+  if(event.key==='Enter'){
+    state.filters.search=event.target.value;
+    syncFilterControls();
+    renderAll();
+    $('#worklistSection').scrollIntoView({behavior:'smooth'});
+    toast('Global search applied to worklist.');
+  }
+};
+$('#clearFiltersBtn').onclick=()=>{
+  Object.keys(state.filters).forEach(key=>state.filters[key]='');
+  syncFilterControls();
+  renderAll();
+};
+$$('[data-clear]').forEach(button=>{
+  button.onclick=()=>{
+    state.filters[button.dataset.clear]='';
+    syncFilterControls();
+    renderAll();
+  };
+});
+$$('.kpi[data-kpi]').forEach(card=>{
+  card.onclick=()=>{
+    const value=card.dataset.kpi;
+    if(value==='all') $('#clearFiltersBtn').click();
+    else if(value==='Ready for Human Review') setFilter('readiness',value);
+    else if(value==='High') setFilter('risk','High');
+    else if(value==='Clinical Notes Pending') setFilter('gap','SOAP Plan rationale incomplete');
+    else if(value==='Overdue'){
+      state.filters.priority='Critical';
+      syncFilterControls();
+      renderAll();
+      $('#worklistSection').scrollIntoView({behavior:'smooth'});
+    }
+  };
+});
+$$('.toggle').forEach(button=>{
+  button.onclick=()=>{
+    $$('.toggle').forEach(item=>item.classList.remove('active'));
+    button.classList.add('active');
+    renderTrend(Number(button.dataset.range));
+  };
+});
+$$('.tab').forEach(tab=>{
+  tab.onclick=()=>{
+    $$('.tab').forEach(item=>item.classList.remove('active'));
+    $$('.tab-panel').forEach(panel=>panel.classList.remove('active'));
+    tab.classList.add('active');
+    $('#tab-'+tab.dataset.tab).classList.add('active');
+  };
+});
+$('#showMoreBtn').onclick=()=>{ state.visible+=10; renderWorklist(); };
+$('#refreshBtn').onclick=()=>{
+  $('#loading').classList.add('show');
+  setTimeout(()=>{
+    $('#loading').classList.remove('show');
+    $('#lastUpdated').textContent='Last updated: just now';
+    toast('Dashboard refreshed using approved sources.');
+  },800);
+};
+$('#reEvaluateBtn').onclick=()=>{
+  $('#loading').classList.add('show');
+  setTimeout(()=>{
+    $('#loading').classList.remove('show');
+    toast('Readiness evaluation refreshed and audit recorded.');
+  },900);
+};
+$('#exportBtn').onclick=()=>toast('Dashboard summary export prepared.');
+$('#exportAuditBtn').onclick=()=>toast('Audit log export prepared.');
+$('#copilotBtn').onclick=()=>toast('AI Copilot opened in decision-support mode.');
+$('#notificationBtn').onclick=()=>toast('You have 3 operational notifications.');
+$('#assignReviewerBtn').onclick=()=>toast('Reviewer assignment workflow opened.');
+$('#overrideBtn').onclick=()=>openModal('overrideModal');
+$$('[data-close]').forEach(button=>button.onclick=()=>closeModal(button.dataset.close));
+$('#submitOverride').onclick=()=>{
+  if(!$('#overrideRole').value||!$('#overrideReason').value.trim()){
+    toast('Please select an authorized role and enter a factual reason.');
+    return;
+  }
+  closeModal('overrideModal');
+  $('#overrideReason').value='';
+  toast('Override request submitted and added to the audit log.');
+};
+$('#markReviewBtn').onclick=()=>toast(state.selected.gaps?'Cannot mark ready: blocking gaps remain.':'Visit prepared for authorized human review.');
+$('#handoffBtn').onclick=()=>toast(state.selected.gaps?'Handoff blocked until required gaps are completed.':'Visit sent to Claim Review Queue for human verification.');
+$('#viewAuditBtn').onclick=()=>{
+  const auditTab=$$('[data-tab]').find(item=>item.dataset.tab==='audit');
+  if(auditTab) auditTab.click();
+  $('#tab-audit').scrollIntoView({behavior:'smooth'});
+};
+$('#overrideModal').onclick=event=>{
+  if(event.target.id==='overrideModal') closeModal('overrideModal');
+};
+
+renderCharts();renderHeatmap();renderAll();bindActions();
+let resizeTimer;window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>Object.values(state.charts).forEach(c=>c&&c.resize()),180)});window.addEventListener('load',()=>setTimeout(()=>Object.values(state.charts).forEach(c=>c&&c.resize()),120));
+})();
+</script>
+</body></html>

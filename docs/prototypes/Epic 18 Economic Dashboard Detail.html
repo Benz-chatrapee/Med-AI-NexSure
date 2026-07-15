@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Med AI NexSure — Economic Dashboard Detail</title>
+<style>
+:root{
+  --primary:#1E3A8A;--deep:#0F2A5F;--ai:#2563EB;--soft:#EFF6FF;--accent:#38BDF8;
+  --bg:#F8FAFC;--surface:#FFFFFF;--border:#E2E8F0;--text:#0F172A;--muted:#64748B;
+  --success:#059669;--warning:#D97706;--high:#EA580C;--critical:#DC2626;--purple:#7C3AED;
+  --shadow:0 10px 26px rgba(15,42,95,.07);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+button,input,select,textarea{font:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid rgba(37,99,235,.24);outline-offset:2px}
+.app{display:grid;grid-template-columns:248px minmax(0,1fr);min-height:100vh}
+.sidebar{position:sticky;top:0;height:100vh;background:linear-gradient(180deg,#0b1f46,#0F2A5F 55%,#12366f);color:#dce8ff;padding:22px 16px;overflow:auto}
+.brand{display:flex;gap:11px;align-items:center;padding:0 8px 24px}
+.brand-mark{width:40px;height:40px;border-radius:13px;background:linear-gradient(135deg,#60a5fa,#2563eb);display:grid;place-items:center;font-weight:900;color:#fff;box-shadow:0 10px 24px #071a3a}
+.brand strong{display:block;color:#fff;font-size:15px}.brand span{font-size:11px;color:#9fb7dc}
+.nav-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#829bc1;padding:14px 12px 7px}
+.nav-item{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:10px;color:#bfd0eb;text-decoration:none;margin:3px 0;border:1px solid transparent}
+.nav-item small{display:block;font-size:10px;color:#89a2c7;margin-top:2px}
+.nav-item.active{background:rgba(96,165,250,.17);color:#fff;border-color:rgba(147,197,253,.22)}
+.nav-item.active small{color:#cfe0fb}.nav-item:hover{background:rgba(255,255,255,.07)}
+.nav-icon{width:20px;text-align:center}
+.main{min-width:0}
+.topbar{height:68px;background:rgba(255,255,255,.96);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 26px;position:sticky;top:0;z-index:20;backdrop-filter:blur(10px)}
+.search{width:min(460px,46vw);display:flex;align-items:center;gap:9px;background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--muted)}
+.top-actions{display:flex;gap:9px;align-items:center}.icon-btn{border:1px solid var(--border);background:#fff;border-radius:10px;padding:9px 11px;color:#475569;cursor:pointer}
+.avatar{width:36px;height:36px;border-radius:50%;background:#dbeafe;color:var(--primary);display:grid;place-items:center;font-weight:800}
+.content{padding:24px 28px 48px;max-width:1800px;margin:auto}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:16px}
+.page-header h1{font-size:28px;line-height:1.2;margin:0 0 7px}
+.page-header .subtitle{margin:0;color:#334155}
+.thai-helper{margin-top:5px;color:var(--muted);font-size:12px;line-height:1.55}
+.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.btn{border:1px solid var(--border);background:#fff;color:#334155;padding:9px 12px;border-radius:9px;cursor:pointer;font-weight:700;transition:.2s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(15,23,42,.08)}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn.danger{background:#fff5f5;border-color:#fecaca;color:#b91c1c}
+.decision-banner{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:#fffbeb;border:1px solid #fde68a;border-radius:12px;margin-bottom:16px}
+.decision-banner strong{display:block;font-size:12px;color:#92400e}.decision-banner p{margin:3px 0 0;color:#92400e;font-size:11.5px}
+.context{display:grid;grid-template-columns:repeat(7,minmax(118px,1fr));background:#fff;border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.context-item{padding:13px 15px;border-right:1px solid var(--border)}
+.context-item:last-child{border:0}.label{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.055em}
+.value{font-weight:760;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.value .mini-thai{display:block;font-size:10px;color:var(--muted);margin-top:4px;font-weight:500;white-space:normal}
+.badge{display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;font-size:10.5px;font-weight:850;white-space:nowrap}
+.badge.green{background:#d1fae5;color:#047857}.badge.amber{background:#fef3c7;color:#b45309}.badge.orange{background:#ffedd5;color:#c2410c}.badge.red{background:#fee2e2;color:#b91c1c}.badge.blue{background:#dbeafe;color:#1d4ed8}.badge.gray{background:#e2e8f0;color:#475569}
+.filters-card{background:#fff;border:1px solid var(--border);border-radius:13px;padding:12px 14px;box-shadow:var(--shadow);margin-bottom:16px}
+.filters{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.select{background:#fff;border:1px solid var(--border);border-radius:9px;padding:9px 32px 9px 11px;color:#334155}
+.filter-note{margin-left:auto;color:var(--muted);font-size:11.5px}
+.kpis{display:grid;grid-template-columns:repeat(8,minmax(128px,1fr));gap:12px;margin-bottom:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow)}
+.kpi{padding:15px;min-height:148px;position:relative;overflow:hidden}
+.kpi:before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:#94a3b8}
+.kpi.normal:before{background:var(--success)}.kpi.watch:before{background:var(--warning)}.kpi.risk:before{background:var(--high)}.kpi.critical:before{background:var(--critical)}
+.kpi-title{font-size:11.5px;color:var(--muted);font-weight:760}.kpi-value{font-size:24px;font-weight:880;letter-spacing:-.04em;margin:12px 0 7px}
+.kpi-sub{font-size:11px;color:var(--muted);line-height:1.45}.kpi .thai-helper{font-size:10.5px;line-height:1.4}
+.trend-up{color:var(--critical);font-weight:800}.trend-good{color:var(--success);font-weight:800}
+.grid-main{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(360px,.85fr);gap:16px}
+.left,.right{display:grid;gap:16px;align-content:start}
+.section{padding:18px}
+.section-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}
+.section h2{font-size:15px;margin:0 0 4px}.section p{margin:0;color:var(--muted);font-size:11.8px}
+.legend{display:flex;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:10.5px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
+.chart-pair{display:grid;grid-template-columns:1fr 1.35fr;gap:18px;align-items:center}
+.donut-wrap{display:flex;align-items:center;justify-content:center}
+.donut{width:196px;height:196px;border-radius:50%;background:conic-gradient(#2563eb 0 42.9%,#7c3aed 42.9% 74.1%,#38bdf8 74.1% 92.3%,#94a3b8 92.3% 100%);position:relative;cursor:pointer}
+.donut:after{content:"";position:absolute;inset:39px;border-radius:50%;background:#fff}
+.donut-center{position:absolute;z-index:2;inset:0;display:grid;place-content:center;text-align:center;pointer-events:none}
+.donut-center strong{font-size:25px}.donut-center span{font-size:10.5px;color:var(--muted)}
+.breakdown-list{display:grid;gap:12px}.break-row{display:grid;grid-template-columns:112px 1fr 74px;gap:10px;align-items:center;padding:6px;border-radius:8px;cursor:pointer}
+.break-row:hover,.break-row.active{background:#eff6ff}
+.bar-track{height:9px;background:#edf2f7;border-radius:999px;overflow:hidden}.bar-fill{height:100%;border-radius:999px}.money{text-align:right;font-weight:760}
+.waterfall{height:230px;display:flex;align-items:flex-end;gap:12px;padding:18px 8px 30px;border-bottom:1px solid var(--border);position:relative}
+.wf-item{flex:1;text-align:center;position:relative}.wf-bar{border-radius:6px 6px 2px 2px;min-height:8px;position:relative}
+.wf-val{position:absolute;top:-20px;width:100%;font-size:10.5px;font-weight:800}.wf-label{position:absolute;top:calc(100% + 8px);width:100%;font-size:9.5px;color:var(--muted)}
+.wf-base{background:var(--primary)}.wf-up{background:var(--critical)}.wf-down{background:var(--success)}.wf-end{background:var(--high)}
+.compare-chart{display:grid;gap:13px}.compare-row{display:grid;grid-template-columns:126px 1fr 94px;gap:10px;align-items:center}
+.dual{height:18px;position:relative;background:#eef2f7;border-radius:5px;overflow:hidden}.expected{position:absolute;top:3px;bottom:3px;background:#bfdbfe;border:1px solid #60a5fa;border-radius:3px}
+.actual{position:absolute;top:6px;height:6px;background:var(--high);border-radius:5px}.compare-stat{text-align:right;font-size:10.5px}.compare-stat strong{display:block;font-size:12px}
+table{width:100%;border-collapse:collapse}th{text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.045em;padding:10px 9px;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer}
+td{padding:11px 9px;border-bottom:1px solid #edf1f6;font-size:11.5px;vertical-align:middle}tbody tr:hover{background:#f8fafc}.table-wrap{overflow:auto}
+.table-action{border:0;background:#eff6ff;color:#1d4ed8;padding:6px 8px;border-radius:7px;font-weight:760;cursor:pointer}
+.ai-panel{background:linear-gradient(145deg,#fff,#f7f9ff);border-color:#bfdbfe;position:relative}.ai-panel:before{content:"AI";position:absolute;right:16px;top:14px;background:#dbeafe;color:#1d4ed8;border-radius:8px;padding:5px 7px;font-size:9.5px;font-weight:900}
+.ai-lead{font-size:12.5px;line-height:1.65;color:#334155;margin:8px 0 13px}.recommend{background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px}
+.recommend ol{padding-left:18px;margin:8px 0 0;line-height:1.55}.thai-summary{margin-top:12px;padding-top:12px;border-top:1px dashed #bfdbfe;color:#475569;font-size:11.5px;line-height:1.6}
+.meta-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.meta-pill{background:#f8fafc;border:1px solid var(--border);border-radius:999px;padding:5px 8px;font-size:10px;color:#475569}
+.gauge{width:180px;height:95px;margin:4px auto 12px;overflow:hidden;position:relative}.gauge-bg{width:180px;height:180px;border-radius:50%;background:conic-gradient(from 270deg,#10b981 0 25%,#f59e0b 25% 50%,#f97316 50% 75%,#ef4444 75% 100%);position:absolute}
+.gauge-mask{position:absolute;left:25px;top:25px;width:130px;height:130px;border-radius:50%;background:#fff}.gauge-bottom{position:absolute;left:0;right:0;top:90px;height:100px;background:#fff}
+.gauge-value{position:absolute;z-index:2;left:0;right:0;top:49px;text-align:center;font-size:28px;font-weight:900}.gauge-value small{font-size:10.5px;color:var(--muted)}
+.risk-list{display:grid;gap:9px}.risk-row{display:grid;grid-template-columns:1fr auto;gap:7px;padding:10px;border:1px solid var(--border);border-radius:9px}.risk-row span:first-child{font-weight:760}.risk-row small{grid-column:1/-1;color:var(--muted)}
+.alert{display:grid;grid-template-columns:auto 1fr;gap:10px;border:1px solid var(--border);border-left:4px solid var(--warning);padding:11px;border-radius:9px;margin-top:9px}
+.alert.critical{border-left-color:var(--critical)}.alert strong{display:block;font-size:11.5px}.alert p{font-size:11px;margin-top:3px}.alert-actions{grid-column:2;display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+.alert-actions button{border:0;background:#f1f5f9;padding:5px 7px;border-radius:6px;font-size:10px;cursor:pointer}
+.evidence-item{display:grid;grid-template-columns:1fr auto;gap:7px;padding:10px 0;border-bottom:1px solid #edf1f6}.evidence-item:last-child{border:0}.evidence-item small{color:var(--muted)}
+.timeline{position:relative;padding-left:19px}.timeline:before{content:"";position:absolute;left:5px;top:7px;bottom:7px;width:2px;background:#dbeafe}
+.time-item{position:relative;display:grid;grid-template-columns:55px 1fr;gap:10px;padding:7px 0;cursor:pointer}.time-item:before{content:"";position:absolute;left:-18px;top:12px;width:9px;height:9px;background:var(--ai);border:2px solid #fff;border-radius:50%;box-shadow:0 0 0 1px #93c5fd}
+.time-item:hover strong{color:var(--primary)}.time-item time{color:var(--muted);font-size:10.5px}.time-item strong{font-size:11.5px}
+.bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.modal{display:none;position:fixed;inset:0;background:rgba(15,23,42,.52);z-index:100;align-items:center;justify-content:center;padding:20px}.modal.open{display:flex}
+.modal-card{background:#fff;border-radius:16px;max-width:660px;width:100%;box-shadow:0 25px 70px rgba(0,0,0,.25);padding:20px}.modal-head{display:flex;justify-content:space-between}.close{border:0;background:#eef2f7;width:30px;height:30px;border-radius:8px;cursor:pointer}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field label{display:block;font-weight:760;margin-bottom:6px}.field select,.field textarea{width:100%;border:1px solid var(--border);border-radius:9px;padding:9px}.field textarea{min-height:110px;resize:vertical}
+.toast{position:fixed;right:22px;bottom:22px;background:#0f172a;color:#fff;padding:12px 16px;border-radius:10px;opacity:0;transform:translateY(12px);transition:.25s;z-index:200;max-width:360px}.toast.show{opacity:1;transform:translateY(0)}
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(248,250,252,.76);z-index:90;align-items:center;justify-content:center}.loading-overlay.show{display:flex}
+.loading-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px 24px;box-shadow:var(--shadow);text-align:center}.spinner{width:32px;height:32px;border:4px solid #dbeafe;border-top-color:var(--ai);border-radius:50%;margin:0 auto 12px;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.highlight-row{background:#eff6ff!important}
+@media(max-width:1450px){.kpis{grid-template-columns:repeat(4,1fr)}.context{grid-template-columns:repeat(4,1fr)}.context-item{border-bottom:1px solid var(--border)}}
+@media(max-width:1100px){.app{grid-template-columns:78px 1fr}.sidebar{padding:18px 10px}.brand div:last-child,.nav-label,.nav-item div{display:none}.brand{padding:0 8px 18px}.nav-item{justify-content:center}.grid-main{grid-template-columns:1fr}.context{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:760px){.app{display:block}.sidebar{display:none}.topbar{padding:0 14px}.content{padding:18px 14px}.page-header{display:block}.actions{justify-content:flex-start;margin-top:14px}.context{grid-template-columns:1fr 1fr}.kpis{grid-template-columns:1fr 1fr}.chart-pair,.bottom-grid,.form-grid{grid-template-columns:1fr}.filter-note{width:100%;margin-left:0}.search{width:58vw}.waterfall{gap:5px}.wf-label{font-size:8px}.page-header h1{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar" aria-label="Primary navigation">
+  <div class="brand"><div class="brand-mark">N</div><div><strong>Med AI NexSure</strong><span>Enterprise Healthcare Intelligence</span></div></div>
+  <div class="nav-label">Workspace</div>
+  <a class="nav-item" href="#"><span class="nav-icon">⌂</span><div><span>Executive Dashboard</span></div></a>
+  <a class="nav-item" href="#"><span class="nav-icon">✚</span><div><span>Patient & Visits</span></div></a>
+  <a class="nav-item" href="#"><span class="nav-icon">✓</span><div><span>Claim Readiness</span></div></a>
+  <a class="nav-item active" href="#"><span class="nav-icon">฿</span><div><span>Economic Intelligence</span><small>วิเคราะห์ต้นทุนและความเสี่ยง</small></div></a>
+  <a class="nav-item" href="#"><span class="nav-icon">▤</span><div><span>Evidence Package</span></div></a>
+  <div class="nav-label">Governance</div>
+  <a class="nav-item" href="#"><span class="nav-icon">⚑</span><div><span>Economic Alerts</span></div></a>
+  <a class="nav-item" href="#"><span class="nav-icon">◎</span><div><span>Audit & Compliance</span></div></a>
+  <a class="nav-item" href="#"><span class="nav-icon">⚙</span><div><span>Settings</span></div></a>
+</aside>
+
+<main class="main">
+<header class="topbar">
+  <div class="search" role="search">⌕ <span>Search patient, visit, claim, or alert...</span></div>
+  <div class="top-actions">
+    <button class="icon-btn" onclick="notify('AI Copilot opened · เปิดผู้ช่วยวิเคราะห์แล้ว')">AI Copilot</button>
+    <button class="icon-btn" aria-label="Notifications" onclick="notify('3 unread notifications · มี 3 การแจ้งเตือนใหม่')">🔔</button>
+    <div class="avatar" aria-label="User profile">CJ</div>
+  </div>
+</header>
+
+<div class="content">
+  <div class="page-header">
+    <div>
+      <h1>Economic Dashboard Detail</h1>
+      <p class="subtitle">Analyze visit cost, medication usage, benchmark variance, and claim economic risk.</p>
+      <div class="thai-helper">ตรวจสอบต้นทุนของ Visit เทียบกับ Benchmark พร้อมระบุรายการผิดปกติและความเสี่ยงก่อนส่ง Claim</div>
+    </div>
+    <div class="actions">
+      <button class="btn" onclick="notify('Report exported successfully · ระบบจัดเตรียม Economic Summary เรียบร้อยแล้ว')">Export Report</button>
+      <button class="btn" onclick="notify('Opening Evidence Package · กำลังเปิดชุดหลักฐานประกอบ Claim')">View Evidence Package</button>
+      <button class="btn" onclick="notify('Opening Claim Readiness · กำลังเปิดหน้าความพร้อมเคลม')">View Claim Readiness</button>
+      <button class="btn" onclick="notify('Opening Complete Audit Trail · แสดงประวัติการดำเนินการทั้งหมด')">Audit Trail</button>
+      <button class="btn primary" onclick="refreshAnalysis()">Refresh Analysis</button>
+    </div>
+  </div>
+
+  <div class="decision-banner">
+    <div>⚠</div>
+    <div><strong>Decision Support Only</strong><p>ข้อมูลจากระบบเป็นเครื่องมือสนับสนุนการตัดสินใจ ผู้มีอำนาจต้องตรวจสอบข้อมูลและหลักฐานก่อนดำเนินการทุกครั้ง</p></div>
+  </div>
+
+  <section class="context" aria-label="Patient and visit context">
+    <div class="context-item"><div class="label">HN</div><div class="value">HN-000245</div></div>
+    <div class="context-item"><div class="label">Patient</div><div class="value">Somchai Jaidee</div></div>
+    <div class="context-item"><div class="label">Visit No.</div><div class="value">VST-20260705-001</div></div>
+    <div class="context-item"><div class="label">Visit Date</div><div class="value">05 Jul 2026</div></div>
+    <div class="context-item"><div class="label">Payer</div><div class="value">AIA / Mock Insurance</div></div>
+    <div class="context-item"><div class="label">Claim Type</div><div class="value">OPD</div></div>
+    <div class="context-item"><div class="label">Visit Status</div><div class="value"><span class="badge amber">Pending Evidence</span><span class="mini-thai">รอเอกสารเพิ่มเติมก่อนส่งเคลม</span></div></div>
+  </section>
+
+  <section class="filters-card">
+    <div class="filters">
+      <select class="select" onchange="filterChanged()"><option>Diagnosis: S91.3</option><option>Diagnosis: Similar Group</option></select>
+      <select class="select" onchange="filterChanged()"><option>Visit Type: OPD</option><option>All Visit Types</option></select>
+      <select class="select" onchange="filterChanged()"><option>Payer: AIA</option><option>All Payers</option></select>
+      <select class="select" onchange="filterChanged()"><option>Claim Type: Medical Expense</option><option>All Claim Types</option></select>
+      <select class="select" onchange="filterChanged()"><option>Period: Last 12 Months</option><option>Last 6 Months</option></select>
+      <span class="filter-note">Benchmark Cohort: 1,284 comparable visits · Last analyzed: <span id="lastAnalyzed">10:15</span><br>เปรียบเทียบตาม Diagnosis, Payer และ Visit Type</span>
+    </div>
+  </section>
+
+  <section class="kpis">
+    <div class="card kpi risk"><div class="kpi-title">Total Visit Cost</div><div class="kpi-value">฿3,850</div><div class="kpi-sub"><span class="trend-up">▲ 28.3%</span> vs Benchmark Average</div><div class="thai-helper">ต้นทุนรวมสูงกว่าค่าเฉลี่ยของกลุ่มเปรียบเทียบ</div></div>
+    <div class="card kpi risk"><div class="kpi-title">Expected Cost Range</div><div class="kpi-value" style="font-size:20px">฿2,100–฿3,200</div><div class="kpi-sub">฿650 above upper range</div><div class="thai-helper">ต้นทุนปัจจุบันอยู่นอกช่วงที่คาดการณ์ไว้</div></div>
+    <div class="card kpi risk"><div class="kpi-title">Cost Variance</div><div class="kpi-value">+28.3%</div><div class="kpi-sub">฿850 above benchmark</div><div class="thai-helper">ส่วนต่างระหว่างต้นทุนจริงและ Benchmark</div></div>
+    <div class="card kpi critical"><div class="kpi-title">Medication Cost</div><div class="kpi-value">฿1,650</div><div class="kpi-sub"><span class="trend-up">▲ 50.0%</span> vs Medication Benchmark</div><div class="thai-helper">ค่ายาเป็นตัวขับเคลื่อนต้นทุนหลัก</div></div>
+    <div class="card kpi risk"><div class="kpi-title">Procedure Cost</div><div class="kpi-value">฿1,200</div><div class="kpi-sub"><span class="trend-up">▲ 20.0%</span> vs Expected</div><div class="thai-helper">ค่าหัตถการสูงกว่าค่าเฉลี่ย</div></div>
+    <div class="card kpi watch"><div class="kpi-title">Claim Risk Level</div><div class="kpi-value" style="font-size:22px">Medium</div><div class="kpi-sub">Needs Review</div><div class="thai-helper">ควรตรวจสอบก่อนส่ง Claim</div></div>
+    <div class="card kpi risk"><div class="kpi-title">Economic Alerts</div><div class="kpi-value">3</div><div class="kpi-sub">1 Critical · 2 Warning</div><div class="thai-helper">รายการที่ต้องตรวจสอบเพิ่มเติม</div></div>
+    <div class="card kpi normal"><div class="kpi-title">AI Confidence</div><div class="kpi-value">87%</div><div class="kpi-sub">High Confidence</div><div class="thai-helper">ระดับความมั่นใจของผลวิเคราะห์</div></div>
+  </section>
+
+  <div class="grid-main">
+    <div class="left">
+      <section class="card section">
+        <div class="section-head">
+          <div><h2>Cost Breakdown</h2><p>Contribution of each category to Total Visit Cost.</p><div class="thai-helper">แสดงสัดส่วนต้นทุนเพื่อระบุหมวดค่าใช้จ่ายหลักของ Visit</div></div>
+          <div class="legend"><span><i class="dot" style="background:#2563eb"></i>Medication</span><span><i class="dot" style="background:#7c3aed"></i>Procedure</span></div>
+        </div>
+        <div class="chart-pair">
+          <div class="donut-wrap"><div class="donut" onclick="highlightCategory('Medication')" aria-label="Cost breakdown donut chart"><div class="donut-center"><strong>฿3,850</strong><span>Total Visit Cost</span></div></div></div>
+          <div class="breakdown-list">
+            <div class="break-row" onclick="highlightCategory('Medication')"><span>Medication <small>42.9%</small></span><div class="bar-track"><div class="bar-fill" style="width:100%;background:#2563eb"></div></div><span class="money">฿1,650</span></div>
+            <div class="break-row" onclick="highlightCategory('Procedure')"><span>Procedure <small>31.2%</small></span><div class="bar-track"><div class="bar-fill" style="width:73%;background:#7c3aed"></div></div><span class="money">฿1,200</span></div>
+            <div class="break-row" onclick="highlightCategory('Consultation')"><span>Consultation <small>18.2%</small></span><div class="bar-track"><div class="bar-fill" style="width:43%;background:#38bdf8"></div></div><span class="money">฿700</span></div>
+            <div class="break-row" onclick="highlightCategory('Consumable')"><span>Consumable <small>7.7%</small></span><div class="bar-track"><div class="bar-fill" style="width:18%;background:#94a3b8"></div></div><span class="money">฿300</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card section">
+        <div class="section-head"><div><h2>Benchmark Variance Bridge</h2><p>How the visit moved from Benchmark Average to Actual Cost.</p><div class="thai-helper">แสดงปัจจัยที่ทำให้ต้นทุนเพิ่มขึ้นหรือลดลงจากค่า Benchmark</div></div><span class="badge orange">Total Variance +฿850</span></div>
+        <div class="waterfall" aria-label="Benchmark variance waterfall">
+          <div class="wf-item"><div class="wf-bar wf-base" style="height:150px"><span class="wf-val">฿3,000</span><span class="wf-label">Benchmark</span></div></div>
+          <div class="wf-item"><div class="wf-bar wf-up" style="height:72px"><span class="wf-val">+฿550</span><span class="wf-label">Medication</span></div></div>
+          <div class="wf-item"><div class="wf-bar wf-up" style="height:39px"><span class="wf-val">+฿200</span><span class="wf-label">Procedure</span></div></div>
+          <div class="wf-item"><div class="wf-bar wf-down" style="height:22px"><span class="wf-val">−฿50</span><span class="wf-label">Consultation</span></div></div>
+          <div class="wf-item"><div class="wf-bar wf-up" style="height:30px"><span class="wf-val">+฿150</span><span class="wf-label">Consumables</span></div></div>
+          <div class="wf-item"><div class="wf-bar wf-end" style="height:192px"><span class="wf-val">฿3,850</span><span class="wf-label">Actual Cost</span></div></div>
+        </div>
+        <div class="thai-helper" style="margin-top:12px">ค่ายาเป็นปัจจัยหลักที่ทำให้ต้นทุนสูงกว่าค่า Benchmark</div>
+      </section>
+
+      <section class="card section">
+        <div class="section-head"><div><h2>Actual vs Expected Range</h2><p>Compare actual values with the expected benchmark range.</p><div class="thai-helper">ช่วยให้เห็นทันทีว่าต้นทุนจริงอยู่ภายในหรือนอกช่วงที่คาดการณ์</div></div><span class="badge blue">1,284 Peer Visits</span></div>
+        <div class="compare-chart">
+          <div class="compare-row"><strong>Total Cost</strong><div class="dual"><div class="expected" style="left:42%;width:22%"></div><div class="actual" style="left:0;width:77%"></div></div><div class="compare-stat"><strong>฿3,850</strong><span class="trend-up">+28.3% · High</span></div></div>
+          <div class="compare-row"><strong>Medication</strong><div class="dual"><div class="expected" style="left:31%;width:24%"></div><div class="actual" style="left:0;width:82%"></div></div><div class="compare-stat"><strong>฿1,650</strong><span class="trend-up">+50.0% · Critical</span></div></div>
+          <div class="compare-row"><strong>Procedure</strong><div class="dual"><div class="expected" style="left:38%;width:24%"></div><div class="actual" style="left:0;width:72%"></div></div><div class="compare-stat"><strong>฿1,200</strong><span class="trend-up">+20.0% · High</span></div></div>
+          <div class="compare-row"><strong>Consultation</strong><div class="dual"><div class="expected" style="left:40%;width:26%"></div><div class="actual" style="left:0;width:58%;background:#059669"></div></div><div class="compare-stat"><strong>฿700</strong><span class="trend-good">−6.7% · Normal</span></div></div>
+        </div>
+      </section>
+
+      <section class="card section">
+        <div class="section-head"><div><h2>Cost Outlier Detection</h2><p>Items with abnormal variance against historical and payer benchmarks.</p><div class="thai-helper">รายการที่มีต้นทุนสูงผิดปกติและอาจต้องใช้หลักฐานเพิ่มเติม</div></div><button class="btn" onclick="notify('Showing all outliers · แสดงรายการผิดปกติทั้งหมด')">View All</button></div>
+        <div class="table-wrap"><table id="outlierTable">
+          <thead><tr><th onclick="sortTable(0)">Item</th><th onclick="sortTable(1)">Category</th><th>Current Cost</th><th>Expected Cost</th><th>Variance</th><th>Detection Reason</th><th>Severity</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr data-category="Medication"><td><b>Antibiotic A</b></td><td>Medication</td><td>฿950</td><td>฿400</td><td class="trend-up">+137%</td><td>High-cost drug</td><td><span class="badge red">Critical</span></td><td><button class="table-action" onclick="openModal('Antibiotic A')">Review</button></td></tr>
+            <tr data-category="Procedure"><td><b>Wound Dressing</b></td><td>Procedure</td><td>฿850</td><td>฿500</td><td class="trend-up">+70%</td><td>Above benchmark</td><td><span class="badge orange">High</span></td><td><button class="table-action" onclick="openModal('Wound Dressing')">Validate</button></td></tr>
+            <tr data-category="Consumable"><td><b>Repeated Supply</b></td><td>Consumable</td><td>฿300</td><td>฿120</td><td class="trend-up">+150%</td><td>Duplicate usage pattern</td><td><span class="badge amber">Medium</span></td><td><button class="table-action" onclick="openModal('Repeated Supply')">Check</button></td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <section class="card section">
+        <div class="section-head"><div><h2>Medication Cost Detail</h2><p>Prescription, stock batch, FEFO, and medication cost information.</p><div class="thai-helper">ตรวจสอบต้นทุนยา Lot การหมดอายุ และความเชื่อมโยงกับ Inventory</div></div><div class="actions"><button class="btn" onclick="notify('Opening Prescription Detail · กำลังเปิดข้อมูลใบสั่งยา')">View Prescription</button><button class="btn" onclick="notify('Opening Inventory Detail · กำลังเปิดข้อมูลคลังยา')">View Inventory</button></div></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Medication</th><th>Quantity</th><th>Unit</th><th>Unit Cost</th><th>Total Cost</th><th>Stock Batch</th><th>Expiry</th><th>Alert</th></tr></thead>
+          <tbody>
+            <tr data-category="Medication"><td><b>Antibiotic A</b></td><td>10</td><td>tab</td><td>฿95</td><td><b>฿950</b></td><td>B-2026-01</td><td>31 Jan 2027</td><td><span class="badge red">High Cost</span></td></tr>
+            <tr data-category="Medication"><td><b>Paracetamol</b></td><td>10</td><td>tab</td><td>฿2</td><td><b>฿20</b></td><td>B-2026-08</td><td>31 Aug 2027</td><td><span class="badge green">Normal</span></td></tr>
+            <tr data-category="Medication"><td><b>Wound Gel</b></td><td>1</td><td>tube</td><td>฿680</td><td><b>฿680</b></td><td>B-2026-03</td><td>15 Mar 2027</td><td><span class="badge amber">Review</span></td></tr>
+          </tbody>
+        </table></div>
+      </section>
+    </div>
+
+    <aside class="right">
+      <section class="card section ai-panel">
+        <div class="section-head"><div><h2>AI Economic Insight</h2><p>Business-readable explanation and recommended next actions.</p></div></div>
+        <div class="ai-lead">This visit is <b>28.3% above</b> the expected benchmark range. The primary cost driver is <b>Medication Cost</b>, especially Antibiotic A, which is <b>137% higher</b> than typical usage for comparable diagnosis groups. The current pattern may increase the likelihood of claim review if clinical justification is incomplete.</div>
+        <div class="recommend"><b>Recommended Actions</b><ol><li>Verify medication necessity and dosage.</li><li>Validate payer coverage for the high-cost antibiotic.</li><li>Add clinical justification before claim submission.</li><li>Review whether procedure cost matches the treatment record.</li></ol></div>
+        <div class="thai-summary"><b>Thai Business Summary</b><br>ระบบพบว่าต้นทุน Visit สูงกว่าค่า Benchmark 28.3% โดยสาเหตุหลักมาจากค่ายา แนะนำให้ตรวจสอบความจำเป็นทางการแพทย์ เงื่อนไขความคุ้มครอง และเพิ่ม Clinical Justification ก่อนส่ง Claim</div>
+        <div class="meta-row"><span class="meta-pill">AI Confidence 87%</span><span class="meta-pill">Generated 10:15</span><span class="meta-pill">Version EC-1.4</span></div>
+        <div class="thai-helper" style="margin-top:12px"><b>AI-generated economic analysis is decision support only.</b><br>ผลวิเคราะห์จาก AI ไม่ใช่คำตัดสินสุดท้าย</div>
+      </section>
+
+      <section class="card section">
+        <div class="section-head"><div><h2>Claim Economic Risk</h2><p>Economic risk score linked to claim approval exposure.</p><div class="thai-helper">มีปัจจัยด้านต้นทุนและหลักฐานที่ควรตรวจสอบก่อนส่ง Claim</div></div><span class="badge amber">Needs Review</span></div>
+        <div class="gauge"><div class="gauge-bg"></div><div class="gauge-mask"></div><div class="gauge-bottom"></div><div class="gauge-value">72 <small>/ 100</small></div></div>
+        <div class="risk-list">
+          <div class="risk-row"><span>Cost Above Benchmark</span><span class="badge amber">Warning</span><small>Total Visit Cost exceeds the expected upper range.<br>ต้นทุนรวมสูงกว่าช่วงที่ระบบคาดการณ์ไว้</small></div>
+          <div class="risk-row"><span>High-cost Medication</span><span class="badge red">Critical</span><small>Medication Cost is 50% above benchmark.<br>ค่ายาสูงกว่าค่าเฉลี่ยและเป็นปัจจัยเสี่ยงหลัก</small></div>
+          <div class="risk-row"><span>Missing Justification</span><span class="badge amber">Warning</span><small>SOAP Note does not explain the high-cost antibiotic.<br>ยังไม่มีเหตุผลทางคลินิกที่เพียงพอ</small></div>
+          <div class="risk-row"><span>Payer Benefit Limit</span><span class="badge amber">Warning</span><small>Medication cost may exceed the OPD benefit threshold.<br>ควรตรวจสอบวงเงินและเงื่อนไข Payer</small></div>
+          <div class="risk-row"><span>Duplicate Item Risk</span><span class="badge green">Normal</span><small>No confirmed duplicate billing found.<br>ยังไม่พบรายการเรียกเก็บซ้ำที่ยืนยันแล้ว</small></div>
+        </div>
+      </section>
+
+      <section class="card section">
+        <div class="section-head"><div><h2>Economic Alerts</h2><p>Open items requiring ownership, review, or resolution.</p><div class="thai-helper">รายการแจ้งเตือนที่อาจส่งผลต่อการพิจารณา Claim</div></div><span class="badge red">3 Open</span></div>
+        <div class="alert critical"><div>!</div><div><strong>High-cost Medication Exceeds Cohort</strong><p>Antibiotic A is 137% above expected cost.<br>ควรตรวจสอบความจำเป็น ขนาดยา และความคุ้มครอง</p><div class="alert-actions"><button onclick="assignAlert()">Assign</button><button onclick="openModal('High-cost Medication Alert')">Review</button><button onclick="notify('Opening related evidence · กำลังเปิดหลักฐานที่เกี่ยวข้อง')">Open Evidence</button></div></div></div>
+        <div class="alert"><div>!</div><div><strong>Clinical Justification Missing</strong><p>Evidence Package lacks sufficient justification.<br>กรุณาเพิ่ม Clinical Justification ก่อนส่ง Claim</p><div class="alert-actions"><button onclick="assignAlert()">Assign</button><button onclick="openModal('Clinical Justification Missing')">Review</button></div></div></div>
+        <div class="alert"><div>!</div><div><strong>Potential Payer Benefit Limit</strong><p>Medication cost may exceed OPD threshold.<br>ควรตรวจสอบ Payer Rule และวงเงินคงเหลือ</p><div class="alert-actions"><button onclick="openModal('Payer Benefit Limit')">Review</button><button onclick="resolveAlert(this)">Resolve</button></div></div></div>
+      </section>
+
+      <section class="card section">
+        <div class="section-head"><div><h2>Evidence & Justification</h2><p>Required evidence supporting cost reasonableness.</p><div class="thai-helper">ตรวจสอบว่ามีหลักฐานเพียงพอก่อนส่ง Claim หรือไม่</div></div><b>3 / 5</b></div>
+        <div class="evidence-item"><div><b>SOAP Clinical Summary</b><br><small>Owner: Doctor</small></div><span class="badge green">Completed</span></div>
+        <div class="evidence-item"><div><b>High-cost Drug Justification</b><br><small>Owner: Doctor · ยังไม่มีคำอธิบายความจำเป็นทางการแพทย์</small></div><span class="badge red">Missing</span></div>
+        <div class="evidence-item"><div><b>Procedure Note</b><br><small>Owner: Nurse</small></div><span class="badge green">Completed</span></div>
+        <div class="evidence-item"><div><b>Payer Rule Validation</b><br><small>Owner: Claim Reviewer · ควรตรวจสอบข้อจำกัดของแผนประกัน</small></div><span class="badge amber">Warning</span></div>
+        <div class="evidence-item"><div><b>Medication Batch Record</b><br><small>Owner: Pharmacist</small></div><span class="badge green">Completed</span></div>
+        <button class="btn" style="width:100%;margin-top:12px" onclick="notify('Opening Evidence Checklist · กำลังเปิดรายการหลักฐานทั้งหมด')">Open Evidence Checklist</button>
+      </section>
+    </aside>
+  </div>
+
+  <div class="bottom-grid">
+    <section class="card section">
+      <div class="section-head"><div><h2>Financial Timeline</h2><p>Cost, prescription, inventory, and analysis events throughout the visit.</p><div class="thai-helper">ลำดับเหตุการณ์สำคัญที่เกี่ยวข้องกับต้นทุนและการเปลี่ยนแปลงข้อมูล</div></div></div>
+      <div class="timeline">
+        <div class="time-item" onclick="timelineInfo('Visit Created','เริ่มต้น Visit และสร้างบริบทสำหรับการวิเคราะห์ต้นทุน')"><time>09:10</time><strong>Visit Created</strong></div>
+        <div class="time-item" onclick="timelineInfo('SOAP Note Drafted','แพทย์เริ่มบันทึกข้อมูล Clinical Documentation')"><time>09:25</time><strong>SOAP Note Drafted</strong></div>
+        <div class="time-item" onclick="timelineInfo('Prescription Created','สร้างใบสั่งยาและคำนวณต้นทุนยาเบื้องต้น')"><time>09:45</time><strong>Prescription Created</strong></div>
+        <div class="time-item" onclick="timelineInfo('Medication Dispensed','เภสัชกรจ่ายยาตามใบสั่งยา')"><time>10:00</time><strong>Medication Dispensed</strong></div>
+        <div class="time-item" onclick="timelineInfo('Stock Deducted','ระบบหัก Stock ตามจำนวนยาที่จ่ายจริงและบันทึก Stock Movement')"><time>10:05</time><strong>Stock Deducted</strong></div>
+        <div class="time-item" onclick="timelineInfo('Economic Analysis Generated','ระบบสร้างผลวิเคราะห์ต้นทุนและ Benchmark')"><time>10:15</time><strong>Economic Analysis Generated</strong></div>
+        <div class="time-item" onclick="timelineInfo('High-cost Alert Created','สร้าง Alert สำหรับรายการยาต้นทุนสูง')"><time>10:20</time><strong>High-cost Alert Created</strong></div>
+      </div>
+    </section>
+
+    <section class="card section">
+      <div class="section-head"><div><h2>Audit & Compliance</h2><p>Traceable access, update, review, export, and dispense activities.</p><div class="thai-helper">ทุกกิจกรรมสำคัญต้องตรวจสอบย้อนหลังได้ตามหลัก PDPA และ Compliance</div></div><button class="btn" onclick="notify('Opening Complete Audit Trail · แสดงประวัติการดำเนินการทั้งหมดของ Visit นี้')">Full Audit Trail</button></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Time</th><th>User</th><th>Role</th><th>Action</th><th>Target</th><th>Detail</th></tr></thead>
+        <tbody>
+          <tr><td>10:15</td><td>Dr. A</td><td>Doctor</td><td>update</td><td>soap_notes</td><td>Added clinical summary</td></tr>
+          <tr><td>10:20</td><td>Claim User</td><td>Claim Reviewer</td><td>review</td><td>economic_alerts</td><td>Marked as needs review</td></tr>
+          <tr><td>10:25</td><td>Pharmacist B</td><td>Pharmacist</td><td>dispense</td><td>stock_movements</td><td>Dispensed Antibiotic A</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+  </div>
+</div>
+</main>
+</div>
+
+<div class="modal" id="reviewModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-card">
+    <div class="modal-head"><div><h2 id="modalTitle" style="margin:0 0 5px">Review Outlier</h2><p style="margin:0;color:#64748b">Validate economic reasonableness and supporting evidence.</p></div><button class="close" aria-label="Close modal" onclick="closeModal()">×</button></div>
+    <hr style="border:0;border-top:1px solid #e2e8f0;margin:17px 0">
+    <div class="thai-helper">กรุณาตรวจสอบความจำเป็นทางการแพทย์ เงื่อนไขผู้ชำระเงิน และหลักฐานประกอบก่อนบันทึกผลการ Review</div>
+    <div class="form-grid" style="margin-top:14px">
+      <div class="field"><label for="reviewer">Assign Reviewer</label><select id="reviewer"><option>Claim Reviewer</option><option>Doctor</option><option>Pharmacist</option><option>Compliance Officer</option></select></div>
+      <div class="field"><label for="severity">Severity</label><select id="severity"><option>Critical</option><option>High</option><option>Medium</option><option>Low</option></select></div>
+      <div class="field" style="grid-column:1/-1"><label for="reviewNote">Reviewer Note</label><textarea id="reviewNote" placeholder="Add review note..."></textarea></div>
+    </div>
+    <div class="actions" style="margin-top:14px"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn" onclick="assignReviewer()">Assign Reviewer</button><button class="btn primary" onclick="markReviewed()">Mark Reviewed</button><button class="btn danger" onclick="resolveFromModal()">Resolve Alert</button></div>
+  </div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay"><div class="loading-card"><div class="spinner"></div><strong>Recalculating Analysis</strong><div class="thai-helper">ระบบกำลังคำนวณข้อมูลล่าสุด กรุณารอสักครู่</div></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+function notify(message){
+  const toast=document.getElementById('toast');
+  toast.textContent=message;toast.classList.add('show');
+  clearTimeout(window.toastTimer);
+  window.toastTimer=setTimeout(()=>toast.classList.remove('show'),2600);
+}
+function refreshAnalysis(){
+  const overlay=document.getElementById('loadingOverlay');
+  overlay.classList.add('show');
+  setTimeout(()=>{
+    overlay.classList.remove('show');
+    const now=new Date();
+    document.getElementById('lastAnalyzed').textContent=now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    notify('Analysis refreshed successfully · ระบบคำนวณข้อมูลต้นทุนล่าสุดเรียบร้อยแล้ว');
+  },900);
+}
+function filterChanged(){notify('Benchmark updated · ระบบปรับกลุ่มเปรียบเทียบตาม Filter แล้ว')}
+function openModal(item){
+  document.getElementById('modalTitle').textContent='Review Outlier — '+item;
+  document.getElementById('reviewModal').classList.add('open');
+  setTimeout(()=>document.getElementById('reviewNote').focus(),80);
+}
+function closeModal(){document.getElementById('reviewModal').classList.remove('open')}
+function assignReviewer(){closeModal();notify('Reviewer assigned successfully · มอบหมายผู้ตรวจสอบเรียบร้อยแล้ว')}
+function markReviewed(){closeModal();notify('Item marked as reviewed · บันทึกผลการตรวจสอบใน Audit Trail แล้ว')}
+function resolveFromModal(){closeModal();notify('Alert resolved successfully · ปิดรายการแจ้งเตือนเรียบร้อยแล้ว')}
+function assignAlert(){notify('Alert assigned successfully · มอบหมายรายการให้ Claim Reviewer เรียบร้อยแล้ว')}
+function resolveAlert(btn){
+  const alert=btn.closest('.alert');
+  alert.style.opacity='.45';
+  alert.style.pointerEvents='none';
+  notify('Alert resolved successfully · ปิดรายการแจ้งเตือนเรียบร้อยแล้ว');
+}
+function timelineInfo(title,thai){notify(title+' · '+thai)}
+function highlightCategory(category){
+  document.querySelectorAll('.break-row').forEach(r=>r.classList.toggle('active',r.textContent.includes(category)));
+  document.querySelectorAll('tr[data-category]').forEach(r=>{
+    r.classList.toggle('highlight-row',r.dataset.category===category);
+  });
+  notify(category+' selected · ไฮไลต์รายการต้นทุนที่เกี่ยวข้องแล้ว');
+}
+function sortTable(col){
+  const table=document.getElementById('outlierTable');
+  const body=table.tBodies[0];
+  const rows=[...body.rows];
+  const asc=table.dataset.sortCol!=col || table.dataset.sortDir!=='asc';
+  rows.sort((a,b)=>a.cells[col].innerText.localeCompare(b.cells[col].innerText,undefined,{numeric:true})*(asc?1:-1));
+  rows.forEach(r=>body.appendChild(r));
+  table.dataset.sortCol=col;table.dataset.sortDir=asc?'asc':'desc';
+  notify('Table sorted · จัดเรียงข้อมูลเรียบร้อยแล้ว');
+}
+document.getElementById('reviewModal').addEventListener('click',e=>{if(e.target.id==='reviewModal')closeModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+</script>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en-TH">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Global Search | Med AI NexSure</title>
+  <meta name="description" content="Permission-aware enterprise search across healthcare, insurance, clinical, and compliance operations." />
+  <style>
+    :root {
+      --navy-950:#07152f; --navy-900:#0f2a5f; --blue-800:#1e3a8a; --blue-700:#1d4ed8;
+      --blue-600:#2563eb; --blue-500:#3b82f6; --sky-400:#38bdf8; --blue-100:#dbeafe;
+      --blue-50:#eff6ff; --slate-950:#0f172a; --slate-800:#1e293b; --slate-700:#334155;
+      --slate-600:#475569; --slate-500:#64748b; --slate-400:#94a3b8; --slate-300:#cbd5e1;
+      --slate-200:#e2e8f0; --slate-100:#f1f5f9; --slate-50:#f8fafc; --white:#fff;
+      --green:#059669; --green-bg:#ecfdf5; --amber:#d97706; --amber-bg:#fffbeb;
+      --red:#dc2626; --red-bg:#fef2f2; --violet:#7c3aed; --violet-bg:#f5f3ff;
+      --shadow:0 14px 36px rgba(15,42,95,.08); --shadow-lg:0 30px 90px rgba(7,21,47,.24); --focus:0 0 0 4px rgba(37,99,235,.15);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;font-family:Inter,"IBM Plex Sans","Noto Sans Thai",ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--slate-950);background:var(--slate-50)}
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+    .app{min-height:100vh;display:grid;grid-template-columns:272px minmax(0,1fr);background:
+      radial-gradient(circle at 90% -10%, rgba(56,189,248,.14), transparent 28%),var(--slate-50)}
+    .sidebar{position:sticky;top:0;height:100vh;background:linear-gradient(180deg,#07152f 0%,#0b2250 46%,#0f2a5f 100%);color:#fff;padding:24px 18px;display:flex;flex-direction:column;border-right:1px solid rgba(255,255,255,.08);z-index:20}
+    .brand{display:flex;align-items:center;gap:12px;padding:0 10px 24px;border-bottom:1px solid rgba(255,255,255,.1)}
+    .brand-mark{width:42px;height:42px;border-radius:13px;background:linear-gradient(145deg,#38bdf8 0%,#2563eb 52%,#1e3a8a 100%);display:grid;place-items:center;box-shadow:0 10px 30px rgba(37,99,235,.4)}
+    .brand-mark svg{width:24px;height:24px}
+    .brand-copy strong{display:block;font-size:17px;letter-spacing:.1px}.brand-copy span{font-size:11px;color:#a8c7ff;letter-spacing:.12em;text-transform:uppercase}
+    .workspace{margin:18px 6px 14px;padding:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);border-radius:12px;display:flex;gap:10px;align-items:center}
+    .workspace .avatar{width:34px;height:34px;border-radius:10px;background:#dbeafe;color:#1d4ed8;display:grid;place-items:center;font-weight:800;font-size:12px}
+    .workspace strong{display:block;font-size:13px}.workspace small{color:#9fb8de;font-size:11px}
+    .nav-label{margin:16px 12px 7px;font-size:10px;color:#7892bc;letter-spacing:.16em;text-transform:uppercase;font-weight:800}
+    .nav{display:flex;flex-direction:column;gap:5px}.nav a{color:#b8cae8;text-decoration:none;display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:11px;font-size:14px;font-weight:600;transition:.2s}.nav a:hover{background:rgba(255,255,255,.08);color:#fff}.nav a.active{background:linear-gradient(90deg,rgba(59,130,246,.28),rgba(56,189,248,.12));color:#fff;box-shadow:inset 3px 0 #60a5fa}.nav-icon{width:20px;height:20px;display:grid;place-items:center;font-size:16px}.nav .count{margin-left:auto;min-width:24px;padding:2px 7px;border-radius:999px;background:rgba(255,255,255,.1);font-size:10px;text-align:center}
+    .sidebar-footer{margin-top:auto;padding:16px 8px 2px;border-top:1px solid rgba(255,255,255,.1)}.secure{display:flex;gap:10px;align-items:flex-start;color:#9fb8de;font-size:11px;line-height:1.45}.secure b{color:#d9e8ff;display:block;font-size:12px}
+    .main{min-width:0}.topbar{height:78px;position:sticky;top:0;z-index:15;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--slate-200);display:flex;align-items:center;gap:18px;padding:0 30px}
+    .mobile-menu{display:none;border:0;background:transparent;font-size:24px}.top-search{max-width:700px;flex:1;height:46px;border:1px solid var(--slate-300);background:var(--slate-50);border-radius:13px;display:flex;align-items:center;gap:11px;padding:0 12px;color:var(--slate-500);transition:.2s}.top-search:hover{border-color:var(--blue-500);background:#fff;box-shadow:0 0 0 4px rgba(59,130,246,.08)}.top-search span{flex:1;font-size:14px;text-align:left}.kbd{border:1px solid var(--slate-300);background:#fff;border-bottom-width:2px;border-radius:7px;padding:3px 7px;font-size:11px;color:var(--slate-600);font-weight:700}
+    .top-actions{margin-left:auto;display:flex;align-items:center;gap:10px}.icon-btn{width:42px;height:42px;border:1px solid var(--slate-200);background:#fff;border-radius:12px;color:var(--slate-600);display:grid;place-items:center;position:relative}.icon-btn:hover{border-color:var(--blue-300);color:var(--blue-700)}.dot{position:absolute;right:8px;top:8px;width:7px;height:7px;border-radius:99px;background:var(--red);box-shadow:0 0 0 2px #fff}.profile{display:flex;align-items:center;gap:10px;padding-left:8px}.profile .pic{width:40px;height:40px;border-radius:12px;background:linear-gradient(145deg,#1e3a8a,#3b82f6);color:#fff;display:grid;place-items:center;font-weight:800}.profile strong{display:block;font-size:13px}.profile small{color:var(--slate-500);font-size:11px}
+    .content{padding:30px;max-width:1680px;margin:auto}.breadcrumb{font-size:12px;color:var(--slate-500);display:flex;gap:8px;align-items:center;margin-bottom:18px}.breadcrumb b{color:var(--blue-700)}
+    .page-head{display:flex;gap:24px;align-items:flex-end;justify-content:space-between;margin-bottom:24px}.eyebrow{font-size:11px;color:var(--blue-700);font-weight:800;text-transform:uppercase;letter-spacing:.15em;margin-bottom:7px}.page-head h1{margin:0;font-size:38px;letter-spacing:-.035em}.page-head p{margin:10px 0 0;color:var(--slate-600);font-size:16px;line-height:1.65}.security-pill{white-space:nowrap;border:1px solid #bbf7d0;background:var(--green-bg);color:#047857;border-radius:999px;padding:9px 13px;font-size:12px;font-weight:700;display:flex;gap:7px;align-items:center}
+    .hero-search{background:linear-gradient(135deg,#fff 0%,#fff 70%,rgba(239,246,255,.9) 100%);border:1px solid var(--blue-100);border-radius:20px;padding:20px;box-shadow:var(--shadow);margin-bottom:20px}.search-row{display:flex;gap:12px}.search-box{min-width:0;flex:1;height:58px;border:1.5px solid #93c5fd;background:#fff;border-radius:14px;display:flex;align-items:center;gap:12px;padding:0 16px;box-shadow:0 0 0 4px rgba(59,130,246,.06)}.search-box:focus-within{border-color:var(--blue-600);box-shadow:var(--focus)}.search-box .search-icon{font-size:20px;color:var(--blue-700)}.search-box input{border:0;outline:0;min-width:0;flex:1;font-size:16px;color:var(--slate-950);background:transparent}.search-box .clear{border:0;background:var(--slate-100);width:30px;height:30px;border-radius:8px;color:var(--slate-500);display:none}.search-box .clear.show{display:grid;place-items:center}.primary-btn{border:0;background:linear-gradient(135deg,var(--blue-700),var(--blue-600));color:#fff;border-radius:13px;padding:0 22px;font-weight:800;box-shadow:0 10px 24px rgba(37,99,235,.22)}.primary-btn:hover{filter:brightness(1.04);transform:translateY(-1px)}.search-hints{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:13px;color:var(--slate-500);font-size:12px}.hint-tags{display:flex;gap:7px;flex-wrap:wrap}.hint-tag{border:1px solid var(--slate-200);background:#fff;border-radius:999px;padding:5px 9px;color:var(--slate-600)}
+    .summary-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:20px}.summary-card{border:1px solid var(--slate-200);background:#fff;border-radius:14px;padding:13px 14px;text-align:left;transition:.2s;min-width:0}.summary-card:hover,.summary-card.active{border-color:#93c5fd;box-shadow:0 8px 24px rgba(30,58,138,.08);transform:translateY(-1px)}.summary-card.active{background:var(--blue-50)}.summary-card span{display:block;color:var(--slate-500);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.summary-card strong{font-size:24px;display:block;margin-top:4px;color:var(--slate-900)}
+    .layout{display:grid;grid-template-columns:285px minmax(0,1fr);gap:20px;align-items:start}.panel{background:#fff;border:1px solid var(--slate-200);border-radius:18px;box-shadow:0 10px 28px rgba(15,42,95,.055)}
+    .filters{position:sticky;top:98px;overflow:hidden}.panel-title{padding:17px 18px;border-bottom:1px solid var(--slate-200);display:flex;align-items:center;justify-content:space-between}.panel-title h2{margin:0;font-size:15px}.text-btn{border:0;background:transparent;color:var(--blue-700);font-size:12px;font-weight:800}.filter-body{padding:7px 18px 16px}.filter-group{padding:14px 0;border-bottom:1px solid var(--slate-100)}.filter-group:last-child{border-bottom:0}.filter-group h3{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--slate-500);margin:0 0 11px}.check{display:flex;align-items:center;gap:10px;margin:9px 0;font-size:13px;color:var(--slate-700)}.check input{accent-color:var(--blue-600);width:16px;height:16px}.check .mini-count{margin-left:auto;color:var(--slate-400);font-size:11px}.select{width:100%;height:40px;border:1px solid var(--slate-300);border-radius:10px;background:#fff;color:var(--slate-700);padding:0 10px;font-size:13px}.active-filter{margin-left:6px;background:var(--blue-600);color:#fff;border-radius:999px;font-size:10px;padding:2px 6px}
+    .results-panel{min-width:0}.results-head{padding:16px 18px;border-bottom:1px solid var(--slate-200);display:flex;align-items:center;gap:12px;flex-wrap:wrap}.results-head strong{font-size:15px}.results-head .meta{color:var(--slate-500);font-size:12px}.sort{margin-left:auto;display:flex;align-items:center;gap:8px;color:var(--slate-500);font-size:12px}.sort select{height:34px;border:1px solid var(--slate-300);border-radius:9px;padding:0 8px;background:#fff;color:var(--slate-700)}
+    .result-list{padding:6px}.result-card{display:grid;grid-template-columns:46px minmax(0,1fr) auto;gap:14px;padding:16px 14px;border:1px solid transparent;border-radius:13px;transition:.18s;align-items:start}.result-card + .result-card{border-top-color:var(--slate-100);border-radius:0}.result-card:hover{border-color:#bfdbfe;background:#f8fbff;border-radius:13px;box-shadow:0 8px 28px rgba(30,58,138,.08)}.entity-icon{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:18px;font-weight:800}.patient{background:#eff6ff;color:#2563eb}.visit{background:#ecfeff;color:#0891b2}.claim{background:#f5f3ff;color:#7c3aed}.task{background:#fff7ed;color:#ea580c}.audit{background:#f1f5f9;color:#475569}.evidence{background:#ecfdf5;color:#059669}.result-main{min-width:0}.result-top{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.entity-label{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--slate-400)}.result-title{margin:5px 0 7px;font-size:16px;letter-spacing:-.01em}.result-title mark{background:#fef3c7;color:inherit;border-radius:4px;padding:0 2px}.result-meta{display:flex;gap:7px 16px;flex-wrap:wrap;color:var(--slate-500);font-size:12px}.result-meta b{color:var(--slate-700);font-weight:700}.subline{margin-top:9px;font-size:12px;color:var(--slate-600);display:flex;gap:8px;align-items:center;flex-wrap:wrap}.badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 8px;font-size:10px;font-weight:800;white-space:nowrap}.badge.success{background:var(--green-bg);color:var(--green)}.badge.warning{background:var(--amber-bg);color:var(--amber)}.badge.danger{background:var(--red-bg);color:var(--red)}.badge.info{background:var(--blue-50);color:var(--blue-700)}.badge.neutral{background:var(--slate-100);color:var(--slate-600)}.result-actions{display:flex;align-items:center;gap:8px}.open-btn{border:1px solid var(--slate-300);background:#fff;color:var(--slate-700);border-radius:10px;padding:9px 11px;font-size:12px;font-weight:800}.open-btn:hover{border-color:var(--blue-500);color:var(--blue-700)}.more-btn{border:0;background:transparent;width:34px;height:34px;border-radius:9px;color:var(--slate-500)}.more-btn:hover{background:var(--slate-100)}
+    .pagination{border-top:1px solid var(--slate-200);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;color:var(--slate-500);font-size:12px}.pages{display:flex;gap:6px}.page-btn{width:34px;height:34px;border:1px solid var(--slate-200);background:#fff;border-radius:9px;color:var(--slate-600)}.page-btn.active{background:var(--blue-700);color:#fff;border-color:var(--blue-700)}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(7,21,47,.62);backdrop-filter:blur(7px);z-index:100;display:none;align-items:flex-start;justify-content:center;padding:8vh 20px}.modal-backdrop.open{display:flex}.command{width:min(760px,100%);max-height:82vh;background:#fff;border-radius:20px;box-shadow:var(--shadow-lg);overflow:hidden;border:1px solid rgba(255,255,255,.2);display:flex;flex-direction:column}.command-head{padding:18px;border-bottom:1px solid var(--slate-200)}.command-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.command-title strong{font-size:16px}.command-title span{font-size:11px;color:var(--slate-500)}.command-input{height:54px;border:1.5px solid #93c5fd;border-radius:13px;display:flex;align-items:center;gap:11px;padding:0 14px;background:#fbfdff}.command-input input{flex:1;border:0;outline:0;font-size:15px;background:transparent}.command-body{overflow:auto;padding:10px}.command-section{padding:8px}.command-section h3{margin:4px 8px 8px;font-size:10px;color:var(--slate-400);letter-spacing:.13em;text-transform:uppercase}.quick-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}.quick-item,.recent-item{border:0;background:#fff;border-radius:11px;padding:11px;display:flex;align-items:center;gap:11px;text-align:left;color:var(--slate-700)}.quick-item:hover,.recent-item:hover,.command-result.active{background:var(--blue-50);color:var(--blue-800)}.quick-item .qicon{width:32px;height:32px;background:var(--slate-100);border-radius:9px;display:grid;place-items:center}.quick-item small{display:block;color:var(--slate-500);font-size:10px;margin-top:2px}.recent-row{display:flex;align-items:center}.recent-item{flex:1}.remove-recent{border:0;background:transparent;color:var(--slate-400);width:34px;height:34px}.command-result{padding:11px;border-radius:11px;display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:11px;align-items:center}.command-result .entity-icon{width:36px;height:36px;border-radius:9px;font-size:14px}.command-result strong{display:block;font-size:13px}.command-result small{color:var(--slate-500);font-size:11px}.command-footer{border-top:1px solid var(--slate-200);padding:11px 16px;display:flex;justify-content:space-between;gap:10px;font-size:10px;color:var(--slate-500);background:var(--slate-50)}.key-guide{display:flex;gap:12px}.key-guide span{display:flex;gap:5px;align-items:center}
+    .toast{position:fixed;right:24px;bottom:24px;background:var(--navy-950);color:#fff;padding:13px 16px;border-radius:12px;box-shadow:var(--shadow-lg);z-index:200;font-size:13px;transform:translateY(30px);opacity:0;pointer-events:none;transition:.25s}.toast.show{transform:translateY(0);opacity:1}
+    @media(max-width:1200px){.summary-grid{grid-template-columns:repeat(3,1fr)}.app{grid-template-columns:238px minmax(0,1fr)}.sidebar{padding-left:12px;padding-right:12px}}
+    @media(max-width:900px){.app{display:block}.sidebar{position:fixed;left:-280px;width:270px;transition:.25s}.sidebar.open{left:0}.mobile-menu{display:block}.content{padding:22px}.layout{grid-template-columns:1fr}.filters{position:static}.filter-body{display:grid;grid-template-columns:repeat(2,1fr);gap:0 24px}.page-head{align-items:flex-start}.security-pill{display:none}.profile-copy{display:none}}
+    @media(max-width:640px){.topbar{padding:0 14px;height:68px}.top-search span{font-size:0}.top-search span:after{content:'Search';font-size:13px}.content{padding:16px}.page-head h1{font-size:28px}.search-row{flex-direction:column}.primary-btn{height:48px}.summary-grid{grid-template-columns:repeat(2,1fr)}.filter-body{grid-template-columns:1fr}.result-card{grid-template-columns:40px minmax(0,1fr)}.result-actions{grid-column:2;justify-content:flex-start}.result-meta{display:grid;grid-template-columns:1fr}.pagination{flex-direction:column;gap:12px}.quick-grid{grid-template-columns:1fr}.command-footer{display:none}.modal-backdrop{padding:0;align-items:stretch}.command{max-height:none;height:100%;border-radius:0}.hint-tags{display:none}}
+  
+    /* Blue Enterprise Theme enhancements */
+    body{letter-spacing:.001em}
+    :focus-visible{outline:none;box-shadow:var(--focus)!important}
+    .topbar{box-shadow:0 1px 0 rgba(15,42,95,.03)}
+    .sidebar:after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 20% 0%,rgba(56,189,248,.12),transparent 28%)}
+    .brand,.workspace,.nav,.sidebar-footer{position:relative;z-index:1}
+    .nav a{min-height:44px}
+    .nav a.active{background:linear-gradient(90deg,rgba(37,99,235,.30),rgba(56,189,248,.08));border:1px solid rgba(147,197,253,.16)}
+    .security-pill{box-shadow:0 4px 14px rgba(5,150,105,.08)}
+    .summary-card{min-height:92px;display:flex;flex-direction:column;justify-content:center}
+    .summary-card.active{background:linear-gradient(180deg,#eff6ff,#ffffff);border-color:#93c5fd}
+    .entity-icon{box-shadow:inset 0 0 0 1px rgba(15,42,95,.06)}
+    .badge{font-weight:700}
+    .badge.info{background:var(--blue-50);color:var(--blue-700);border-color:var(--blue-100)}
+    .result-card{transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+    .result-card:hover{transform:translateY(-2px);border-color:#bfdbfe;box-shadow:0 14px 32px rgba(15,42,95,.08)}
+    .open-btn{font-weight:750}
+    .primary-btn{background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 100%)}
+    .primary-btn:hover{box-shadow:0 14px 28px rgba(37,99,235,.28)}
+    .command{border:1px solid rgba(191,219,254,.65)}
+    .command-head{background:linear-gradient(180deg,#ffffff,#f8fbff)}
+    .quick-item:hover,.command-result:hover{background:var(--blue-50);border-color:var(--blue-100)}
+    @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M12 3v18M3 12h18"/><path d="M7 5.5c1.6-1.2 3.2-1.8 5-1.8s3.4.6 5 1.8M7 18.5c1.6 1.2 3.2 1.8 5 1.8s3.4-.6 5-1.8" opacity=".65"/></svg>
+      </div>
+      <div class="brand-copy"><strong>Med AI NexSure</strong><span>Healthcare & Insurance Intelligence</span></div>
+    </div>
+    <div class="workspace"><div class="avatar">NS</div><div><strong>NexSure Health Network</strong><small>Bangkok Enterprise</small></div><span style="margin-left:auto">⌄</span></div>
+    <div class="nav-label">Intelligence</div>
+    <nav class="nav">
+      <a href="#"><span class="nav-icon">⌂</span>Main Dashboard</a>
+      <a class="active" href="#"><span class="nav-icon">⌕</span>Global Search</a>
+      <a href="#"><span class="nav-icon">✦</span>AI Copilot</a>
+      <a href="#"><span class="nav-icon">▥</span>Claim Readiness<span class="count">12</span></a>
+      <a href="#"><span class="nav-icon">◈</span>Economic Intelligence</a>
+    </nav>
+    <div class="nav-label">Operations</div>
+    <nav class="nav">
+      <a href="#"><span class="nav-icon">♙</span>Patient Management</a>
+      <a href="#"><span class="nav-icon">▣</span>Visit Management</a>
+      <a href="#"><span class="nav-icon">✓</span>Task Management<span class="count">8</span></a>
+      <a href="#"><span class="nav-icon">▤</span>Evidence Package</a>
+      <a href="#"><span class="nav-icon">◌</span>Audit & Compliance</a>
+    </nav>
+    <div class="nav-label">Administration</div>
+    <nav class="nav"><a href="#"><span class="nav-icon">⚙</span>Admin Settings</a></nav>
+    <div class="sidebar-footer"><div class="secure"><span>◉</span><div><b>Secure Enterprise Session</b>Role and data-scope policies are enforced on every search.</div></div></div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <button class="mobile-menu" id="mobileMenu" aria-label="Open navigation">☰</button>
+      <button class="top-search" id="openCommand" aria-label="Open Global Search"><span style="font-size:20px">⌕</span><span>Search patients, visits, claims, evidence, tasks, and audit records</span><kbd class="kbd">Ctrl K</kbd></button>
+      <div class="top-actions">
+        <button class="icon-btn" aria-label="AI Copilot">✦</button>
+        <button class="icon-btn" aria-label="Notifications">♢<span class="dot"></span></button>
+        <div class="profile"><div class="pic">BC</div><div class="profile-copy"><strong>Benz Chatrapee</strong><small>Product Owner · Admin</small></div><span>⌄</span></div>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="breadcrumb"><span>Main Dashboard</span><span>/</span><b>Global Search</b></div>
+      <section class="page-head">
+        <div><div class="eyebrow">Enterprise Intelligence Access</div><h1>Global Search</h1><p>ค้นหาข้อมูลด้านผู้ป่วย การรักษา เคลม เอกสารหลักฐาน และ Audit Record จากจุดเดียว โดยแสดงเฉพาะข้อมูลตามสิทธิ์ของผู้ใช้งาน</p></div>
+        <div class="security-pill"><span>✓</span> Permission-aware results</div>
+      </section>
+
+      <section class="hero-search" aria-label="Search controls">
+        <div class="search-row">
+          <label class="search-box"><span class="search-icon">⌕</span><input id="mainSearch" value="Somchai" placeholder="Search by HN, patient name, visit, claim, task, payer, or keyword..." aria-label="Global search query"><button class="clear show" id="clearSearch" type="button" aria-label="Clear search">×</button><kbd class="kbd">Enter</kbd></label>
+          <button class="primary-btn" id="searchBtn">Search Records</button>
+        </div>
+        <div class="search-hints"><div class="hint-tags"><span>Suggested:</span><button class="hint-tag">HN000342</button><button class="hint-tag">CLM-2026-00549</button><button class="hint-tag">Pending Evidence</button></div><span>ผลลัพธ์ถูกจำกัดตาม Role, Organization, Clinic และ Data Scope ของคุณ</span></div>
+      </section>
+
+      <section class="summary-grid" aria-label="Result categories">
+        <button class="summary-card active" data-type="all"><span>All Accessible Results</span><strong>42</strong></button>
+        <button class="summary-card" data-type="patient"><span>Patient Records</span><strong>5</strong></button>
+        <button class="summary-card" data-type="visit"><span>Visit Records</span><strong>14</strong></button>
+        <button class="summary-card" data-type="claim"><span>Claim Records</span><strong>8</strong></button>
+        <button class="summary-card" data-type="task"><span>Task Records</span><strong>6</strong></button>
+        <button class="summary-card" data-type="other"><span>Evidence & Audit</span><strong>9</strong></button>
+      </section>
+
+      <div class="layout">
+        <aside class="panel filters">
+          <div class="panel-title"><h2>Advanced Filters <span class="active-filter">3</span></h2><button class="text-btn" id="clearFilters">Clear All</button></div>
+          <div class="filter-body">
+            <div class="filter-group"><h3>Record Type</h3>
+              <label class="check"><input type="checkbox" checked>Patient Records<span class="mini-count">5</span></label>
+              <label class="check"><input type="checkbox" checked>Visit Records<span class="mini-count">14</span></label>
+              <label class="check"><input type="checkbox" checked>Claim Records<span class="mini-count">8</span></label>
+              <label class="check"><input type="checkbox">Task Records<span class="mini-count">6</span></label>
+              <label class="check"><input type="checkbox">Evidence Package<span class="mini-count">4</span></label>
+              <label class="check"><input type="checkbox">Audit & Compliance<span class="mini-count">2</span></label>
+            </div>
+            <div class="filter-group"><h3>Organization & Clinic</h3><select class="select"><option>NexSure Health Network</option></select><select class="select" style="margin-top:8px"><option>All authorized clinics</option><option>Sukhumvit Medical Center</option><option>Bangkok North Clinic</option></select></div>
+            <div class="filter-group"><h3>Status</h3>
+              <label class="check"><input type="checkbox">Completed</label><label class="check"><input type="checkbox">Pending Evidence</label><label class="check"><input type="checkbox">Needs Review</label><label class="check"><input type="checkbox">Active</label>
+            </div>
+            <div class="filter-group"><h3>Date Range</h3><select class="select"><option>Last 30 Days</option><option>Today</option><option>Last 7 Days</option><option>This Month</option><option>Custom Range</option></select></div>
+            <div class="filter-group"><h3>Risk Level</h3><label class="check"><input type="checkbox">Low</label><label class="check"><input type="checkbox">Medium</label><label class="check"><input type="checkbox">High</label><label class="check"><input type="checkbox">Critical</label></div>
+          </div>
+        </aside>
+
+        <section class="panel results-panel">
+          <div class="results-head"><strong>Accessible results for “<span id="queryLabel">Somchai</span>”</strong><span class="meta">42 permission-approved records</span><div class="sort"><span>Sort Results</span><select><option>Relevance</option><option>Latest Update</option><option>Recent Access</option></select></div></div>
+          <div class="result-list" id="resultList">
+            <article class="result-card" data-entity="patient">
+              <div class="entity-icon patient">P</div><div class="result-main"><div class="result-top"><span class="entity-label">Patient Record</span><span class="badge success">● Active</span><span class="badge info">✓ PDPA Consent</span></div><h3 class="result-title"><mark>Somchai</mark> Jaidee</h3><div class="result-meta"><span><b>HN:</b> HN000342</span><span><b>Patient Context:</b> 48 years / Male</span><span><b>Phone:</b> 08X-XXX-4521</span><span><b>Latest Visit:</b> 10 Jul 2026</span></div><div class="subline"><span>Sukhumvit Medical Center</span><span>•</span><span>2 active insurance claims</span></div></div><div class="result-actions"><button class="open-btn">View Patient Profile →</button><button class="more-btn">•••</button></div>
+            </article>
+            <article class="result-card" data-entity="visit">
+              <div class="entity-icon visit">V</div><div class="result-main"><div class="result-top"><span class="entity-label">Visit Record</span><span class="badge info">● In Consultation</span><span class="badge info">✦ AI Assisted</span></div><h3 class="result-title">Visit VST-2026-0710-0342 · <mark>Somchai</mark> Jaidee</h3><div class="result-meta"><span><b>Visit Date:</b> 10 Jul 2026, 10:45</span><span><b>Department:</b> Internal Medicine</span><span><b>Attending Doctor:</b> Dr. Narin Wong</span></div><div class="subline"><span class="badge warning">Claim Readiness 78 · Needs Review</span><span>ข้อมูลหลักฐานยังขาด 2 รายการ</span></div></div><div class="result-actions"><button class="open-btn">View Visit Detail →</button><button class="more-btn">•••</button></div>
+            </article>
+            <article class="result-card" data-entity="claim">
+              <div class="entity-icon claim">C</div><div class="result-main"><div class="result-top"><span class="entity-label">Insurance Claim</span><span class="badge warning">● Needs Review</span><span class="badge danger">High Risk</span></div><h3 class="result-title">CLM-2026-00549 · <mark>Somchai</mark> Jaidee</h3><div class="result-meta"><span><b>Visit:</b> VST-2026-0708-0198</span><span><b>Payer:</b> AIA Thailand</span><span><b>Claim Amount:</b> ฿18,750</span><span><b>Updated:</b> 9 Jul 2026</span></div><div class="subline"><span class="badge warning">Needs Review</span><span>ยังขาดลายเซ็นแพทย์ผู้รับผิดชอบ</span></div></div><div class="result-actions"><button class="open-btn">View Claim Detail →</button><button class="more-btn">•••</button></div>
+            </article>
+            <article class="result-card" data-entity="task">
+              <div class="entity-icon task">T</div><div class="result-main"><div class="result-top"><span class="entity-label">Workflow Task</span><span class="badge danger">● Overdue</span><span class="badge warning">High Priority</span></div><h3 class="result-title">Complete SOAP evidence for <mark>Somchai</mark></h3><div class="result-meta"><span><b>Task ID:</b> TSK-2026-1184</span><span><b>Assignee:</b> Nalin P.</span><span><b>Due:</b> 9 Jul 2026</span><span><b>Related Visit:</b> VST-2026-0708-0198</span></div><div class="subline"><span>Claim Review Queue</span><span>•</span><span>Internal Medicine</span></div></div><div class="result-actions"><button class="open-btn">View Task Detail →</button><button class="more-btn">•••</button></div>
+            </article>
+            <article class="result-card" data-entity="evidence">
+              <div class="entity-icon evidence">E</div><div class="result-main"><div class="result-top"><span class="entity-label">Evidence Package</span><span class="badge warning">● Needs Review</span></div><h3 class="result-title">EVP-2026-00198 · <mark>Somchai</mark> Jaidee</h3><div class="result-meta"><span><b>Visit:</b> VST-2026-0708-0198</span><span><b>Completeness:</b> 82%</span><span><b>Documents:</b> 8 / 10</span><span><b>Updated:</b> 9 Jul 2026</span></div><div class="subline"><span>SOAP Note complete</span><span>•</span><span>ICD-10 validated</span><span>•</span><span>รอลายเซ็นผู้รับผิดชอบ</span></div></div><div class="result-actions"><button class="open-btn">View Evidence Package →</button><button class="more-btn">•••</button></div>
+            </article>
+            <article class="result-card" data-entity="audit">
+              <div class="entity-icon audit">A</div><div class="result-main"><div class="result-top"><span class="entity-label">Audit & Compliance Record</span><span class="badge neutral">● Success</span></div><h3 class="result-title">Patient record access · <mark>Somchai</mark> Jaidee</h3><div class="result-meta"><span><b>Event:</b> AUD-2026-78491</span><span><b>Actor:</b> Dr. Narin Wong</span><span><b>Date:</b> 10 Jul 2026, 10:47</span><span><b>IP:</b> 10.24.XX.XX</span></div><div class="subline"><span>Entity: Patient HN000342</span><span>•</span><span>Sukhumvit Medical Center</span></div></div><div class="result-actions"><button class="open-btn">View Audit Detail →</button><button class="more-btn">•••</button></div>
+            </article>
+          </div>
+          <div class="pagination"><span>Showing 1–6 of 42 permission-approved results</span><div class="pages"><button class="page-btn">‹</button><button class="page-btn active">1</button><button class="page-btn">2</button><button class="page-btn">3</button><button class="page-btn">…</button><button class="page-btn">7</button><button class="page-btn">›</button></div></div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="modal-backdrop" id="commandModal" role="dialog" aria-modal="true" aria-label="Global Search Command Palette">
+  <div class="command">
+    <div class="command-head"><div class="command-title"><strong>Global Search</strong><span>ค้นหาข้อมูลสำคัญจากทุกโมดูลภายใต้สิทธิ์ของคุณ</span></div><label class="command-input"><span style="font-size:20px;color:#2563eb">⌕</span><input id="commandSearch" placeholder="Search patients, visits, claims, evidence, tasks, and audit records"><kbd class="kbd">ESC</kbd></label></div>
+    <div class="command-body" id="commandBody">
+      <div class="command-section" id="recentSection"><h3>Recent Searches</h3>
+        <div class="recent-row"><button class="recent-item">↻ <span>HN000342 <small style="display:block">Patient</small></span></button><button class="remove-recent">×</button></div>
+        <div class="recent-row"><button class="recent-item">↻ <span>CLM-2026-00549 <small style="display:block">Claim</small></span></button><button class="remove-recent">×</button></div>
+        <div class="recent-row"><button class="recent-item">↻ <span>Pending Evidence <small style="display:block">Visit status</small></span></button><button class="remove-recent">×</button></div>
+      </div>
+      <div class="command-section" id="quickSection"><h3>Quick Navigation</h3><div class="quick-grid">
+        <button class="quick-item"><span class="qicon">⌂</span><span><b>Open Main Dashboard</b><small>View executive KPIs, queues, and operational signals</small></span></button>
+        <button class="quick-item"><span class="qicon">＋</span><span><b>Create Patient</b><small>ลงทะเบียนผู้ป่วยใหม่ตาม Workflow ขององค์กร</small></span></button>
+        <button class="quick-item"><span class="qicon">▣</span><span><b>Create Visit</b><small>Start a new clinical encounter and care workflow</small></span></button>
+        <button class="quick-item"><span class="qicon">▥</span><span><b>Claim Readiness</b><small>ตรวจสอบความพร้อมก่อนส่งเคลมประกัน</small></span></button>
+        <button class="quick-item"><span class="qicon">✓</span><span><b>Task Management</b><small>Review assigned tasks, priorities, and due dates</small></span></button>
+        <button class="quick-item"><span class="qicon">◌</span><span><b>Audit & Compliance</b><small>ติดตามประวัติการเข้าถึงและเหตุการณ์สำคัญ</small></span></button>
+      </div></div>
+      <div class="command-section" id="previewSection" style="display:none"><h3>Top Matches</h3>
+        <div class="command-result active"><div class="entity-icon patient">P</div><div><strong>Somchai Jaidee</strong><small>HN000342 · Patient · Active</small></div><kbd class="kbd">↵</kbd></div>
+        <div class="command-result"><div class="entity-icon visit">V</div><div><strong>VST-2026-0710-0342</strong><small>Somchai Jaidee · In Consultation</small></div><span>›</span></div>
+        <div class="command-result"><div class="entity-icon claim">C</div><div><strong>CLM-2026-00549</strong><small>Somchai Jaidee · Needs Review</small></div><span>›</span></div>
+        <div class="command-result"><div class="entity-icon task">T</div><div><strong>Complete missing SOAP evidence</strong><small>TSK-2026-1184 · Overdue</small></div><span>›</span></div>
+      </div>
+    </div>
+    <div class="command-footer"><div class="key-guide"><span><kbd class="kbd">↑↓</kbd> Navigate</span><span><kbd class="kbd">↵</kbd> Open</span><span><kbd class="kbd">Esc</kbd> Close</span></div><span>ผลลัพธ์ผ่าน Permission Scope และพร้อมรองรับ Audit</span></div>
+  </div>
+</div>
+<div class="toast" id="toast">Search results updated</div>
+
+<script>
+  const modal=document.getElementById('commandModal'); const commandSearch=document.getElementById('commandSearch');
+  const openModal=()=>{modal.classList.add('open');setTimeout(()=>commandSearch.focus(),30)};
+  const closeModal=()=>modal.classList.remove('open');
+  document.getElementById('openCommand').addEventListener('click',openModal);
+  modal.addEventListener('click',e=>{if(e.target===modal)closeModal()});
+  document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openModal()} if(e.key==='Escape')closeModal()});
+  commandSearch.addEventListener('input',()=>{const has=commandSearch.value.trim().length>0;document.getElementById('recentSection').style.display=has?'none':'block';document.getElementById('quickSection').style.display=has?'none':'block';document.getElementById('previewSection').style.display=has?'block':'none'});
+  const mainSearch=document.getElementById('mainSearch'),clear=document.getElementById('clearSearch'),queryLabel=document.getElementById('queryLabel'),toast=document.getElementById('toast');
+  function showToast(message){toast.textContent=message;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),1800)}
+  function runSearch(){const q=mainSearch.value.trim()||'All Accessible Records';queryLabel.textContent=q;showToast(`Showing permission-approved results for “${q}”`)}
+  mainSearch.addEventListener('input',()=>clear.classList.toggle('show',mainSearch.value.length>0));
+  mainSearch.addEventListener('keydown',e=>{if(e.key==='Enter')runSearch()});
+  clear.addEventListener('click',()=>{mainSearch.value='';clear.classList.remove('show');mainSearch.focus();queryLabel.textContent='';showToast('Search query cleared')});
+  document.getElementById('searchBtn').addEventListener('click',runSearch);
+  document.querySelectorAll('.hint-tag').forEach(btn=>btn.addEventListener('click',()=>{mainSearch.value=btn.textContent;clear.classList.add('show');runSearch()}));
+  document.querySelectorAll('.summary-card').forEach(card=>card.addEventListener('click',()=>{document.querySelectorAll('.summary-card').forEach(c=>c.classList.remove('active'));card.classList.add('active');const type=card.dataset.type;document.querySelectorAll('.result-card').forEach(r=>r.style.display=(type==='all'||type==='other'||r.dataset.entity===type)?'grid':'none');showToast(`${card.querySelector('span').textContent} view selected`)}));
+  document.getElementById('clearFilters').addEventListener('click',()=>{document.querySelectorAll('.filters input[type=checkbox]').forEach(c=>c.checked=false);document.querySelector('.active-filter').textContent='0';showToast('All search filters cleared')});
+  document.querySelectorAll('.open-btn').forEach(btn=>btn.addEventListener('click',()=>showToast(btn.textContent.replace(' →',''))));
+  document.querySelectorAll('.remove-recent').forEach(btn=>btn.addEventListener('click',()=>btn.parentElement.remove()));
+  document.querySelectorAll('.recent-item').forEach(btn=>btn.addEventListener('click',()=>{commandSearch.value=btn.innerText.split('\n')[0];commandSearch.dispatchEvent(new Event('input'))}));
+  document.getElementById('mobileMenu').addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open'));
+</script>
+</body>
+</html>

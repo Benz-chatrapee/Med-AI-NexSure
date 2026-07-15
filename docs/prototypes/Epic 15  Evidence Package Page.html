@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Evidence Package Enterprise V2 | Med AI NexSure</title>
+
+<style>
+:root{
+  --primary:#1E3A8A;
+  --executive:#0F2A5F;
+  --ai:#2563EB;
+  --purple:#7C3AED;
+  --bg:#F8FAFC;
+  --card:#FFFFFF;
+  --border:#E2E8F0;
+  --text:#0F172A;
+  --muted:#64748B;
+  --success:#16A34A;
+  --warning:#D97706;
+  --critical:#DC2626;
+  --blue-soft:#EFF6FF;
+  --green-soft:#F0FDF4;
+  --amber-soft:#FFFBEB;
+  --red-soft:#FEF2F2;
+  --purple-soft:#F5F3FF;
+  --shadow:0 18px 44px rgba(15,42,95,.08);
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Inter,Segoe UI,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+.app{
+  display:grid;
+  grid-template-columns:280px 1fr;
+  min-height:100vh;
+}
+
+.sidebar{
+  background:linear-gradient(180deg,var(--executive),#102A56);
+  color:white;
+  padding:26px 20px;
+  position:sticky;
+  top:0;
+  height:100vh;
+}
+
+.brand{
+  font-size:22px;
+  font-weight:900;
+  letter-spacing:-.04em;
+}
+
+.brand small{
+  display:block;
+  margin-top:5px;
+  font-size:12px;
+  color:#BFDBFE;
+  line-height:1.5;
+}
+
+.domain{margin-top:28px}
+
+.domain h4{
+  margin:0 0 10px;
+  font-size:11px;
+  color:#93C5FD;
+  text-transform:uppercase;
+  letter-spacing:.13em;
+}
+
+.nav-item{
+  padding:11px 12px;
+  border-radius:12px;
+  color:#DBEAFE;
+  font-size:14px;
+  margin-bottom:5px;
+}
+
+.nav-item.active{
+  background:rgba(255,255,255,.15);
+  color:white;
+  font-weight:800;
+}
+
+.main{
+  padding:30px;
+}
+
+.header{
+  background:linear-gradient(135deg,#FFFFFF,#EFF6FF);
+  border:1px solid var(--border);
+  border-radius:26px;
+  padding:30px;
+  box-shadow:var(--shadow);
+  display:flex;
+  justify-content:space-between;
+  gap:20px;
+}
+
+.eyebrow{
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  color:var(--ai);
+  font-weight:900;
+}
+
+h1{
+  margin:8px 0;
+  font-size:34px;
+  color:var(--executive);
+  letter-spacing:-.045em;
+}
+
+.thai{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.6;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-content:flex-start;
+}
+
+button{
+  border:0;
+  border-radius:12px;
+  padding:11px 16px;
+  font-size:13px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.btn-primary{background:var(--primary);color:white}
+.btn-secondary{background:white;color:var(--primary);border:1px solid var(--border)}
+.btn-ai{background:var(--purple);color:white}
+.btn-ghost{background:transparent;color:var(--primary)}
+
+.section-title{
+  margin:30px 0 14px;
+  font-size:22px;
+  color:var(--executive);
+  letter-spacing:-.03em;
+}
+
+.grid-4{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+}
+
+.grid-3{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:22px;
+  padding:20px;
+  box-shadow:var(--shadow);
+}
+
+.kpi-label{
+  font-size:13px;
+  color:var(--muted);
+  font-weight:800;
+}
+
+.kpi-value{
+  font-size:38px;
+  font-weight:900;
+  color:var(--executive);
+  margin:8px 0;
+  letter-spacing:-.04em;
+}
+
+.trend{
+  font-size:12px;
+  color:var(--success);
+  font-weight:800;
+}
+
+.status-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin:13px 0;
+  font-size:14px;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:900;
+  white-space:nowrap;
+}
+
+.ready{background:var(--green-soft);color:var(--success)}
+.review{background:var(--amber-soft);color:var(--warning)}
+.not-ready{background:var(--red-soft);color:var(--critical)}
+.draft{background:#F1F5F9;color:#475569}
+.exported{background:var(--blue-soft);color:var(--ai)}
+.ai-badge{background:var(--purple-soft);color:var(--purple)}
+
+.patient-context{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:12px;
+  margin-top:20px;
+}
+
+.context-item{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:14px;
+}
+
+.context-item small{
+  display:block;
+  font-size:11px;
+  color:var(--muted);
+  font-weight:900;
+}
+
+.context-item strong{
+  display:block;
+  margin-top:6px;
+  font-size:14px;
+}
+
+.workspace{
+  display:grid;
+  grid-template-columns:1fr 370px;
+  gap:20px;
+  align-items:start;
+  margin-top:20px;
+}
+
+.section-card{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:22px;
+  padding:20px;
+  margin-bottom:16px;
+  box-shadow:var(--shadow);
+}
+
+.section-head{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:14px;
+}
+
+.section-head h3,
+.card h3{
+  margin:0 0 6px;
+  font-size:16px;
+  color:var(--executive);
+}
+
+.mini-box{
+  background:#F8FAFC;
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:14px;
+  font-size:13px;
+  line-height:1.55;
+}
+
+.mini-box strong{
+  display:block;
+  color:var(--executive);
+  margin-bottom:5px;
+}
+
+.soap-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+
+.sticky{
+  position:sticky;
+  top:24px;
+}
+
+.panel-heading{
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+  margin-bottom:16px;
+}
+
+.panel-heading h3{
+  margin:0;
+  font-size:16px;
+}
+
+.panel-heading p{
+  margin:4px 0 0;
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.5;
+}
+
+.export-readiness-card{
+  border:1px solid #BBF7D0;
+  background:linear-gradient(180deg,#FFFFFF,#F0FDF4);
+}
+
+.success-heading h3{color:var(--success)}
+
+.readiness-score{
+  font-size:46px;
+  font-weight:900;
+  letter-spacing:-.06em;
+  margin-bottom:8px;
+  color:var(--success);
+}
+
+.bar{
+  height:10px;
+  border-radius:999px;
+  overflow:hidden;
+  background:#E5E7EB;
+}
+
+.bar span{
+  display:block;
+  height:100%;
+  border-radius:999px;
+}
+
+.success-bar{
+  background:#DCFCE7;
+  margin:18px 0;
+}
+
+.success-bar span{background:var(--success)}
+
+.success-message{
+  background:#DCFCE7;
+  color:#166534;
+  border:1px solid #BBF7D0;
+  padding:12px;
+  border-radius:14px;
+  font-size:12px;
+  line-height:1.55;
+  font-weight:800;
+}
+
+.checklist-card{
+  margin-top:18px;
+  border:1px solid #BFDBFE;
+  background:linear-gradient(180deg,#FFFFFF,#EFF6FF);
+}
+
+.blue-heading h3{color:var(--primary)}
+
+.checklist{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.check{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px;
+  border-radius:14px;
+  font-size:13px;
+  font-weight:800;
+}
+
+.blue-check{
+  background:#EFF6FF;
+  border:1px solid #BFDBFE;
+  color:var(--primary);
+}
+
+.blue-check strong{color:var(--success)}
+
+.warning-item{
+  background:#FFFBEB;
+  border-color:#FDE68A;
+  color:var(--warning);
+}
+
+.warning-item strong{color:var(--warning)}
+
+.ai-recommendation-card{
+  margin-top:18px;
+  border:1px solid #DDD6FE;
+  background:linear-gradient(180deg,#FFFFFF,#F5F3FF);
+}
+
+.purple-heading h3{color:var(--purple)}
+
+.ai-priority{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:14px;
+}
+
+.confidence{
+  font-size:12px;
+  font-weight:900;
+  color:var(--purple);
+}
+
+.ai-box{
+  background:#FFFFFF;
+  border:1px solid #DDD6FE;
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:14px;
+}
+
+.ai-box strong{
+  color:var(--purple);
+  font-size:13px;
+}
+
+.ai-box p{
+  font-size:13px;
+  line-height:1.55;
+  margin:8px 0;
+}
+
+.ai-box small{
+  display:block;
+  color:#6D28D9;
+  font-size:12px;
+  line-height:1.5;
+}
+
+.disclaimer{
+  margin-top:14px;
+  padding:12px;
+  background:var(--purple-soft);
+  color:#5B21B6;
+  border-radius:14px;
+  font-size:12px;
+  line-height:1.5;
+  font-weight:800;
+}
+
+.export-actions{
+  display:grid;
+  gap:10px;
+  margin-top:16px;
+}
+
+.export-actions button{width:100%}
+
+.timeline{
+  display:grid;
+  gap:12px;
+  margin-top:14px;
+}
+
+.time-item{
+  display:grid;
+  grid-template-columns:58px 1fr auto;
+  gap:12px;
+  padding:14px;
+  background:#F8FAFC;
+  border:1px solid var(--border);
+  border-radius:14px;
+}
+
+.time{
+  font-weight:900;
+  color:var(--executive);
+}
+
+.source{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:3px;
+}
+
+table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+  background:white;
+  border:1px solid var(--border);
+  border-radius:22px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+}
+
+th,td{
+  padding:14px;
+  text-align:left;
+  font-size:13px;
+  border-bottom:1px solid var(--border);
+  vertical-align:top;
+}
+
+th{
+  background:#F8FAFC;
+  color:#475569;
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+
+tr:last-child td{border-bottom:0}
+
+@media(max-width:1200px){
+  .app{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .grid-4,.grid-3,.patient-context,.workspace,.soap-grid{
+    grid-template-columns:1fr;
+  }
+  .sticky{position:static}
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<aside class="sidebar">
+  <div class="brand">
+    Med AI NexSure
+    <small>Enterprise Healthcare & Insurance Intelligence Platform</small>
+  </div>
+
+  <div class="domain">
+    <h4>Clinical Operations</h4>
+    <div class="nav-item">Patient Management</div>
+    <div class="nav-item">Visit Management</div>
+    <div class="nav-item">SOAP Note</div>
+    <div class="nav-item">Prescription</div>
+  </div>
+
+  <div class="domain">
+    <h4>Insurance Intelligence</h4>
+    <div class="nav-item">Claim Readiness</div>
+    <div class="nav-item active">Evidence Package</div>
+    <div class="nav-item">Payer Rules</div>
+  </div>
+
+  <div class="domain">
+    <h4>AI Intelligence</h4>
+    <div class="nav-item">AI Copilot</div>
+    <div class="nav-item">AI Clinical Insight</div>
+    <div class="nav-item">AI Recommendation Center</div>
+  </div>
+
+  <div class="domain">
+    <h4>Business Intelligence</h4>
+    <div class="nav-item">Economic Intelligence</div>
+    <div class="nav-item">Executive Dashboard</div>
+  </div>
+
+  <div class="domain">
+    <h4>Governance</h4>
+    <div class="nav-item">Audit & Compliance</div>
+    <div class="nav-item">Admin Settings</div>
+  </div>
+</aside>
+
+<main class="main">
+
+<section class="header">
+  <div>
+    <div class="eyebrow">Insurance Intelligence / Evidence Assembly Workspace</div>
+    <h1>Evidence Package Page</h1>
+    <div class="thai">
+      หน้ารวบรวมหลักฐาน เอกสารทางการแพทย์ และข้อมูลประกอบการเคลม พร้อมตรวจสอบก่อน Export PDF
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn-secondary">View Claim Readiness</button>
+    <button class="btn-secondary">Visit Detail</button>
+    <button class="btn-ai">Generate Claim Summary</button>
+    <button class="btn-primary">Export Evidence Package</button>
+  </div>
+</section>
+
+<h2 class="section-title">Executive KPI</h2>
+<section class="grid-4">
+  <div class="card">
+    <div class="kpi-label">Today Visits</div>
+    <div class="kpi-value">128</div>
+    <div class="trend">▲ 12% from yesterday</div>
+  </div>
+
+  <div class="card">
+    <div class="kpi-label">Claim Submission Readiness</div>
+    <div class="kpi-value">86%</div>
+    <div class="trend">▲ 8% improved</div>
+  </div>
+
+  <div class="card">
+    <div class="kpi-label">AI-assisted Documentation</div>
+    <div class="kpi-value">42</div>
+    <div class="trend">AI summary generated</div>
+  </div>
+
+  <div class="card">
+    <div class="kpi-label">Average Evidence Quality Score</div>
+    <div class="kpi-value">91</div>
+    <div class="trend">Enterprise-ready level</div>
+  </div>
+</section>
+
+<h2 class="section-title">Operational Snapshot</h2>
+<section class="grid-3">
+  <div class="card">
+    <h3>Queue Snapshot</h3>
+    <div class="thai">ภาพรวม Visit และเคสที่รอเอกสาร</div>
+    <div class="status-row"><span>Waiting</span><strong>18</strong></div>
+    <div class="status-row"><span>In Consultation</span><strong>24</strong></div>
+    <div class="status-row"><span>Pending Evidence</span><strong style="color:var(--warning)">16</strong></div>
+    <div class="status-row"><span>Completed</span><strong>70</strong></div>
+  </div>
+
+  <div class="card">
+    <h3>Claim Readiness Overview</h3>
+    <div class="thai">สถานะความพร้อมก่อนจัดชุด Evidence</div>
+    <div class="status-row"><span class="badge ready">Ready</span><strong>64</strong></div>
+    <div class="status-row"><span class="badge review">Needs Review</span><strong>38</strong></div>
+    <div class="status-row"><span class="badge not-ready">Not Ready</span><strong>26</strong></div>
+  </div>
+
+  <div class="card">
+    <h3>Economic Intelligence</h3>
+    <div class="thai">ตรวจค่าใช้จ่ายผิดปกติก่อนส่งประกัน</div>
+    <div class="status-row"><span>Average Visit Cost</span><strong>฿2,850</strong></div>
+    <div class="status-row"><span>Cost Alert Cases</span><strong style="color:var(--critical)">7</strong></div>
+    <div class="status-row"><span>Normal Cost Cases</span><strong style="color:var(--success)">121</strong></div>
+  </div>
+</section>
+
+<h2 class="section-title">Evidence Package Detail</h2>
+
+<section class="patient-context">
+  <div class="context-item"><small>HN</small><strong>HN-240189</strong></div>
+  <div class="context-item"><small>Patient</small><strong>Male, 42 yrs</strong></div>
+  <div class="context-item"><small>Visit ID</small><strong>VIS-2026-0081</strong></div>
+  <div class="context-item"><small>Doctor</small><strong>Dr. Anan</strong></div>
+  <div class="context-item"><small>Claim Status</small><strong><span class="badge ready">Ready</span></strong></div>
+  <div class="context-item"><small>Package Status</small><strong><span class="badge review">Review Needed</span></strong></div>
+</section>
+
+<section class="workspace">
+
+<div>
+  <div class="section-card">
+    <div class="section-head">
+      <div>
+        <h3>Insurance Claim Summary</h3>
+        <div class="thai">สรุปเหตุผลการรักษาและข้อมูลประกอบการเคลม</div>
+      </div>
+      <span class="badge ai-badge">AI Generated</span>
+    </div>
+
+    <div class="mini-box">
+      Patient presented with acute upper respiratory symptoms. Clinical assessment supports acute pharyngitis with prescribed symptomatic treatment. ICD-10 and prescription records are aligned with claim readiness requirements.
+    </div>
+
+    <div class="disclaimer">
+      AI-generated content requires clinician review prior to claim submission.<br>
+      AI ช่วยสรุปข้อมูลเบื้องต้น ผู้ใช้งานต้องตรวจสอบก่อนใช้งานจริง
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-head">
+      <div>
+        <h3>SOAP Evidence</h3>
+        <div class="thai">ข้อมูลทางคลินิกแบบ Read-only แก้ไขที่ Visit Detail</div>
+      </div>
+      <button class="btn-ghost">Edit in Visit Detail</button>
+    </div>
+
+    <div class="soap-grid">
+      <div class="mini-box"><strong>Subjective</strong>Fever, sore throat, mild cough for 2 days.</div>
+      <div class="mini-box"><strong>Objective</strong>Temp 38.1°C, throat erythema, no respiratory distress.</div>
+      <div class="mini-box"><strong>Assessment</strong>Acute pharyngitis, low complication risk.</div>
+      <div class="mini-box"><strong>Plan</strong>Medication, hydration, follow-up if symptoms persist.</div>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-head">
+      <div>
+        <h3>Diagnosis & ICD</h3>
+        <div class="thai">รหัสวินิจฉัยสำหรับตรวจสอบความถูกต้องของเคลม</div>
+      </div>
+      <span class="badge ready">Complete</span>
+    </div>
+
+    <div class="mini-box">
+      <strong>Primary Diagnosis</strong>
+      Acute pharyngitis — ICD-10: J02.9<br>
+      Procedure Code: Not applicable
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-head">
+      <div>
+        <h3>Prescription Evidence</h3>
+        <div class="thai">รายการยา วิธีใช้ จำนวน และ Safety Note</div>
+      </div>
+      <span class="badge ready">Safety Passed</span>
+    </div>
+
+    <div class="mini-box">
+      Paracetamol 500mg — 1 tab every 6 hours as needed, 10 tablets<br>
+      Chlorpheniramine 4mg — 1 tab before bedtime, 5 tablets<br>
+      Safety Note: No allergy alert detected.
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-head">
+      <div>
+        <h3>Medical Certificate</h3>
+        <div class="thai">ใบรับรองแพทย์สำหรับแนบชุด Evidence</div>
+      </div>
+      <button class="btn-secondary">Generate Medical Certificate</button>
+    </div>
+
+    <div class="mini-box">
+      Certificate status: Draft available. Electronic Signature Ready.
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-head">
+      <div>
+        <h3>Supporting Evidence</h3>
+        <div class="thai">ไฟล์แนบ เช่น Lab, Image, Consent, Referral</div>
+      </div>
+      <button class="btn-secondary">Upload Supporting Document</button>
+    </div>
+
+    <div class="mini-box">
+      Lab_Result_240189.pdf · Consent_Form.png · Referral_Note.pdf
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-head">
+      <div>
+        <h3>Economic Summary</h3>
+        <div class="thai">ตรวจสอบความสมเหตุสมผลของค่าใช้จ่าย</div>
+      </div>
+      <span class="badge review">Cost Justification Required</span>
+    </div>
+
+    <div class="mini-box">
+      Visit Cost: ฿4,250<br>
+      Expected Range: ฿1,800–฿3,200<br>
+      Cost Drivers: Lab, Medication<br>
+      Required Action: Add Cost Justification before export.
+    </div>
+  </div>
+</div>
+
+<aside class="sticky">
+  <div class="card export-readiness-card">
+    <div class="panel-heading success-heading">
+      <span>🟢</span>
+      <div>
+        <h3>Export Readiness</h3>
+        <p>สถานะความพร้อมก่อน Export Evidence Package</p>
+      </div>
+    </div>
+
+    <div class="readiness-score">96%</div>
+    <span class="badge ready">Ready to Export</span>
+
+    <div class="bar success-bar">
+      <span style="width:96%"></span>
+    </div>
+
+    <div class="success-message">
+      No critical issue detected. Package is ready for PDF preview and export.<br>
+      เอกสารพร้อมสำหรับตรวจสอบตัวอย่างและ Export
+    </div>
+
+    <div class="export-actions">
+      <button class="btn-secondary">Preview PDF</button>
+      <button class="btn-primary">Export Evidence Package</button>
+    </div>
+  </div>
+
+  <div class="card checklist-card">
+    <div class="panel-heading blue-heading">
+      <span>🔵</span>
+      <div>
+        <h3>Evidence Validation Checklist</h3>
+        <p>ตรวจสอบเอกสารสำคัญก่อนส่งประกัน</p>
+      </div>
+    </div>
+
+    <div class="checklist">
+      <div class="check blue-check"><span>Claim Summary</span><strong>✓</strong></div>
+      <div class="check blue-check"><span>SOAP Note</span><strong>✓</strong></div>
+      <div class="check blue-check"><span>Diagnosis & ICD</span><strong>✓</strong></div>
+      <div class="check blue-check"><span>Prescription</span><strong>✓</strong></div>
+      <div class="check blue-check"><span>Medical Certificate</span><strong>✓</strong></div>
+      <div class="check blue-check warning-item"><span>Cost Justification</span><strong>Review</strong></div>
+    </div>
+  </div>
+
+  <div class="card ai-recommendation-card">
+    <div class="panel-heading purple-heading">
+      <span>🟣</span>
+      <div>
+        <h3>AI Recommendation</h3>
+        <p>ข้อเสนอแนะจาก AI เพื่อเพิ่มความสมบูรณ์ของเอกสาร</p>
+      </div>
+    </div>
+
+    <div class="ai-priority">
+      <span class="badge ai-badge">High Priority</span>
+      <span class="confidence">Confidence 92%</span>
+    </div>
+
+    <div class="ai-box">
+      <strong>Recommended Next Action</strong>
+      <p>Review cost justification and confirm medical certificate before final export.</p>
+      <small>
+        AI-generated content requires clinician review prior to claim submission.
+        AI ช่วยสรุปข้อมูลเบื้องต้น ผู้ใช้งานต้องตรวจสอบก่อนใช้งานจริง
+      </small>
+    </div>
+
+    <button class="btn-ai">Open Source Reference</button>
+  </div>
+</aside>
+
+</section>
+
+<h2 class="section-title">Activity Timeline</h2>
+<section class="card">
+  <div class="timeline">
+    <div class="time-item">
+      <div class="time">10:42</div>
+      <div><strong>Evidence Generated</strong><div class="source">Insurance Claim Summary created</div></div>
+      <span class="badge ai-badge">AI</span>
+    </div>
+
+    <div class="time-item">
+      <div class="time">10:38</div>
+      <div><strong>SOAP Updated</strong><div class="source">Clinical note updated by doctor</div></div>
+      <span class="badge draft">Doctor</span>
+    </div>
+
+    <div class="time-item">
+      <div class="time">10:31</div>
+      <div><strong>ICD Added</strong><div class="source">ICD-10 J02.9 added</div></div>
+      <span class="badge draft">Doctor</span>
+    </div>
+
+    <div class="time-item">
+      <div class="time">10:25</div>
+      <div><strong>Attachment Uploaded</strong><div class="source">Lab result uploaded</div></div>
+      <span class="badge draft">Nurse</span>
+    </div>
+  </div>
+</section>
+
+<h2 class="section-title">Operational Worklist</h2>
+<table>
+  <thead>
+    <tr>
+      <th>HN / Patient</th>
+      <th>Visit Date</th>
+      <th>Visit Status</th>
+      <th>Claim Readiness</th>
+      <th>Evidence Quality</th>
+      <th>Package Status</th>
+      <th>Missing Evidence</th>
+      <th>Cost Status</th>
+      <th>Last Updated</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <td>HN-240189<br><span class="thai">Masked patient view</span></td>
+      <td>07 Jul 2026</td>
+      <td><span class="badge review">Pending Evidence</span></td>
+      <td>92</td>
+      <td>96</td>
+      <td><span class="badge ready">Ready to Export</span></td>
+      <td><span class="badge review">Cost Review</span></td>
+      <td><span class="badge review">Alert</span></td>
+      <td>10:42</td>
+      <td>
+        <button class="btn-primary">View Package</button>
+        <button class="btn-secondary">Visit Detail</button>
+      </td>
+    </tr>
+
+    <tr>
+      <td>HN-240191</td>
+      <td>07 Jul 2026</td>
+      <td><span class="badge ready">Completed</span></td>
+      <td>98</td>
+      <td>96</td>
+      <td><span class="badge exported">Exported</span></td>
+      <td>-</td>
+      <td><span class="badge ready">Normal</span></td>
+      <td>10:18</td>
+      <td>
+        <button class="btn-secondary">Download</button>
+        <button class="btn-ghost">Audit</button>
+      </td>
+    </tr>
+
+    <tr>
+      <td>HN-240205</td>
+      <td>07 Jul 2026</td>
+      <td><span class="badge review">Pending Evidence</span></td>
+      <td>68</td>
+      <td>62</td>
+      <td><span class="badge not-ready">Not Ready</span></td>
+      <td>
+        <span class="badge not-ready">ICD Missing</span>
+        <span class="badge not-ready">SOAP Incomplete</span>
+      </td>
+      <td><span class="badge ready">Normal</span></td>
+      <td>09:55</td>
+      <td>
+        <button class="btn-secondary">Review</button>
+        <button class="btn-secondary">Visit Detail</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 class="section-title">Compliance</h2>
+<section class="grid-3">
+  <div class="card">
+    <h3>Audit Alerts</h3>
+    <div class="thai">แจ้งเตือนกิจกรรมที่ต้องตรวจสอบ</div>
+    <div class="status-row"><span>Blocked Export</span><strong style="color:var(--critical)">3</strong></div>
+    <div class="status-row"><span>Missing Consent</span><strong style="color:var(--warning)">2</strong></div>
+  </div>
+
+  <div class="card">
+    <h3>Export History</h3>
+    <div class="thai">ประวัติการ Export PDF และ Version</div>
+    <div class="status-row"><span>Latest Version</span><strong>v3</strong></div>
+    <div class="status-row"><span>Exported By</span><strong>Clinic Admin</strong></div>
+  </div>
+
+  <div class="card">
+    <h3>Compliance Status</h3>
+    <div class="thai">PDPA, Audit Trail และ Access Control</div>
+    <div class="status-row"><span>PDPA Consent</span><span class="badge ready">Verified</span></div>
+    <div class="status-row"><span>Audit Trail</span><span class="badge ready">Enabled</span></div>
+  </div>
+</section>
+
+</main>
+</div>
+</body>
+</html>

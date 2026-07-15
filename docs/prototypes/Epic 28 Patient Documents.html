@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Patient Documents — Med AI NexSure Enterprise Platform</title>
+  <meta name="description" content="Enterprise patient document management for clinical, insurance and claim evidence workflows." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <style>
+    :root{
+      --primary:#1E3A8A;--deep:#0F2A5F;--ai:#2563EB;--sky:#38BDF8;
+      --soft:#EFF6FF;--bg:#F8FAFC;--surface:#FFFFFF;--border:#E2E8F0;
+      --text:#0F172A;--muted:#64748B;--success:#059669;--warning:#D97706;
+      --danger:#DC2626;--purple:#7C3AED;--shadow:0 8px 28px rgba(15,42,95,.08);
+      --shadow-sm:0 2px 8px rgba(15,42,95,.06);--radius:14px;
+    }
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,"Noto Sans Thai",sans-serif;font-size:14px}
+    button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display:none!important}
+    .app{display:grid;grid-template-columns:248px minmax(0,1fr);min-height:100vh}
+    .sidebar{background:linear-gradient(180deg,#0F2A5F 0%,#0A1F49 100%);color:white;padding:22px 16px;position:sticky;top:0;height:100vh;overflow:auto;z-index:20}
+    .brand{display:flex;align-items:center;gap:10px;padding:0 8px 24px}.brand-mark{width:38px;height:38px;border-radius:11px;background:linear-gradient(145deg,#3B82F6,#38BDF8);display:grid;place-items:center;box-shadow:0 8px 20px rgba(56,189,248,.25)}
+    .brand h1{font-size:15px;margin:0;font-weight:700}.brand p{font-size:10px;margin:2px 0 0;color:#BFDBFE;letter-spacing:.05em}
+    .nav-label{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#93C5FD;padding:18px 12px 8px;font-weight:700}
+    .nav-item{display:flex;align-items:center;gap:11px;color:#CBD5E1;text-decoration:none;padding:10px 12px;border-radius:9px;margin:2px 0;font-weight:500;transition:.2s}.nav-item:hover{background:rgba(255,255,255,.08);color:white}.nav-item.active{background:rgba(59,130,246,.24);color:white;border:1px solid rgba(147,197,253,.22)}
+    .nav-item i{width:18px;height:18px}.nav-badge{margin-left:auto;background:#EF4444;color:white;font-size:10px;padding:2px 6px;border-radius:999px}
+    .sidebar-footer{margin-top:26px;padding:14px;border:1px solid rgba(147,197,253,.18);background:rgba(255,255,255,.05);border-radius:12px}.sidebar-footer strong{font-size:12px}.sidebar-footer p{font-size:11px;color:#BFDBFE;line-height:1.5;margin:6px 0 0}
+    .main{min-width:0}.topbar{height:64px;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;position:sticky;top:0;z-index:15}
+    .org-switcher{display:flex;align-items:center;gap:9px;font-weight:600}.top-search{margin-left:auto;width:min(360px,34vw);position:relative}.top-search input{width:100%;height:38px;border:1px solid var(--border);border-radius:10px;padding:0 38px;background:#F8FAFC;outline:none}.top-search i{position:absolute;left:12px;top:10px;width:17px;color:var(--muted)}
+    .top-actions{display:flex;gap:6px;margin-left:14px;align-items:center}.icon-btn{width:38px;height:38px;border:0;background:transparent;border-radius:9px;display:grid;place-items:center;color:#475569}.icon-btn:hover{background:#F1F5F9}.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#1E3A8A,#2563EB);color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px;margin-left:6px}
+    .content{padding:24px 28px 60px;max-width:1680px;margin:auto}.breadcrumb{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted);margin-bottom:15px}.breadcrumb a{color:var(--muted);text-decoration:none}.breadcrumb a:hover{color:var(--ai)}
+    .page-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:18px}.page-title h2{font-size:26px;margin:0 0 6px;letter-spacing:-.025em}.page-title p{margin:0;color:var(--muted);line-height:1.55}.head-actions{display:flex;gap:9px}.btn{border:1px solid var(--border);background:#fff;color:#334155;border-radius:9px;height:40px;padding:0 14px;display:inline-flex;align-items:center;gap:8px;font-weight:600;box-shadow:0 1px 2px rgba(15,23,42,.03)}.btn:hover{background:#F8FAFC}.btn-primary{background:var(--primary);color:#fff;border-color:var(--primary)}.btn-primary:hover{background:var(--deep)}.btn-danger{color:var(--danger)}.btn-sm{height:32px;padding:0 10px;font-size:12px}.btn i{width:16px;height:16px}
+    .patient-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:17px 18px;display:flex;align-items:center;gap:18px;margin-bottom:14px}.patient-avatar{width:52px;height:52px;border-radius:15px;background:linear-gradient(135deg,#DBEAFE,#BFDBFE);color:var(--primary);display:grid;place-items:center;font-weight:800;font-size:17px;flex:none}.patient-main{min-width:210px}.patient-main h3{font-size:16px;margin:0 0 5px}.patient-main p{margin:0;color:var(--muted);font-size:12px}.patient-meta{display:grid;grid-template-columns:repeat(5,minmax(110px,1fr));gap:16px;flex:1;border-left:1px solid var(--border);padding-left:18px}.meta-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}.meta-value{font-weight:600;font-size:12px}.status-inline{display:inline-flex;align-items:center;gap:5px;color:var(--success)}
+    .alert{display:flex;gap:12px;border-radius:12px;padding:12px 15px;align-items:flex-start;margin-bottom:18px}.alert-warning{background:#FFF7ED;border:1px solid #FED7AA}.alert i{width:18px;height:18px;flex:none;margin-top:1px;color:var(--warning)}.alert strong{display:block;font-size:12px;margin-bottom:3px}.alert p{font-size:11px;color:#9A3412;margin:0;line-height:1.5}
+    .kpi-head{display:flex;justify-content:space-between;align-items:center;margin:20px 0 10px}.section-title{font-size:15px;margin:0;font-weight:700}.refreshed{font-size:11px;color:var(--muted)}
+    .kpi-grid{display:grid;grid-template-columns:repeat(6,minmax(135px,1fr));gap:11px}.kpi{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px;transition:.2s;text-align:left;position:relative;overflow:hidden}.kpi:hover{transform:translateY(-1px);box-shadow:var(--shadow-sm);border-color:#BFDBFE}.kpi.active{border-color:var(--ai);box-shadow:0 0 0 2px rgba(37,99,235,.1)}.kpi-icon{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;margin-bottom:12px}.kpi-icon i{width:15px}.blue{background:#EFF6FF;color:#2563EB}.green{background:#ECFDF5;color:#059669}.amber{background:#FFFBEB;color:#D97706}.red{background:#FEF2F2;color:#DC2626}.purple{background:#F5F3FF;color:#7C3AED}.cyan{background:#ECFEFF;color:#0891B2}.kpi-value{font-size:23px;font-weight:700;letter-spacing:-.03em}.kpi-label{font-size:11px;color:var(--muted);margin-top:3px}.kpi-delta{font-size:10px;margin-top:8px;color:var(--muted)}
+    .category-wrap{background:#fff;border:1px solid var(--border);border-radius:12px;margin-top:14px;padding:10px;display:flex;gap:7px;overflow-x:auto}.category{white-space:nowrap;border:0;background:transparent;color:#475569;border-radius:8px;padding:9px 11px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:7px}.category:hover{background:#F8FAFC}.category.active{background:var(--soft);color:var(--primary)}.count{font-size:10px;background:#E2E8F0;color:#475569;padding:2px 6px;border-radius:999px}.category.active .count{background:#BFDBFE;color:#1E3A8A}.warn-dot{width:7px;height:7px;background:var(--warning);border-radius:50%}
+    .overview{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1.55fr);gap:14px;margin-top:14px}.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm)}.card-head{padding:16px 17px 12px;display:flex;justify-content:space-between;align-items:flex-start}.card-head h3{font-size:14px;margin:0 0 4px}.card-head p{font-size:11px;color:var(--muted);margin:0}.card-body{padding:0 17px 17px}
+    .score-row{display:flex;gap:20px;align-items:center}.score-ring{--score:78;position:relative;width:112px;height:112px;border-radius:50%;background:conic-gradient(var(--warning) calc(var(--score)*1%),#E2E8F0 0);display:grid;place-items:center;flex:none}.score-ring:before{content:"";width:82px;height:82px;background:#fff;border-radius:50%;position:absolute}.score-content{z-index:1;text-align:center}.score-content strong{font-size:25px}.score-content span{font-size:9px;color:var(--muted);display:block}.score-info h4{margin:0 0 5px;color:var(--warning);font-size:14px}.score-info p{margin:0;color:var(--muted);font-size:11px;line-height:1.5}.progress-list{margin-top:16px;display:grid;gap:10px}.prog-top{display:flex;justify-content:space-between;font-size:10px;margin-bottom:5px}.bar{height:6px;border-radius:999px;background:#E2E8F0;overflow:hidden}.bar span{display:block;height:100%;border-radius:999px;background:var(--ai)}.decision-note{margin-top:13px;padding:10px;background:#EFF6FF;border-radius:8px;color:#1E40AF;font-size:10px;display:flex;gap:7px;line-height:1.45}.decision-note i{width:15px;flex:none}
+    .missing-list{display:grid;gap:8px}.missing-item{display:grid;grid-template-columns:8px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 11px;border:1px solid var(--border);border-radius:10px}.severity{width:8px;height:38px;border-radius:5px}.sev-critical{background:var(--danger)}.sev-high{background:var(--warning)}.sev-medium{background:#EAB308}.missing-item strong{font-size:11px;display:block}.missing-item p{font-size:10px;color:var(--muted);margin:3px 0 0}.missing-actions{display:flex;gap:6px}
+    .worklist{margin-top:14px}.toolbar{padding:14px;display:flex;gap:9px;align-items:center;border-bottom:1px solid var(--border);flex-wrap:wrap}.searchbox{position:relative;flex:1;min-width:230px}.searchbox input{width:100%;height:38px;border:1px solid var(--border);border-radius:9px;padding:0 12px 0 36px;outline:none}.searchbox i{position:absolute;left:11px;top:10px;width:17px;color:#94A3B8}.filter-btn{height:38px;border:1px solid var(--border);background:#fff;border-radius:9px;padding:0 11px;display:flex;align-items:center;gap:7px;color:#475569;font-size:12px;font-weight:600}.filter-btn.active{background:var(--soft);border-color:#BFDBFE;color:var(--primary)}.view-toggle{display:flex;border:1px solid var(--border);border-radius:9px;padding:3px}.view-toggle button{border:0;background:transparent;width:31px;height:30px;border-radius:6px;color:#64748B}.view-toggle button.active{background:#E2E8F0;color:#0F172A}.active-filters{padding:0 14px 12px;display:flex;gap:7px;align-items:center;flex-wrap:wrap}.chip{display:flex;align-items:center;gap:6px;background:#EFF6FF;color:#1E40AF;border:1px solid #DBEAFE;border-radius:999px;padding:5px 9px;font-size:10px}.chip button{border:0;background:transparent;color:inherit;padding:0;line-height:0}.clear-link{border:0;background:transparent;color:var(--ai);font-size:10px;font-weight:600}
+    .bulkbar{margin:0 14px 12px;padding:9px 11px;border-radius:9px;background:#EFF6FF;border:1px solid #BFDBFE;display:flex;align-items:center;gap:8px;color:#1E3A8A;font-size:11px}.bulkbar .spacer{flex:1}
+    .table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:1100px}thead th{background:#F8FAFC;color:#64748B;text-transform:uppercase;letter-spacing:.04em;font-size:9px;text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);font-weight:700}tbody td{padding:11px 12px;border-bottom:1px solid #EEF2F7;vertical-align:middle;font-size:11px}tbody tr:hover{background:#FAFCFF}.doc-cell{display:flex;align-items:center;gap:10px;min-width:230px}.file-icon{width:35px;height:40px;border-radius:8px;background:#FEF2F2;color:#DC2626;display:grid;place-items:center;flex:none}.file-icon.img{background:#EFF6FF;color:#2563EB}.file-icon.doc{background:#F5F3FF;color:#7C3AED}.file-icon i{width:18px}.doc-name{font-weight:600;color:#0F172A}.doc-sub{font-size:9px;color:#94A3B8;margin-top:3px;display:flex;gap:7px}.tag{display:inline-flex;align-items:center;border-radius:999px;padding:4px 7px;font-size:9px;font-weight:600;gap:4px}.tag i{width:10px}.tag-success{background:#ECFDF5;color:#047857}.tag-warning{background:#FFF7ED;color:#C2410C}.tag-danger{background:#FEF2F2;color:#B91C1C}.tag-info{background:#EFF6FF;color:#1D4ED8}.tag-neutral{background:#F1F5F9;color:#475569}.tag-purple{background:#F5F3FF;color:#6D28D9}.related a{color:#1D4ED8;text-decoration:none;font-weight:600}.related div{margin-bottom:3px}.user-cell{display:flex;align-items:center;gap:7px}.mini-avatar{width:25px;height:25px;border-radius:50%;background:#E2E8F0;display:grid;place-items:center;font-size:8px;font-weight:700}.confidence{display:flex;align-items:center;gap:6px}.mini-bar{width:42px;height:4px;background:#E2E8F0;border-radius:99px;overflow:hidden}.mini-bar span{display:block;height:100%;background:var(--success)}.row-actions{display:flex;gap:1px}.row-actions button{border:0;background:transparent;width:29px;height:29px;border-radius:7px;color:#64748B}.row-actions button:hover{background:#F1F5F9;color:#0F172A}.confidential{color:var(--purple);margin-left:4px;vertical-align:middle;width:12px}
+    .card-grid{padding:14px;display:grid;grid-template-columns:repeat(3,minmax(240px,1fr));gap:12px}.doc-card{border:1px solid var(--border);border-radius:11px;padding:13px}.doc-card:hover{border-color:#BFDBFE;box-shadow:var(--shadow-sm)}.doc-card-top{display:flex;justify-content:space-between;align-items:flex-start}.doc-card .file-icon{margin-bottom:12px}.doc-card h4{font-size:12px;margin:0 0 5px}.doc-card p{font-size:10px;color:var(--muted);margin:0}.doc-card-meta{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0}.doc-card-meta span{font-size:9px;color:var(--muted);display:block}.doc-card-meta strong{font-size:10px}.doc-card-foot{padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+    .pagination{display:flex;justify-content:space-between;align-items:center;padding:13px 15px;color:var(--muted);font-size:10px}.pages{display:flex;gap:4px}.pages button{border:1px solid var(--border);background:white;width:29px;height:29px;border-radius:7px;color:#475569}.pages button.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .activity{margin-top:14px}.activity-list{padding:0 17px 16px}.activity-item{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:10px;padding:10px 0;border-bottom:1px solid #EEF2F7}.activity-item:last-child{border-bottom:0}.activity-icon{width:30px;height:30px;border-radius:8px;background:#EFF6FF;color:#2563EB;display:grid;place-items:center}.activity-icon i{width:14px}.activity-text{font-size:10px;line-height:1.45}.activity-text strong{font-size:11px}.activity-time{font-size:9px;color:#94A3B8;text-align:right}
+    .overlay{position:fixed;inset:0;background:rgba(15,23,42,.46);z-index:60;opacity:0;pointer-events:none;transition:.2s}.overlay.show{opacity:1;pointer-events:auto}.drawer{position:fixed;top:0;right:0;width:min(680px,94vw);height:100vh;background:#fff;z-index:70;transform:translateX(100%);transition:.25s;box-shadow:-20px 0 50px rgba(15,23,42,.16);display:flex;flex-direction:column}.drawer.show{transform:none}.drawer-head{height:66px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;gap:12px}.drawer-head h3{font-size:14px;margin:0}.drawer-head p{font-size:9px;color:var(--muted);margin:3px 0 0}.drawer-head .close{margin-left:auto}.drawer-body{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(250px,.9fr);flex:1;min-height:0}.preview{background:#E2E8F0;padding:18px;display:flex;flex-direction:column;min-height:0}.preview-toolbar{background:#fff;border-radius:9px;padding:7px;display:flex;gap:5px;justify-content:center;margin-bottom:12px;box-shadow:var(--shadow-sm)}.preview-toolbar button{border:0;background:transparent;width:30px;height:28px;border-radius:6px;color:#475569}.preview-toolbar button:hover{background:#F1F5F9}.paper{background:#fff;flex:1;border-radius:5px;box-shadow:0 5px 22px rgba(15,23,42,.14);padding:28px;overflow:auto;font-size:10px;color:#334155}.paper-head{text-align:center;border-bottom:2px solid #1E3A8A;padding-bottom:12px;margin-bottom:15px}.paper-logo{font-weight:800;color:#1E3A8A;font-size:15px}.paper table{min-width:0;font-size:9px}.paper td{padding:5px;border:1px solid #CBD5E1}.detail-panel{overflow:auto;border-left:1px solid var(--border)}.tabs{display:flex;border-bottom:1px solid var(--border);padding:0 12px}.tabs button{border:0;background:transparent;padding:13px 10px;font-size:10px;color:var(--muted);font-weight:600;border-bottom:2px solid transparent}.tabs button.active{color:var(--primary);border-color:var(--primary)}.panel-content{padding:15px}.detail-section{margin-bottom:18px}.detail-section h4{font-size:11px;margin:0 0 10px}.field{display:flex;justify-content:space-between;gap:12px;padding:6px 0;font-size:10px}.field span:first-child{color:var(--muted)}.ai-field{border:1px solid var(--border);border-radius:9px;padding:9px;margin-bottom:7px}.ai-field-top{display:flex;justify-content:space-between;font-size:10px}.ai-field-value{font-weight:600;margin-top:4px}.ai-source{font-size:8px;color:var(--muted);margin-top:4px}.drawer-foot{border-top:1px solid var(--border);padding:12px 16px;display:flex;gap:8px;justify-content:flex-end}
+    .modal{position:fixed;z-index:80;left:50%;top:50%;transform:translate(-50%,-48%) scale(.98);width:min(720px,94vw);max-height:90vh;background:#fff;border-radius:16px;box-shadow:0 25px 70px rgba(15,23,42,.25);opacity:0;pointer-events:none;transition:.2s;overflow:hidden}.modal.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}.modal-head{padding:17px 19px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}.modal-head h3{font-size:15px;margin:0}.modal-body{padding:18px;overflow:auto;max-height:calc(90vh - 130px)}.dropzone{border:2px dashed #BFDBFE;background:#F8FBFF;border-radius:12px;padding:26px;text-align:center;color:var(--muted)}.dropzone.dragover{border-color:var(--ai);background:#EFF6FF}.dropzone i{width:32px;color:var(--ai);margin-bottom:8px}.dropzone strong{display:block;color:var(--text);font-size:12px;margin-bottom:4px}.dropzone p{font-size:10px;margin:0 0 12px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}.form-group label{display:block;font-size:10px;font-weight:600;margin-bottom:6px}.form-group input,.form-group select,.form-group textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 10px;outline:none;background:#fff;font-size:11px}.form-group textarea{min-height:70px;resize:vertical}.span-2{grid-column:span 2}.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#60A5FA;box-shadow:0 0 0 3px rgba(37,99,235,.1)}.upload-queue{margin-top:13px;border:1px solid var(--border);border-radius:10px;padding:10px;display:none}.upload-queue.show{display:block}.queue-file{display:flex;align-items:center;gap:9px}.queue-file .file-icon{width:30px;height:33px}.queue-info{flex:1}.queue-info strong{font-size:10px}.queue-info p{font-size:8px;color:var(--muted);margin:2px 0 5px}.upload-progress{height:5px;background:#E2E8F0;border-radius:99px;overflow:hidden}.upload-progress span{display:block;width:0;height:100%;background:var(--ai);transition:.3s}.modal-foot{padding:12px 18px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+    .toast{position:fixed;right:22px;bottom:22px;background:#fff;border:1px solid var(--border);box-shadow:0 12px 36px rgba(15,23,42,.16);border-radius:11px;padding:12px 14px;z-index:100;display:flex;align-items:flex-start;gap:10px;min-width:300px;transform:translateY(30px);opacity:0;pointer-events:none;transition:.25s}.toast.show{transform:none;opacity:1}.toast-icon{width:28px;height:28px;border-radius:8px;background:#ECFDF5;color:var(--success);display:grid;place-items:center}.toast-icon i{width:15px}.toast strong{font-size:11px;display:block}.toast p{font-size:9px;color:var(--muted);margin:3px 0 0}.mobile-menu{display:none}
+    @media(max-width:1250px){.kpi-grid{grid-template-columns:repeat(3,1fr)}.patient-meta{grid-template-columns:repeat(3,1fr)}.card-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:980px){.app{grid-template-columns:1fr}.sidebar{display:none}.mobile-menu{display:grid}.topbar{padding:0 16px}.content{padding:18px}.overview{grid-template-columns:1fr}.patient-card{align-items:flex-start;flex-wrap:wrap}.patient-meta{border-left:0;padding-left:0;width:100%}.top-search{display:none}.drawer-body{grid-template-columns:1fr}.detail-panel{display:none}.preview{padding:12px}.card-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:640px){.page-head{flex-direction:column}.head-actions{width:100%}.head-actions .btn-primary{flex:1;justify-content:center}.patient-meta{grid-template-columns:repeat(2,1fr)}.kpi-grid{grid-template-columns:repeat(2,1fr)}.card-grid{grid-template-columns:1fr}.missing-item{grid-template-columns:8px 1fr}.missing-actions{grid-column:2}.content{padding:14px}.page-title h2{font-size:22px}.score-row{align-items:flex-start}.modal{width:96vw}.form-grid{grid-template-columns:1fr}.span-2{grid-column:auto}}
+  
+
+    /* =========================================================
+       MED AI NEXSURE — BLUE ENTERPRISE THEME OVERRIDES
+       Premium healthcare, insurance, AI and compliance system
+       ========================================================= */
+    :root{
+      --primary:#1E3A8A;
+      --primary-hover:#172F73;
+      --deep:#0F2A5F;
+      --deep-2:#0A214C;
+      --ai:#2563EB;
+      --ai-hover:#1D4ED8;
+      --sky:#38BDF8;
+      --soft:#EFF6FF;
+      --blue-border:#BFDBFE;
+      --bg:#F8FAFC;
+      --surface:#FFFFFF;
+      --surface-subtle:#F8FAFC;
+      --border:#E2E8F0;
+      --border-strong:#CBD5E1;
+      --text:#0F172A;
+      --muted:#64748B;
+      --success:#059669;
+      --warning:#D97706;
+      --danger:#DC2626;
+      --info:#2563EB;
+      --purple:#2563EB;
+      --focus:0 0 0 3px rgba(37,99,235,.16);
+      --shadow-sm:0 1px 2px rgba(15,23,42,.04),0 4px 12px rgba(15,42,95,.04);
+      --shadow:0 10px 30px rgba(15,42,95,.08);
+      --shadow-lg:0 24px 64px rgba(15,42,95,.18);
+      --radius:16px;
+    }
+
+    html{background:var(--bg)}
+    body{background:var(--bg);color:var(--text);letter-spacing:-.005em}
+    ::selection{background:#DBEAFE;color:var(--deep)}
+    :focus-visible{outline:none;box-shadow:var(--focus)}
+
+    .app{grid-template-columns:260px minmax(0,1fr)}
+    .sidebar{
+      background:var(--deep);
+      border-right:1px solid rgba(191,219,254,.12);
+      box-shadow:10px 0 32px rgba(15,42,95,.08);
+      padding:20px 14px;
+    }
+    .brand{padding:2px 8px 22px;border-bottom:1px solid rgba(191,219,254,.12)}
+    .brand-mark{
+      width:40px;height:40px;border-radius:12px;
+      background:var(--ai);
+      box-shadow:0 8px 20px rgba(37,99,235,.28),inset 0 0 0 1px rgba(255,255,255,.18)
+    }
+    .brand h1{font-size:15px;letter-spacing:-.02em}
+    .brand p{color:#BFDBFE;letter-spacing:.065em}
+    .nav-label{color:#7DD3FC;padding:20px 12px 8px}
+    .nav-item{color:#CBD5E1;border:1px solid transparent;border-radius:11px;padding:10px 12px}
+    .nav-item:hover{background:rgba(255,255,255,.075);color:#fff;border-color:rgba(191,219,254,.08)}
+    .nav-item.active{
+      background:rgba(37,99,235,.23);
+      border-color:rgba(147,197,253,.28);
+      color:#fff;
+      box-shadow:inset 3px 0 0 var(--sky)
+    }
+    .nav-badge{background:#DC2626;box-shadow:0 0 0 2px var(--deep)}
+    .sidebar-footer{background:rgba(255,255,255,.045);border-color:rgba(191,219,254,.16);border-radius:14px}
+
+    .topbar{
+      height:68px;
+      background:rgba(255,255,255,.97);
+      border-bottom:1px solid var(--border);
+      box-shadow:0 1px 0 rgba(15,23,42,.02);
+    }
+    .org-switcher{color:var(--deep)}
+    .top-search input,.searchbox input{
+      background:#fff;
+      border-color:var(--border);
+      border-radius:11px;
+      transition:border-color .2s,box-shadow .2s,background .2s;
+    }
+    .top-search input:hover,.searchbox input:hover{border-color:var(--border-strong)}
+    .top-search input:focus,.searchbox input:focus{border-color:#60A5FA;box-shadow:var(--focus)}
+    .icon-btn{border-radius:10px;color:#475569}
+    .icon-btn:hover{background:var(--soft);color:var(--primary)}
+    .avatar{background:var(--primary);box-shadow:0 0 0 3px var(--soft)}
+
+    .content{padding:28px 32px 64px}
+    .breadcrumb{margin-bottom:17px}
+    .breadcrumb a:hover{color:var(--ai)}
+    .page-title h2{font-size:28px;color:var(--deep);font-weight:700}
+    .page-title p{max-width:760px}
+    .btn{
+      height:40px;border-radius:10px;border-color:var(--border);
+      color:#334155;background:#fff;box-shadow:0 1px 2px rgba(15,23,42,.03);
+      transition:background .18s,border-color .18s,color .18s,box-shadow .18s,transform .18s
+    }
+    .btn:hover{background:#F8FAFC;border-color:var(--border-strong)}
+    .btn:active{transform:translateY(1px)}
+    .btn-primary{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 5px 14px rgba(30,58,138,.18)}
+    .btn-primary:hover{background:var(--primary-hover);border-color:var(--primary-hover);color:#fff;box-shadow:0 7px 18px rgba(30,58,138,.22)}
+
+    .patient-card,.card,.worklist,.activity{
+      background:var(--surface);
+      border-color:var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow-sm)
+    }
+    .patient-card{padding:18px 20px;position:relative;overflow:hidden}
+    .patient-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--primary)}
+    .patient-avatar{background:var(--soft);color:var(--primary);border:1px solid var(--blue-border);box-shadow:inset 0 0 0 4px #fff}
+    .patient-main h3{color:var(--deep)}
+    .meta-label{color:#64748B;font-weight:600}
+    .meta-value{color:#1E293B}
+
+    .alert{border-radius:14px;box-shadow:0 1px 2px rgba(15,23,42,.02)}
+    .alert-warning{background:#FFF7ED;border-color:#FED7AA}
+    .alert-warning strong{color:#9A3412}
+
+    .section-title{color:var(--deep);font-size:16px}
+    .kpi-grid{gap:12px}
+    .kpi{
+      min-height:132px;border-radius:14px;padding:15px;background:#fff;
+      box-shadow:0 1px 2px rgba(15,23,42,.03);
+      border-color:var(--border)
+    }
+    .kpi:before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:transparent}
+    .kpi:hover{transform:translateY(-2px);border-color:var(--blue-border);box-shadow:var(--shadow)}
+    .kpi.active{border-color:#93C5FD;background:#FBFDFF;box-shadow:0 0 0 3px rgba(37,99,235,.10),var(--shadow-sm)}
+    .kpi.active:before{background:var(--ai)}
+    .kpi-icon{width:34px;height:34px;border-radius:10px}
+    .blue,.purple,.cyan{background:var(--soft);color:var(--ai)}
+    .green{background:#ECFDF5;color:var(--success)}
+    .amber{background:#FFF7ED;color:var(--warning)}
+    .red{background:#FEF2F2;color:var(--danger)}
+    .kpi-value{color:var(--deep);font-size:25px}
+    .kpi-label{font-weight:600;color:#475569}.kpi-helper{font-size:9px;color:#94A3B8;margin-top:3px;line-height:1.35}
+
+    .category-wrap{border-radius:14px;padding:9px;box-shadow:var(--shadow-sm)}
+    .category{border-radius:10px;padding:9px 12px}
+    .category:hover{background:#F1F5F9;color:var(--deep)}
+    .category.active{background:var(--soft);color:var(--primary);box-shadow:inset 0 0 0 1px var(--blue-border)}
+    .category.active .count{background:#DBEAFE;color:var(--primary)}
+
+    .card-head{padding:18px 19px 13px}
+    .card-head h3{color:var(--deep);font-size:15px}
+    .card-body{padding:0 19px 19px}
+    .score-ring{box-shadow:inset 0 0 0 1px rgba(15,23,42,.02)}
+    .score-info h4{font-weight:700}
+    .bar{background:#E8EEF6}
+    .bar span{background:var(--ai)}
+    .decision-note{
+      background:var(--soft);border:1px solid var(--blue-border);color:#1E40AF;
+      border-radius:10px;padding:11px 12px
+    }
+
+    .missing-item{border-radius:11px;background:#fff;transition:border-color .18s,box-shadow .18s}
+    .missing-item:hover{border-color:var(--blue-border);box-shadow:0 4px 14px rgba(15,42,95,.05)}
+    .severity{width:6px;border-radius:999px}
+
+    .toolbar{padding:14px 15px;background:#FCFDFE;border-radius:16px 16px 0 0}
+    .filter-btn{border-radius:10px;background:#fff}
+    .filter-btn:hover{border-color:var(--blue-border);color:var(--primary)}
+    .filter-btn.active{background:var(--soft);border-color:var(--blue-border);color:var(--primary)}
+    .view-toggle{background:#F1F5F9;border-radius:10px;padding:3px}
+    .view-toggle button{border-radius:8px}
+    .view-toggle button.active{background:#fff;color:var(--primary);box-shadow:0 1px 3px rgba(15,23,42,.10)}
+    .bulkbar{background:var(--soft);border-color:var(--blue-border);color:var(--deep)}
+
+    table{border-collapse:separate;border-spacing:0}
+    thead th{background:#F8FAFC;color:#64748B;border-bottom:1px solid var(--border);font-size:9px}
+    tbody td{border-bottom:1px solid #EEF2F7}
+    tbody tr{transition:background .14s}
+    tbody tr:hover{background:#F8FBFF}
+    .file-icon{background:#FEF2F2;color:var(--danger);border:1px solid #FECACA}
+    .file-icon.img,.file-icon.doc{background:var(--soft);color:var(--ai);border-color:var(--blue-border)}
+    .doc-name{color:var(--deep)}
+    .tag{border:1px solid transparent;font-weight:700}
+    .tag-success{background:#ECFDF5;color:#047857;border-color:#A7F3D0}
+    .tag-warning{background:#FFF7ED;color:#B45309;border-color:#FED7AA}
+    .tag-danger{background:#FEF2F2;color:#B91C1C;border-color:#FECACA}
+    .tag-info,.tag-purple{background:var(--soft);color:#1D4ED8;border-color:var(--blue-border)}
+    .tag-neutral{background:#F1F5F9;color:#475569;border-color:#E2E8F0}
+    .related a{color:var(--ai)}
+    .mini-avatar{background:#EAF2FF;color:var(--primary);border:1px solid #DBEAFE}
+    .row-actions button:hover{background:var(--soft);color:var(--primary)}
+    .confidential{color:var(--ai)}
+
+    .doc-card{border-radius:14px;background:#fff;transition:transform .18s,border-color .18s,box-shadow .18s}
+    .doc-card:hover{transform:translateY(-2px);border-color:var(--blue-border);box-shadow:var(--shadow)}
+    .pages button{border-radius:8px}
+    .pages button:hover{border-color:var(--blue-border);color:var(--primary)}
+    .pages button.active{background:var(--primary);border-color:var(--primary)}
+
+    .activity-icon{background:var(--soft);color:var(--ai);border:1px solid var(--blue-border)}
+    .activity-item:hover{background:#FBFDFF}
+
+    .overlay{background:rgba(15,42,95,.52);backdrop-filter:blur(2px)}
+    .drawer{box-shadow:-24px 0 64px rgba(15,42,95,.22)}
+    .drawer-head{background:#fff}
+    .preview{background:#E9EFF7}
+    .preview-toolbar{border:1px solid var(--border)}
+    .paper{box-shadow:0 8px 28px rgba(15,42,95,.16)}
+    .paper-head{border-color:var(--primary)}
+    .paper-logo{color:var(--primary)}
+    .tabs button.active{color:var(--ai);border-color:var(--ai)}
+    .ai-field{background:#FBFDFF;border-color:var(--blue-border)}
+    .ai-field-top span:first-child{color:var(--deep);font-weight:600}
+    .ai-source{color:#64748B}
+
+    .modal{border:1px solid rgba(255,255,255,.6);box-shadow:var(--shadow-lg);border-radius:18px}
+    .modal-head{background:#FBFDFF}
+    .modal-head h3{color:var(--deep)}
+    .dropzone{background:#F8FBFF;border-color:#93C5FD;border-radius:14px}
+    .dropzone:hover,.dropzone.dragover{background:var(--soft);border-color:var(--ai)}
+    .form-group label{color:#334155}
+    .form-group input,.form-group select,.form-group textarea{border-radius:10px;background:#fff}
+    .form-group input:hover,.form-group select:hover,.form-group textarea:hover{border-color:var(--border-strong)}
+    .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#60A5FA;box-shadow:var(--focus)}
+    .upload-progress span{background:var(--ai)}
+
+    .toast{border-radius:14px;border-color:#A7F3D0;box-shadow:var(--shadow-lg)}
+    .toast-icon{background:#ECFDF5;color:var(--success)}
+
+    @media(max-width:980px){
+      .app{grid-template-columns:1fr}
+      .content{padding:22px 18px 48px}
+    }
+
+
+    /* =========================================================
+       LARGE TYPE ACCESSIBILITY SCALE
+       Improved readability for enterprise clinical operations
+       ========================================================= */
+    html{font-size:16px}
+    body{font-size:16px;line-height:1.55}
+
+    /* Enterprise navigation */
+    .brand h1{font-size:18px}
+    .brand p{font-size:12px;line-height:1.4}
+    .nav-label{font-size:12px}
+    .nav-item{font-size:14px;min-height:43px}
+    .nav-badge{font-size:11px;padding:3px 7px}
+    .sidebar-footer strong{font-size:14px}
+    .sidebar-footer p{font-size:13px;line-height:1.6}
+    .avatar{font-size:14px}
+
+    /* Page hierarchy */
+    .breadcrumb{font-size:14px}
+    .page-title h2{font-size:34px;line-height:1.2}
+    .page-title p{font-size:16px;line-height:1.65;max-width:820px}
+    .section-title{font-size:19px;line-height:1.35}
+    .refreshed{font-size:13px}
+
+    /* Controls and buttons */
+    .btn{height:44px;padding:0 16px;font-size:14px}
+    .btn-sm{height:36px;padding:0 12px;font-size:13px}
+    .icon-btn{width:42px;height:42px}
+
+    /* Patient context */
+    .patient-avatar{width:58px;height:58px;font-size:20px}
+    .patient-main h3{font-size:19px}
+    .patient-main p{font-size:14px}
+    .meta-label{font-size:12px}
+    .meta-value{font-size:14px}
+    .alert strong{font-size:14px}
+    .alert p{font-size:13px;line-height:1.65}
+
+    /* KPI cards */
+    .kpi{padding:17px}
+    .kpi-icon{width:36px;height:36px}
+    .kpi-icon i{width:18px;height:18px}
+    .kpi-value{font-size:30px;line-height:1.15}
+    .kpi-label{font-size:14px;line-height:1.4}
+    .kpi-helper,.kpi-delta{font-size:12px;line-height:1.5}
+
+    /* Category navigation */
+    .category{font-size:14px;padding:11px 14px}
+    .count{font-size:12px;padding:3px 7px}
+
+    /* Overview cards */
+    .card-head h3{font-size:18px}
+    .card-head p{font-size:13px;line-height:1.55}
+    .score-content strong{font-size:31px}
+    .score-content span{font-size:11px}
+    .score-info h4{font-size:17px}
+    .score-info p{font-size:13px;line-height:1.6}
+    .prog-top{font-size:12px}
+    .decision-note{font-size:12px;line-height:1.6;padding:12px}
+    .missing-item strong{font-size:14px}
+    .missing-item p{font-size:12px;line-height:1.5}
+
+    /* Search, filters and bulk actions */
+    .searchbox input{height:44px;font-size:14px;padding-left:40px}
+    .searchbox i{top:13px}
+    .filter-btn{height:44px;font-size:14px;padding:0 14px}
+    .view-toggle button{width:36px;height:35px}
+    .chip{font-size:12px;padding:6px 10px}
+    .clear-link{font-size:12px}
+    .bulkbar{font-size:13px;padding:11px 13px}
+
+    /* Document table */
+    thead th{font-size:11px;padding:13px 14px;line-height:1.4}
+    tbody td{font-size:14px;padding:14px;line-height:1.45}
+    .doc-name{font-size:14px;line-height:1.45}
+    .doc-sub{font-size:12px;line-height:1.45}
+    .tag{font-size:12px;padding:5px 9px;line-height:1.3}
+    .file-icon{width:40px;height:45px}
+    .row-actions button{width:34px;height:34px}
+
+    /* Card view */
+    .doc-card{padding:16px}
+    .doc-card h4{font-size:15px;line-height:1.45}
+    .doc-card p{font-size:13px;line-height:1.5}
+    .doc-card-meta span{font-size:12px}
+    .doc-card-meta strong{font-size:13px}
+    .doc-card-foot span{font-size:12px !important}
+    .pagination{font-size:13px}
+    .pages button{width:34px;height:34px;font-size:13px}
+
+    /* Recent activity */
+    .activity-text{font-size:13px;line-height:1.55}
+    .activity-text strong{font-size:14px}
+    .activity-time{font-size:12px}
+
+    /* Preview drawer */
+    .drawer-head h3{font-size:18px}
+    .drawer-head p{font-size:12px}
+    .paper{font-size:13px;line-height:1.6}
+    .paper-logo{font-size:19px}
+    .paper table{font-size:12px}
+    .tabs button{font-size:13px;padding:15px 12px}
+    .detail-section h4{font-size:15px}
+    .field{font-size:13px;padding:8px 0}
+    .ai-field-top{font-size:13px}
+    .ai-field-value{font-size:14px}
+    .ai-source{font-size:11px;line-height:1.45}
+
+    /* Upload modal and forms */
+    .modal-head h3{font-size:19px}
+    .modal-head p{font-size:13px !important}
+    .dropzone strong{font-size:15px}
+    .dropzone p{font-size:13px;line-height:1.55}
+    .form-group label{font-size:13px;margin-bottom:7px}
+    .form-group input,
+    .form-group select,
+    .form-group textarea{font-size:14px;padding:11px 12px;min-height:44px}
+    .form-group textarea{min-height:86px}
+    .queue-info strong{font-size:13px}
+    .queue-info p{font-size:11px}
+
+    /* Notifications */
+    .toast strong{font-size:14px}
+    .toast p{font-size:12px;line-height:1.5}
+
+    @media(max-width:640px){
+      body{font-size:15px}
+      .page-title h2{font-size:28px}
+      .page-title p{font-size:15px}
+      .section-title{font-size:18px}
+      .kpi-value{font-size:27px}
+      .kpi-label{font-size:13px}
+      .patient-main h3{font-size:18px}
+      .meta-label{font-size:11px}
+      .meta-value{font-size:13px}
+    }
+
+
+    /* =========================================================
+       PATIENT DOCUMENT INTELLIGENCE DASHBOARD
+       ========================================================= */
+    .analytics-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
+    .analytics-grid.status-grid{grid-template-columns:minmax(360px,.82fr) minmax(0,1.18fr)}
+    .analytics-card{min-width:0;overflow:hidden}
+    .chart-container{position:relative;width:100%;height:300px;min-height:300px;padding:0 14px 12px}
+    .chart-container.compact{height:260px;min-height:260px}
+    .chart-container.tall{height:350px;min-height:350px}
+    .chart-summary{margin:0 18px 18px;padding:11px 12px;border-radius:10px;background:#F8FAFC;border:1px solid var(--border);font-size:13px;color:#475569;line-height:1.55}
+    .chart-legend{display:grid;gap:9px;padding:0 18px 18px}
+    .legend-row{display:grid;grid-template-columns:12px minmax(0,1fr) auto auto;gap:9px;align-items:center;font-size:13px}
+    .legend-dot{width:10px;height:10px;border-radius:3px}.legend-row strong{color:var(--deep)}.legend-row span:last-child{color:var(--muted)}
+    .chart-card-actions{display:flex;gap:8px;align-items:center}
+    .reset-chart{border:0;background:transparent;color:var(--ai);font-weight:700;font-size:12px;padding:4px 0}
+    .kpi-progress{height:7px;background:#E2E8F0;border-radius:999px;overflow:hidden;margin:10px 0 6px}.kpi-progress span{display:block;height:100%;border-radius:999px;background:var(--ai)}
+    .kpi-context{display:flex;justify-content:space-between;gap:8px;margin-top:8px;font-size:12px;color:#64748B}.kpi-context strong{color:#334155}
+    .priority-section{margin-top:16px}
+    .priority-card{border-left:4px solid transparent}.priority-card[data-severity="critical"]{border-left-color:var(--danger)}.priority-card[data-severity="high"]{border-left-color:var(--warning)}.priority-card[data-severity="medium"]{border-left-color:#EAB308}
+    .priority-card.highlight{box-shadow:0 0 0 3px rgba(37,99,235,.16),var(--shadow);background:#FBFDFF}
+    .priority-meta{display:flex;flex-wrap:wrap;gap:7px;margin-top:7px}.priority-meta span{font-size:11px;padding:4px 7px;border-radius:999px;background:#F1F5F9;color:#475569}
+    .result-status{font-size:13px;color:var(--muted);font-weight:600}
+    .empty-worklist{padding:42px 20px;text-align:center;color:var(--muted);display:none}.empty-worklist.show{display:block}.empty-worklist i{width:30px;color:#94A3B8;margin-bottom:8px}.empty-worklist strong{display:block;color:var(--text);font-size:16px;margin-bottom:4px}
+    .filter-chip-container{padding:0 14px 12px;display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+    .baseline-chip{display:flex;align-items:center;gap:6px;background:#F1F5F9;color:#475569;border:1px solid #E2E8F0;border-radius:999px;padding:6px 10px;font-size:12px}
+    .progress-row{cursor:pointer;padding:7px;border-radius:8px;transition:.18s}.progress-row:hover{background:#F8FAFC}.progress-row.active{background:#EFF6FF;box-shadow:inset 0 0 0 1px #BFDBFE}
+    .linkage-segments{display:flex;height:28px;border-radius:9px;overflow:hidden;margin:10px 18px 16px;background:#E2E8F0}.linkage-segment{border:0;color:white;font-size:11px;font-weight:700;min-width:28px;position:relative}.linkage-segment:focus-visible{outline:3px solid rgba(37,99,235,.35);outline-offset:2px}.seg-claim{background:#1E3A8A}.seg-evidence{background:#2563EB}.seg-required{background:#D97706}.seg-notrequired{background:#94A3B8}
+    .linkage-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;padding:0 18px 18px}.linkage-detail{border:1px solid var(--border);border-radius:10px;padding:10px;background:#fff;cursor:pointer}.linkage-detail:hover{border-color:#93C5FD;background:#FBFDFF}.linkage-detail strong{display:block;font-size:14px;color:var(--deep)}.linkage-detail span{font-size:12px;color:var(--muted)}
+    .ai-disclaimer{margin-top:16px}
+    .chart-error{display:none;height:100%;place-items:center;text-align:center;color:var(--muted);padding:20px}.chart-error.show{display:grid}.chart-error strong{display:block;color:var(--text);margin-bottom:5px}
+    @media(max-width:1180px){.analytics-grid,.analytics-grid.status-grid{grid-template-columns:1fr}.chart-container{height:290px;min-height:290px}}
+    @media(max-width:640px){.chart-container,.chart-container.compact,.chart-container.tall{height:270px;min-height:270px;padding:0 8px 10px}.linkage-details{grid-template-columns:1fr}.legend-row{grid-template-columns:12px minmax(0,1fr) auto}.legend-row span:last-child{display:none}.kpi-context{font-size:11px}}
+    @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark"><i data-lucide="activity"></i></div><div><h1>Med AI NexSure</h1><p>ENTERPRISE HEALTHCARE INTELLIGENCE</p></div></div>
+    <div class="nav-label">Workspace</div>
+    <a class="nav-item" href="#"><i data-lucide="layout-dashboard"></i>Main Dashboard</a>
+    <a class="nav-item active" href="#"><i data-lucide="users"></i>Patient Management</a>
+    <a class="nav-item" href="#"><i data-lucide="stethoscope"></i>Visit Management</a>
+    <a class="nav-item" href="#"><i data-lucide="brain-circuit"></i>AI Copilot</a>
+    <div class="nav-label">Insurance Intelligence</div>
+    <a class="nav-item" href="#"><i data-lucide="shield-check"></i>Claim Readiness <span class="nav-badge">8</span></a>
+    <a class="nav-item" href="#"><i data-lucide="package-check"></i>Evidence Package</a>
+    <a class="nav-item" href="#"><i data-lucide="landmark"></i>Payer Rules</a>
+    <div class="nav-label">Governance</div>
+    <a class="nav-item" href="#"><i data-lucide="clipboard-check"></i>Task Center</a>
+    <a class="nav-item" href="#"><i data-lucide="scroll-text"></i>Audit & Compliance</a>
+    <a class="nav-item" href="#"><i data-lucide="settings"></i>Admin Settings</a>
+    <div class="sidebar-footer"><strong>Bangkok Medical Center</strong><p>Enterprise production workspace<br>เปิดใช้ PDPA และ audit controls</p></div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <button class="icon-btn mobile-menu" aria-label="Open navigation"><i data-lucide="menu"></i></button>
+      <div class="org-switcher"><i data-lucide="building-2" style="width:18px;color:#2563EB"></i> Bangkok Medical Center <i data-lucide="chevron-down" style="width:14px;color:#94A3B8"></i></div>
+      <div class="top-search"><i data-lucide="search"></i><input placeholder="Search patients, visits, claims, or documents..." /></div>
+      <div class="top-actions"><button class="icon-btn" aria-label="AI Copilot"><i data-lucide="sparkles"></i></button><button class="icon-btn" aria-label="Notifications"><i data-lucide="bell"></i></button><div class="avatar">CJ</div></div>
+    </header>
+
+    <div class="content">
+      <nav class="breadcrumb"><a href="#">Patient Management</a><i data-lucide="chevron-right" style="width:12px"></i><a href="#">PT-000124</a><i data-lucide="chevron-right" style="width:12px"></i><span>Patient Documents</span></nav>
+
+      <section class="page-head">
+        <div class="page-title"><h2>Patient Documents</h2><p>Securely manage clinical, insurance, and claim-supporting evidence.<br>จัดการเอกสารผู้ป่วยและหลักฐานประกอบการเคลมอย่างปลอดภัยในจุดเดียว</p></div>
+        <div class="head-actions"><button class="btn"><i data-lucide="ellipsis"></i>More</button><button class="btn btn-primary" onclick="openUpload()"><i data-lucide="upload-cloud"></i>Upload Document</button></div>
+      </section>
+
+      <section class="patient-card">
+        <div class="patient-avatar">KS</div>
+        <div class="patient-main"><h3>Kanokwan Srisuk</h3><p>HN 68-001245 · Patient ID PT-000124</p></div>
+        <div class="patient-meta">
+          <div><div class="meta-label">Date of Birth</div><div class="meta-value">14 Aug 1988 · 37 yrs</div></div>
+          <div><div class="meta-label">Gender</div><div class="meta-value">Female</div></div>
+          <div><div class="meta-label">Primary Payer</div><div class="meta-value">AIA Health Plus</div></div>
+          <div><div class="meta-label">PDPA Consent</div><div class="meta-value status-inline"><i data-lucide="circle-check" style="width:13px"></i>Active</div></div>
+          <div><div class="meta-label">Active Alerts</div><div class="meta-value" style="color:#DC2626">Penicillin Allergy</div></div>
+        </div>
+        <button class="btn btn-sm">View Patient Profile <i data-lucide="arrow-up-right"></i></button>
+      </section>
+
+      <div class="alert alert-warning"><i data-lucide="shield-alert"></i><div><strong>Restricted Access Policy</strong><p>เอกสารจิตเวช พันธุกรรม และข้อมูลอ่อนไหวต้องใช้สิทธิ์เพิ่มเติม ทุกการเปิดดูและดาวน์โหลดจะถูกบันทึกใน Audit Log</p></div></div>
+
+      <div class="kpi-head"><h3 class="section-title">Document Intelligence Overview</h3><span class="refreshed"><i data-lucide="refresh-cw" style="width:11px;vertical-align:middle"></i> Last refreshed 10 Jul 2026, 16:42</span></div>
+      <section class="kpi-grid" id="kpiGrid">
+        <button class="kpi active" data-filter="all"><div class="kpi-icon blue"><i data-lucide="files"></i></div><div class="kpi-value">24</div><div class="kpi-label">Total Documents</div><div class="kpi-helper">เอกสารทั้งหมดใน current patient record</div><div class="kpi-context"><span>Categories</span><strong>9</strong></div><div class="kpi-context"><span>Status</span><strong>Current Record</strong></div></button>
+        <button class="kpi" data-filter="verified"><div class="kpi-icon green"><i data-lucide="badge-check"></i></div><div class="kpi-value">18</div><div class="kpi-label">Verified Documents</div><div class="kpi-helper">ผ่านการตรวจสอบโดยผู้มีสิทธิ์แล้ว</div><div class="kpi-progress"><span style="width:75%;background:#059669"></span></div><div class="kpi-context"><span>Verification Progress</span><strong>75%</strong></div><div class="kpi-context"><span>Pending</span><strong>3</strong></div></button>
+        <button class="kpi" data-filter="pending"><div class="kpi-icon amber"><i data-lucide="clock-3"></i></div><div class="kpi-value">3</div><div class="kpi-label">Pending Review</div><div class="kpi-helper">รอ Human Review ตาม workflow</div><div class="kpi-context"><span>Due Today</span><strong style="color:#D97706">2</strong></div><div class="kpi-context"><span>Operational Status</span><strong>Action Required</strong></div></button>
+        <button class="kpi" data-filter="expiring"><div class="kpi-icon red"><i data-lucide="calendar-clock"></i></div><div class="kpi-value">2</div><div class="kpi-label">Expiring Soon</div><div class="kpi-helper">เอกสารใกล้หมดอายุภายใน 30 วัน</div><div class="kpi-context"><span>Next Expiry</span><strong style="color:#DC2626">22 Jul 2026</strong></div><div class="kpi-context"><span>Status</span><strong>Replacement Required</strong></div></button>
+        <button class="kpi" data-filter="missing"><div class="kpi-icon purple"><i data-lucide="file-warning"></i></div><div class="kpi-value">3</div><div class="kpi-label">Missing Required</div><div class="kpi-helper">เอกสารจำเป็นยังไม่ครบตาม Payer Rule</div><div class="kpi-context"><span>Severity</span><strong>1 Critical · 1 High</strong></div><div class="kpi-context"><span>Claim Impact</span><strong>Review Needed</strong></div></button>
+        <button class="kpi" data-filter="claim"><div class="kpi-icon cyan"><i data-lucide="link-2"></i></div><div class="kpi-value">11</div><div class="kpi-label">Claim Linked</div><div class="kpi-helper">เชื่อมกับ Claim หรือ Evidence Package</div><div class="kpi-progress"><span style="width:46%"></span></div><div class="kpi-context"><span>Coverage</span><strong>46%</strong></div><div class="kpi-context"><span>Evidence Packages</span><strong>3</strong></div></button>
+      </section>
+
+      <section class="category-wrap" id="categories">
+        <button class="category active" data-category="all">All Documents <span class="count">24</span></button>
+        <button class="category" data-category="identity">Identity <span class="count">3</span></button>
+        <button class="category" data-category="insurance">Insurance <span class="count">4</span><span class="warn-dot"></span></button>
+        <button class="category" data-category="clinical">Clinical <span class="count">5</span></button>
+        <button class="category" data-category="laboratory">Laboratory <span class="count">3</span></button>
+        <button class="category" data-category="radiology">Radiology <span class="count">2</span></button>
+        <button class="category" data-category="prescription">Prescription <span class="count">2</span></button>
+        <button class="category" data-category="certificate">Medical Certificate <span class="count">2</span></button>
+        <button class="category" data-category="consent">Consent <span class="count">1</span><span class="warn-dot"></span></button>
+        <button class="category" data-category="claim">Claim Evidence <span class="count">2</span></button>
+      </section>
+
+      <section class="analytics-grid status-grid" aria-label="Document status and completeness analytics">
+        <article class="card analytics-card">
+          <div class="card-head"><div><h3>Document Status Distribution</h3><p>สรุปสัดส่วนสถานะเอกสารทั้งหมดใน current patient record</p></div><button class="reset-chart" type="button" onclick="resetDashboardFilters()">Reset</button></div>
+          <div class="chart-container compact"><canvas id="documentStatusChart" role="img" aria-label="Donut chart showing document status distribution"></canvas><div class="chart-error" id="documentStatusError"><div><strong>Chart unavailable</strong><span>ไม่สามารถแสดงกราฟสถานะเอกสารได้</span></div></div></div>
+          <div class="chart-legend" id="statusLegend"></div>
+          <p class="chart-summary">18 of 24 documents are verified. Three documents are pending review. เอกสารที่ยังไม่ผ่านการตรวจสอบควรได้รับ Human Review ก่อนนำไปใช้</p>
+        </article>
+
+        <article class="card analytics-card">
+          <div class="card-head"><div><h3>Document Completeness</h3><p>Coverage across patient, visit, payer, and compliance requirements</p></div><span class="tag tag-warning"><i data-lucide="triangle-alert"></i>Review Needed</span></div>
+          <div class="card-body">
+            <div class="score-row"><div class="score-ring"><div class="score-content"><strong>78</strong><span>OF 100</span></div></div><div class="score-info"><h4>Review Needed</h4><p>Primary Gap: <strong>Referral Letter Required</strong><br>Potential Score Improvement: <strong>+12 points</strong> after required evidence is verified.</p></div></div>
+            <div class="progress-list">
+              <div class="progress-row" data-category-target="identity"><div class="prog-top"><span>Identity Documents</span><strong>100%</strong></div><div class="bar"><span style="width:100%"></span></div></div>
+              <div class="progress-row" data-category-target="insurance"><div class="prog-top"><span>Insurance Documents</span><strong>72%</strong></div><div class="bar"><span style="width:72%;background:#D97706"></span></div></div>
+              <div class="progress-row" data-category-target="clinical"><div class="prog-top"><span>Clinical Evidence</span><strong>88%</strong></div><div class="bar"><span style="width:88%"></span></div></div>
+              <div class="progress-row" data-category-target="consent"><div class="prog-top"><span>Consent & Claim Support</span><strong>55%</strong></div><div class="bar"><span style="width:55%;background:#DC2626"></span></div></div>
+            </div>
+            <div class="decision-note"><i data-lucide="info"></i><span><strong>Decision Support Only.</strong> คะแนนนี้ใช้เพื่อช่วยจัดลำดับการตรวจสอบ และไม่ถือเป็นการอนุมัติเคลมโดยอัตโนมัติ</span></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="analytics-grid">
+        <article class="card analytics-card"><div class="card-head"><div><h3>Documents by Category</h3><p>เปรียบเทียบจำนวนเอกสารในแต่ละหมวดหมู่</p></div><button class="reset-chart" type="button" onclick="setDashboardFilter('category','all')">Clear category</button></div><div class="chart-container tall"><canvas id="documentCategoryChart" role="img" aria-label="Horizontal bar chart showing documents by category"></canvas><div class="chart-error" id="documentCategoryError"><div><strong>Chart unavailable</strong><span>ไม่สามารถแสดงข้อมูลหมวดหมู่ได้</span></div></div></div><p class="chart-summary">Clinical documents are the largest category. คลิกแท่งกราฟเพื่อกรอง Patient Document Worklist</p></article>
+        <article class="card analytics-card"><div class="card-head"><div><h3>Missing Evidence Priority</h3><p>จัดลำดับเอกสารตามผลกระทบต่อ Claim และ Compliance</p></div><button class="btn btn-sm" type="button" onclick="scrollToPriorityQueue()">View Requirements</button></div><div class="chart-container tall"><canvas id="missingEvidenceChart" role="img" aria-label="Horizontal bar chart showing missing evidence priority impact score"></canvas><div class="chart-error" id="missingEvidenceError"><div><strong>Chart unavailable</strong><span>ไม่สามารถแสดงลำดับความสำคัญได้</span></div></div></div><p class="chart-summary">Priority Impact Score is a workflow weight, not a population frequency. คะแนนใช้สำหรับจัดลำดับงานของผู้ป่วยรายนี้</p></article>
+      </section>
+
+      <section class="analytics-grid">
+        <article class="card analytics-card"><div class="card-head"><div><h3>Document Expiry Risk</h3><p>ติดตามเอกสารใกล้หมดอายุเพื่อป้องกัน claim interruption</p></div><button class="reset-chart" type="button" onclick="setDashboardFilter('expiry','all')">Clear expiry</button></div><div class="chart-container"><canvas id="expiryRiskChart" role="img" aria-label="Horizontal bar chart showing document expiry risk buckets"></canvas><div class="chart-error" id="expiryRiskError"><div><strong>Chart unavailable</strong><span>ไม่สามารถแสดงความเสี่ยงวันหมดอายุได้</span></div></div></div><p class="chart-summary"><strong>Next expiry: 22 Jul 2026.</strong> Replacement Required for the current insurance card.</p></article>
+        <article class="card analytics-card"><div class="card-head"><div><h3>Claim & Evidence Linkage</h3><p>แสดงความเชื่อมโยงระหว่าง Document, Claim และ Evidence Package</p></div><button class="reset-chart" type="button" onclick="setDashboardFilter('linkage','all')">Clear linkage</button></div><div class="linkage-segments" aria-label="Claim and evidence linkage distribution"><button class="linkage-segment seg-claim" style="width:29.17%" onclick="setDashboardFilter('linkage','claim')" title="Linked to Claim: 7 documents">29%</button><button class="linkage-segment seg-evidence" style="width:16.67%" onclick="setDashboardFilter('linkage','evidence')" title="Linked to Evidence Package: 4 documents">17%</button><button class="linkage-segment seg-required" style="width:12.5%" onclick="setDashboardFilter('linkage','required')" title="Linking Required: 3 documents">13%</button><button class="linkage-segment seg-notrequired" style="width:41.66%" onclick="setDashboardFilter('linkage','not-required')" title="Not Required: 10 documents">41%</button></div><div class="linkage-details"><button class="linkage-detail" onclick="setDashboardFilter('linkage','claim')"><strong>7 · Linked to Claim</strong><span>29% of total documents</span></button><button class="linkage-detail" onclick="setDashboardFilter('linkage','evidence')"><strong>4 · Evidence Package</strong><span>17% of total documents</span></button><button class="linkage-detail" onclick="setDashboardFilter('linkage','required')"><strong>3 · Linking Required</strong><span>Action needed</span></button><button class="linkage-detail" onclick="setDashboardFilter('linkage','not-required')"><strong>10 · Not Required</strong><span>Patient-level records</span></button></div><p class="chart-summary">Segments represent mutually exclusive operational states to avoid double-counting.</p></article>
+      </section>
+
+      <section class="analytics-grid">
+        <article class="card analytics-card"><div class="card-head"><div><h3>AI Processing Quality</h3><p>สรุปคุณภาพการอ่านเอกสารโดย AI ก่อน Human Review</p></div><button class="reset-chart" type="button" onclick="setDashboardFilter('aiConfidence','all')">Clear AI filter</button></div><div class="chart-container"><canvas id="aiQualityChart" role="img" aria-label="Horizontal bar chart showing AI confidence buckets"></canvas><div class="chart-error" id="aiQualityError"><div><strong>Chart unavailable</strong><span>ไม่สามารถแสดงคุณภาพ AI processing ได้</span></div></div></div><p class="chart-summary">Low-confidence and unprocessed documents require manual review. ข้อมูลที่ AI อ่านต้องได้รับการยืนยันก่อนใช้งาน</p></article>
+        <article class="card analytics-card"><div class="card-head"><div><h3>Document Processing Timeline</h3><p>Recent upload, verification, and evidence-linking activity</p></div><span class="tag tag-info">Patient-level</span></div><div class="activity-list"><div class="activity-item"><div class="activity-icon"><i data-lucide="upload-cloud"></i></div><div class="activity-text"><strong>Insurance card uploaded</strong><br><span>10 Jul 2026 · AI extraction queued</span></div><div class="activity-time">14:32</div></div><div class="activity-item"><div class="activity-icon"><i data-lucide="badge-check"></i></div><div class="activity-text"><strong>Medical certificate verified</strong><br><span>Human review completed</span></div><div class="activity-time">16:18</div></div><div class="activity-item"><div class="activity-icon"><i data-lucide="package-plus"></i></div><div class="activity-text"><strong>SOAP note linked to Evidence EP-1047</strong><br><span>Claim-supporting evidence updated</span></div><div class="activity-time">13:02</div></div></div><p class="chart-summary">A timeline is used instead of a trend chart because this patient has limited historical periods.</p></article>
+      </section>
+
+      <section class="card priority-section" id="priorityQueue">
+        <div class="card-head"><div><h3>Priority Action Queue</h3><p>Missing documents and evidence prioritized by severity, due date, and claim impact</p></div><button class="btn btn-sm">View All Requirements</button></div>
+        <div class="card-body missing-list">
+          <div class="missing-item priority-card" id="priority-referral" data-severity="critical"><span class="severity sev-critical"></span><div><span class="tag tag-danger">Critical</span><strong style="margin-top:7px">Referral Letter Required</strong><p>Visit VN-260710-0042 · AIA Payer Rule · Due Today</p><div class="priority-meta"><span>Claim Impact: High</span><span>Owner: Unassigned</span><span>Compliance: Required</span></div></div><div class="missing-actions"><button class="btn btn-sm" onclick="openUpload()"><i data-lucide="upload"></i>Upload</button><button class="btn btn-sm"><i data-lucide="user-plus"></i>Assign</button><button class="btn btn-sm"><i data-lucide="clipboard-plus"></i>Create Task</button></div></div>
+          <div class="missing-item priority-card" id="priority-insurance" data-severity="high"><span class="severity sev-high"></span><div><span class="tag tag-warning">High</span><strong style="margin-top:7px">Insurance Card Expiry Alert</strong><p>Patient Record · AIA Health Plus · Expires 22 Jul 2026</p><div class="priority-meta"><span>Claim Impact: Medium</span><span>Owner: Pim S.</span><span>Replacement Required</span></div></div><div class="missing-actions"><button class="btn btn-sm" onclick="openUpload()"><i data-lucide="replace"></i>Replace</button><button class="btn btn-sm" onclick="setDashboardFilter('category','insurance')"><i data-lucide="eye"></i>View</button></div></div>
+          <div class="missing-item priority-card" id="priority-consent" data-severity="medium"><span class="severity sev-medium"></span><div><span class="tag tag-warning">Medium</span><strong style="margin-top:7px">Consent Signature Incomplete</strong><p>Clinic PDPA Policy · Registration Record · Review Required</p><div class="priority-meta"><span>Claim Impact: Medium</span><span>Owner: Registration Team</span><span>PDPA Review</span></div></div><div class="missing-actions"><button class="btn btn-sm" onclick="setDashboardFilter('category','consent')"><i data-lucide="clipboard-pen"></i>Review</button><button class="btn btn-sm"><i data-lucide="user-plus"></i>Assign</button></div></div>
+        </div>
+      </section>
+
+      <section class="overview hidden" aria-hidden="true">
+        <article class="card">
+          <div class="card-head"><div><h3>Document Completeness</h3><p>Coverage across patient, visit, payer, and compliance requirements</p></div><span class="tag tag-warning"><i data-lucide="triangle-alert"></i>Review Needed</span></div>
+          <div class="card-body">
+            <div class="score-row"><div class="score-ring"><div class="score-content"><strong>78</strong><span>OF 100</span></div></div><div class="score-info"><h4>Review Needed</h4><p>พบเอกสารที่ขาดหรือจำเป็นต้องแก้ไข 3 รายการ กรุณาเพิ่ม Referral Letter เพื่อยกระดับความครบถ้วนของหลักฐานเคลม</p></div></div>
+            <div class="progress-list">
+              <div><div class="prog-top"><span>Identity Documents</span><strong>100%</strong></div><div class="bar"><span style="width:100%"></span></div></div>
+              <div><div class="prog-top"><span>Insurance Documents</span><strong>72%</strong></div><div class="bar"><span style="width:72%;background:#D97706"></span></div></div>
+              <div><div class="prog-top"><span>Clinical Evidence</span><strong>88%</strong></div><div class="bar"><span style="width:88%"></span></div></div>
+              <div><div class="prog-top"><span>Consent & Claim Support</span><strong>55%</strong></div><div class="bar"><span style="width:55%;background:#DC2626"></span></div></div>
+            </div>
+            <div class="decision-note"><i data-lucide="info"></i><span><strong>Decision Support Only.</strong> คะแนนนี้ใช้เพื่อช่วยจัดลำดับการตรวจสอบ และไม่ถือเป็นการอนุมัติเคลมโดยอัตโนมัติ</span></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head"><div><h3>Missing Documents & Evidence</h3><p>Prioritized by clinical safety, payer, and compliance rules</p></div><button class="btn btn-sm">View Requirements</button></div>
+          <div class="card-body missing-list">
+            <div class="missing-item"><span class="severity sev-critical"></span><div><strong>Referral Letter Required</strong><p>Visit VN-260710-0042 · AIA Payer Rule · ต้องดำเนินการภายในวันนี้</p></div><div class="missing-actions"><button class="btn btn-sm" onclick="openUpload()"><i data-lucide="upload"></i>Upload</button><button class="btn btn-sm"><i data-lucide="user-plus"></i>Assign</button></div></div>
+            <div class="missing-item"><span class="severity sev-high"></span><div><strong>Insurance Card Expiry Alert</strong><p>Patient-level requirement · หมดอายุ 22 Jul 2026</p></div><div class="missing-actions"><button class="btn btn-sm" onclick="openUpload()"><i data-lucide="replace"></i>Replace</button></div></div>
+            <div class="missing-item"><span class="severity sev-medium"></span><div><strong>Consent Signature Incomplete</strong><p>Clinic PDPA Policy · กรุณาตรวจสอบลายเซ็นใน registration record</p></div><div class="missing-actions"><button class="btn btn-sm"><i data-lucide="clipboard-pen"></i>Review</button></div></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="card worklist">
+        <div class="card-head"><div><h3>Patient Document Worklist</h3><p><span id="visibleResultCount">6</span> visible of 24 documents · แสดงเฉพาะ current version</p></div><div class="view-toggle"><button class="active" id="tableViewBtn" aria-label="Table view"><i data-lucide="list"></i></button><button id="cardViewBtn" aria-label="Card view"><i data-lucide="layout-grid"></i></button></div></div>
+        <div class="toolbar">
+          <div class="searchbox"><i data-lucide="search"></i><input id="docSearch" placeholder="Search document name, number, visit, claim, tag..." /></div>
+          <button class="filter-btn active"><i data-lucide="sliders-horizontal"></i>Filters <span class="count">2</span></button>
+          <button class="filter-btn"><i data-lucide="arrow-up-down"></i>Newest First</button>
+          <button class="filter-btn"><i data-lucide="calendar-range"></i>Date Range</button>
+        </div>
+        <div class="filter-chip-container" id="activeFilterChips"><span class="baseline-chip">Current Version</span><span class="baseline-chip">Not Archived</span><button class="clear-link" type="button" onclick="resetDashboardFilters()">Clear dashboard filters</button></div>
+        <div class="bulkbar hidden" id="bulkbar"><strong><span id="selectedCount">0</span> selected</strong><div class="spacer"></div><button class="btn btn-sm"><i data-lucide="download"></i>Download</button><button class="btn btn-sm"><i data-lucide="package-plus"></i>Add to Evidence</button><button class="btn btn-sm"><i data-lucide="user-check"></i>Assign Reviewer</button><button class="btn btn-sm btn-danger"><i data-lucide="archive"></i>Archive</button></div>
+
+        <div class="table-wrap" id="tableView">
+          <table>
+            <thead><tr><th><input type="checkbox" id="selectAll" aria-label="Select all documents"></th><th>Document</th><th>Category</th><th>Related To</th><th>Status</th><th>Uploaded By</th><th>Uploaded Date</th><th>Expiry Date</th><th>AI Status</th><th>Actions</th></tr></thead>
+            <tbody id="documentRows">
+              <tr data-document-id="DOC-001" data-category="insurance" data-status="pending" data-expiry-bucket="within-30-days" data-linkage-state="claim" data-ai-bucket="medium" data-name="AIA Health Insurance Card"><td><input class="row-check" type="checkbox"></td><td><div class="doc-cell"><div class="file-icon img"><i data-lucide="image"></i></div><div><div class="doc-name">AIA Health Insurance Card <i class="confidential" data-lucide="lock-keyhole"></i></div><div class="doc-sub"><span>JPG · 1.4 MB</span><span>v2 · Current</span></div></div></div></td><td><span class="tag tag-info">Insurance</span></td><td class="related"><div><a href="#">Patient Record</a></div><div>Claim CLM-88214</div></td><td><span class="tag tag-warning"><i data-lucide="clock"></i>Pending Review</span></td><td><div class="user-cell"><span class="mini-avatar">PS</span><span>Pim S.</span></div></td><td>10 Jul 2026<br><small>14:32</small></td><td style="color:#DC2626">22 Jul 2026</td><td><span class="tag tag-purple"><i data-lucide="sparkles"></i>Needs Review</span></td><td><div class="row-actions"><button onclick="openPreviewDocument('AIA Health Insurance Card')" aria-label="Preview Document"><i data-lucide="eye"></i></button><button aria-label="Download"><i data-lucide="download"></i></button><button aria-label="More"><i data-lucide="ellipsis-vertical"></i></button></div></td></tr>
+              <tr data-document-id="DOC-002" data-category="clinical" data-status="verified" data-expiry-bucket="no-expiry" data-linkage-state="evidence" data-ai-bucket="high" data-name="SOAP Note — Respiratory Consultation"><td><input class="row-check" type="checkbox"></td><td><div class="doc-cell"><div class="file-icon"><i data-lucide="file-text"></i></div><div><div class="doc-name">SOAP Note — Respiratory Consultation</div><div class="doc-sub"><span>PDF · 842 KB</span><span>v1 · Current</span></div></div></div></td><td><span class="tag tag-neutral">Clinical</span></td><td class="related"><div><a href="#">VN-260710-0042</a></div><div>Evidence EP-1047</div></td><td><span class="tag tag-success"><i data-lucide="badge-check"></i>Verified</span></td><td><div class="user-cell"><span class="mini-avatar">DR</span><span>Dr. Rachata</span></div></td><td>10 Jul 2026<br><small>11:48</small></td><td>—</td><td><div class="confidence"><span class="tag tag-success">Completed</span><div class="mini-bar"><span style="width:96%"></span></div><small>96%</small></div></td><td><div class="row-actions"><button onclick="openPreviewDocument('SOAP Note — Respiratory Consultation')"><i data-lucide="eye"></i></button><button><i data-lucide="download"></i></button><button><i data-lucide="ellipsis-vertical"></i></button></div></td></tr>
+              <tr data-document-id="DOC-003" data-category="laboratory" data-status="verified" data-expiry-bucket="no-expiry" data-linkage-state="claim" data-ai-bucket="high" data-name="Complete Blood Count Result"><td><input class="row-check" type="checkbox"></td><td><div class="doc-cell"><div class="file-icon"><i data-lucide="file-text"></i></div><div><div class="doc-name">Complete Blood Count Result</div><div class="doc-sub"><span>PDF · 526 KB</span><span>v1 · Current</span></div></div></div></td><td><span class="tag tag-purple">Laboratory</span></td><td class="related"><div><a href="#">VN-260708-0019</a></div><div>Claim CLM-88150</div></td><td><span class="tag tag-success"><i data-lucide="badge-check"></i>Verified</span></td><td><div class="user-cell"><span class="mini-avatar">SYS</span><span>Lab System</span></div></td><td>08 Jul 2026<br><small>16:05</small></td><td>—</td><td><div class="confidence"><span class="tag tag-success">Completed</span><div class="mini-bar"><span style="width:99%"></span></div><small>99%</small></div></td><td><div class="row-actions"><button onclick="openPreviewDocument('Complete Blood Count Result')"><i data-lucide="eye"></i></button><button><i data-lucide="download"></i></button><button><i data-lucide="ellipsis-vertical"></i></button></div></td></tr>
+              <tr data-document-id="DOC-004" data-category="identity" data-status="verified" data-expiry-bucket="more-than-90-days" data-linkage-state="not-required" data-ai-bucket="high" data-name="Thai National ID Card"><td><input class="row-check" type="checkbox"></td><td><div class="doc-cell"><div class="file-icon img"><i data-lucide="image"></i></div><div><div class="doc-name">Thai National ID Card <i class="confidential" data-lucide="lock-keyhole"></i></div><div class="doc-sub"><span>PNG · 2.1 MB</span><span>v3 · Current</span></div></div></div></td><td><span class="tag tag-info">Identity</span></td><td class="related"><div><a href="#">Patient Record</a></div><div>Registration</div></td><td><span class="tag tag-success"><i data-lucide="badge-check"></i>Verified</span></td><td><div class="user-cell"><span class="mini-avatar">NK</span><span>Nalin K.</span></div></td><td>04 Jun 2026<br><small>09:21</small></td><td>14 Aug 2030</td><td><div class="confidence"><span class="tag tag-success">Completed</span><div class="mini-bar"><span style="width:98%"></span></div><small>98%</small></div></td><td><div class="row-actions"><button onclick="openPreviewDocument('Thai National ID Card')"><i data-lucide="eye"></i></button><button><i data-lucide="download"></i></button><button><i data-lucide="ellipsis-vertical"></i></button></div></td></tr>
+              <tr data-document-id="DOC-005" data-category="consent" data-status="correction" data-expiry-bucket="no-expiry" data-linkage-state="required" data-ai-bucket="medium" data-name="PDPA Treatment Consent Form"><td><input class="row-check" type="checkbox"></td><td><div class="doc-cell"><div class="file-icon"><i data-lucide="file-text"></i></div><div><div class="doc-name">PDPA Treatment Consent Form</div><div class="doc-sub"><span>PDF · 633 KB</span><span>v1 · Current</span></div></div></div></td><td><span class="tag tag-neutral">Consent</span></td><td class="related"><div><a href="#">Patient Record</a></div><div>Registration</div></td><td><span class="tag tag-warning"><i data-lucide="circle-alert"></i>Correction Requested</span></td><td><div class="user-cell"><span class="mini-avatar">PS</span><span>Pim S.</span></div></td><td>04 Jun 2026<br><small>09:19</small></td><td>—</td><td><span class="tag tag-purple"><i data-lucide="sparkles"></i>Needs Review</span></td><td><div class="row-actions"><button onclick="openPreviewDocument('PDPA Treatment Consent Form')"><i data-lucide="eye"></i></button><button><i data-lucide="download"></i></button><button><i data-lucide="ellipsis-vertical"></i></button></div></td></tr>
+              <tr data-document-id="DOC-006" data-category="certificate" data-status="verified" data-expiry-bucket="no-expiry" data-linkage-state="evidence" data-ai-bucket="high" data-name="Medical Certificate — 10 Jul 2026"><td><input class="row-check" type="checkbox"></td><td><div class="doc-cell"><div class="file-icon"><i data-lucide="file-text"></i></div><div><div class="doc-name">Medical Certificate — 10 Jul 2026</div><div class="doc-sub"><span>PDF · 384 KB</span><span>v1 · Current</span></div></div></div></td><td><span class="tag tag-info">Medical Certificate</span></td><td class="related"><div><a href="#">VN-260710-0042</a></div><div>Evidence EP-1047</div></td><td><span class="tag tag-success"><i data-lucide="badge-check"></i>Verified</span></td><td><div class="user-cell"><span class="mini-avatar">DR</span><span>Dr. Rachata</span></div></td><td>10 Jul 2026<br><small>12:04</small></td><td>—</td><td><div class="confidence"><span class="tag tag-success">Completed</span><div class="mini-bar"><span style="width:94%"></span></div><small>94%</small></div></td><td><div class="row-actions"><button onclick="openPreviewDocument('Medical Certificate — 10 Jul 2026')"><i data-lucide="eye"></i></button><button><i data-lucide="download"></i></button><button><i data-lucide="ellipsis-vertical"></i></button></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="empty-worklist" id="emptyWorklist"><i data-lucide="file-search"></i><strong>No documents match the selected filters</strong><span>กรุณาล้างตัวกรองหรือปรับเงื่อนไขการค้นหา</span></div>
+
+        <div class="card-grid hidden" id="cardView"></div>
+        <div class="pagination"><span>Showing 1–6 of 24 documents · แสดง 6 รายการต่อหน้า</span><div class="pages"><button><i data-lucide="chevron-left" style="width:14px"></i></button><button class="active">1</button><button>2</button><button>3</button><button>4</button><button><i data-lucide="chevron-right" style="width:14px"></i></button></div></div>
+      </section>
+
+      <section class="card activity">
+        <div class="card-head"><div><h3>Recent Activity</h3><p>Document access and change events within your authorized scope</p></div><button class="btn btn-sm">Open Audit Log <i data-lucide="arrow-up-right"></i></button></div>
+        <div class="activity-list">
+          <div class="activity-item"><div class="activity-icon"><i data-lucide="badge-check"></i></div><div class="activity-text"><strong>Dr. Rachata verified “Medical Certificate — 10 Jul 2026”</strong><br><span>Related to VN-260710-0042 · Verification completed · ตรวจสอบเอกสารสำเร็จ</span></div><div class="activity-time">Today<br>16:18</div></div>
+          <div class="activity-item"><div class="activity-icon"><i data-lucide="sparkles"></i></div><div class="activity-text"><strong>AI extraction completed for “AIA Health Insurance Card”</strong><br><span>8 fields extracted · Overall confidence 87% · กรุณาตรวจสอบก่อนใช้งาน</span></div><div class="activity-time">Today<br>14:34</div></div>
+          <div class="activity-item"><div class="activity-icon"><i data-lucide="package-plus"></i></div><div class="activity-text"><strong>Pim S. added “SOAP Note — Respiratory Consultation” to Evidence Package</strong><br><span>Evidence EP-1047 · Claim CLM-88214</span></div><div class="activity-time">Today<br>13:02</div></div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeAll()"></div>
+
+<aside class="drawer" id="previewDrawer" aria-label="Document preview">
+  <div class="drawer-head"><div class="file-icon"><i data-lucide="file-text"></i></div><div><h3 id="previewTitle">AIA Health Insurance Card</h3><p>Current Version v2 · Confidential document</p></div><button class="icon-btn close" onclick="closeAll()" aria-label="Close preview"><i data-lucide="x"></i></button></div>
+  <div class="drawer-body">
+    <div class="preview"><div class="preview-toolbar"><button aria-label="Previous page"><i data-lucide="chevron-left"></i></button><button>1 / 1</button><button aria-label="Next page"><i data-lucide="chevron-right"></i></button><button aria-label="Zoom out"><i data-lucide="zoom-out"></i></button><button aria-label="Zoom in"><i data-lucide="zoom-in"></i></button><button aria-label="Rotate"><i data-lucide="rotate-cw"></i></button><button aria-label="Full screen"><i data-lucide="maximize"></i></button></div><div class="paper"><div class="paper-head"><div class="paper-logo">AIA HEALTH PLUS</div><div>Health Insurance Membership Card</div></div><p><strong>Member Name:</strong> Kanokwan Srisuk</p><p><strong>Policy Number:</strong> HP-8821-45903</p><table><tr><td>Plan</td><td>Health Plus Platinum</td></tr><tr><td>Effective Date</td><td>23 July 2025</td></tr><tr><td>Expiry Date</td><td>22 July 2026</td></tr><tr><td>Network</td><td>Nationwide Cashless</td></tr></table><p style="margin-top:18px;color:#64748B">Preview Document for demonstration only. เอกสารลับใน Production อาจแสดง dynamic watermark และ access trace</p></div></div>
+    <div class="detail-panel"><div class="tabs"><button class="active">Metadata</button><button>AI Extraction</button><button>Related</button><button>History</button></div><div class="panel-content">
+      <div class="detail-section"><h4>Document Governance Status</h4><div class="field"><span>Verification</span><span class="tag tag-warning">Pending Review</span></div><div class="field"><span>AI Processing</span><span class="tag tag-purple">Needs Review</span></div><div class="field"><span>Confidentiality</span><strong>Confidential</strong></div></div>
+      <div class="detail-section"><h4>Metadata</h4><div class="field"><span>Category</span><strong>Insurance</strong></div><div class="field"><span>Document Number</span><strong>HP-8821-45903</strong></div><div class="field"><span>Issuing Organization</span><strong>AIA Thailand</strong></div><div class="field"><span>Expiry Date</span><strong style="color:#DC2626">22 Jul 2026</strong></div><div class="field"><span>Uploaded By</span><strong>Pim S.</strong></div><div class="field"><span>Uploaded At</span><strong>10 Jul 2026, 14:32</strong></div></div>
+      <div class="detail-section"><h4>AI Extraction Fields</h4><div class="ai-field"><div class="ai-field-top"><span>Policy Number</span><strong style="color:#059669">98%</strong></div><div class="ai-field-value">HP-8821-45903</div><div class="ai-source">Source: Page 1 · Member information area</div></div><div class="ai-field"><div class="ai-field-top"><span>Expiry Date</span><strong style="color:#D97706">82%</strong></div><div class="ai-field-value">22 July 2026</div><div class="ai-source">Source: Page 1 · Coverage period table</div></div></div>
+      <div class="decision-note"><i data-lucide="sparkles"></i><span>AI-generated data requires human review. กรุณาตรวจสอบข้อมูลจากเอกสารก่อนใช้ในงานรักษา การเคลม หรือการตัดสินใจ</span></div>
+    </div></div>
+  </div>
+  <div class="drawer-foot"><button class="btn"><i data-lucide="download"></i>Download</button><button class="btn"><i data-lucide="message-square-warning"></i>Request Correction</button><button class="btn btn-primary"><i data-lucide="badge-check"></i>Verify Document</button></div>
+</aside>
+
+<div class="modal" id="uploadModal" role="dialog" aria-modal="true" aria-labelledby="uploadTitle">
+  <div class="modal-head"><div><h3 id="uploadTitle">Upload Patient Document</h3><p style="font-size:10px;color:#64748B;margin:4px 0 0">Kanokwan Srisuk · HN 68-001245</p></div><button class="icon-btn" onclick="closeAll()"><i data-lucide="x"></i></button></div>
+  <div class="modal-body">
+    <div class="dropzone" id="dropzone"><i data-lucide="cloud-upload"></i><strong>Drop files here or select from your device</strong><p>รองรับ PDF, JPG, JPEG, PNG และ DOCX · ขนาดสูงสุด 20 MB ต่อไฟล์</p><button class="btn btn-sm" onclick="document.getElementById('fileInput').click()"><i data-lucide="folder-open"></i>Select Files</button><input id="fileInput" type="file" accept=".pdf,.jpg,.jpeg,.png,.docx" multiple hidden></div>
+    <div class="upload-queue" id="uploadQueue"><div class="queue-file"><div class="file-icon"><i data-lucide="file-text"></i></div><div class="queue-info"><strong id="queueName">referral-letter.pdf</strong><p id="queueMeta">1.8 MB · พร้อมอัปโหลด</p><div class="upload-progress"><span id="progressBar"></span></div></div><button class="icon-btn"><i data-lucide="x"></i></button></div></div>
+    <div class="form-grid">
+      <div class="form-group span-2"><label>Document Name *</label><input id="documentName" value="Referral Letter — Pulmonology" /></div>
+      <div class="form-group"><label>Document Category *</label><select><option>Referral</option><option>Identity</option><option>Insurance</option><option>Clinical</option><option>Laboratory</option><option>Claim Evidence</option></select></div>
+      <div class="form-group"><label>Document Type *</label><select><option>Referral Letter</option><option>Insurance Card</option><option>Lab Result</option><option>Medical Certificate</option></select></div>
+      <div class="form-group"><label>Related Visit</label><select><option>VN-260710-0042 · Respiratory consultation</option><option>VN-260708-0019 · Follow-up</option></select></div>
+      <div class="form-group"><label>Related Claim</label><select><option>CLM-88214 · AIA Health Plus</option><option>Not linked</option></select></div>
+      <div class="form-group"><label>Document Date</label><input type="date" value="2026-07-10" /></div>
+      <div class="form-group"><label>Expiry Date</label><input type="date" /></div>
+      <div class="form-group"><label>Confidentiality Level *</label><select><option>Standard</option><option>Sensitive</option><option>Confidential</option><option>Restricted</option></select></div>
+      <div class="form-group"><label>Issuing Organization</label><input placeholder="Hospital, insurer or laboratory" /></div>
+      <div class="form-group span-2"><label>Notes</label><textarea placeholder="Add optional reviewer context or operational notes..."></textarea></div>
+    </div>
+    <div class="decision-note"><i data-lucide="shield-check"></i><span>ไฟล์จะถูกตรวจสอบประเภท ขนาด และความปลอดภัยก่อนจัดเก็บใน private storage พร้อมบันทึก Audit Log ตามนโยบายองค์กร</span></div>
+  </div>
+  <div class="modal-foot"><button class="btn" onclick="closeAll()">Cancel</button><button class="btn btn-primary" onclick="simulateUpload()"><i data-lucide="upload-cloud"></i>Upload Document</button></div>
+</div>
+
+<div class="toast" id="toast"><div class="toast-icon"><i data-lucide="check"></i></div><div><strong>Document Uploaded Successfully</strong><p>เอกสารถูกส่งเข้าคิว AI classification และรอ Human Review แล้ว</p></div></div>
+
+<script>
+  const patientDocumentDashboardData = {
+    summary:{total:24,verified:18,pending:3,expiring:2,missing:3,claimLinked:11},
+    statusDistribution:[
+      {label:'Verified',value:18,status:'verified',color:'#059669'},
+      {label:'Pending Review',value:3,status:'pending',color:'#D97706'},
+      {label:'Correction Requested',value:1,status:'correction',color:'#7C3AED'},
+      {label:'Expiring Soon',value:2,status:'expiring',color:'#DC2626'}
+    ],
+    categories:[
+      {label:'Clinical',key:'clinical',value:5},{label:'Insurance',key:'insurance',value:4},{label:'Identity',key:'identity',value:3},{label:'Laboratory',key:'laboratory',value:3},{label:'Radiology',key:'radiology',value:2},{label:'Prescription',key:'prescription',value:2},{label:'Medical Certificate',key:'certificate',value:2},{label:'Claim Evidence',key:'claim',value:2},{label:'Consent',key:'consent',value:1}
+    ],
+    missingEvidence:[
+      {label:'Referral Letter',value:5,target:'priority-referral'},{label:'Consent Signature',value:4,target:'priority-consent'},{label:'Insurance Card',value:3,target:'priority-insurance'},{label:'Medical Certificate',value:2,target:null},{label:'Lab Result',value:1,target:null}
+    ],
+    expiry:[
+      {label:'Expired',value:0,key:'expired'},{label:'Within 7 Days',value:1,key:'within-7-days'},{label:'Within 30 Days',value:1,key:'within-30-days'},{label:'Within 90 Days',value:2,key:'within-90-days'},{label:'More than 90 Days',value:5,key:'more-than-90-days'},{label:'No Expiry',value:15,key:'no-expiry'}
+    ],
+    aiQuality:[
+      {label:'High Confidence ≥ 90%',value:15,key:'high'},{label:'Medium Confidence 70–89%',value:5,key:'medium'},{label:'Low Confidence < 70%',value:2,key:'low'},{label:'Not Processed',value:2,key:'not-processed'}
+    ]
+  };
+
+  const dashboardState={status:'all',category:'all',expiry:'all',linkage:'all',aiConfidence:'all',search:''};
+  const chartInstances={};
+  let lastFocusedElement=null;
+
+  function safeCreateIcons(){ if(window.lucide){ lucide.createIcons(); } }
+  function openUpload(){ lastFocusedElement=document.activeElement; document.getElementById('overlay').classList.add('show'); document.getElementById('uploadModal').classList.add('show'); setTimeout(()=>document.getElementById('documentName').focus(),200); }
+  function openPreviewDocument(name){ lastFocusedElement=document.activeElement; document.getElementById('previewTitle').textContent=name; document.getElementById('overlay').classList.add('show'); document.getElementById('previewDrawer').classList.add('show'); setTimeout(()=>document.querySelector('#previewDrawer .close').focus(),150); }
+  function closeAll(){ document.getElementById('overlay').classList.remove('show'); document.getElementById('previewDrawer').classList.remove('show'); document.getElementById('uploadModal').classList.remove('show'); if(lastFocusedElement && typeof lastFocusedElement.focus==='function') lastFocusedElement.focus(); }
+  function scrollToWorklist(){ document.querySelector('.worklist').scrollIntoView({behavior:'smooth',block:'start'}); }
+  function scrollToPriorityQueue(){ document.getElementById('priorityQueue').scrollIntoView({behavior:'smooth',block:'center'}); }
+  function highlightPriority(targetId){ document.querySelectorAll('.priority-card').forEach(el=>el.classList.remove('highlight')); if(!targetId)return; const el=document.getElementById(targetId); if(el){ el.classList.add('highlight'); el.scrollIntoView({behavior:'smooth',block:'center'}); setTimeout(()=>el.classList.remove('highlight'),2600); } }
+
+  function setDashboardFilter(key,value,scroll=true){
+    dashboardState[key]=value;
+    if(key==='category') syncCategoryState();
+    applyDashboardFilters();
+    syncKpiState();
+    if(scroll) scrollToWorklist();
+  }
+  function resetDashboardFilters(){ Object.assign(dashboardState,{status:'all',category:'all',expiry:'all',linkage:'all',aiConfidence:'all',search:''}); const search=document.getElementById('docSearch'); if(search)search.value=''; syncCategoryState(); syncKpiState(); applyDashboardFilters(); }
+  function rowMatches(row){
+    const statusMatch=dashboardState.status==='all' || (dashboardState.status==='expiring' ? ['within-7-days','within-30-days'].includes(row.dataset.expiryBucket) : row.dataset.status===dashboardState.status);
+    const categoryMatch=dashboardState.category==='all'||row.dataset.category===dashboardState.category;
+    const expiryMatch=dashboardState.expiry==='all'||row.dataset.expiryBucket===dashboardState.expiry;
+    const linkageMatch=dashboardState.linkage==='all'||row.dataset.linkageState===dashboardState.linkage;
+    const aiMatch=dashboardState.aiConfidence==='all'||row.dataset.aiBucket===dashboardState.aiConfidence;
+    const searchMatch=!dashboardState.search||row.innerText.toLowerCase().includes(dashboardState.search);
+    return statusMatch&&categoryMatch&&expiryMatch&&linkageMatch&&aiMatch&&searchMatch;
+  }
+  function applyDashboardFilters(){
+    const rows=[...document.querySelectorAll('#documentRows tr')]; let visible=0;
+    rows.forEach(row=>{ const show=rowMatches(row); row.style.display=show?'':'none'; if(show)visible++; });
+    document.getElementById('visibleResultCount').textContent=visible;
+    document.getElementById('emptyWorklist').classList.toggle('show',visible===0);
+    document.getElementById('tableView').classList.toggle('hidden',visible===0 && !document.getElementById('cardViewBtn').classList.contains('active'));
+    updateActiveFilterChips(); buildCards(); updateBulk();
+  }
+  function updateActiveFilterChips(){
+    const box=document.getElementById('activeFilterChips');
+    box.innerHTML='<span class="baseline-chip">Current Version</span><span class="baseline-chip">Not Archived</span>';
+    const labels={status:'Status',category:'Category',expiry:'Expiry',linkage:'Linkage',aiConfidence:'AI Confidence'};
+    Object.entries(labels).forEach(([key,label])=>{ const value=dashboardState[key]; if(value!=='all'){ const chip=document.createElement('span'); chip.className='chip'; chip.innerHTML=`${label}: ${formatFilterValue(value)} <button type="button" aria-label="Remove ${label} filter"><i data-lucide="x" style="width:12px"></i></button>`; chip.querySelector('button').onclick=()=>setDashboardFilter(key,'all',false); box.appendChild(chip); } });
+    if(dashboardState.search){ const chip=document.createElement('span'); chip.className='chip'; chip.innerHTML=`Search: ${escapeHtml(dashboardState.search)} <button type="button" aria-label="Clear search"><i data-lucide="x" style="width:12px"></i></button>`; chip.querySelector('button').onclick=()=>{dashboardState.search='';document.getElementById('docSearch').value='';applyDashboardFilters()}; box.appendChild(chip); }
+    const clear=document.createElement('button'); clear.className='clear-link'; clear.type='button'; clear.textContent='Clear dashboard filters'; clear.onclick=resetDashboardFilters; box.appendChild(clear); safeCreateIcons();
+  }
+  function formatFilterValue(value){ return value.split('-').map(x=>x.charAt(0).toUpperCase()+x.slice(1)).join(' '); }
+  function escapeHtml(text){ const div=document.createElement('div'); div.textContent=text; return div.innerHTML; }
+  function syncKpiState(){ document.querySelectorAll('.kpi').forEach(k=>{ const f=k.dataset.filter; const active=(f==='all'&&dashboardState.status==='all'&&dashboardState.expiry==='all'&&dashboardState.linkage==='all')||(f===dashboardState.status)||(f==='expiring'&&dashboardState.status==='expiring')||(f==='claim'&&dashboardState.linkage!=='all'); k.classList.toggle('active',active); }); }
+  function syncCategoryState(){ document.querySelectorAll('.category').forEach(c=>c.classList.toggle('active',c.dataset.category===dashboardState.category)); document.querySelectorAll('.progress-row').forEach(r=>r.classList.toggle('active',r.dataset.categoryTarget===dashboardState.category)); }
+
+  function initializeCharts(){
+    if(!window.Chart){ ['documentStatus','documentCategory','missingEvidence','expiryRisk','aiQuality'].forEach(id=>document.getElementById(id+'Error')?.classList.add('show')); return; }
+    Chart.defaults.font.family='Inter, Noto Sans Thai, sans-serif'; Chart.defaults.color='#64748B';
+    createStatusChart(); createCategoryChart(); createMissingChart(); createExpiryChart(); createAiChart(); renderStatusLegend();
+  }
+  function makeChart(id,config,errorId){ try{ if(chartInstances[id])chartInstances[id].destroy(); const canvas=document.getElementById(id); if(!canvas)throw new Error('Canvas not found'); chartInstances[id]=new Chart(canvas,config); }catch(error){ console.error('Chart initialization failed:',id,error); document.getElementById(errorId)?.classList.add('show'); } }
+  function createStatusChart(){ const d=patientDocumentDashboardData.statusDistribution; makeChart('documentStatusChart',{type:'doughnut',data:{labels:d.map(x=>x.label),datasets:[{data:d.map(x=>x.value),backgroundColor:d.map(x=>x.color),borderColor:'#FFFFFF',borderWidth:3,hoverOffset:5}]},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>{const value=ctx.raw,total=d.reduce((a,b)=>a+b.value,0);return `${ctx.label}: ${value} documents · ${(value/total*100).toFixed(1)}%`;}}}},onClick:(evt,elements)=>{if(!elements.length)return;const item=d[elements[0].index];if(item.status==='expiring'){dashboardState.status='expiring'}else dashboardState.status=item.status;applyDashboardFilters();syncKpiState();scrollToWorklist();}}},'documentStatusError'); }
+  function createCategoryChart(){ const d=patientDocumentDashboardData.categories; makeChart('documentCategoryChart',{type:'bar',data:{labels:d.map(x=>x.label),datasets:[{label:'Documents',data:d.map(x=>x.value),backgroundColor:d.map(x=>x.key===dashboardState.category?'#0F2A5F':'#2563EB'),borderRadius:7,barThickness:18}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,scales:{x:{beginAtZero:true,ticks:{stepSize:1,precision:0},grid:{color:'#E2E8F0'}},y:{grid:{display:false},ticks:{color:'#334155'}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw} documents`}}},onClick:(evt,elements)=>{if(!elements.length)return;setDashboardFilter('category',d[elements[0].index].key);}}},'documentCategoryError'); }
+  function createMissingChart(){ const d=patientDocumentDashboardData.missingEvidence; makeChart('missingEvidenceChart',{type:'bar',data:{labels:d.map(x=>x.label),datasets:[{label:'Priority Impact Score',data:d.map(x=>x.value),backgroundColor:['#DC2626','#D97706','#EAB308','#2563EB','#94A3B8'],borderRadius:7,barThickness:20}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,scales:{x:{beginAtZero:true,max:5,ticks:{stepSize:1},title:{display:true,text:'Priority Impact Score'},grid:{color:'#E2E8F0'}},y:{grid:{display:false},ticks:{color:'#334155'}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`Priority Impact Score: ${ctx.raw}`}}},onClick:(evt,elements)=>{if(!elements.length)return;highlightPriority(d[elements[0].index].target);}}},'missingEvidenceError'); }
+  function createExpiryChart(){ const d=patientDocumentDashboardData.expiry; makeChart('expiryRiskChart',{type:'bar',data:{labels:d.map(x=>x.label),datasets:[{label:'Documents',data:d.map(x=>x.value),backgroundColor:['#DC2626','#EA580C','#D97706','#F59E0B','#2563EB','#94A3B8'],borderRadius:7,barThickness:17}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,scales:{x:{beginAtZero:true,ticks:{stepSize:1},grid:{color:'#E2E8F0'}},y:{grid:{display:false},ticks:{color:'#334155'}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw} documents`}}},onClick:(evt,elements)=>{if(!elements.length)return;setDashboardFilter('expiry',d[elements[0].index].key);}}},'expiryRiskError'); }
+  function createAiChart(){ const d=patientDocumentDashboardData.aiQuality; makeChart('aiQualityChart',{type:'bar',data:{labels:d.map(x=>x.label),datasets:[{label:'Documents',data:d.map(x=>x.value),backgroundColor:['#059669','#D97706','#DC2626','#94A3B8'],borderRadius:7,barThickness:20}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,scales:{x:{beginAtZero:true,ticks:{stepSize:1},grid:{color:'#E2E8F0'}},y:{grid:{display:false},ticks:{color:'#334155'}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw} documents`}}},onClick:(evt,elements)=>{if(!elements.length)return;setDashboardFilter('aiConfidence',d[elements[0].index].key);}}},'aiQualityError'); }
+  function renderStatusLegend(){ const total=24,box=document.getElementById('statusLegend'); box.innerHTML=''; patientDocumentDashboardData.statusDistribution.forEach(item=>{ const row=document.createElement('button'); row.type='button'; row.className='legend-row'; row.style.border='0';row.style.background='transparent';row.style.textAlign='left';row.style.cursor='pointer'; row.innerHTML=`<span class="legend-dot" style="background:${item.color}"></span><strong>${item.label}</strong><span>${item.value}</span><span>${(item.value/total*100).toFixed(1)}%</span>`; row.onclick=()=>{dashboardState.status=item.status==='expiring'?'expiring':item.status;applyDashboardFilters();syncKpiState();scrollToWorklist()}; box.appendChild(row); }); }
+
+  function buildCards(){ const cardView=document.getElementById('cardView'); cardView.innerHTML=''; [...document.querySelectorAll('#documentRows tr')].filter(r=>r.style.display!=='none').forEach(r=>{ const cells=r.querySelectorAll('td'),name=r.querySelector('.doc-name').textContent.trim(),cat=cells[2].innerText.trim(),status=cells[4].innerText.trim(),date=cells[6].innerText.trim(); const card=document.createElement('article'); card.className='doc-card'; card.innerHTML=`<div class="doc-card-top"><div class="file-icon"><i data-lucide="file-text"></i></div><span class="tag tag-${status.includes('Verified')?'success':'warning'}">${status}</span></div><h4>${escapeHtml(name)}</h4><p>${escapeHtml(r.querySelector('.doc-sub').innerText)}</p><div class="doc-card-meta"><div><span>Category</span><strong>${escapeHtml(cat)}</strong></div><div><span>Uploaded</span><strong>${escapeHtml(date)}</strong></div><div><span>Linkage</span><strong>${formatFilterValue(r.dataset.linkageState)}</strong></div><div><span>AI Confidence</span><strong>${formatFilterValue(r.dataset.aiBucket)}</strong></div></div><div class="doc-card-foot"><span>Current Version</span><button class="btn btn-sm">Preview Document</button></div>`; card.querySelector('button').onclick=()=>openPreviewDocument(name); cardView.appendChild(card); }); safeCreateIcons(); }
+  function updateBulk(){ const visibleChecks=[...document.querySelectorAll('.row-check')].filter(c=>c.closest('tr').style.display!=='none'),n=visibleChecks.filter(c=>c.checked).length,selectAll=document.getElementById('selectAll'); document.getElementById('selectedCount').textContent=n; document.getElementById('bulkbar').classList.toggle('hidden',n===0); selectAll.indeterminate=n>0&&n<visibleChecks.length; selectAll.checked=visibleChecks.length>0&&n===visibleChecks.length; }
+
+  function setFile(file){ if(!file)return; const allowed=['application/pdf','image/jpeg','image/png','application/vnd.openxmlformats-officedocument.wordprocessingml.document']; if(file.size>20*1024*1024){showToast('Upload Validation','File exceeds 20 MB. ไฟล์มีขนาดเกินที่กำหนด',false);return;} if(file.type&&!allowed.includes(file.type)){showToast('Upload Validation','Unsupported file type. กรุณาเลือก PDF, JPG, PNG หรือ DOCX',false);return;} document.getElementById('queueName').textContent=file.name;document.getElementById('queueMeta').textContent=(file.size/1024/1024).toFixed(1)+' MB · พร้อมอัปโหลด';document.getElementById('uploadQueue').classList.add('show');document.getElementById('documentName').value=file.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' '); }
+  function simulateUpload(){ const name=document.getElementById('documentName').value.trim(); if(!name){showToast('Validation Required','Document Name is required. กรุณาระบุชื่อเอกสาร',false);document.getElementById('documentName').focus();return;} const queue=document.getElementById('uploadQueue'); queue.classList.add('show'); let p=0,bar=document.getElementById('progressBar'),meta=document.getElementById('queueMeta'); const timer=setInterval(()=>{p+=20;bar.style.width=p+'%';meta.textContent=p<100?`กำลังอัปโหลดอย่างปลอดภัย... ${p}%`:'อัปโหลดสำเร็จ · เข้าคิว AI processing แล้ว';if(p>=100){clearInterval(timer);setTimeout(()=>{closeAll();showToast('Document Uploaded Successfully','เอกสารถูกส่งเข้าคิว AI classification และรอ Human Review แล้ว',true)},350)}},180); }
+  function showToast(title,message,success=true){ const toast=document.getElementById('toast');toast.querySelector('strong').textContent=title;toast.querySelector('p').textContent=message;toast.querySelector('.toast-icon').style.background=success?'#ECFDF5':'#FEF2F2';toast.querySelector('.toast-icon').style.color=success?'#059669':'#DC2626';toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),3600); }
+
+  document.addEventListener('DOMContentLoaded',()=>{
+    safeCreateIcons(); initializeCharts(); buildCards(); updateActiveFilterChips();
+    document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll()});
+    document.querySelectorAll('.kpi').forEach(k=>k.addEventListener('click',()=>{ const f=k.dataset.filter; if(f==='all')resetDashboardFilters(); else if(f==='missing'){scrollToPriorityQueue();highlightPriority('priority-referral')} else if(f==='expiring'){dashboardState.status='expiring';applyDashboardFilters();syncKpiState();scrollToWorklist()} else if(f==='claim'){setDashboardFilter('linkage','claim')} else setDashboardFilter('status',f); }));
+    document.querySelectorAll('.category').forEach(c=>c.addEventListener('click',()=>setDashboardFilter('category',c.dataset.category)));
+    document.querySelectorAll('.progress-row').forEach(r=>r.addEventListener('click',()=>setDashboardFilter('category',r.dataset.categoryTarget)));
+    const search=document.getElementById('docSearch'); search.addEventListener('input',()=>{dashboardState.search=search.value.trim().toLowerCase();applyDashboardFilters()});
+    const rowChecks=[...document.querySelectorAll('.row-check')]; rowChecks.forEach(c=>c.addEventListener('change',updateBulk)); document.getElementById('selectAll').addEventListener('change',e=>{rowChecks.filter(c=>c.closest('tr').style.display!=='none').forEach(c=>c.checked=e.target.checked);updateBulk()});
+    const tableView=document.getElementById('tableView'),cardView=document.getElementById('cardView'),tableBtn=document.getElementById('tableViewBtn'),cardBtn=document.getElementById('cardViewBtn'); tableBtn.onclick=()=>{tableView.classList.remove('hidden');cardView.classList.add('hidden');tableBtn.classList.add('active');cardBtn.classList.remove('active')}; cardBtn.onclick=()=>{buildCards();tableView.classList.add('hidden');cardView.classList.remove('hidden');cardBtn.classList.add('active');tableBtn.classList.remove('active')};
+    const fileInput=document.getElementById('fileInput'),dropzone=document.getElementById('dropzone'); fileInput.onchange=e=>setFile(e.target.files[0]); ['dragenter','dragover'].forEach(evt=>dropzone.addEventListener(evt,e=>{e.preventDefault();dropzone.classList.add('dragover')})); ['dragleave','drop'].forEach(evt=>dropzone.addEventListener(evt,e=>{e.preventDefault();dropzone.classList.remove('dragover')})); dropzone.addEventListener('drop',e=>setFile(e.dataTransfer.files[0]));
+  });
+</script>
+</body>
+</html>

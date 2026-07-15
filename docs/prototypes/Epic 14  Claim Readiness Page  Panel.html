@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Med AI NexSure | Claim Readiness Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <style>
+    :root{
+      --navy:#071733;--deep:#0f2a5f;--primary:#1e3a8a;--blue:#2563eb;--accent:#38bdf8;
+      --soft:#eff6ff;--bg:#f8fafc;--surface:#fff;--border:#e2e8f0;--text:#0f172a;
+      --muted:#64748b;--subtle:#94a3b8;--green:#059669;--green-bg:#ecfdf5;
+      --amber:#d97706;--amber-bg:#fffbeb;--red:#dc2626;--red-bg:#fef2f2;
+      --shadow:0 12px 32px rgba(15,23,42,.08);--radius:16px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;font-family:Inter,"Noto Sans Thai",ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+    button,input,select{font:inherit}
+    button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid rgba(56,189,248,.35);outline-offset:2px}
+    .app{display:grid;grid-template-columns:272px minmax(0,1fr);min-height:100vh}
+    .sidebar{position:sticky;top:0;height:100vh;overflow:auto;background:var(--navy);color:#dbeafe;padding:24px 18px;z-index:30}
+    .brand{display:flex;align-items:center;gap:12px;padding:0 6px 24px}
+    .logo{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#60a5fa,#1d4ed8);color:white;font-weight:800}
+    .brand h1{margin:0;font-size:17px;color:white}.brand p{margin:3px 0 0;font-size:11px;color:#93c5fd}
+    .nav-group{margin-top:8px}.nav-label{padding:12px 12px 6px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#64748b;font-weight:800}
+    nav a{display:flex;align-items:center;justify-content:space-between;padding:12px 13px;border-radius:10px;color:#bfdbfe;text-decoration:none;font-size:13px;margin-bottom:4px}
+    nav a:hover,nav a.active{background:rgba(37,99,235,.24);color:#fff}
+    main{min-width:0;padding:26px 28px 40px}
+    .mobile-bar{display:none}
+    .topbar{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:18px}
+    .eyebrow{font-size:11px;font-weight:800;color:var(--blue);letter-spacing:.1em;text-transform:uppercase}
+    h2{font-size:38px;letter-spacing:-.04em;margin:6px 0 8px}
+    .subtitle{margin:0;color:var(--muted);max-width:840px;line-height:1.65;font-size:14px}
+    .thai{font-size:12px;color:var(--muted);margin-top:6px}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:40px;padding:10px 14px;border-radius:10px;border:1px solid transparent;font-weight:700;font-size:13px;cursor:pointer;text-decoration:none;white-space:nowrap}
+    .btn-primary{color:#fff;background:linear-gradient(135deg,var(--blue),var(--primary));box-shadow:0 8px 18px rgba(37,99,235,.18)}
+    .btn-secondary{color:var(--text);background:#fff;border-color:var(--border)}
+    .btn-ghost{background:transparent;border-color:var(--border);color:var(--muted)}
+    .btn-danger{background:#fff;color:var(--red);border-color:#fecaca}
+    .btn:disabled{background:#f1f5f9;color:#94a3b8;border-color:var(--border);cursor:not-allowed;box-shadow:none}
+    .filter-card,.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .filter-card{padding:16px;margin-bottom:16px}
+    .filter-grid{display:grid;grid-template-columns:repeat(7,minmax(140px,1fr));gap:10px;align-items:end}
+    .field label{display:block;font-size:11px;color:var(--muted);font-weight:700;margin:0 0 6px}
+    .field input,.field select{width:100%;height:40px;border:1px solid var(--border);border-radius:10px;padding:0 11px;background:#fff;color:var(--text)}
+    .filter-actions{display:flex;gap:8px;align-items:end}
+    .active-filters{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;background:var(--soft);color:var(--primary);padding:6px 10px;font-size:11px;font-weight:700}
+    .grid{display:grid;gap:16px}
+    .kpi-grid{grid-template-columns:repeat(6,minmax(0,1fr));margin-bottom:16px}
+    .kpi{padding:17px;position:relative;overflow:hidden}
+    .kpi::before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--blue)}
+    .kpi.warning::before{background:var(--amber)}.kpi.danger::before{background:var(--red)}.kpi.success::before{background:var(--green)}
+    .kpi-label{font-size:13px;color:var(--text);font-weight:800;letter-spacing:-.01em}.kpi-value{font-size:34px;font-weight:800;margin-top:14px;letter-spacing:-.045em;text-align:center}
+    .kpi-progress{height:10px;margin-top:14px;background:#e2e8f0;border-radius:999px;overflow:hidden}.kpi-progress span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--blue),var(--primary))}
+    .kpi-meta{font-size:11px;color:var(--muted);margin-top:6px}.kpi-trend{font-size:11px;font-weight:700;margin-top:14px;color:var(--green)}
+    .kpi-trend.warn{color:var(--amber)}.kpi-trend.bad{color:var(--red)}.kpi-status{font-size:11px;color:var(--muted);margin-top:5px;font-weight:600}
+    .kpi-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.kpi-icon{width:30px;height:30px;border-radius:9px;background:var(--soft);color:var(--primary);display:grid;place-items:center;font-size:13px;font-weight:800}
+    .two-col{grid-template-columns:minmax(0,1.55fr) minmax(320px,.85fr);margin-bottom:16px}
+    .equal-col{grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:16px}
+    .card{padding:18px;min-width:0}
+    .card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+    .card-head h3{margin:0;font-size:18px}.card-head p{margin:4px 0 0;font-size:12px;color:var(--muted)}
+    .segmented{display:inline-flex;border:1px solid var(--border);border-radius:9px;overflow:hidden}
+    .segmented button{border:0;background:#fff;padding:7px 10px;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer}
+    .segmented button.active{background:var(--soft);color:var(--primary)}
+    .chart-wrap{position:relative;height:300px}
+    .chart-wrap.small{height:250px}
+    .insight{margin-top:12px;padding:11px 12px;border-radius:10px;background:var(--soft);border:1px solid #bfdbfe;color:var(--deep);font-size:12px;line-height:1.55}
+    .donut-layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:14px;align-items:center}
+    .donut-box{position:relative;height:220px}.donut-center{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;text-align:center}
+    .donut-center strong{font-size:28px}.donut-center span{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+    .legend-list{display:grid;gap:9px}.legend-row{display:grid;grid-template-columns:12px 1fr auto;gap:8px;align-items:center;font-size:12px}
+    .legend-dot{width:10px;height:10px;border-radius:50%}.legend-row strong{font-size:13px}
+    .summary-list{margin-top:12px;border-top:1px solid var(--border);padding-top:10px;display:grid;gap:7px}
+    .summary-row{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}.summary-row strong{color:var(--text)}
+    .heatmap{display:grid;grid-template-columns:120px repeat(3,1fr);gap:8px;align-items:stretch}
+    .heat-head,.heat-row-label{display:grid;place-items:center;font-size:11px;font-weight:800;color:var(--muted);min-height:42px}
+    .heat-cell{border:1px solid var(--border);border-radius:10px;min-height:72px;display:grid;place-items:center;text-align:center;cursor:pointer;transition:.2s}
+    .heat-cell:hover{transform:translateY(-2px);box-shadow:var(--shadow)}.heat-cell strong{font-size:22px}.heat-cell span{font-size:10px;color:var(--muted)}
+    .h1{background:#ecfdf5}.h2{background:#fffbeb}.h3{background:#fef2f2}
+    .queue-bars{display:grid;gap:14px}.queue-row{display:grid;grid-template-columns:140px 1fr 72px;gap:12px;align-items:center}
+    .queue-row label{font-size:12px;font-weight:700}.track{height:12px;border-radius:999px;background:#e2e8f0;overflow:hidden}
+    .fill{height:100%;border-radius:999px}.queue-value{text-align:right;font-size:12px;font-weight:800}.queue-value span{display:block;color:var(--muted);font-size:10px;font-weight:500}
+    .worklist-card{padding:0;overflow:hidden}
+    .worklist-head{padding:18px;border-bottom:1px solid var(--border)}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.toolbar input,.toolbar select{height:40px;border:1px solid var(--border);border-radius:10px;padding:0 10px;background:#fff}
+    .toolbar input{min-width:260px;flex:1}.toolbar select{min-width:150px}
+    .table-wrap{overflow:auto;max-height:520px}
+    table{width:100%;border-collapse:separate;border-spacing:0;min-width:1450px;font-size:12px}
+    thead th{position:sticky;top:0;background:#f8fafc;z-index:2;color:#475569;text-align:left;padding:12px 10px;border-bottom:1px solid var(--border);font-size:11px}
+    tbody td{padding:13px 10px;border-bottom:1px solid #edf2f7;vertical-align:top}
+    tbody tr{cursor:pointer}tbody tr:hover{background:#f8fbff}
+    .patient{font-weight:800}.muted{color:var(--muted);font-size:11px;margin-top:3px}
+    .badge{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;font-weight:700;font-size:10px;white-space:nowrap}
+    .badge.green{background:var(--green-bg);color:var(--green)}.badge.amber{background:var(--amber-bg);color:var(--amber)}
+    .badge.red{background:var(--red-bg);color:var(--red)}.badge.blue{background:var(--soft);color:var(--primary)}.badge.gray{background:#f1f5f9;color:#475569}
+    .score-bar{width:80px}.score-bar strong{font-size:16px}.mini-track{height:6px;background:#e2e8f0;border-radius:999px;overflow:hidden;margin-top:5px}.mini-fill{height:100%;background:var(--blue)}
+    .table-actions{display:flex;gap:6px;flex-wrap:wrap}.table-actions .btn{min-height:32px;padding:7px 9px;font-size:11px}
+    .timeline{display:grid;gap:0}.timeline-item{display:grid;grid-template-columns:70px 14px 1fr;gap:10px;padding:12px 0;border-bottom:1px solid #eef2f7}
+    .timeline-dot{width:10px;height:10px;border-radius:50%;background:var(--blue);margin-top:4px;position:relative}.timeline-dot::after{content:"";position:absolute;width:2px;height:54px;background:#dbeafe;left:4px;top:10px}
+    .timeline-item:last-child .timeline-dot::after{display:none}.timeline-time{font-size:11px;color:var(--muted)}
+    .drawer-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.35);opacity:0;pointer-events:none;transition:.2s;z-index:80}
+    .drawer{position:fixed;top:0;right:0;height:100vh;width:min(480px,100vw);background:#fff;box-shadow:-20px 0 60px rgba(15,23,42,.18);transform:translateX(100%);transition:.25s;z-index:90;display:flex;flex-direction:column}
+    .drawer.open{transform:translateX(0)}.drawer-backdrop.open{opacity:1;pointer-events:auto}
+    .drawer-head{padding:18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:12px}.drawer-head h3{margin:0;font-size:18px}
+    .drawer-body{padding:18px;overflow:auto}.drawer-section{margin-bottom:18px}.drawer-section h4{margin:0 0 10px;font-size:14px}
+    .score-summary{display:grid;grid-template-columns:110px 1fr;gap:16px;align-items:center}
+    .score-ring{width:106px;height:106px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,#fff 56%,transparent 57%),conic-gradient(var(--blue) 0 78%,#e2e8f0 78%);text-align:center}
+    .score-ring strong{font-size:28px}.component{margin-bottom:10px}.component-head{display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px}.component .track{height:8px}
+    .issue{border:1px solid var(--border);border-radius:10px;padding:11px;margin-bottom:8px;font-size:12px}.issue.blocking{background:var(--red-bg);border-color:#fecaca}.issue.required{background:var(--amber-bg);border-color:#fde68a}
+    .governance{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:10px;padding:11px;font-size:11px;line-height:1.5;color:var(--muted)}
+    .drawer-actions{padding:14px 18px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap}
+    .toast{position:fixed;right:24px;bottom:24px;background:var(--navy);color:white;padding:12px 14px;border-radius:10px;box-shadow:var(--shadow);opacity:0;transform:translateY(12px);transition:.2s;z-index:120;font-size:12px}
+    .toast.show{opacity:1;transform:translateY(0)}
+    .empty{padding:32px;text-align:center;color:var(--muted);display:none}
+    @media(max-width:1500px){.kpi-grid{grid-template-columns:repeat(3,1fr)}.filter-grid{grid-template-columns:repeat(4,1fr)}}
+    @media(max-width:1100px){.app{grid-template-columns:1fr}.sidebar{position:fixed;left:0;transform:translateX(-100%);transition:.2s;width:272px}.sidebar.open{transform:translateX(0)}.mobile-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.two-col,.equal-col{grid-template-columns:1fr}.filter-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:700px){main{padding:16px}.topbar{flex-direction:column}h2{font-size:30px}.kpi-grid{grid-template-columns:1fr}.filter-grid{grid-template-columns:1fr}.donut-layout{grid-template-columns:1fr}.heatmap{grid-template-columns:90px repeat(3,1fr)}.queue-row{grid-template-columns:110px 1fr 60px}.drawer{width:100vw}.toolbar input,.toolbar select{min-width:100%;width:100%}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="logo">AI</div><div><h1>Med AI NexSure</h1><p>Enterprise Healthcare Intelligence</p></div></div>
+    <nav>
+      <div class="nav-group"><div class="nav-label">Operations</div>
+        <a href="#">Main Dashboard <span>⌘1</span></a><a href="#">Patient Management <span>⌘2</span></a><a href="#">Visit Management <span>⌘3</span></a>
+        <a href="#">SOAP Note <span>⌘4</span></a><a href="#">Prescription <span>⌘5</span></a><a class="active" href="#">Claim Readiness <span>⌘6</span></a>
+      </div>
+      <div class="nav-group"><div class="nav-label">Intelligence</div>
+        <a href="#">Evidence Package <span>⌘7</span></a><a href="#">Payer Rules <span>⌘8</span></a><a href="#">Economic Intelligence <span>⌘9</span></a><a href="#">AI Copilot <span>⌘A</span></a>
+      </div>
+      <div class="nav-group"><div class="nav-label">Governance</div>
+        <a href="#">Audit & Compliance <span>⌘C</span></a><a href="#">Admin Settings <span>⌘S</span></a>
+      </div>
+    </nav>
+  </aside>
+
+  <main>
+    <div class="mobile-bar"><button class="btn btn-secondary" id="menuBtn">☰ Menu</button><strong>Claim Readiness</strong></div>
+    <header class="topbar">
+      <div><div class="eyebrow">Enterprise Claim Intelligence</div><h2>Claim Readiness</h2>
+        <p class="subtitle">Monitor claim-ready cases, missing evidence, risk level, economic alerts, and AI recommendations in one audit-ready operational workspace.</p>
+        <div class="thai">ตรวจสอบความพร้อมของข้อมูลก่อนสร้าง Evidence Package หรือส่งเคลมประกัน</div>
+      </div>
+      <div class="actions"><button class="btn btn-secondary" id="recalcBtn">↻ Recalculate All</button><button class="btn btn-secondary">Audit Review Mode</button><button class="btn btn-primary" id="headerGenerate">Generate Evidence Package</button></div>
+    </header>
+
+    <section class="filter-card">
+      <div class="filter-grid">
+        <div class="field"><label>Date Range</label><select id="dateFilter"><option>Last 7 Days</option><option>Last 30 Days</option><option>Last 90 Days</option></select></div>
+        <div class="field"><label>Clinic</label><select id="clinicFilter"><option value="">All Clinics</option><option>Bangkok OPD</option><option>Chiang Mai Clinic</option></select></div>
+        <div class="field"><label>Department</label><select id="departmentFilter"><option value="">All Departments</option><option>General Medicine</option><option>Orthopedics</option></select></div>
+        <div class="field"><label>Payer</label><select id="payerFilter"><option value="">All Payers</option><option>ABC Insurance</option><option>XYZ Health</option></select></div>
+        <div class="field"><label>Visit Type</label><select id="visitTypeFilter"><option value="">All Visit Types</option><option>OPD</option><option>IPD</option></select></div>
+        <div class="field"><label>Claim Type</label><select id="claimTypeFilter"><option value="">All Claim Types</option><option>Reimbursement</option><option>Direct Billing</option></select></div>
+        <div class="field"><label>AI Assisted</label><select id="aiFilter"><option value="">All Cases</option><option value="Yes">AI Assisted</option><option value="No">Non-AI</option></select></div>
+      </div>
+      <div class="active-filters" id="activeFilters"><span class="chip">Last 7 Days</span><button class="btn btn-ghost" id="resetFilters">Reset Filters</button></div>
+    </section>
+
+    <section class="grid kpi-grid">
+      <article class="card kpi success">
+        <div class="kpi-top"><div class="kpi-label">Claim Readiness</div><div class="kpi-icon">CR</div></div>
+        <div class="kpi-value">92%</div><div class="kpi-progress" aria-label="Claim Readiness 92 percent"><span style="width:92%;background:linear-gradient(90deg,#10b981,#059669)"></span></div>
+        <div class="kpi-trend">▲ +5% vs Last Week</div><div class="kpi-status">Ready for Submission</div>
+      </article>
+      <article class="card kpi">
+        <div class="kpi-top"><div class="kpi-label">Total Eligible Visits</div><div class="kpi-icon">TV</div></div>
+        <div class="kpi-value" id="kpiTotal">128</div><div class="kpi-progress"><span style="width:80%"></span></div>
+        <div class="kpi-trend">▲ 12% vs Previous Period</div><div class="kpi-status">จำนวน Visit ที่เข้าเกณฑ์</div>
+      </article>
+      <article class="card kpi warning">
+        <div class="kpi-top"><div class="kpi-label">Needs Review</div><div class="kpi-icon">NR</div></div>
+        <div class="kpi-value">56</div><div class="kpi-progress"><span style="width:43.8%;background:linear-gradient(90deg,#f59e0b,#d97706)"></span></div>
+        <div class="kpi-trend warn">43.8% of Current Cases</div><div class="kpi-status">เคสที่ต้องตรวจสอบเพิ่มเติม</div>
+      </article>
+      <article class="card kpi danger">
+        <div class="kpi-top"><div class="kpi-label">High Risk Cases</div><div class="kpi-icon">HR</div></div>
+        <div class="kpi-value">14</div><div class="kpi-progress"><span style="width:35%;background:linear-gradient(90deg,#ef4444,#dc2626)"></span></div>
+        <div class="kpi-trend bad">5 Cases Over SLA</div><div class="kpi-status">Human Review Required</div>
+      </article>
+      <article class="card kpi">
+        <div class="kpi-top"><div class="kpi-label">Average Readiness Score</div><div class="kpi-icon">AS</div></div>
+        <div class="kpi-value">78</div><div class="kpi-progress"><span style="width:78%"></span></div>
+        <div class="kpi-trend">▲ +4 Points Today</div><div class="kpi-status">คะแนนเฉลี่ยความพร้อมเคลม</div>
+      </article>
+      <article class="card kpi danger">
+        <div class="kpi-top"><div class="kpi-label">Over SLA Cases</div><div class="kpi-icon">SL</div></div>
+        <div class="kpi-value">9</div><div class="kpi-progress"><span style="width:22%;background:linear-gradient(90deg,#ef4444,#dc2626)"></span></div>
+        <div class="kpi-trend bad">Requires Escalation</div><div class="kpi-status">เคสเกินเวลาที่กำหนด</div>
+      </article>
+    </section>
+
+    <section class="grid two-col">
+      <article class="card"><div class="card-head"><div><h3>Claim Readiness Trend</h3><p>แนวโน้มความพร้อมเทียบเป้าหมายและช่วงก่อนหน้า</p></div><div class="segmented"><button class="active">7 Days</button><button>30 Days</button><button>90 Days</button></div></div><div class="chart-wrap"><canvas id="trendChart"></canvas></div><div class="insight">Readiness improved by 7 percentage points in the last 7 days, but remains below the 85% operational target.</div></article>
+      <article class="card"><div class="card-head"><div><h3>Claim Readiness Overview</h3><p>สัดส่วนเคสตามสถานะความพร้อม</p></div></div>
+        <div class="donut-layout"><div class="donut-box"><canvas id="donutChart"></canvas><div class="donut-center"><div><strong>128</strong><span>Total Cases</span></div></div></div>
+          <div><div class="legend-list"><div class="legend-row"><span class="legend-dot" style="background:#059669"></span><span>Ready</span><strong>42 · 32.8%</strong></div><div class="legend-row"><span class="legend-dot" style="background:#d97706"></span><span>Needs Review</span><strong>56 · 43.8%</strong></div><div class="legend-row"><span class="legend-dot" style="background:#dc2626"></span><span>Not Ready</span><strong>30 · 23.4%</strong></div></div>
+          <div class="summary-list"><div class="summary-row"><span>Operational Target</span><strong>85%</strong></div><div class="summary-row"><span>Gap to Target</span><strong style="color:#dc2626">-52.2 pts</strong></div><div class="summary-row"><span>Top Blocker</span><strong>ICD Missing</strong></div></div></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="grid equal-col">
+      <article class="card"><div class="card-head"><div><h3>Missing Evidence Pareto</h3><p>สาเหตุหลักที่ทำให้เคลมยังไม่พร้อม</p></div></div><div class="chart-wrap"><canvas id="paretoChart"></canvas></div><div class="insight"><strong>Primary Improvement Focus:</strong> ICD validation, SOAP completeness validation, and medical certificate rule automation.</div></article>
+      <article class="card"><div class="card-head"><div><h3>Risk Heatmap</h3><p>การกระจุกตัวของ Risk × Readiness</p></div></div>
+        <div class="heatmap" id="heatmap">
+          <div></div><div class="heat-head">Ready</div><div class="heat-head">Needs Review</div><div class="heat-head">Not Ready</div>
+          <div class="heat-row-label">Low Risk</div><div class="heat-cell h1" data-risk="Low" data-status="Ready"><div><strong>35</strong><span>cases</span></div></div><div class="heat-cell h1" data-risk="Low" data-status="Needs Review"><div><strong>12</strong><span>cases</span></div></div><div class="heat-cell h2" data-risk="Low" data-status="Not Ready"><div><strong>2</strong><span>cases</span></div></div>
+          <div class="heat-row-label">Medium Risk</div><div class="heat-cell h1" data-risk="Medium" data-status="Ready"><div><strong>6</strong><span>cases</span></div></div><div class="heat-cell h2" data-risk="Medium" data-status="Needs Review"><div><strong>31</strong><span>cases</span></div></div><div class="heat-cell h2" data-risk="Medium" data-status="Not Ready"><div><strong>10</strong><span>cases</span></div></div>
+          <div class="heat-row-label">High Risk</div><div class="heat-cell h2" data-risk="High" data-status="Ready"><div><strong>1</strong><span>case</span></div></div><div class="heat-cell h3" data-risk="High" data-status="Needs Review"><div><strong>13</strong><span>cases</span></div></div><div class="heat-cell h3" data-risk="High" data-status="Not Ready"><div><strong>18</strong><span>cases</span></div></div>
+        </div><div class="insight" style="background:var(--red-bg);border-color:#fecaca;color:#991b1b">18 High-Risk cases are currently Not Ready and require priority review.</div>
+      </article>
+    </section>
+
+    <section class="grid equal-col">
+      <article class="card"><div class="card-head"><div><h3>Queue Snapshot</h3><p>ภาพรวมสถานะงานและเคสที่ยังรอดำเนินการ</p></div></div>
+        <div class="queue-bars">
+          <div class="queue-row" data-queue="Waiting"><label>Waiting</label><div class="track"><div class="fill" style="width:49%;background:#64748b"></div></div><div class="queue-value">24<span>18.8%</span></div></div>
+          <div class="queue-row" data-queue="In Consultation"><label>In Consultation</label><div class="track"><div class="fill" style="width:37%;background:#2563eb"></div></div><div class="queue-value">18<span>14.1%</span></div></div>
+          <div class="queue-row" data-queue="Pending Evidence"><label>Pending Evidence</label><div class="track"><div class="fill" style="width:76%;background:#d97706"></div></div><div class="queue-value">37<span>28.9%</span></div></div>
+          <div class="queue-row" data-queue="Completed"><label>Completed</label><div class="track"><div class="fill" style="width:100%;background:#059669"></div></div><div class="queue-value">49<span>38.3%</span></div></div>
+        </div>
+      </article>
+      <article class="card"><div class="card-head"><div><h3>Economic Intelligence</h3><p>วิเคราะห์ค่าใช้จ่ายและ Outlier ก่อนส่งเคลม</p></div></div><div class="chart-wrap small"><canvas id="costChart"></canvas></div><div class="summary-list"><div class="summary-row"><span>Average Visit Cost</span><strong>฿2,840</strong></div><div class="summary-row"><span>Expected Range</span><strong>฿900–3,200</strong></div><div class="summary-row"><span>Cost Alert Cases</span><strong style="color:#dc2626">11</strong></div></div></article>
+    </section>
+
+    <section class="card worklist-card">
+      <div class="worklist-head"><div class="card-head"><div><h3>Claim Readiness Worklist</h3><p>รายการเคสสำหรับตรวจสอบ แก้ไข และส่งต่อ Evidence Package</p></div><div class="actions"><button class="btn btn-secondary">Export</button><button class="btn btn-secondary">Column Settings</button></div></div>
+        <div class="toolbar"><input id="searchInput" placeholder="Search HN, Patient, Visit ID"><select id="statusFilter"><option value="">All Readiness Status</option><option>Ready</option><option>Needs Review</option><option>Not Ready</option></select><select id="riskFilter"><option value="">All Risk Levels</option><option>Low</option><option>Medium</option><option>High</option></select><select id="missingFilter"><option value="">All Missing Evidence</option><option>ICD Missing</option><option>SOAP Incomplete</option><option>Medical Certificate Missing</option></select><select id="sortFilter"><option value="priority">Sort by Priority</option><option value="score">Sort by Score</option><option value="updated">Sort by Last Updated</option></select><button class="btn btn-secondary" id="clearChartFilter">Clear Chart Filter</button></div>
+      </div>
+      <div class="table-wrap"><table><thead><tr><th><input type="checkbox" aria-label="Select all"></th><th>HN / Patient</th><th>Visit</th><th>Score</th><th>Status</th><th>Risk</th><th>Primary Blocker</th><th>Missing</th><th>Cost Variance</th><th>AI Recommendation</th><th>SLA / Aging</th><th>Owner</th><th>Next Action</th></tr></thead><tbody id="caseBody"></tbody></table><div class="empty" id="emptyState">No claim cases found for the selected filters.<br>ไม่พบเคสตามเงื่อนไขที่เลือก กรุณาปรับตัวกรองและลองอีกครั้ง</div></div>
+    </section>
+
+    <section class="card" style="margin-top:16px"><div class="card-head"><div><h3>Recent Activity</h3><p>ประวัติการเปลี่ยนแปลงเพื่อรองรับ Audit Trail</p></div><button class="btn btn-secondary">View Full Audit Trail</button></div><div class="timeline" id="timeline">
+      <div class="timeline-item"><div class="timeline-time">10:42</div><div class="timeline-dot"></div><div><strong>AI System</strong><div class="muted">Readiness score recalculated · 72 → 78 · Source: Rule Engine</div></div></div>
+      <div class="timeline-item"><div class="timeline-time">10:31</div><div class="timeline-dot"></div><div><strong>Dr. Ben</strong><div class="muted">ICD-10 recommendation applied · J06.9 added · Source: User Action</div></div></div>
+      <div class="timeline-item"><div class="timeline-time">10:18</div><div class="timeline-dot"></div><div><strong>Claim Reviewer</strong><div class="muted">Risk changed · Medium → High · Source: Manual Review</div></div></div>
+    </div></section>
+  </main>
+</div>
+
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="drawer-head"><div><h3 id="drawerTitle">AI Recommendation</h3><div class="muted" id="drawerMeta"></div></div><button class="btn btn-secondary" id="closeDrawer" aria-label="Close drawer">✕</button></div>
+  <div class="drawer-body">
+    <div class="drawer-section"><div class="score-summary"><div class="score-ring" id="drawerRing"><div><strong id="drawerScore">78</strong><div class="muted">Readiness</div></div></div><div><div id="drawerBadges"></div><p class="muted" id="pointsToReady"></p><div class="governance">AI recommendation has not been applied. Human confirmation is required.</div></div></div></div>
+    <div class="drawer-section"><h4>Score Breakdown</h4><div id="components"></div></div>
+    <div class="drawer-section"><h4>Issues</h4><div id="issues"></div></div>
+    <div class="drawer-section"><h4>AI Recommendation</h4><div class="insight" id="recommendation"></div></div>
+    <div class="drawer-section"><h4>Required Documents</h4><div id="documents"></div></div>
+    <div class="governance">AI Decision Support only. AI-generated recommendations must not automatically approve or submit a claim. High-risk cases require human review, reviewer confirmation, permission validation, and an audit trail.</div>
+  </div>
+  <div class="drawer-actions"><button class="btn btn-primary" id="applySuggestion">Apply Suggestion</button><button class="btn btn-secondary" id="uploadEvidence">Upload Evidence</button><button class="btn btn-secondary">Request Manual Review</button><button class="btn btn-danger">Manual Override</button><button class="btn btn-primary" id="drawerGenerate" disabled title="Resolve blocking issues first">Generate Evidence Package</button></div>
+</aside>
+<div class="toast" id="toast"></div>
+
+<script>
+const cases=[
+{id:'VIS-10091',hn:'HN-240091',patient:'K. S*** P.',date:'07 Jul 2026',visitType:'OPD',queue:'Pending Evidence',score:78,status:'Needs Review',risk:'Medium',blocker:'ICD Missing',missing:['ICD Missing','Medical Certificate Missing'],cost:'Normal',recommendation:'Add ICD-10 J06.9 based on the Assessment text.',sla:'Near SLA',aging:'1 hr 24 min',owner:'Dr. Ben',ai:'Yes',payer:'ABC Insurance',clinic:'Bangkok OPD',department:'General Medicine',claimType:'Direct Billing',updated:3},
+{id:'VIS-10102',hn:'HN-240102',patient:'K. M*** T.',date:'07 Jul 2026',visitType:'OPD',queue:'Completed',score:92,status:'Ready',risk:'Low',blocker:'None',missing:[],cost:'Normal',recommendation:'No blocking issue.',sla:'Within SLA',aging:'18 min',owner:'Claim Team',ai:'Yes',payer:'XYZ Health',clinic:'Bangkok OPD',department:'General Medicine',claimType:'Reimbursement',updated:1},
+{id:'VIS-10118',hn:'HN-240118',patient:'K. A*** R.',date:'07 Jul 2026',visitType:'OPD',queue:'In Consultation',score:48,status:'Not Ready',risk:'High',blocker:'SOAP Incomplete',missing:['SOAP Incomplete','ICD Missing','Cost Justification Missing'],cost:'Cost Alert',recommendation:'Human Review Required.',sla:'Over SLA',aging:'6 hr',owner:'Unassigned',ai:'Yes',payer:'ABC Insurance',clinic:'Chiang Mai Clinic',department:'Orthopedics',claimType:'Direct Billing',updated:5},
+{id:'VIS-10123',hn:'HN-240123',patient:'K. P*** N.',date:'07 Jul 2026',visitType:'OPD',queue:'Waiting',score:84,status:'Needs Review',risk:'Medium',blocker:'Medical Certificate Missing',missing:['Medical Certificate Missing'],cost:'Normal',recommendation:'Upload required certificate.',sla:'Within SLA',aging:'26 min',owner:'Nurse A',ai:'No',payer:'XYZ Health',clinic:'Bangkok OPD',department:'General Medicine',claimType:'Reimbursement',updated:2},
+{id:'VIS-10131',hn:'HN-240131',patient:'K. T*** C.',date:'07 Jul 2026',visitType:'IPD',queue:'Pending Evidence',score:58,status:'Not Ready',risk:'High',blocker:'ICD Missing',missing:['ICD Missing','Attachment Missing'],cost:'Cost Alert',recommendation:'Coding and document review required.',sla:'Over SLA',aging:'8 hr',owner:'Coder 2',ai:'Yes',payer:'ABC Insurance',clinic:'Chiang Mai Clinic',department:'Orthopedics',claimType:'Direct Billing',updated:4}
+];
+let currentCases=[...cases],selectedCase=null,chartFilter={};
+
+function badge(text,type){return `<span class="badge ${type}">${text}</span>`}
+function statusType(s){return s==='Ready'?'green':s==='Needs Review'?'amber':'red'}
+function riskType(r){return r==='Low'?'green':r==='Medium'?'amber':'red'}
+function slaType(s){return s==='Within SLA'?'green':s==='Near SLA'?'amber':'red'}
+
+function renderCases(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  const status=document.getElementById('statusFilter').value;
+  const risk=document.getElementById('riskFilter').value;
+  const missing=document.getElementById('missingFilter').value;
+  const clinic=document.getElementById('clinicFilter').value;
+  const department=document.getElementById('departmentFilter').value;
+  const payer=document.getElementById('payerFilter').value;
+  const visitType=document.getElementById('visitTypeFilter').value;
+  const claimType=document.getElementById('claimTypeFilter').value;
+  const ai=document.getElementById('aiFilter').value;
+  let rows=cases.filter(c=>{
+    const text=(c.hn+' '+c.patient+' '+c.id).toLowerCase();
+    return (!q||text.includes(q))&&(!status||c.status===status)&&(!risk||c.risk===risk)&&(!missing||c.missing.includes(missing))&&(!clinic||c.clinic===clinic)&&(!department||c.department===department)&&(!payer||c.payer===payer)&&(!visitType||c.visitType===visitType)&&(!claimType||c.claimType===claimType)&&(!ai||c.ai===ai)&&(!chartFilter.status||c.status===chartFilter.status)&&(!chartFilter.risk||c.risk===chartFilter.risk)&&(!chartFilter.queue||c.queue===chartFilter.queue)&&(!chartFilter.missing||c.missing.includes(chartFilter.missing));
+  });
+  const sort=document.getElementById('sortFilter').value;
+  if(sort==='score') rows.sort((a,b)=>b.score-a.score);
+  else if(sort==='updated') rows.sort((a,b)=>b.updated-a.updated);
+  else rows.sort((a,b)=>({High:3,Medium:2,Low:1}[b.risk]-({High:3,Medium:2,Low:1}[a.risk]))||((a.sla==='Over SLA')?-1:1));
+  currentCases=rows;
+  const body=document.getElementById('caseBody');
+  body.innerHTML=rows.map(c=>`<tr data-id="${c.id}">
+    <td><input type="checkbox" aria-label="Select ${c.id}"></td>
+    <td><div class="patient">${c.hn}</div><div class="muted">${c.patient} · ${c.visitType}</div></td>
+    <td>${c.date}<div class="muted">${c.queue}</div></td>
+    <td><div class="score-bar"><strong>${c.score}</strong><div class="mini-track"><div class="mini-fill" style="width:${c.score}%;background:${c.score>=85?'#059669':c.score>=60?'#d97706':'#dc2626'}"></div></div></div></td>
+    <td>${badge(c.status,statusType(c.status))}</td><td>${badge(c.risk,riskType(c.risk))}</td>
+    <td>${c.blocker==='None'?badge('No blocker','green'):`<strong>${c.blocker}</strong>`}</td>
+    <td>${c.missing.length?`${c.missing.length} missing<div class="muted">Primary: ${c.missing[0]}</div>`:badge('Complete','green')}</td>
+    <td>${badge(c.cost,c.cost==='Normal'?'green':'red')}</td><td>${c.recommendation}</td>
+    <td>${badge(c.sla,slaType(c.sla))}<div class="muted">${c.aging}</div></td><td>${c.owner}</td>
+    <td><div class="table-actions"><button class="btn btn-secondary review-btn" data-id="${c.id}">Review</button><button class="btn btn-primary" ${c.status!=='Ready'?'disabled title="Resolve blocking issues first"':''}>Generate</button></div></td>
+  </tr>`).join('');
+  document.getElementById('emptyState').style.display=rows.length?'none':'block';
+  document.getElementById('kpiTotal').textContent=rows.length||0;
+}
+function openDrawer(id){
+  selectedCase=cases.find(c=>c.id===id); if(!selectedCase)return;
+  document.getElementById('drawerTitle').textContent=`${selectedCase.hn} · ${selectedCase.patient}`;
+  document.getElementById('drawerMeta').textContent=`${selectedCase.id} · ${selectedCase.date} · ${selectedCase.visitType} · ${selectedCase.payer}`;
+  document.getElementById('drawerScore').textContent=selectedCase.score;
+  document.getElementById('drawerRing').style.background=`radial-gradient(circle,#fff 56%,transparent 57%),conic-gradient(${selectedCase.score>=85?'#059669':selectedCase.score>=60?'#d97706':'#dc2626'} 0 ${selectedCase.score}%,#e2e8f0 ${selectedCase.score}% 100%)`;
+  document.getElementById('drawerBadges').innerHTML=badge(selectedCase.status,statusType(selectedCase.status))+' '+badge(selectedCase.risk+' Risk',riskType(selectedCase.risk));
+  document.getElementById('pointsToReady').textContent=selectedCase.score>=85?'Ready threshold achieved.':`${85-selectedCase.score} points to Ready`;
+  const comps=[['SOAP Completeness',selectedCase.missing.includes('SOAP Incomplete')?14:25,25],['Diagnosis & ICD',selectedCase.missing.includes('ICD Missing')?12:20,20],['Prescription / Procedure',15,15],['Evidence',selectedCase.missing.length?11:20,20],['Insurance Rule',8,10],['Economic Check',selectedCase.cost==='Cost Alert'?5:10,10]];
+  document.getElementById('components').innerHTML=comps.map(x=>`<div class="component"><div class="component-head"><span>${x[0]}</span><strong>${x[1]}/${x[2]}</strong></div><div class="track"><div class="fill" style="width:${x[1]/x[2]*100}%;background:${x[1]===x[2]?'#059669':'#2563eb'}"></div></div></div>`).join('');
+  document.getElementById('issues').innerHTML=selectedCase.missing.length?selectedCase.missing.map((m,i)=>`<div class="issue ${i===0?'blocking':'required'}"><strong>${i===0?'Blocking':'Required'}:</strong> ${m}</div>`).join(''):'<div class="issue"><strong>No blocking issue.</strong> Evidence is complete.</div>';
+  document.getElementById('recommendation').innerHTML=`<strong>${selectedCase.recommendation}</strong><br>Confidence: 87%<br>Expected impact: ${selectedCase.score<85?'+8 readiness points':'No change required'}`;
+  document.getElementById('documents').innerHTML=badge('SOAP Note',selectedCase.missing.includes('SOAP Incomplete')?'red':'green')+' '+badge('Prescription','green')+' '+badge('Medical Certificate',selectedCase.missing.includes('Medical Certificate Missing')?'amber':'green')+' '+badge('Supporting Attachment',selectedCase.missing.includes('Attachment Missing')?'amber':'blue')+' '+badge('Claim Summary','blue');
+  const gen=document.getElementById('drawerGenerate');gen.disabled=selectedCase.status!=='Ready';gen.title=gen.disabled?'Evidence Package cannot be generated because blocking issues remain.':'Generate Evidence Package';
+  document.getElementById('drawer').classList.add('open');document.getElementById('drawerBackdrop').classList.add('open');document.getElementById('drawer').setAttribute('aria-hidden','false');
+}
+function closeDrawer(){document.getElementById('drawer').classList.remove('open');document.getElementById('drawerBackdrop').classList.remove('open');document.getElementById('drawer').setAttribute('aria-hidden','true')}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+function addActivity(msg){document.getElementById('timeline').insertAdjacentHTML('afterbegin',`<div class="timeline-item"><div class="timeline-time">Now</div><div class="timeline-dot"></div><div><strong>Current User</strong><div class="muted">${msg} · Source: User Action</div></div></div>`)}
+
+document.addEventListener('click',e=>{
+  const btn=e.target.closest('.review-btn');if(btn){e.stopPropagation();openDrawer(btn.dataset.id)}
+  const row=e.target.closest('tbody tr');if(row&&!e.target.closest('button,input'))openDrawer(row.dataset.id);
+  const qr=e.target.closest('.queue-row');if(qr){chartFilter={queue:qr.dataset.queue};renderCases();toast(`Filtered by ${qr.dataset.queue}`)}
+});
+['searchInput','statusFilter','riskFilter','missingFilter','sortFilter','clinicFilter','departmentFilter','payerFilter','visitTypeFilter','claimTypeFilter','aiFilter'].forEach(id=>document.getElementById(id).addEventListener('input',renderCases));
+document.getElementById('resetFilters').onclick=()=>{document.querySelectorAll('.filter-card select,.toolbar select').forEach(s=>s.selectedIndex=0);document.getElementById('searchInput').value='';chartFilter={};renderCases();toast('Filters reset')};
+document.getElementById('clearChartFilter').onclick=()=>{chartFilter={};renderCases();toast('Chart filter cleared')};
+document.getElementById('closeDrawer').onclick=closeDrawer;document.getElementById('drawerBackdrop').onclick=closeDrawer;document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer()});
+document.getElementById('menuBtn').onclick=()=>document.getElementById('sidebar').classList.toggle('open');
+document.getElementById('recalcBtn').onclick=()=>{toast('Readiness scores recalculated');addActivity('Readiness scores recalculated for current filter scope')};
+document.getElementById('headerGenerate').onclick=()=>toast('Select a Ready case before generating an Evidence Package');
+document.getElementById('applySuggestion').onclick=()=>{
+  if(!selectedCase)return;
+  selectedCase.missing=selectedCase.missing.filter(x=>x!=='ICD Missing');selectedCase.score=Math.min(100,selectedCase.score+8);
+  selectedCase.status=selectedCase.score>=85&&selectedCase.missing.length===0?'Ready':selectedCase.score>=60?'Needs Review':'Not Ready';
+  selectedCase.blocker=selectedCase.missing[0]||'None';selectedCase.recommendation='Recommendation applied. Awaiting human confirmation.';
+  renderCases();openDrawer(selectedCase.id);toast('AI suggestion applied');addActivity(`AI recommendation applied to ${selectedCase.id}`);
+};
+document.getElementById('uploadEvidence').onclick=()=>{
+  if(!selectedCase)return;selectedCase.missing=selectedCase.missing.filter(x=>!x.includes('Certificate')&&!x.includes('Attachment'));
+  if(selectedCase.missing.length===0&&selectedCase.score<85)selectedCase.score=85;selectedCase.status=selectedCase.missing.length===0&&selectedCase.score>=85?'Ready':selectedCase.status;selectedCase.blocker=selectedCase.missing[0]||'None';
+  renderCases();openDrawer(selectedCase.id);toast('Evidence uploaded');addActivity(`Evidence uploaded for ${selectedCase.id}`);
+};
+document.getElementById('drawerGenerate').onclick=()=>{toast('Evidence Package generated');addActivity(`Evidence Package generated for ${selectedCase.id}`)};
+
+Chart.defaults.font.family='Inter, "Noto Sans Thai", sans-serif';Chart.defaults.color='#64748b';
+const gridColor='#e2e8f0';
+const trendChart=new Chart(document.getElementById('trendChart'),{type:'line',data:{labels:['Jul 1','Jul 2','Jul 3','Jul 4','Jul 5','Jul 6','Jul 7'],datasets:[
+{label:'Actual Readiness %',data:[61,63,65,64,67,66,68],borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,.08)',fill:true,tension:.35,borderWidth:3,pointRadius:3},
+{label:'Target %',data:[85,85,85,85,85,85,85],borderColor:'#059669',borderDash:[6,5],borderWidth:2,pointRadius:0},
+{label:'Previous Period',data:[58,59,60,61,62,63,64],borderColor:'#94a3b8',borderWidth:2,pointRadius:2}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{min:50,max:90,ticks:{callback:v=>v+'%'},grid:{color:gridColor}},x:{grid:{display:false}}}}});
+const donutChart=new Chart(document.getElementById('donutChart'),{type:'doughnut',data:{labels:['Ready','Needs Review','Not Ready'],datasets:[{data:[42,56,30],backgroundColor:['#059669','#d97706','#dc2626'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:false}},onClick:(evt,els)=>{if(els.length){chartFilter={status:['Ready','Needs Review','Not Ready'][els[0].index]};renderCases();toast(`Filtered by ${chartFilter.status}`)}}}});
+const paretoChart=new Chart(document.getElementById('paretoChart'),{data:{labels:['ICD Missing','SOAP Incomplete','Medical Certificate Missing','Attachment Missing','Cost Justification Missing'],datasets:[
+{type:'bar',label:'Issue Count',data:[18,14,11,9,7],backgroundColor:'#2563eb',borderRadius:6,xAxisID:'x'},
+{type:'line',label:'Cumulative %',data:[30.5,54.2,72.9,88.1,100],borderColor:'#d97706',backgroundColor:'#d97706',tension:.25,yAxisID:'y1'}
+]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{x:{beginAtZero:true,grid:{color:gridColor}},y:{grid:{display:false}},y1:{position:'right',min:0,max:100,ticks:{callback:v=>v+'%'},grid:{drawOnChartArea:false}}},onClick:(evt,els)=>{if(els.length){chartFilter={missing:['ICD Missing','SOAP Incomplete','Medical Certificate Missing','Attachment Missing','Cost Justification Missing'][els[0].index]};renderCases();toast(`Filtered by ${chartFilter.missing}`)}}}});
+new Chart(document.getElementById('costChart'),{type:'bar',data:{labels:['฿0–999','฿1,000–1,999','฿2,000–3,199','฿3,200–4,999','฿5,000+'],datasets:[{label:'Visits',data:[16,33,49,19,11],backgroundColor:['#94a3b8','#60a5fa','#2563eb','#d97706','#dc2626'],borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:gridColor}},x:{grid:{display:false}}}}});
+document.querySelectorAll('.heat-cell').forEach(c=>c.onclick=()=>{chartFilter={risk:c.dataset.risk,status:c.dataset.status};renderCases();toast(`Filtered by ${c.dataset.risk} Risk + ${c.dataset.status}`)});
+
+renderCases();
+</script>
+</body>
+</html>

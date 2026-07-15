@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Role Detail — Med AI Enterprise Healthcare Intelligence Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --navy:#0f2a5f; --blue:#1e3a8a; --ai:#2563eb; --sky:#38bdf8;
+      --bg:#f4f7fb; --surface:#fff; --soft:#eff6ff; --line:#dbe5f1;
+      --text:#0f172a; --muted:#64748b; --success:#059669; --warn:#d97706; --danger:#dc2626;
+      --shadow:0 12px 36px rgba(15,42,95,.09); --radius:16px;
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth}
+    body{margin:0;font-family:Inter,"Noto Sans Thai",sans-serif;background:var(--bg);color:var(--text);font-size:15px}
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    .app{min-height:100vh;display:grid;grid-template-columns:252px 1fr}
+    .sidebar{position:sticky;top:0;height:100vh;background:linear-gradient(180deg,#0b1f47 0%,#0f2a5f 100%);color:#fff;padding:22px 16px;overflow:auto}
+    .brand{display:flex;align-items:center;gap:12px;padding:2px 8px 24px}.logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#60a5fa,#22d3ee);display:grid;place-items:center;font-weight:800;color:#082f49;box-shadow:0 8px 24px rgba(56,189,248,.28)}
+    .brand strong{font-size:17px}.brand small{display:block;color:#b9c9e8;margin-top:2px}
+    .nav-label{font-size:11px;text-transform:uppercase;letter-spacing:.13em;color:#8ca4cf;padding:14px 12px 8px}
+    .nav a{display:flex;align-items:center;gap:11px;color:#cad7ee;text-decoration:none;padding:11px 12px;border-radius:10px;margin:3px 0;font-weight:500}.nav a:hover,.nav a.active{background:rgba(255,255,255,.1);color:#fff}.nav a.active{box-shadow:inset 3px 0 0 #38bdf8}
+    .main{min-width:0}.topbar{height:72px;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:20}
+    .search{width:min(500px,42vw);position:relative}.search input{width:100%;height:42px;border:1px solid var(--line);border-radius:12px;padding:0 16px 0 42px;background:#f8fafc;outline:none}.search input:focus{border-color:#60a5fa;box-shadow:0 0 0 3px rgba(37,99,235,.1)}.search span{position:absolute;left:14px;top:11px;color:var(--muted)}
+    .top-actions{display:flex;align-items:center;gap:10px}.icon-btn,.avatar{width:40px;height:40px;border:1px solid var(--line);background:#fff;border-radius:12px;display:grid;place-items:center}.avatar{border-radius:50%;background:linear-gradient(135deg,#dbeafe,#bfdbfe);font-weight:700;color:var(--blue)}
+    .content{padding:26px 30px 110px;max-width:1680px;margin:auto}
+    .crumb{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;margin-bottom:18px}.crumb b{color:var(--blue)}
+    .hero{background:linear-gradient(135deg,#fff 10%,#f4f8ff 60%,#ecf8ff 100%);border:1px solid var(--line);border-radius:20px;padding:24px;box-shadow:var(--shadow)}
+    .hero-top{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}.title-wrap{display:flex;gap:16px}.role-icon{width:54px;height:54px;border-radius:15px;background:linear-gradient(135deg,var(--blue),var(--ai));color:#fff;display:grid;place-items:center;font-size:25px;box-shadow:0 10px 25px rgba(37,99,235,.25)}
+    h1{margin:0;font-size:28px;letter-spacing:-.03em}.meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:9px}.badge{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;font-size:12px;font-weight:700}.badge.blue{background:#dbeafe;color:#1d4ed8}.badge.green{background:#d1fae5;color:#047857}.badge.amber{background:#fef3c7;color:#b45309}.badge.red{background:#fee2e2;color:#b91c1c}.badge.gray{background:#eef2f7;color:#475569}
+    .sub{color:var(--muted);margin-top:10px;line-height:1.6}.hero-actions{display:flex;gap:9px;flex-wrap:wrap;justify-content:flex-end}.btn{height:40px;border-radius:10px;padding:0 14px;border:1px solid var(--line);background:#fff;color:var(--text);font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px}.btn:hover{transform:translateY(-1px);box-shadow:0 6px 15px rgba(15,42,95,.09)}.btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}.btn.danger{color:var(--danger);border-color:#fecaca}.btn.soft{background:var(--soft);color:var(--blue);border-color:#bfdbfe}
+    .hero-details{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}.detail-label{color:var(--muted);font-size:12px;margin-bottom:5px}.detail-value{font-weight:700;font-size:14px}
+    .kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px;margin:18px 0}.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 6px 22px rgba(15,42,95,.05)}
+    .kpi{padding:17px}.kpi-top{display:flex;justify-content:space-between;align-items:center}.kpi-icon{width:38px;height:38px;border-radius:11px;background:var(--soft);display:grid;place-items:center;color:var(--ai)}.kpi .value{font-size:23px;font-weight:800;margin-top:14px}.kpi .label{font-size:12px;color:var(--muted);margin-top:4px}.trend{font-size:11px;color:var(--success);margin-top:8px}
+    .tabs{display:flex;gap:6px;background:#e9eff7;padding:5px;border-radius:13px;margin:20px 0 16px;overflow:auto;position:sticky;top:83px;z-index:12}.tab{border:0;background:transparent;padding:10px 14px;border-radius:9px;color:#52657f;font-weight:700;white-space:nowrap}.tab.active{background:#fff;color:var(--blue);box-shadow:0 3px 10px rgba(15,42,95,.08)}
+    .panel{display:none}.panel.active{display:block}
+    .grid-2{display:grid;grid-template-columns:1.3fr .7fr;gap:16px}.section{padding:20px}.section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}.section h2{margin:0;font-size:18px}.section p{margin:5px 0 0;color:var(--muted);font-size:13px;line-height:1.5}
+    .summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.summary-card{border:1px solid var(--line);border-radius:13px;padding:14px;background:#fbfdff}.summary-card .row{display:flex;justify-content:space-between;align-items:center}.summary-card h3{font-size:14px;margin:0}.metric-row{display:flex;gap:12px;margin-top:13px;font-size:12px;color:var(--muted)}.dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:4px}.allow{background:var(--success)}.deny{background:var(--danger)}.restrict{background:var(--warn)}
+    .timeline{display:flex;flex-direction:column;gap:14px}.activity{display:grid;grid-template-columns:36px 1fr;gap:12px}.activity .av{width:36px;height:36px;border-radius:10px;background:#dbeafe;color:var(--blue);display:grid;place-items:center;font-weight:800}.activity strong{font-size:13px}.activity p{margin:3px 0;color:var(--muted);font-size:12px}.activity small{color:#94a3b8}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}.toolbar .grow{flex:1}.toolbar input,.toolbar select{height:40px;border:1px solid var(--line);border-radius:10px;padding:0 12px;background:#fff;outline:none}.toolbar input{min-width:240px}
+    .alert{display:flex;gap:12px;border:1px solid #fde68a;background:#fffbeb;color:#92400e;border-radius:12px;padding:13px 14px;margin-bottom:14px}.alert strong{display:block;font-size:13px}.alert p{margin:3px 0 0;font-size:12px;color:#a16207}
+    .matrix{overflow:auto;border:1px solid var(--line);border-radius:13px}.matrix table{border-collapse:separate;border-spacing:0;width:100%;min-width:960px}.matrix th{position:sticky;top:0;background:#f6f9fd;color:#52657f;font-size:11px;text-transform:uppercase;letter-spacing:.05em;padding:11px;border-bottom:1px solid var(--line);text-align:center}.matrix th:first-child,.matrix td:first-child{position:sticky;left:0;z-index:2;background:#fff;text-align:left}.matrix th:first-child{z-index:3;background:#f6f9fd}.matrix td{padding:12px;border-bottom:1px solid #edf2f7;text-align:center}.matrix tr:last-child td{border-bottom:0}.module{font-weight:700}.module small{display:block;color:var(--muted);font-weight:400;margin-top:3px}.state{border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:#fff;color:#475569;font-size:12px}.state.allow-s{background:#ecfdf5;color:#047857;border-color:#a7f3d0}.state.deny-s{background:#fff1f2;color:#be123c;border-color:#fecdd3}.state.read-s{background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe}.state.cond-s{background:#fffbeb;color:#b45309;border-color:#fde68a}
+    .scope-list{display:grid;gap:12px}.scope-option{border:1px solid var(--line);border-radius:13px;padding:15px;display:flex;gap:13px;align-items:flex-start}.scope-option.selected{border-color:#60a5fa;background:#eff6ff}.radio{width:18px;height:18px;border:2px solid #94a3b8;border-radius:50%;margin-top:2px}.selected .radio{border:5px solid var(--ai)}.scope-option strong{font-size:14px}.scope-option p{margin:4px 0 0}
+    .ai-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.ai-card{border:1px solid var(--line);border-radius:13px;padding:15px;background:linear-gradient(135deg,#fff,#f6faff)}.ai-head{display:flex;justify-content:space-between;gap:10px}.ai-head strong{font-size:14px}.toggle{width:42px;height:24px;background:#cbd5e1;border-radius:999px;position:relative;border:0}.toggle:after{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.2s}.toggle.on{background:var(--ai)}.toggle.on:after{left:21px}.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}.chip{font-size:11px;border:1px solid var(--line);padding:5px 8px;border-radius:999px;background:#fff}.chip.on{background:#dbeafe;border-color:#93c5fd;color:#1d4ed8}
+    .table-wrap{overflow:auto}.data-table{width:100%;border-collapse:collapse;min-width:850px}.data-table th{text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em;padding:11px;border-bottom:1px solid var(--line)}.data-table td{padding:13px 11px;border-bottom:1px solid #edf2f7;font-size:13px}.user{display:flex;align-items:center;gap:10px}.user .av{width:34px;height:34px;border-radius:50%;background:#dbeafe;color:var(--blue);display:grid;place-items:center;font-weight:800}.user small{display:block;color:var(--muted);margin-top:2px}
+    .audit-item{display:grid;grid-template-columns:160px 1fr 150px;gap:14px;padding:15px 0;border-bottom:1px solid #edf2f7}.audit-item:last-child{border-bottom:0}.audit-type{font-weight:700;font-size:13px}.audit-desc{font-size:13px}.audit-desc small{display:block;color:var(--muted);margin-top:4px}.audit-time{font-size:12px;color:var(--muted);text-align:right}
+    .sticky-actions{display:none;position:fixed;left:252px;right:0;bottom:0;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:13px 28px;z-index:30;box-shadow:0 -8px 24px rgba(15,42,95,.08);align-items:center;justify-content:space-between}.sticky-actions.show{display:flex}.unsaved{display:flex;align-items:center;gap:10px;font-weight:700}.unsaved:before{content:"";width:9px;height:9px;background:var(--warn);border-radius:50%}
+    .modal{position:fixed;inset:0;background:rgba(2,6,23,.52);z-index:100;display:none;place-items:center;padding:20px}.modal.show{display:grid}.dialog{width:min(560px,100%);background:#fff;border-radius:18px;box-shadow:0 24px 70px rgba(2,6,23,.3);padding:22px}.dialog h3{margin:0;font-size:20px}.dialog .impact{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:14px;margin:15px 0}.dialog textarea{width:100%;min-height:90px;border:1px solid var(--line);border-radius:10px;padding:10px}.dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+    .toast{position:fixed;top:86px;right:24px;background:#0f172a;color:#fff;padding:12px 16px;border-radius:10px;box-shadow:var(--shadow);opacity:0;transform:translateY(-8px);pointer-events:none;transition:.25s;z-index:200}.toast.show{opacity:1;transform:translateY(0)}
+    @media(max-width:1200px){.kpis{grid-template-columns:repeat(3,1fr)}.hero-details{grid-template-columns:repeat(2,1fr)}.summary-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:900px){.app{grid-template-columns:78px 1fr}.sidebar{padding:18px 9px}.brand div,.nav-label,.nav a span{display:none}.brand{justify-content:center;padding-left:0;padding-right:0}.nav a{justify-content:center}.sticky-actions{left:78px}.grid-2{grid-template-columns:1fr}.hero-top{flex-direction:column}.hero-actions{justify-content:flex-start}.ai-grid{grid-template-columns:1fr}}
+    @media(max-width:640px){body{font-size:14px}.topbar{padding:0 14px}.search{width:60%}.content{padding:18px 14px 110px}.kpis{grid-template-columns:repeat(2,1fr)}.hero-details{grid-template-columns:1fr}.summary-grid{grid-template-columns:1fr}.title-wrap{flex-direction:column}.hero-actions .btn{flex:1}.sticky-actions{left:0;padding:10px 14px}.sticky-actions .left-text{display:none}.sidebar{display:none}.app{display:block}.audit-item{grid-template-columns:1fr}.audit-time{text-align:left}.tabs{top:76px}}
+
+    /* Blue Enterprise Theme — Premium Healthcare AI / InsurTech Visual System */
+    :root{
+      --navy:#0F2A5F;
+      --blue:#1E3A8A;
+      --ai:#2563EB;
+      --soft:#EFF6FF;
+      --blue-border:#BFDBFE;
+      --sky:#38BDF8;
+      --bg:#F8FAFC;
+      --surface:#FFFFFF;
+      --line:#E2E8F0;
+      --text:#0F172A;
+      --muted:#64748B;
+      --success:#059669;
+      --warn:#D97706;
+      --danger:#DC2626;
+      --shadow:0 10px 30px rgba(15,42,95,.07);
+      --shadow-lg:0 22px 54px rgba(15,42,95,.12);
+      --radius:16px;
+    }
+    body{background:var(--bg);font-size:15px;line-height:1.5}
+    .sidebar{background:var(--navy);border-right:1px solid rgba(191,219,254,.12);box-shadow:14px 0 36px rgba(15,42,95,.12)}
+    .logo{background:var(--ai);color:#fff;box-shadow:0 10px 24px rgba(37,99,235,.30)}
+    .brand small{color:#BFDBFE}
+    .nav-label{color:#93A9CF}
+    .nav a{color:#D7E2F3;border:1px solid transparent}
+    .nav a:hover{background:rgba(255,255,255,.07);border-color:rgba(191,219,254,.12)}
+    .nav a.active{background:rgba(37,99,235,.18);color:#fff;border-color:rgba(56,189,248,.20);box-shadow:inset 3px 0 0 var(--sky)}
+    .topbar{background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);box-shadow:0 4px 18px rgba(15,42,95,.04)}
+    .search input{background:#fff;border-color:var(--line)}
+    .search input:focus,.toolbar input:focus,.toolbar select:focus,textarea:focus,select:focus{border-color:var(--ai)!important;box-shadow:0 0 0 3px rgba(37,99,235,.12)!important;outline:none}
+    .icon-btn,.avatar{transition:.18s ease}
+    .icon-btn:hover{border-color:var(--blue-border);background:var(--soft);color:var(--blue)}
+    .content{padding-top:30px}
+    .hero{background:#fff;border:1px solid var(--line);box-shadow:var(--shadow-lg);position:relative;overflow:hidden}
+    .hero:before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:linear-gradient(90deg,var(--blue),var(--ai),var(--sky))}
+    .role-icon{background:var(--blue);box-shadow:0 12px 28px rgba(30,58,138,.24)}
+    h1{color:var(--navy);font-weight:800}
+    .sub{color:var(--muted)}
+    .btn{border-radius:12px;transition:.18s ease;box-shadow:none}
+    .btn:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(15,42,95,.10)}
+    .btn.primary{background:var(--blue);border-color:var(--blue)}
+    .btn.primary:hover{background:var(--navy);border-color:var(--navy)}
+    .btn.soft{background:var(--soft);border-color:var(--blue-border);color:var(--blue)}
+    .btn.danger{background:#fff;color:var(--danger);border-color:#FECACA}
+    .card{border-color:var(--line);box-shadow:var(--shadow)}
+    .kpi{position:relative;overflow:hidden}
+    .kpi:before{content:"";position:absolute;left:0;top:0;width:100%;height:3px;background:var(--blue);opacity:.85}
+    .kpi:nth-child(2):before,.kpi:nth-child(5):before{background:var(--ai)}
+    .kpi:nth-child(4):before{background:var(--warn)}
+    .kpi:nth-child(6):before{background:var(--sky)}
+    .kpi-icon{background:var(--soft);border:1px solid var(--blue-border);color:var(--ai)}
+    .kpi .value{color:var(--navy)}
+    .tabs{background:#EEF2F7;border:1px solid var(--line);box-shadow:0 8px 20px rgba(15,42,95,.04)}
+    .tab{color:#52657F}
+    .tab.active{color:var(--blue);background:#fff;box-shadow:0 4px 14px rgba(15,42,95,.08)}
+    .section h2{color:var(--navy);font-weight:750}
+    .summary-card{background:#fff;border-color:var(--line);transition:.18s ease}
+    .summary-card:hover{border-color:var(--blue-border);box-shadow:0 10px 24px rgba(15,42,95,.06)}
+    .activity .av,.user .av{background:var(--soft)!important;color:var(--blue)!important;border:1px solid var(--blue-border)}
+    .alert{border-color:#FDE68A;background:#FFFBEB}
+    .matrix{border-color:var(--line);box-shadow:inset 0 1px 0 #fff}
+    .matrix th{background:#F1F5F9;color:#475569}
+    .matrix th:first-child{background:#F1F5F9}
+    .matrix tbody tr:hover td{background:#F8FBFF}
+    .matrix tbody tr:hover td:first-child{background:#F8FBFF}
+    .state{border-radius:10px}
+    .state.allow-s{background:#ECFDF5;color:#047857;border-color:#A7F3D0}
+    .state.deny-s{background:#FEF2F2;color:#B91C1C;border-color:#FECACA}
+    .state.read-s{background:var(--soft);color:var(--ai);border-color:var(--blue-border)}
+    .state.cond-s{background:#FFFBEB;color:#B45309;border-color:#FDE68A}
+    .scope-option{background:#fff;transition:.18s ease}
+    .scope-option:hover{border-color:var(--blue-border);box-shadow:0 8px 20px rgba(15,42,95,.05)}
+    .scope-option.selected{background:var(--soft);border-color:var(--ai);box-shadow:0 0 0 3px rgba(37,99,235,.07)}
+    .ai-card{background:var(--soft);border-color:var(--blue-border);position:relative;overflow:hidden}
+    .ai-card:before{content:"AI";position:absolute;right:14px;bottom:-8px;font-size:54px;font-weight:800;color:rgba(37,99,235,.05)}
+    .toggle.on{background:var(--ai);box-shadow:0 0 0 3px rgba(37,99,235,.10)}
+    .chip.on{background:#DBEAFE!important;color:#1D4ED8!important;border-color:var(--blue-border)!important}
+    .badge.blue{background:#DBEAFE;color:#1D4ED8;border:1px solid var(--blue-border)}
+    .badge.green{background:#ECFDF5;color:#047857;border:1px solid #A7F3D0}
+    .badge.amber{background:#FFFBEB;color:#B45309;border:1px solid #FDE68A}
+    .badge.red{background:#FEF2F2;color:#B91C1C;border:1px solid #FECACA}
+    .badge.gray{background:#F1F5F9;color:#475569;border:1px solid var(--line)}
+    .data-table thead th{background:#F1F5F9;color:#475569}
+    .data-table tbody tr:hover{background:#F8FBFF}
+    .audit-item{border-color:var(--line)}
+    .sticky-actions{background:rgba(255,255,255,.98);border-top:1px solid var(--blue-border);box-shadow:0 -14px 36px rgba(15,42,95,.12)}
+    .dialog{border:1px solid var(--blue-border);box-shadow:0 28px 80px rgba(15,42,95,.24)}
+    .impact{background:var(--soft);border:1px solid var(--blue-border);color:var(--navy)}
+    .toast{background:var(--navy);box-shadow:0 14px 34px rgba(15,42,95,.28)}
+    @media(max-width:900px){.sidebar{box-shadow:none}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo">N</div><div><strong>Med AI NexSure</strong><small>Enterprise Platform</small></div></div>
+    <div class="nav">
+      <div class="nav-label">Workspace</div>
+      <a href="#"><b>⌂</b><span>Executive Dashboard</span></a><a href="#"><b>◉</b><span>Patients</span></a><a href="#"><b>▣</b><span>Visits</span></a><a href="#"><b>✦</b><span>AI Clinical Engine</span></a><a href="#"><b>✓</b><span>Claim Readiness</span></a>
+      <div class="nav-label">Intelligence</div>
+      <a href="#"><b>◇</b><span>Economic Intelligence</span></a><a href="#"><b>▤</b><span>Evidence Packages</span></a><a href="#"><b>⌁</b><span>Audit & Compliance</span></a>
+      <div class="nav-label">Administration</div>
+      <a href="#"><b>♙</b><span>Users</span></a><a class="active" href="#"><b>⬡</b><span>Roles & Permissions</span></a><a href="#"><b>⚙</b><span>Organization Settings</span></a>
+    </div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><div class="search"><span>⌕</span><input placeholder="Search patients, visits, claims or users..." /></div><div class="top-actions"><button class="icon-btn">✦</button><button class="icon-btn">♢</button><div class="avatar">BJ</div></div></header>
+    <div class="content">
+      <div class="crumb"><span>Administration</span><span>›</span><span>Roles</span><span>›</span><b>Role Detail</b></div>
+      <section class="hero">
+        <div class="hero-top">
+          <div class="title-wrap"><div class="role-icon">⬡</div><div><h1>Claim Reviewer</h1><div class="meta"><span class="badge blue">System Role</span><span class="badge green">● Active</span><span class="badge gray">CLAIM_REVIEWER</span></div><div class="sub">Reviews claim readiness, validates evidence packages, and manages claim submission exceptions.<br>ตรวจสอบความพร้อมเคลม หลักฐาน และข้อยกเว้นก่อนส่งเคลม</div></div></div>
+          <div class="hero-actions"><button class="btn soft" onclick="showToast('Role duplicated as a draft')">⧉ Duplicate</button><button class="btn" onclick="showToast('Permission report export started')">⇩ Export</button><button class="btn primary" onclick="enterEdit()">✎ Edit Role</button><button class="btn danger" onclick="openDeactivate()">⊘ Deactivate</button></div>
+        </div>
+        <div class="hero-details"><div><div class="detail-label">Access Level</div><div class="detail-value">Organization & Assigned Clinics</div></div><div><div class="detail-label">Last Updated</div><div class="detail-value">10 Jul 2026, 14:42</div></div><div><div class="detail-label">Updated By</div><div class="detail-value">Benz Jam-Oum · Administrator</div></div><div><div class="detail-label">Permission Version</div><div class="detail-value">v12 · Audit Ready</div></div></div>
+      </section>
+
+      <section class="kpis">
+        <div class="card kpi"><div class="kpi-top"><span class="kpi-icon">♙</span><span class="badge blue">+3</span></div><div class="value">24</div><div class="label">Assigned Users</div><div class="trend">21 active · 3 invited</div></div>
+        <div class="card kpi"><div class="kpi-top"><span class="kpi-icon">●</span></div><div class="value">21</div><div class="label">Active Users</div><div class="trend">87.5% of assignments</div></div>
+        <div class="card kpi"><div class="kpi-top"><span class="kpi-icon">✓</span></div><div class="value">46</div><div class="label">Enabled Permissions</div><div class="trend">Across 12 modules</div></div>
+        <div class="card kpi"><div class="kpi-top"><span class="kpi-icon">⊘</span></div><div class="value">18</div><div class="label">Restricted Permissions</div><div class="trend">7 conditional · 11 denied</div></div>
+        <div class="card kpi"><div class="kpi-top"><span class="kpi-icon">◎</span></div><div class="value" style="font-size:18px">Organization</div><div class="label">Maximum Data Scope</div><div class="trend">Limited by clinic assignment</div></div>
+        <div class="card kpi"><div class="kpi-top"><span class="kpi-icon">↻</span></div><div class="value" style="font-size:18px">8 Jul</div><div class="label">Last Permission Change</div><div class="trend">2 days ago by Compliance</div></div>
+      </section>
+
+      <div class="tabs" role="tablist"><button class="tab active" data-tab="overview">Overview</button><button class="tab" data-tab="permissions">Permissions</button><button class="tab" data-tab="scope">Data Scope</button><button class="tab" data-tab="ai">AI Access</button><button class="tab" data-tab="users">Assigned Users</button><button class="tab" data-tab="audit">Audit Trail</button></div>
+
+      <section id="overview" class="panel active">
+        <div class="grid-2">
+          <div class="card section"><div class="section-head"><div><h2>Permission Summary</h2><p>ภาพรวมสิทธิ์ตามหมวดหมู่สำหรับการตรวจสอบอย่างรวดเร็ว</p></div><button class="btn" onclick="activateTab('permissions')">View Matrix →</button></div>
+            <div class="summary-grid">
+              <div class="summary-card"><div class="row"><h3>Clinical Access</h3><span class="badge red">Sensitive</span></div><div class="metric-row"><span><i class="dot allow"></i>12 enabled</span><span><i class="dot deny"></i>4 denied</span><span><i class="dot restrict"></i>3 restricted</span></div></div>
+              <div class="summary-card"><div class="row"><h3>Insurance Access</h3><span class="badge blue">Core</span></div><div class="metric-row"><span><i class="dot allow"></i>16 enabled</span><span><i class="dot deny"></i>2 denied</span><span><i class="dot restrict"></i>2 restricted</span></div></div>
+              <div class="summary-card"><div class="row"><h3>Financial Access</h3><span class="badge amber">Restricted</span></div><div class="metric-row"><span><i class="dot allow"></i>4 enabled</span><span><i class="dot deny"></i>5 denied</span><span><i class="dot restrict"></i>2 restricted</span></div></div>
+              <div class="summary-card"><div class="row"><h3>Administration</h3><span class="badge gray">Limited</span></div><div class="metric-row"><span><i class="dot allow"></i>2 enabled</span><span><i class="dot deny"></i>11 denied</span><span><i class="dot restrict"></i>0 restricted</span></div></div>
+              <div class="summary-card"><div class="row"><h3>Compliance</h3><span class="badge red">Sensitive</span></div><div class="metric-row"><span><i class="dot allow"></i>6 enabled</span><span><i class="dot deny"></i>3 denied</span><span><i class="dot restrict"></i>2 restricted</span></div></div>
+              <div class="summary-card"><div class="row"><h3>AI Access</h3><span class="badge blue">AI</span></div><div class="metric-row"><span><i class="dot allow"></i>6 enabled</span><span><i class="dot deny"></i>3 denied</span><span><i class="dot restrict"></i>2 restricted</span></div></div>
+            </div>
+          </div>
+          <div class="card section"><div class="section-head"><div><h2>Recent Activity</h2><p>กิจกรรมล่าสุดของบทบาท</p></div><button class="btn" onclick="activateTab('audit')">Audit Log</button></div><div class="timeline">
+            <div class="activity"><div class="av">BJ</div><div><strong>Benz enabled Claim Readiness Override</strong><p>Sensitive permission · Change reason recorded</p><small>10 Jul 2026 · 14:42</small></div></div>
+            <div class="activity"><div class="av">SP</div><div><strong>Somchai assigned this role to 3 users</strong><p>Bangkok Clinic · Claim Operations</p><small>9 Jul 2026 · 11:18</small></div></div>
+            <div class="activity"><div class="av">NC</div><div><strong>Nicha removed Export Patient Data</strong><p>Compliance access review</p><small>8 Jul 2026 · 16:05</small></div></div>
+            <div class="activity"><div class="av">SY</div><div><strong>System refreshed permission version</strong><p>Active sessions queued for revalidation</p><small>8 Jul 2026 · 16:06</small></div></div>
+          </div></div>
+        </div>
+      </section>
+
+      <section id="permissions" class="panel"><div class="card section"><div class="section-head"><div><h2>Permission Matrix</h2><p>Manage access by module and action. Default policy is Deny.</p></div><span class="badge amber" id="changeCount">0 changes</span></div>
+        <div class="alert"><span>⚠</span><div><strong>Segregation of Duties monitoring is enabled</strong><p>ระบบจะตรวจสอบ Permission conflict และ Sensitive access ก่อนบันทึก</p></div></div>
+        <div class="toolbar"><input class="grow" id="permissionSearch" placeholder="Search module or permission..." oninput="filterPermissions()"><select><option>All Categories</option><option>Clinical</option><option>Insurance</option><option>Administration</option></select><select><option>All Permissions</option><option>Sensitive only</option><option>Changed only</option></select><button class="btn" onclick="resetPermissions()">Reset Default</button><button class="btn soft" onclick="showToast('Role comparison drawer opened')">⇄ Compare Role</button></div>
+        <div class="matrix"><table><thead><tr><th>Module / Permission</th><th>View</th><th>Create</th><th>Edit</th><th>Approve</th><th>Export</th><th>Override</th></tr></thead><tbody id="matrixBody">
+          <tr data-search="patients clinical"><td><div class="module">Patients <span class="badge red">Sensitive</span><small>Patient demographics and identifiable information</small></div></td><td><select class="state allow-s" onchange="changed(this)"><option>Allow</option><option>Deny</option><option>Read Only</option></select></td><td><select class="state deny-s" onchange="changed(this)"><option>Deny</option><option>Allow</option></select></td><td><select class="state read-s" onchange="changed(this)"><option>Read Only</option><option>Allow</option><option>Deny</option></select></td><td>—</td><td><select class="state deny-s" onchange="changed(this)"><option>Deny</option><option>Conditional</option></select></td><td>—</td></tr>
+          <tr data-search="visits clinical"><td><div class="module">Visits<small>Visit records, status and clinical workflow</small></div></td><td><select class="state allow-s" onchange="changed(this)"><option>Allow</option><option>Deny</option></select></td><td><select class="state deny-s" onchange="changed(this)"><option>Deny</option><option>Allow</option></select></td><td><select class="state read-s" onchange="changed(this)"><option>Read Only</option><option>Allow</option></select></td><td>—</td><td><select class="state cond-s" onchange="changed(this)"><option>Conditional</option><option>Deny</option></select></td><td>—</td></tr>
+          <tr data-search="soap notes clinical"><td><div class="module">SOAP Notes <span class="badge red">Sensitive</span><small>Clinical documentation and signed notes</small></div></td><td><select class="state allow-s" onchange="changed(this)"><option>Allow</option><option>Deny</option></select></td><td><select class="state deny-s" onchange="changed(this)"><option>Deny</option><option>Allow</option></select></td><td><select class="state read-s" onchange="changed(this)"><option>Read Only</option><option>Allow</option><option>Deny</option></select></td><td><select class="state deny-s" onchange="changed(this)"><option>Deny</option><option>Conditional</option></select></td><td>—</td><td>—</td></tr>
+          <tr data-search="claim readiness insurance"><td><div class="module">Claim Readiness <span class="badge blue">Core</span><small>Assess, recalculate and submit readiness</small></div></td><td><select class="state allow-s" onchange="changed(this)"><option>Allow</option><option>Deny</option></select></td><td><select class="state allow-s" onchange="changed(this)"><option>Allow</option><option>Deny</option></select></td><td><select class="state allow-s" onchange="changed(this)"><option>Allow</option><option>Read Only</option></select></td><td><select class="state cond-s" onchange="changed(this)"><option>Conditional</option><option>Allow</option><option>Deny</option></select></td><td><select class="state allow-s" onchange="changed(this)"><option>Allow</option><option>Deny</option></select></td><td><select class="state cond-s" onchange="changed(this)"><option>Conditional</option><option>Deny</option></select></td></tr>
+          <tr data-search="evidence package insurance"><td><div class="module">Evidence Package<small>Generate and export claim evidence</small></div></td><td><select class="state allow-s" onchange="changed(this)"><option>Allow</option><option>Deny</option></select></td><td><select class="state allow-s" onchange="changed(this)"><option>Allow</option><option>Deny</option></select></td><td><select class="state read-s" onchange="changed(this)"><option>Read Only</option><option>Allow</option></select></td><td><select class="state cond-s" onchange="changed(this)"><option>Conditional</option><option>Deny</option></select></td><td><select class="state allow-s" onchange="changed(this)"><option>Allow</option><option>Deny</option></select></td><td>—</td></tr>
+          <tr data-search="economic intelligence financial"><td><div class="module">Economic Intelligence <span class="badge amber">Restricted</span><small>Cost summary, benchmark and outliers</small></div></td><td><select class="state allow-s" onchange="changed(this)"><option>Allow</option><option>Deny</option></select></td><td>—</td><td><select class="state deny-s" onchange="changed(this)"><option>Deny</option><option>Allow</option></select></td><td>—</td><td><select class="state deny-s" onchange="changed(this)"><option>Deny</option><option>Conditional</option></select></td><td>—</td></tr>
+          <tr data-search="role management administration"><td><div class="module">Role Management <span class="badge red">Sensitive</span><small>Manage roles and assign permissions</small></div></td><td><select class="state read-s" onchange="changed(this)"><option>Read Only</option><option>Allow</option><option>Deny</option></select></td><td><select class="state deny-s" onchange="changed(this)"><option>Deny</option><option>Allow</option></select></td><td><select class="state deny-s" onchange="changed(this)"><option>Deny</option><option>Allow</option></select></td><td>—</td><td><select class="state deny-s" onchange="changed(this)"><option>Deny</option><option>Conditional</option></select></td><td>—</td></tr>
+          <tr data-search="audit compliance"><td><div class="module">Audit & Compliance <span class="badge red">Sensitive</span><small>Audit trail and access history</small></div></td><td><select class="state allow-s" onchange="changed(this)"><option>Allow</option><option>Deny</option></select></td><td>—</td><td>—</td><td>—</td><td><select class="state cond-s" onchange="changed(this)"><option>Conditional</option><option>Deny</option></select></td><td>—</td></tr>
+        </tbody></table></div>
+      </div></section>
+
+      <section id="scope" class="panel"><div class="grid-2"><div class="card section"><div class="section-head"><div><h2>Data Access Scope</h2><p>Permission และ Data Scope ต้องทำงานร่วมกัน</p></div><span class="badge red">Sensitive Control</span></div><div class="scope-list">
+        <div class="scope-option selected" onclick="selectScope(this)"><span class="radio"></span><div><strong>Organization & Assigned Clinics</strong><p>Access all claim records across the organization, limited to assigned clinics.</p></div></div>
+        <div class="scope-option" onclick="selectScope(this)"><span class="radio"></span><div><strong>Clinic</strong><p>เข้าถึงเฉพาะ Clinic ที่ได้รับมอบหมาย</p></div></div>
+        <div class="scope-option" onclick="selectScope(this)"><span class="radio"></span><div><strong>Department</strong><p>Access only selected departments and their assigned cases.</p></div></div>
+        <div class="scope-option" onclick="selectScope(this)"><span class="radio"></span><div><strong>Assigned Cases Only</strong><p>เข้าถึงเฉพาะเคสที่ Assign ให้ผู้ใช้งาน</p></div></div>
+      </div></div><div class="card section"><h2>Scope Configuration</h2><p>Current organization policy restrictions</p><div style="margin-top:18px;display:grid;gap:14px"><label><b>Organization</b><select style="width:100%;height:42px;margin-top:6px;border:1px solid var(--line);border-radius:10px;padding:0 10px"><option>Med AI NexSure Group</option></select></label><label><b>Allowed Clinics</b><select multiple style="width:100%;height:120px;margin-top:6px;border:1px solid var(--line);border-radius:10px;padding:8px"><option selected>Bangkok Central Clinic</option><option selected>Rama 9 Medical Center</option><option>Chiang Mai Clinic</option></select></label><label><b>Patient Data</b><select style="width:100%;height:42px;margin-top:6px;border:1px solid var(--line);border-radius:10px;padding:0 10px"><option>Identifiable within assigned claims</option></select></label><div class="alert" style="margin:0"><span>🛡</span><div><strong>PHI Access is logged</strong><p>ทุกการเข้าถึงข้อมูลผู้ป่วยจะถูกบันทึกเพื่อ Audit</p></div></div></div></div></div></section>
+
+      <section id="ai" class="panel"><div class="card section"><div class="section-head"><div><h2>AI Access Control</h2><p>AI is Decision Support — not a Decision Maker.</p></div><span class="badge blue">Organization Policy Applied</span></div><div class="ai-grid">
+        <div class="ai-card"><div class="ai-head"><div><strong>AI SOAP Summary</strong><p>View generated clinical summaries</p></div><button class="toggle on" onclick="toggleAI(this)"></button></div><div class="chips"><span class="chip on">View</span><span class="chip">Generate</span><span class="chip">Accept</span></div></div>
+        <div class="ai-card"><div class="ai-head"><div><strong>AI ICD Suggestion</strong><p>Review coding recommendations</p></div><button class="toggle on" onclick="toggleAI(this)"></button></div><div class="chips"><span class="chip on">View</span><span class="chip on">Generate</span><span class="chip">Override</span></div></div>
+        <div class="ai-card"><div class="ai-head"><div><strong>Claim Readiness AI</strong><p>Assess completeness and risk</p></div><button class="toggle on" onclick="toggleAI(this)"></button></div><div class="chips"><span class="chip on">View</span><span class="chip on">Recalculate</span><span class="chip on">Override</span></div></div>
+        <div class="ai-card"><div class="ai-head"><div><strong>Missing Evidence Detection</strong><p>Identify missing claim documents</p></div><button class="toggle on" onclick="toggleAI(this)"></button></div><div class="chips"><span class="chip on">View</span><span class="chip on">Resolve</span></div></div>
+        <div class="ai-card"><div class="ai-head"><div><strong>Clinical Recommendation</strong><p>Clinical authorization required</p></div><button class="toggle" onclick="toggleAI(this)"></button></div><div class="chips"><span class="chip">View</span><span class="chip">Generate</span><span class="chip">Accept</span></div></div>
+        <div class="ai-card"><div class="ai-head"><div><strong>AI Copilot with Patient Context</strong><p>Restricted contextual assistance</p></div><button class="toggle" onclick="toggleAI(this)"></button></div><div class="chips"><span class="chip">Use</span><span class="chip">Patient Context</span></div></div>
+      </div></div></section>
+
+      <section id="users" class="panel"><div class="card section"><div class="section-head"><div><h2>Assigned Users</h2><p>24 users currently receive this role</p></div><button class="btn primary" onclick="showToast('Assign users dialog opened')">＋ Assign Users</button></div><div class="toolbar"><input class="grow" placeholder="Search user, email or department..."><select><option>All Clinics</option><option>Bangkok Central</option><option>Rama 9</option></select><select><option>All Status</option><option>Active</option><option>Invited</option></select><button class="btn">⇩ Export List</button></div><div class="table-wrap"><table class="data-table"><thead><tr><th>User</th><th>Organization / Clinic</th><th>Department</th><th>Status</th><th>Last Active</th><th>Assigned At</th><th></th></tr></thead><tbody>
+        <tr><td><div class="user"><div class="av">NK</div><div><b>Nicha Kittipong</b><small>nicha.k@nexsure.co.th</small></div></div></td><td>Med AI NexSure<br><small>Bangkok Central</small></td><td>Claim Operations</td><td><span class="badge green">Active</span></td><td>10 Jul 2026</td><td>15 May 2026</td><td><button class="btn">View</button></td></tr>
+        <tr><td><div class="user"><div class="av">SP</div><div><b>Somchai Prasert</b><small>somchai.p@nexsure.co.th</small></div></div></td><td>Med AI NexSure<br><small>Rama 9</small></td><td>Claim Review</td><td><span class="badge green">Active</span></td><td>10 Jul 2026</td><td>02 Jun 2026</td><td><button class="btn">View</button></td></tr>
+        <tr><td><div class="user"><div class="av">AR</div><div><b>Araya Rattanakul</b><small>araya.r@nexsure.co.th</small></div></div></td><td>Med AI NexSure<br><small>Bangkok Central</small></td><td>Insurance Liaison</td><td><span class="badge amber">Invited</span></td><td>—</td><td>09 Jul 2026</td><td><button class="btn">View</button></td></tr>
+      </tbody></table></div></div></section>
+
+      <section id="audit" class="panel"><div class="card section"><div class="section-head"><div><h2>Role Audit Trail</h2><p>Append-only records for compliance and traceability</p></div><button class="btn" onclick="showToast('Audit export started')">⇩ Export Audit</button></div>
+        <div class="audit-item"><div class="audit-type"><span class="badge blue">Permission Updated</span></div><div class="audit-desc"><b>Claim Readiness Override enabled</b><small>Before: Deny → After: Conditional · Reason: Senior reviewer escalation workflow</small></div><div class="audit-time">10 Jul 2026<br>14:42:18</div></div>
+        <div class="audit-item"><div class="audit-type"><span class="badge green">Users Assigned</span></div><div class="audit-desc"><b>3 users assigned by Somchai Prasert</b><small>Correlation ID: rol_9fa21 · Bangkok Central Clinic</small></div><div class="audit-time">9 Jul 2026<br>11:18:04</div></div>
+        <div class="audit-item"><div class="audit-type"><span class="badge red">Permission Removed</span></div><div class="audit-desc"><b>Export Patient Data removed</b><small>Compliance review · Before: Conditional → After: Deny</small></div><div class="audit-time">8 Jul 2026<br>16:05:31</div></div>
+        <div class="audit-item"><div class="audit-type"><span class="badge gray">Scope Changed</span></div><div class="audit-desc"><b>Clinic scope updated</b><small>Added Rama 9 Medical Center · Actor IP 10.24.8.15</small></div><div class="audit-time">3 Jul 2026<br>09:24:52</div></div>
+      </div></section>
+    </div>
+  </main>
+</div>
+
+<div class="sticky-actions" id="sticky"><div class="unsaved"><span class="left-text">Unsaved changes · การแก้ไขยังไม่ถูกบันทึก</span></div><div style="display:flex;gap:8px"><button class="btn" onclick="discardChanges()">Discard</button><button class="btn soft" onclick="reviewChanges()">Review Changes</button><button class="btn primary" onclick="reviewChanges()">Save Role</button></div></div>
+<div class="modal" id="saveModal"><div class="dialog"><h3>Review Permission Impact</h3><p style="color:var(--muted)">โปรดตรวจสอบผลกระทบก่อนบันทึกการเปลี่ยนแปลง</p><div class="impact"><b>24 users will be affected</b><p>• 2 permissions changed<br>• 1 sensitive permission enabled<br>• 21 active sessions require revalidation</p></div><label><b>Change reason</b><textarea placeholder="Explain why this access change is required..."></textarea></label><div class="dialog-actions"><button class="btn" onclick="closeModal('saveModal')">Cancel</button><button class="btn primary" onclick="saveRole()">Confirm & Save</button></div></div></div>
+<div class="modal" id="deactivateModal"><div class="dialog"><h3>Deactivate Claim Reviewer?</h3><p style="color:var(--muted)">Role นี้มีผู้ใช้งาน 24 คน และจะไม่สามารถ Assign เพิ่มได้หลังปิดใช้งาน</p><div class="impact"><b>User Impact</b><p>• 24 assigned users remain in history<br>• New assignments will be blocked<br>• Existing sessions will refresh permissions</p></div><div class="dialog-actions"><button class="btn" onclick="closeModal('deactivateModal')">Cancel</button><button class="btn danger" onclick="deactivateRole()">Deactivate Role</button></div></div></div>
+<div class="toast" id="toast">Saved</div>
+<script>
+  let changeCounter=0;
+  document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>activateTab(t.dataset.tab)));
+  function activateTab(id){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===id));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===id));}
+  function enterEdit(){document.getElementById('sticky').classList.add('show');showToast('Edit mode enabled');activateTab('permissions');}
+  function changed(el){changeCounter++;document.getElementById('changeCount').textContent=changeCounter+' changes';document.getElementById('sticky').classList.add('show');el.classList.add('cond-s');}
+  function resetPermissions(){changeCounter=0;document.getElementById('changeCount').textContent='0 changes';showToast('Permissions reset to default');}
+  function discardChanges(){changeCounter=0;document.getElementById('changeCount').textContent='0 changes';document.getElementById('sticky').classList.remove('show');showToast('Changes discarded');}
+  function reviewChanges(){document.getElementById('saveModal').classList.add('show');}
+  function closeModal(id){document.getElementById(id).classList.remove('show');}
+  function saveRole(){closeModal('saveModal');changeCounter=0;document.getElementById('changeCount').textContent='0 changes';document.getElementById('sticky').classList.remove('show');showToast('Role updated successfully');}
+  function openDeactivate(){document.getElementById('deactivateModal').classList.add('show');}
+  function deactivateRole(){closeModal('deactivateModal');showToast('Role deactivated successfully');}
+  function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2300)}
+  function selectScope(el){document.querySelectorAll('.scope-option').forEach(x=>x.classList.remove('selected'));el.classList.add('selected');document.getElementById('sticky').classList.add('show');}
+  function toggleAI(el){el.classList.toggle('on');document.getElementById('sticky').classList.add('show');}
+  function filterPermissions(){const q=document.getElementById('permissionSearch').value.toLowerCase();document.querySelectorAll('#matrixBody tr').forEach(r=>r.style.display=r.dataset.search.includes(q)?'':'none');}
+  document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')}));
+</script>
+</body>
+</html>

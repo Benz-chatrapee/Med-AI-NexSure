@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Med AI NexSure — AI Clinical Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--primary:#1E3A8A;--deep:#0F2A5F;--deep2:#071B42;--ai:#2563EB;--soft:#EFF6FF;--blue-border:#BFDBFE;--azure:#38BDF8;--bg:#F8FAFC;--surface:#FFFFFF;--section:#F1F5F9;--border:#E2E8F0;--text:#0F172A;--muted:#64748B;--success:#059669;--warning:#D97706;--danger:#DC2626;--purple:#7C3AED;--shadow:0 16px 36px rgba(15,42,95,.08)}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:var(--text)}
+    .app{display:grid;grid-template-columns:292px 1fr;min-height:100vh}.sidebar{background:linear-gradient(180deg,var(--deep),var(--deep2));color:white;padding:24px 18px;position:sticky;top:0;height:100vh;overflow:auto}.brand{display:flex;gap:12px;align-items:center;margin-bottom:26px}.logo{width:44px;height:44px;border-radius:16px;background:linear-gradient(135deg,var(--azure),var(--ai));display:grid;place-items:center;font-weight:900;box-shadow:0 14px 30px rgba(37,99,235,.35)}.brand h1{font-size:16px;margin:0}.brand p{font-size:11px;color:#BFDBFE;margin:4px 0 0}.nav-title{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:#93C5FD;margin:22px 10px 9px}.nav a{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:15px;color:#DBEAFE;text-decoration:none;font-size:13px;font-weight:750;margin:4px 0}.nav a.active,.nav a:hover{background:rgba(239,246,255,.14);color:white}.nav small{display:block;font-size:10px;color:#BFDBFE;font-weight:500;margin-top:2px}.main{min-width:0}.topbar{height:74px;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:10}.search{width:460px;max-width:44vw;background:white;border:1px solid var(--border);border-radius:15px;padding:12px 14px;color:var(--muted);font-size:13px;display:flex;gap:10px;align-items:center}.top-actions{display:flex;gap:10px;align-items:center}.org,.icon-btn,.profile{border:1px solid var(--border);background:white;border-radius:15px;padding:10px 12px;font-size:13px;font-weight:800;color:var(--text)}.icon-btn{width:42px;height:42px;display:grid;place-items:center}.ai-btn{background:var(--soft);border-color:var(--blue-border);color:var(--ai)}.content{padding:28px;max-width:1580px;margin:0 auto}.hero{background:linear-gradient(135deg,#fff 0%,#fff 58%,var(--soft) 100%);border:1px solid var(--border);border-radius:26px;padding:26px;box-shadow:var(--shadow);display:flex;justify-content:space-between;gap:24px;align-items:flex-start}.eyebrow{font-size:12px;font-weight:900;color:var(--ai);letter-spacing:.09em;text-transform:uppercase}.hero h2{font-size:32px;margin:8px 0 8px;letter-spacing:-.045em}.hero p{margin:0;color:var(--muted);font-size:14px;line-height:1.75;max-width:860px}.hero-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}.btn{border:0;border-radius:15px;padding:11px 15px;font-weight:900;font-size:13px;cursor:pointer}.btn.primary{background:var(--primary);color:white}.btn.secondary{background:white;color:var(--primary);border:1px solid var(--blue-border)}.btn.ghost{background:var(--section);color:var(--text);border:1px solid var(--border)}.btn.danger{background:#FEF2F2;color:var(--danger);border:1px solid #FECACA}.btn.success{background:#ECFDF5;color:var(--success);border:1px solid #A7F3D0}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:18px}.card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:18px;box-shadow:0 10px 24px rgba(15,23,42,.04)}.kpi .icon{width:38px;height:38px;border-radius:14px;display:grid;place-items:center;background:var(--soft);color:var(--ai);font-weight:900;margin-bottom:12px}.kpi .label{font-size:13px;color:var(--muted);font-weight:800}.kpi .value{font-size:31px;font-weight:900;margin:9px 0 2px;letter-spacing:-.04em}.kpi .note{font-size:12px;color:var(--muted);line-height:1.55}.grid{display:grid;grid-template-columns:1.25fr .95fr;gap:18px;margin-top:18px}.workspace{display:grid;grid-template-columns:.92fr 1.2fr .92fr;gap:18px;margin-top:18px;align-items:start}.section-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:14px}.section-head h3{margin:0;font-size:16px}.section-head p{margin:4px 0 0;color:var(--muted);font-size:12px;line-height:1.55}.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 9px;font-size:11px;font-weight:900;border:1px solid var(--border);white-space:nowrap}.pill.ai{color:var(--ai);background:var(--soft);border-color:var(--blue-border)}.pill.success{color:var(--success);background:#ECFDF5;border-color:#A7F3D0}.pill.warn{color:var(--warning);background:#FFFBEB;border-color:#FDE68A}.pill.danger{color:var(--danger);background:#FEF2F2;border-color:#FECACA}.pill.gray{color:#475569;background:#F8FAFC}.pill.purple{color:var(--purple);background:#F5F3FF;border-color:#DDD6FE}.context{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px}.context div{padding:13px;border:1px solid var(--border);border-radius:16px;background:white}.context span{display:block;font-size:11px;color:var(--muted);font-weight:800}.context b{font-size:13px;margin-top:5px;display:block}.soap-box{background:#F8FAFC;border:1px solid var(--border);border-radius:16px;padding:14px;margin:12px 0}.soap-box b{display:block;margin-bottom:6px}.soap-box p{margin:0;color:var(--muted);font-size:13px;line-height:1.65}.ai-panel{border:1px solid var(--blue-border);background:linear-gradient(180deg,#fff 0%,var(--soft) 100%);box-shadow:0 16px 36px rgba(37,99,235,.08)}.ai-card{border:1px solid var(--blue-border);background:white;border-radius:18px;padding:16px;margin-bottom:12px}.ai-card h4{margin:0 0 8px;font-size:14px;color:var(--primary)}.ai-card p,.list p{margin:0;color:var(--muted);font-size:13px;line-height:1.62}.confidence{display:flex;align-items:center;gap:12px;margin-top:12px}.bar{height:10px;background:#DBEAFE;border-radius:999px;overflow:hidden;flex:1}.bar i{display:block;height:100%;background:var(--ai);border-radius:999px}.score{font-weight:900;color:var(--ai)}.row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;border-top:1px solid var(--border);padding:12px 0}.row:first-child{border-top:0}.code{font-weight:900;color:var(--primary)}.muted{color:var(--muted);font-size:12px;line-height:1.5}.warning-box{background:#FFFBEB;border:1px solid #FDE68A;color:#92400E;border-radius:16px;padding:14px;font-size:13px;line-height:1.65;margin-top:12px}.danger-box{background:#FEF2F2;border:1px solid #FECACA;color:#991B1B;border-radius:16px;padding:14px;font-size:13px;line-height:1.65;margin-bottom:12px}.safety{border:1px solid #FECACA;background:#FEF2F2;color:#991B1B;border-radius:18px;padding:16px;margin-top:18px;display:flex;gap:12px;align-items:flex-start}.safety b{display:block;margin-bottom:4px}.safety p{margin:0;font-size:13px;line-height:1.6}.drawer{background:white;border:1px solid var(--border);border-radius:18px;padding:16px}.trace{border-left:3px solid var(--ai);padding-left:12px;margin:12px 0}.trace b{font-size:13px}.trace p{margin:4px 0 0;color:var(--muted);font-size:12px;line-height:1.55}.audit .row{align-items:center}.dot{width:10px;height:10px;border-radius:999px;background:var(--ai);box-shadow:0 0 0 4px var(--soft)}table{width:100%;border-collapse:collapse}th{text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:12px;border-bottom:1px solid var(--border)}td{padding:14px 12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}tr:hover{background:#F8FAFC}.impact{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}.impact .card{border-top:4px solid var(--primary)}.empty{border:1px dashed var(--blue-border);background:var(--soft);border-radius:18px;padding:18px;text-align:center;color:var(--muted);font-size:13px;line-height:1.65}.system{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:18px}.system .card{box-shadow:none}.footer-note{margin-top:18px;color:var(--muted);font-size:12px;text-align:center}
+    @media(max-width:1180px){.app{grid-template-columns:1fr}.sidebar{display:none}.workspace,.grid,.kpis,.impact,.context,.system{grid-template-columns:1fr}.search{display:none}.hero{flex-direction:column}.topbar{padding:0 16px}.content{padding:18px}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo">NX</div><div><h1>Med AI NexSure</h1><p>Enterprise Healthcare & Insurance Intelligence</p></div></div>
+    <div class="nav-title">Enterprise Modules</div>
+    <nav class="nav">
+      <a href="#"><span>📊</span><div>Main Dashboard<small>ภาพรวมผู้บริหารและปฏิบัติการ</small></div></a>
+      <a href="#"><span>👥</span><div>Patient Management<small>Patient directory</small></div></a>
+      <a href="#"><span>🩺</span><div>Visit Management<small>Clinical workflow</small></div></a>
+      <a href="#"><span>📝</span><div>SOAP Note<small>Clinical documentation</small></div></a>
+      <a href="#"><span>💊</span><div>Prescription<small>Medication workflow</small></div></a>
+      <a class="active" href="#"><span>🤖</span><div>AI Clinical Engine<small>AI decision support</small></div></a>
+      <a href="#"><span>✅</span><div>Claim Readiness<small>ความพร้อมส่งเคลม</small></div></a>
+      <a href="#"><span>📦</span><div>Evidence Package<small>Claim evidence export</small></div></a>
+      <a href="#"><span>📘</span><div>Payer Rules<small>Insurance rule engine</small></div></a>
+      <a href="#"><span>💳</span><div>Economic Intelligence<small>Cost signal</small></div></a>
+      <a href="#"><span>💬</span><div>AI Copilot<small>Assistant workspace</small></div></a>
+      <a href="#"><span>🛡️</span><div>Audit & Compliance<small>PDPA-ready traceability</small></div></a>
+      <a href="#"><span>⚙️</span><div>Admin Settings<small>Role & policy</small></div></a>
+    </nav>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <div class="search">🔎 Search patient, visit, ICD-10, claim case, audit event</div>
+      <div class="top-actions">
+        <button class="org">Bangkok Care Network ▾</button>
+        <button class="icon-btn ai-btn">AI</button>
+        <button class="icon-btn">🔔</button>
+        <button class="profile">Dr. Benz ▾</button>
+      </div>
+    </header>
+    <section class="content">
+      <div class="hero">
+        <div>
+          <div class="eyebrow">AI Clinical Engine · Decision Support Workspace</div>
+          <h2>AI Clinical Engine</h2>
+          <p>สรุป SOAP, แนะนำ ICD-10, วิเคราะห์ Differential Diagnosis และตรวจ Clinical Correlation เพื่อช่วยแพทย์ตัดสินใจอย่างปลอดภัย พร้อม Explainability, Confidence Score และ Audit Trail สำหรับงานคลินิก ประกัน และ Compliance</p>
+        </div>
+        <div class="hero-actions">
+          <button class="btn primary">Generate AI Summary</button>
+          <button class="btn secondary">Open Explainability</button>
+          <button class="btn ghost">Export Evidence</button>
+        </div>
+      </div>
+
+      <div class="context">
+        <div><span>Patient Context</span><b>HN-004928 · Male · 42Y</b></div>
+        <div><span>Visit Status</span><b>กำลังตรวจ</b></div>
+        <div><span>PDPA Consent</span><b>Verified</b></div>
+        <div><span>AI Governance</span><b>Human Review Required</b></div>
+      </div>
+
+      <div class="kpis">
+        <div class="card kpi"><div class="icon">AI</div><div class="label">AI Assisted Cases</div><div class="value">74</div><div class="note">เคสที่ AI ช่วยวิเคราะห์วันนี้</div></div>
+        <div class="card kpi"><div class="icon">%</div><div class="label">Average Confidence</div><div class="value">91%</div><div class="note">AI confidence across reviewed cases</div></div>
+        <div class="card kpi"><div class="icon">ICD</div><div class="label">ICD Suggestions</div><div class="value">128</div><div class="note">แนะนำรหัส ICD-10 พร้อมเหตุผลประกอบ</div></div>
+        <div class="card kpi"><div class="icon">✓</div><div class="label">Accepted by Clinician</div><div class="value">62</div><div class="note">ผ่านการยืนยันโดยแพทย์แล้ว</div></div>
+      </div>
+
+      <div class="safety"><div>⚠️</div><div><b>Clinical Safety Notice</b><p>AI recommendation must be reviewed by a licensed clinician before clinical use. ระบบ AI เป็น Decision Support เท่านั้น ไม่ใช่ผู้วินิจฉัยหรือสั่งการรักษาแทนแพทย์</p></div></div>
+
+      <div class="grid">
+        <div class="card">
+          <div class="section-head"><div><h3>AI Case List</h3><p>Track AI status, review progress, and clinician decision for each visit.</p></div><span class="pill ai">● AI Monitoring</span></div>
+          <table>
+            <thead><tr><th>Visit ID</th><th>Patient</th><th>AI Status</th><th>Confidence</th><th>Claim Impact</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr><td>VIS-2026-1042</td><td>Somchai J.</td><td><span class="pill ai">Generated</span></td><td>94%</td><td><span class="pill success">Ready</span></td><td><button class="btn secondary">Review</button></td></tr>
+              <tr><td>VIS-2026-1041</td><td>Malee P.</td><td><span class="pill warn">Reviewed</span></td><td>82%</td><td><span class="pill warn">Needs Review</span></td><td><button class="btn secondary">View Detail</button></td></tr>
+              <tr><td>VIS-2026-1039</td><td>Anan K.</td><td><span class="pill gray">Not Generated</span></td><td>—</td><td><span class="pill danger">Not Ready</span></td><td><button class="btn primary">Generate</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card ai-panel">
+          <div class="section-head"><div><h3>AI Recommendation Panel</h3><p>ข้อเสนอแนะที่ต้องตรวจสอบโดยแพทย์ก่อนนำไปใช้</p></div><span class="pill ai">AI Assisted</span></div>
+          <div class="ai-card"><h4>Clinical Recommendation</h4><p>Consider confirming respiratory findings and documenting lung auscultation result before finalizing ICD-10 and claim evidence.</p><div class="confidence"><div class="bar"><i style="width:88%"></i></div><span class="score">88%</span></div></div>
+          <div class="ai-card"><h4>Claim Readiness Signal</h4><p>SOAP and Assessment are mostly complete. Missing evidence risk remains for doctor signature and attachment verification.</p></div>
+          <button class="btn primary">Review Recommendation</button>
+        </div>
+      </div>
+
+      <div class="workspace">
+        <div class="card">
+          <div class="section-head"><div><h3>Clinical Workspace</h3><p>SOAP source data used by AI Clinical Engine.</p></div><span class="pill success">Consent Verified</span></div>
+          <div class="soap-box"><b>Subjective</b><p>ไข้ ไอ เจ็บคอ 2 วัน ไม่มีหอบเหนื่อย รับประทานอาหารได้น้อยลง</p></div>
+          <div class="soap-box"><b>Objective</b><p>T 38.2°C, BP 122/78, HR 92, SpO2 98%. Throat erythema, no wheezing.</p></div>
+          <div class="soap-box"><b>Assessment</b><p>Acute upper respiratory infection, rule out influenza-like illness.</p></div>
+          <div class="soap-box"><b>Plan</b><p>Symptomatic treatment, hydration, return if dyspnea or persistent fever.</p></div>
+          <div class="warning-box">ข้อมูลทางคลินิกควรระบุ Red Flag และ Follow-up instruction ให้ครบถ้วนก่อนส่งเคลม</div>
+        </div>
+
+        <div class="card ai-panel">
+          <div class="section-head"><div><h3>AI Clinical Insight</h3><p>AI-generated summary, ICD suggestion, differential diagnosis and correlation analysis.</p></div><span class="pill ai">Generated · v1.3</span></div>
+          <div class="ai-card"><h4>AI SOAP Summary</h4><p>Patient presents with acute fever, cough, and sore throat for 2 days. Vital signs are stable with mild fever and normal oxygen saturation. Findings support uncomplicated upper respiratory infection with no current respiratory distress.</p><div class="confidence"><div class="bar"><i style="width:94%"></i></div><span class="score">94%</span></div></div>
+          <div class="ai-card"><h4>AI ICD Suggestion</h4><div class="row"><div><div class="code">J06.9 · Acute upper respiratory infection, unspecified</div><div class="muted">Supported by fever, cough, sore throat, stable SpO2 and clinical assessment.</div></div><span class="pill success">Primary</span></div><div class="row"><div><div class="code">R50.9 · Fever, unspecified</div><div class="muted">Can be considered if final diagnosis remains symptom-based.</div></div><span class="pill warn">Secondary</span></div></div>
+          <div class="ai-card"><h4>AI Differential Diagnosis</h4><div class="row"><div><b>Viral URI</b><div class="muted">Most consistent with current SOAP evidence.</div></div><span class="score">91%</span></div><div class="row"><div><b>Influenza-like illness</b><div class="muted">Consider if exposure history or myalgia is present.</div></div><span class="score">68%</span></div><div class="row"><div><b>Acute pharyngitis</b><div class="muted">Needs additional throat assessment or test result.</div></div><span class="score">61%</span></div></div>
+          <div class="ai-card"><h4>Clinical Correlation</h4><p>Symptoms, vital signs and assessment are clinically aligned. Prescription should remain symptomatic unless bacterial evidence is documented.</p></div>
+        </div>
+
+        <div class="card">
+          <div class="section-head"><div><h3>Intelligence Panel</h3><p>Claim, evidence, cost and audit readiness.</p></div><span class="pill ai">Enterprise AI</span></div>
+          <div class="ai-card"><h4>Claim Readiness</h4><div class="row"><div><b>Ready</b><div class="muted">SOAP, ICD-10 and prescription are aligned.</div></div><span class="pill success">Ready</span></div><div class="confidence"><div class="bar"><i style="width:92%"></i></div><span class="score">92</span></div></div>
+          <div class="ai-card"><h4>Missing Evidence Checklist</h4><div class="row"><div>✅ SOAP Note</div><span class="pill success">Passed</span></div><div class="row"><div>✅ ICD-10</div><span class="pill success">Passed</span></div><div class="row"><div>⚠ Doctor Signature</div><span class="pill warn">Needs Review</span></div><div class="row"><div>✅ PDPA Consent</div><span class="pill success">Verified</span></div></div>
+          <div class="ai-card"><h4>Economic Intelligence</h4><p>Visit cost is within expected range. No high-cost anomaly detected.</p><div class="row"><div><b>Visit Cost</b><div class="muted">Estimated OPD cost</div></div><b>1,280 THB</b></div></div>
+          <div class="danger-box"><b>Priority Alert</b><br>Clinical safety alerts must be reviewed before claim or financial processing.</div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="drawer">
+          <div class="section-head"><div><h3>Explainability</h3><p>Traceable reasoning for AI recommendation and ICD suggestion.</p></div><span class="pill ai">Transparent AI</span></div>
+          <div class="trace"><b>SOAP Evidence · Subjective</b><p>Fever, cough and sore throat for 2 days support acute respiratory condition.</p></div>
+          <div class="trace"><b>SOAP Evidence · Objective</b><p>Normal SpO2 and no wheezing reduce current concern for severe lower respiratory disease.</p></div>
+          <div class="trace"><b>Clinical Reasoning</b><p>AI ranks Viral URI highest because symptoms and physical findings are consistent with uncomplicated URI.</p></div>
+          <div class="trace"><b>Confidence Basis</b><p>High confidence due to sufficient SOAP completeness, stable vital signs and clear assessment.</p></div>
+        </div>
+        <div class="card audit">
+          <div class="section-head"><div><h3>Recent Activity Timeline</h3><p>Audit-ready trace for generate, review, accept and reject actions.</p></div><span class="pill success">Audit Logged</span></div>
+          <div class="row"><span class="dot"></span><div><b>AI Summary Generated</b><div class="muted">10:22 · Dr. Benz · Prompt Context v1.3</div></div><span class="pill ai">Generated</span></div>
+          <div class="row"><span class="dot"></span><div><b>ICD Suggestion Reviewed</b><div class="muted">10:27 · Clinician review required</div></div><span class="pill warn">Reviewed</span></div>
+          <div class="row"><span class="dot"></span><div><b>Recommendation Accepted</b><div class="muted">10:31 · Accepted with clinical confirmation</div></div><span class="pill success">Accepted</span></div>
+        </div>
+      </div>
+
+      <div class="system">
+        <div class="card"><div class="section-head"><div><h3>Language Strategy</h3><p>English-first product naming with Thai support for operational guidance.</p></div></div><p class="muted">Main navigation, modules, KPIs and enterprise terminology use English. Thai is used for user guidance, warning messages, validation and workflow explanation.</p></div>
+        <div class="card"><div class="section-head"><div><h3>Enterprise Tone Guideline</h3><p>Modern, clear, audit-ready and healthcare-compliant.</p></div></div><p class="muted">Use concise wording, avoid casual phrases, and always make AI governance visible. Clinical recommendations should be cautious and explainable.</p></div>
+      </div>
+
+      <div class="impact">
+        <div class="card"><h3>Loss Ratio Impact</h3><p class="muted">Reduce claim leakage by improving SOAP, ICD and evidence consistency before submission.</p></div>
+        <div class="card"><h3>Operation Efficiency</h3><p class="muted">ลดเวลาสรุป SOAP, ค้นหา ICD และตรวจหลักฐานซ้ำในงานประจำวัน</p></div>
+        <div class="card"><h3>Customer Journey</h3><p class="muted">Patients receive complete documentation faster, reducing claim delays and document rework.</p></div>
+      </div>
+      <p class="footer-note">Med AI NexSure · Enterprise Healthcare & Insurance Intelligence Platform · AI Decision Support with Human-in-the-Loop Governance</p>
+    </section>
+  </main>
+</div>
+</body>
+</html>

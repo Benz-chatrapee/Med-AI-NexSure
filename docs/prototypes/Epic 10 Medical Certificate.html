@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Med AI NexSure — Medical Certificate Operations Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="assets/styles/medical-certificate-dashboard.css" />
+</head>
+<body>
+<div class="app">
+  <!-- Primary navigation -->
+  <aside class="sidebar" id="sidebar" aria-label="Primary navigation">
+    <div class="brand"><div class="logo">NX</div><div><h1>Med AI NexSure</h1><p>Healthcare & Insurance Intelligence</p></div></div>
+    <div class="nav-group"><div class="nav-title">Overview</div><nav class="nav"><a href="#"><span class="nav-icon">▦</span>Main Dashboard <span class="nav-th">ภาพรวมระบบ</span></a></nav></div>
+    <div class="nav-group"><div class="nav-title">Clinical Operations</div><nav class="nav">
+      <a href="#"><span class="nav-icon">◉</span>Patient Management <span class="nav-th">จัดการผู้ป่วย</span></a><a href="#"><span class="nav-icon">⌁</span>Visit Management <span class="nav-th">จัดการ Visit</span></a><a href="#"><span class="nav-icon">✎</span>SOAP Note <span class="nav-th">บันทึกการรักษา</span></a><a href="#"><span class="nav-icon">＋</span>Diagnosis <span class="nav-th">การวินิจฉัย</span></a><a href="#"><span class="nav-icon">⚕</span>Prescription <span class="nav-th">ใบสั่งยา</span></a><a href="#" class="active"><span class="nav-icon">▤</span>Medical Certificate <span class="nav-th">ใบรับรองแพทย์</span></a>
+    </nav></div>
+    <div class="nav-group"><div class="nav-title">Insurance Intelligence</div><nav class="nav"><a href="#"><span class="nav-icon">✓</span>Claim Readiness <span class="nav-th">ความพร้อมเคลม</span></a><a href="#"><span class="nav-icon">▣</span>Evidence Package <span class="nav-th">ชุดหลักฐาน</span></a><a href="#"><span class="nav-icon">⚙</span>Payer Rules <span class="nav-th">กฎผู้ชำระเงิน</span></a></nav></div>
+    <div class="nav-group"><div class="nav-title">Governance</div><nav class="nav"><a href="#"><span class="nav-icon">◈</span>Audit & Compliance <span class="nav-th">ตรวจสอบและกำกับ</span></a><a href="#"><span class="nav-icon">☑</span>Task Management <span class="nav-th">จัดการงาน</span></a></nav></div>
+    <div class="nav-group"><div class="nav-title">Administration</div><nav class="nav"><a href="#"><span class="nav-icon">⚙</span>Admin Settings <span class="nav-th">ตั้งค่าระบบ</span></a></nav></div>
+    <div class="profile"><div class="avatar">BC</div><div><b>Benz Healthcare Network</b><span>Enterprise Operations Manager</span></div></div>
+  </aside>
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <div class="content-shell">
+    <!-- Global header -->
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="Open navigation">☰</button>
+      <div class="search"><span>⌕</span><input id="globalSearch" aria-label="Global Search" placeholder="Search patient, HN, certificate or visit..." /></div>
+      <div class="top-actions">
+        <select class="top-control" aria-label="Organization"><option>Benz Healthcare Network</option><option>Bangkok Health Group</option></select>
+        <select class="top-control" aria-label="Clinic"><option>Bangkok Main Clinic</option><option>Rama 9 Clinic</option></select>
+        <button class="top-control copilot" id="copilotBtn">✦ AI Copilot</button>
+        <button class="icon-btn" id="notifyBtn" aria-label="Notifications">♢<span class="notif-dot">3</span></button>
+        <div class="avatar" title="Benz — Enterprise Operations Manager">BZ</div>
+      </div>
+    </header>
+
+    <main class="main">
+      <nav class="breadcrumb" aria-label="Breadcrumb">Clinical Operations / Medical Certificate / Operations Intelligence</nav>
+      <section class="page-head" aria-labelledby="pageTitle">
+        <div>
+          <h1 id="pageTitle">Medical Certificate Intelligence</h1>
+          <p>Enterprise operations, claim evidence, signature workflow, and compliance intelligence</p>
+          <p>Unified operational view for certificate issuance, claim evidence readiness, and document risk<br><span class="support-th">ติดตามการออกใบรับรองแพทย์และความพร้อมด้าน Claim Evidence จากมุมมองเดียว</span></p>
+          <div class="head-meta"><span class="live"><span class="pulse"></span>Live monitoring</span><span class="support">Last updated: 12 Jul 2026, 10:24 ICT</span><span class="status s-info">Blue Enterprise Theme</span></div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-secondary" id="exportBtn">⇩ Export Report</button>
+          <button class="btn btn-secondary" data-open-workspace>▤ Open Workspace</button>
+          <button class="btn btn-primary" data-open-workspace>＋ Create Certificate</button>
+        </div>
+      </section>
+
+      <section class="filter-panel" aria-label="Global filters">
+        <div class="filter-grid">
+          <div class="field"><label>Date Range <span class="label-th">ช่วงเวลา</span></label><select class="select filter-input"><option>Last 30 Days</option><option>Today</option><option>Last 7 Days</option><option>This Quarter</option></select></div>
+          <div class="field"><label>Organization <span class="label-th">องค์กร</span></label><select class="select filter-input"><option>All Organizations</option><option>Benz Healthcare Network</option></select></div>
+          <div class="field"><label>Clinic <span class="label-th">คลินิก</span></label><select class="select filter-input"><option>All Clinics</option><option>Bangkok Main</option><option>Rama 9</option></select></div>
+          <div class="field"><label>Department <span class="label-th">แผนก</span></label><select class="select filter-input"><option>All Departments</option><option>General Practice</option><option>Internal Medicine</option></select></div>
+          <div class="field"><label>Physician <span class="label-th">แพทย์</span></label><select class="select filter-input"><option>All Physicians</option><option>Dr. Anan T.</option><option>Dr. Suda P.</option></select></div>
+          <div class="field"><label>Certificate Type <span class="label-th">ประเภทใบรับรอง</span></label><select class="select filter-input"><option>All Types</option><option>Sick Leave</option><option>Insurance Claim</option><option>Fitness to Work</option></select></div>
+          <div class="field"><label>Certificate Status <span class="label-th">สถานะเอกสาร</span></label><select class="select filter-input" id="statusFilter"><option value="">All Statuses</option><option>Draft</option><option>Ready to Sign</option><option>Signed</option><option>Voided</option></select></div>
+          <div class="field"><label>Claim Readiness <span class="label-th">ความพร้อมเคลม</span></label><select class="select filter-input" id="claimFilter"><option value="">All Readiness</option><option>Ready</option><option>Needs Review</option><option>Not Ready</option></select></div>
+          <div class="field"><label>Risk Level / Payer <span class="label-th">ระดับความเสี่ยง / ผู้ชำระเงิน</span></label><select class="select filter-input" id="riskFilter"><option value="">All Risks</option><option>Critical</option><option>High</option><option>Medium</option><option>Low</option></select></div>
+          <div class="field"><label>Certificate No. or HN <span class="label-th">เลขเอกสารหรือ HN</span></label><input class="input filter-input" id="worklistSearchTop" placeholder="MC-20260712 / HN-..." /></div>
+        </div>
+        <div class="filter-footer">
+          <div class="chips" id="activeChips"><span class="chip">Clinic: Bangkok Main <button aria-label="Remove filter">×</button></span><span class="chip">Date: Last 30 Days <button aria-label="Remove filter">×</button></span></div>
+          <div class="filter-actions"><button class="btn btn-ghost" id="resetFilters">Reset</button><button class="btn btn-secondary" id="saveView">Save View</button><button class="btn btn-primary" id="applyFilters">Apply Filters</button></div>
+        </div>
+      </section>
+
+      <!-- Executive KPI summary -->
+      <section class="grid kpi-grid" id="kpiGrid" aria-label="Medical certificate KPI summary">
+        <article class="card kpi" data-kpi-filter="all"><div class="kpi-title">Certificates Today</div><div class="kpi-value">42</div><div class="support">Certificates created today<br><span class="support-th">จำนวนใบรับรองที่สร้างวันนี้</span></div><svg class="spark" viewBox="0 0 120 34" aria-hidden="true"><polyline fill="none" stroke="#2563EB" stroke-width="3" points="2,27 18,22 34,25 50,14 66,17 82,9 98,12 118,5"/></svg><div class="trend"><span class="up">↑ 12% vs yesterday</span><span>38 prior</span></div><button aria-label="Filter certificates created today"></button></article>
+        <article class="card kpi" data-kpi-filter="awaiting"><div class="kpi-title">Awaiting Signature</div><div class="kpi-value">12</div><div class="support">Pending physician review and signature<br><span class="support-th">รอแพทย์ตรวจสอบและลงนาม</span></div><div class="progress"><span style="width:72%;background:var(--warning)"></span></div><div class="trend"><span class="warn">4 high priority</span><span>Oldest 38 min</span></div><button aria-label="Filter awaiting signature"></button></article>
+        <article class="card kpi" data-kpi-filter="signed"><div class="kpi-title">Signed Today</div><div class="kpi-value">31</div><div class="support">Certificates completed with valid signature today<br><span class="support-th">ลงนามสมบูรณ์แล้ววันนี้</span></div><svg class="spark" viewBox="0 0 120 34" aria-hidden="true"><polyline fill="none" stroke="#059669" stroke-width="3" points="2,28 18,24 34,20 50,22 66,14 82,11 98,7 118,9"/></svg><div class="trend"><span class="up">74% signed rate</span><span>↑ 8%</span></div><button aria-label="Filter signed certificates"></button></article>
+        <article class="card kpi" data-kpi-filter="tat"><div class="kpi-title">Average Turnaround Time</div><div class="kpi-value">18 min</div><div class="support">Average time from Draft creation to physician signature<br><span class="support-th">เวลาเฉลี่ยตั้งแต่ Draft จนลงนาม</span></div><div class="progress"><span style="width:90%"></span></div><div class="trend"><span class="up">Within SLA</span><span>Target 20 min</span></div><button aria-label="Filter turnaround exceptions"></button></article>
+        <article class="card kpi" data-kpi-filter="sla"><div class="kpi-title">SLA Compliance</div><div class="kpi-value">92%</div><div class="support">Certificates completed within the defined SLA target<br><span class="support-th">ดำเนินการเสร็จภายใน SLA</span></div><div class="progress"><span style="width:92%"></span></div><div class="trend"><span class="up">Target exceeded</span><span>Target 90%</span></div><button aria-label="Filter SLA breaches"></button></article>
+        <article class="card kpi" data-kpi-filter="claim"><div class="kpi-title">Claim Evidence Ready</div><div class="kpi-value">86%</div><div class="support">Certificates ready to support insurance claims<br><span class="support-th">พร้อมใช้ประกอบการเคลม</span></div><div class="progress"><span style="width:86%;background:var(--ai)"></span></div><div class="trend"><span class="up">110 Ready</span><span>18 Review / 0 NR</span></div><button aria-label="Filter claim evidence readiness"></button></article>
+      </section>
+
+      <section class="section" id="operationsOverview" aria-labelledby="operationsOverviewTitle">
+        <div class="section-head"><div><h2 id="operationsOverviewTitle">Certificate Operations Overview</h2><p>Monitor certificate volume, status distribution, throughput, and operational performance<br><span class="support-th">ติดตามปริมาณงาน สถานะ และประสิทธิภาพการดำเนินงาน</span></p></div></div>
+        <div class="grid two-col">
+          <article class="card chart-card">
+            <div class="card-title"><div><h3>Certificate Volume Trend</h3><p>Created, Signed, Voided and Reissued<br><span class="support-th">เปรียบเทียบเอกสารที่สร้าง ลงนาม ยกเลิก และออกใหม่</span></p></div><div><span class="insight">↑ Signed volume +8%</span><div class="segmented" style="margin-left:8px"><button class="period-btn active" data-period="daily">Daily</button><button class="period-btn" data-period="weekly">Weekly</button><button class="period-btn" data-period="monthly">Monthly</button></div></div></div>
+            <div class="chart-wrap"><canvas id="volumeChart" aria-label="Certificate volume trend chart"></canvas></div>
+          </article>
+          <article class="card chart-card">
+            <div class="card-title"><div><h3>Certificate Status Distribution</h3><p>128 certificates in selected period<br><span class="support-th">จำนวนใบรับรองทั้งหมดภายใต้เงื่อนไขที่เลือก</span></p></div></div>
+            <div class="chart-wrap compact"><canvas id="statusChart" aria-label="Certificate status distribution"></canvas></div>
+            <div class="legend-list">
+              <div class="legend-row"><span class="legend-dot" style="background:#94A3B8"></span><b>Draft</b><span>22 · 17%</span><span>↓ 2%</span></div>
+              <div class="legend-row"><span class="legend-dot" style="background:#D97706"></span><b>Ready to Sign</b><span>12 · 9%</span><span>↑ 1%</span></div>
+              <div class="legend-row"><span class="legend-dot" style="background:#059669"></span><b>Signed</b><span>86 · 67%</span><span>↑ 8%</span></div>
+              <div class="legend-row"><span class="legend-dot" style="background:#DC2626"></span><b>Voided</b><span>4 · 3%</span><span>0%</span></div>
+              <div class="legend-row"><span class="legend-dot" style="background:#2563EB"></span><b>Reissued</b><span>4 · 3%</span><span>↑ 1%</span></div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="workflowPerformance" aria-labelledby="workflowPerformanceTitle">
+        <div class="section-head"><div><h2 id="workflowPerformanceTitle">Workflow Performance & Bottleneck</h2><p>Identify workflow delays, processing bottlenecks, and SLA exceptions<br><span class="support-th">ระบุขั้นตอนที่เกิดงานค้างและระยะเวลาที่เกิน SLA</span></p></div></div>
+        <div class="grid three-col">
+          <article class="card">
+            <div class="card-title"><div><h3>Certificate Processing Funnel</h3><p>Conversion and average time by stage<br><span class="support-th">อัตราการผ่านแต่ละขั้นตอนและเวลาเฉลี่ยในการดำเนินงาน</span></p></div></div>
+            <div class="funnel" id="funnel">
+              <div class="funnel-stage" style="width:100%;background:#0F2A5F"><div><b>Eligible Visits</b><small>164 cases · 0 min</small></div><strong>100%</strong></div>
+              <div class="funnel-stage" style="width:92%;background:#1E3A8A"><div><b>Certificate Requested</b><small>151 cases · 2.1 min</small></div><strong>92%</strong></div>
+              <div class="funnel-stage" style="width:84%;background:#2563EB"><div><b>AI Draft Generated</b><small>138 cases · 0.8 min</small></div><strong>84%</strong></div>
+              <div class="funnel-stage" style="width:72%;background:#D97706"><div><b>Clinician Reviewed</b><small>118 cases · 9.4 min</small></div><strong>72%</strong></div>
+              <div class="funnel-stage" style="width:66%;background:#3B82F6"><div><b>Ready to Sign</b><small>108 cases · 3.3 min</small></div><strong>66%</strong></div>
+              <div class="funnel-stage" style="width:61%;background:#059669"><div><b>Signed</b><small>100 cases · 2.4 min</small></div><strong>61%</strong></div>
+              <div class="funnel-stage" style="width:57%;background:#047857"><div><b>Exported / Delivered</b><small>94 cases · 1.1 min</small></div><strong>57%</strong></div>
+            </div>
+            <div class="bottleneck"><b>Largest bottleneck:</b> Clinician Review — 14 pending cases</div>
+          </article>
+          <article class="card chart-card"><div class="card-title"><div><h3>Average Time by Stage</h3><p>Actual duration compared with SLA<br><span class="support-th">เปรียบเทียบเวลาจริงกับ SLA ที่กำหนด</span></p></div></div><div class="chart-wrap tall"><canvas id="stageChart"></canvas></div></article>
+          <article class="card chart-card"><div class="card-title"><div><h3>Turnaround Time vs SLA</h3><p>Daily actual, target and previous period<br><span class="support-th">แนวโน้มรายวัน เทียบเป้าหมายและช่วงเวลาก่อนหน้า</span></p></div></div><div class="chart-wrap tall"><canvas id="tatChart"></canvas></div><div class="legend-list"><div class="legend-row"><span class="legend-dot" style="background:#2563EB"></span><b>Average</b><span>18 min</span><span>6 breaches</span></div><div class="legend-row"><span class="legend-dot" style="background:#DC2626"></span><b>Maximum</b><span>42 min</span><span>↑ 4 min</span></div></div></article>
+        </div>
+      </section>
+
+      <section class="section" id="claimEvidence" aria-labelledby="claimEvidenceTitle">
+        <div class="section-head"><div><h2 id="claimEvidenceTitle">Claim Evidence Intelligence</h2><p>Assess certificate readiness for insurance review and claim evidence submission<br><span class="support-th">ตรวจสอบความพร้อมของใบรับรองแพทย์สำหรับกระบวนการเคลม</span></p></div></div>
+        <div class="grid three-col">
+          <article class="card chart-card"><div class="card-title"><div><h3>Claim Readiness Summary</h3><p>Document completeness, diagnosis consistency, signature and payer rules<br><span class="support-th">ประเมินความครบถ้วน ความสอดคล้อง ลายเซ็น และกฎผู้ชำระเงิน</span></p></div></div><div class="chart-wrap compact"><canvas id="claimChart"></canvas></div><p class="support">Readiness is calculated from document completeness, clinical consistency, signature validity, payer rules, and supporting evidence.<br><span class="support-th">คะแนนพิจารณาจากความครบถ้วนของเอกสาร ความสอดคล้องทางคลินิก และกฎของผู้ชำระเงิน</span></p></article>
+          <article class="card chart-card"><div class="card-title"><div><h3>Missing Evidence Ranking</h3><p>Top issues affecting claim support<br><span class="support-th">ประเด็นสำคัญที่กระทบต่อการใช้เอกสารประกอบการเคลม</span></p></div></div><div class="chart-wrap tall"><canvas id="missingChart"></canvas></div></article>
+          <article class="card chart-card"><div class="card-title"><div><h3>Rule Validation Results</h3><p>Passed, warning and failed rules<br><span class="support-th">สรุปกฎที่ผ่าน ต้องตรวจสอบ และไม่ผ่าน</span></p></div></div><div class="chart-wrap tall"><canvas id="ruleChart"></canvas></div></article>
+        </div>
+      </section>
+
+      <section class="section" id="documentRiskCompliance" aria-labelledby="documentRiskComplianceTitle">
+        <div class="section-head"><div><h2 id="documentRiskComplianceTitle">Document Risk & Compliance</h2><p>Monitor document integrity, signature validity, correction patterns, and compliance risks<br><span class="support-th">ติดตามความเสี่ยงด้านเอกสารและความถูกต้องในการลงนาม</span></p></div></div>
+        <div class="grid two-col">
+          <article class="card">
+            <div class="card-title"><div><h3>Document Risk Heatmap</h3><p>Click a cell to filter the worklist<br><span class="support-th">เลือกช่องเพื่อกรองรายการที่ต้องดำเนินการ</span></p></div></div>
+            <div class="heatmap" id="riskHeatmap"></div>
+          </article>
+          <article class="card chart-card"><div class="card-title"><div><h3>Void and Reissue Trend</h3><p>Weekly rate per 100 certificates<br><span class="support-th">อัตรารายสัปดาห์ต่อใบรับรอง 100 ฉบับ</span></p></div><span class="insight" style="background:var(--warning-bg);color:#92400E;border-color:#FCD34D">Reissue rate +0.8</span></div><div class="chart-wrap tall"><canvas id="voidChart"></canvas></div></article>
+        </div>
+        <div class="grid compliance-grid">
+          <div class="card mini-card"><b>Signed Document Integrity</b><strong>99.6%</strong><span>Hash validation completed<br><span class="support-th">ตรวจสอบความถูกต้องของ Signature Hash แล้ว</span></span></div>
+          <div class="card mini-card"><b>Electronic Signature Validity</b><strong>98.9%</strong><span>1 case pending revalidation<br><span class="support-th">มี 1 รายการรอตรวจสอบลายเซ็นซ้ำ</span></span></div>
+          <div class="card mini-card"><b>Audit Trail Coverage</b><strong>100%</strong><span>All critical actions are recorded<br><span class="support-th">ทุกเหตุการณ์สำคัญมีการบันทึก</span></span></div>
+          <div class="card mini-card"><b>Unauthorized Edit Attempts</b><strong>2</strong><span>Blocked and logged<br><span class="support-th">ระบบบล็อกและบันทึกเหตุการณ์แล้ว</span></span></div>
+          <div class="card mini-card"><b>Reissue Rate</b><strong>3.1%</strong><span>Within control threshold<br><span class="support-th">อยู่ภายในเกณฑ์ควบคุมที่กำหนด</span></span></div>
+        </div>
+      </section>
+
+      <section class="section" id="worklistSection" aria-labelledby="worklistTitle">
+        <div class="section-head"><div><h2 id="worklistTitle">Certificate Review Worklist</h2><p>Actionable review queue for high-risk, incomplete, and exception cases<br><span class="support-th">รายการที่ต้องตรวจสอบและดำเนินการตามลำดับความสำคัญ</span></p></div></div>
+        <article class="card">
+          <div class="table-toolbar">
+            <div class="search" style="max-width:390px"><span>⌕</span><input id="tableSearch" placeholder="Search certificate, patient, HN or alert..." /></div>
+            <div class="table-actions"><button class="btn btn-ghost" id="bulkAssign">Assign Selected</button><button class="btn btn-secondary" id="exportSelected">Export Selected</button></div>
+          </div>
+          <div class="table-wrap">
+            <table class="table" aria-label="Certificate review worklist">
+              <thead><tr><th><input type="checkbox" id="selectAll"></th><th><button class="sort" data-sort="risk">Risk Level ↕</button></th><th><button class="sort" data-sort="certificate">Certificate No. ↕</button></th><th>Patient</th><th>HN</th><th>Visit Date</th><th>Certificate Type</th><th>Physician</th><th>Status</th><th>Claim Readiness</th><th>Alert Reason</th><th>Assigned Reviewer</th><th>Aging</th><th>Actions</th></tr></thead>
+              <tbody id="worklistBody"></tbody>
+            </table>
+          </div>
+          <div class="pagination"><span id="pageInfo">Showing 1–6 of 12 records</span><div class="pager"><button id="prevPage">‹</button><button class="active">1</button><button>2</button><button id="nextPage">›</button></div></div>
+        </article>
+      </section>
+
+      <section class="section" id="operationalAnalytics" aria-labelledby="operationalAnalyticsTitle">
+        <div class="section-head"><div><h2 id="operationalAnalyticsTitle">Operational Analytics</h2><p>Analyze demand patterns, workload concentration, and certificate utilization<br><span class="support-th">วิเคราะห์รูปแบบการใช้งานและภาระงานของทีม</span></p></div></div>
+        <div class="grid three-col">
+          <article class="card"><div class="card-title"><div><h3>Certificate Demand Heatmap</h3><p>Requests by day and time<br><span class="support-th">ความต้องการออกใบรับรองตามวันและช่วงเวลา</span></p></div></div><div class="demand-grid" id="demandGrid"></div><div class="bottleneck" style="background:var(--soft);border-color:#BFDBFE;color:var(--primary)"><b>Peak demand:</b> Monday 09:00–11:00. Recommend one additional reviewer.</div></article>
+          <article class="card chart-card"><div class="card-title"><div><h3>Certificate Type Ranking</h3><p>Volume and percentage share<br><span class="support-th">ปริมาณงานและสัดส่วนของแต่ละประเภท</span></p></div></div><div class="chart-wrap tall"><canvas id="typeChart"></canvas></div></article>
+          <article class="card chart-card"><div class="card-title"><div><h3>Diagnosis Driver Pareto</h3><p>Top three diagnoses represent 61% of certificates<br><span class="support-th">สามกลุ่มการวินิจฉัยหลักคิดเป็น 61% ของใบรับรองทั้งหมด</span></p></div></div><div class="chart-wrap tall"><canvas id="diagnosisChart"></canvas></div></article>
+        </div>
+      </section>
+
+      <section class="section card economic" id="economicSection" aria-labelledby="economicImpactTitle">
+        <button class="economic-toggle" id="economicToggle" aria-expanded="false"><div><div class="section-head" style="margin:0"><div><h2 id="economicImpactTitle">Economic Impact <span class="status s-info">Estimated Metrics</span></h2><p>Evaluate time, cost, and productivity impact from the AI-assisted workflow<br><span class="support-th">ประเมินผลกระทบด้านเวลาและต้นทุนจาก AI-assisted workflow</span></p></div></div></div><strong id="economicArrow">＋</strong></button>
+        <div class="economic-body">
+          <div class="grid economic-kpis">
+            <div class="card mini-card"><b>Estimated Time Saved</b><strong>18.4 h</strong><span>Based on average manual preparation time</span></div>
+            <div class="card mini-card"><b>Estimated Processing Cost</b><strong>฿48.20</strong><span>Per certificate</span></div>
+            <div class="card mini-card"><b>AI-Assisted Cost Saving</b><strong>฿21,600</strong><span>Illustrative monthly estimate</span></div>
+            <div class="card mini-card"><b>Rework Cost</b><strong>฿3,420</strong><span>Estimated from correction events</span></div>
+            <div class="card mini-card"><b>Void / Reissue Cost</b><strong>฿1,180</strong><span>Estimated operational impact</span></div>
+          </div>
+          <div class="grid two-col" style="margin-top:16px">
+            <article class="card chart-card"><div class="card-title"><div><h3>Manual vs AI-Assisted Processing</h3><p>Time, cost and rework rate<br><span class="support-th">เปรียบเทียบเวลา ต้นทุน และอัตราการแก้ไขงาน</span></p></div></div><div class="chart-wrap tall"><canvas id="economicChart"></canvas></div></article>
+            <article class="card"><div class="card-title"><div><h3>Cost Avoidance Waterfall</h3><p>Illustrative estimate for operational planning<br><span class="support-th">ค่าประมาณเพื่อใช้วางแผนการดำเนินงาน ไม่ใช่ข้อมูลทางการเงินที่ผ่านการตรวจสอบ</span></p></div></div><div class="waterfall"><div class="water-item"><div class="water-bar cost" style="height:210px"></div><b>฿42K</b><small>Baseline Manual Cost</small></div><div class="water-item"><div class="water-bar negative" style="height:120px"></div><b>-฿12K</b><small>AI Draft Saving</small></div><div class="water-item"><div class="water-bar negative" style="height:85px"></div><b>-฿7K</b><small>Reduced Data Entry</small></div><div class="water-item"><div class="water-bar negative" style="height:58px"></div><b>-฿4K</b><small>Reduced Rework</small></div><div class="water-item"><div class="water-bar negative" style="height:44px"></div><b>-฿3K</b><small>Claim Clarification</small></div><div class="water-item"><div class="water-bar cost" style="height:38px"></div><b>+฿2K</b><small>AI Infrastructure</small></div><div class="water-item"><div class="water-bar" style="height:132px"></div><b>฿22K</b><small>Net Saving</small></div></div><p class="support">Estimated values are not audited financial data.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="recentActivity" aria-labelledby="recentActivityTitle">
+        <div class="section-head"><div><h2 id="recentActivityTitle">Recent Certificate Activity</h2><p>Latest certificate creation, review, signature, export, and compliance events<br><span class="support-th">เหตุการณ์ล่าสุดที่เกี่ยวข้องกับการตรวจสอบและลงนามเอกสาร</span></p></div><button class="btn btn-secondary" id="auditBtn">View Full Audit Trail</button></div>
+        <div class="grid two-col">
+          <article class="card"><div class="table-toolbar"><select class="select" style="max-width:190px"><option>All Event Types</option><option>Signed</option><option>AI Draft</option><option>Compliance Alert</option></select><select class="select" style="max-width:190px"><option>All Users</option><option>Dr. Anan T.</option><option>Clinic Staff</option></select></div><div class="timeline" id="timeline"></div></article>
+          <article class="card">
+            <div class="card-title"><div><h3>AI Governance & Human Review</h3><p>Clinical decision support controls<br><span class="support-th">มาตรการกำกับ AI และ Human Review สำหรับการใช้งานทางคลินิก</span></p></div></div>
+            <div class="ai-panel"><b>AI-generated draft for clinical review.</b><p class="support">Physician validation is mandatory before signature.<br><span class="support-th">แพทย์ต้องตรวจสอบความถูกต้องก่อนลงนามทุกครั้ง</span></p></div>
+            <div class="legend-list">
+              <div class="legend-row"><span class="legend-dot" style="background:#059669"></span><b>Physician Review Required</b><span>100%</span><span>Enforced</span></div>
+              <div class="legend-row"><span class="legend-dot" style="background:#2563EB"></span><b>Signed Version Lock</b><span>Enabled</span><span>Reissue only</span></div>
+              <div class="legend-row"><span class="legend-dot" style="background:#D97706"></span><b>Void Reason Required</b><span>Enabled</span><span>Audit logged</span></div>
+              <div class="legend-row"><span class="legend-dot" style="background:#64748B"></span><b>Signature Metadata</b><span>Signer, time, version, hash</span><span>Complete</span></div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      
+      <section class="section enterprise-guidance" id="enterpriseGuidance" aria-labelledby="enterpriseGuidanceTitle">
+        <div class="section-head"><div><h2 id="enterpriseGuidanceTitle">Enterprise Operating Principles</h2><p>Governed workflows for clinical safety, insurance evidence, and audit readiness<br><span class="support-th">แนวทางการดำเนินงานสำหรับความปลอดภัยทางคลินิก ความพร้อมด้านประกัน และการตรวจสอบย้อนหลัง</span></p></div></div>
+        <div class="grid three-col">
+          <article class="card guidance-card"><h3>Clinical Safety First</h3><p>Clinical alerts, allergy risks, and physician validation always receive the highest priority.</p><p class="support-th">การแจ้งเตือนด้านความปลอดภัย การแพ้ยา และการยืนยันโดยแพทย์ต้องมีลำดับความสำคัญสูงสุด</p></article>
+          <article class="card guidance-card"><h3>Human-in-the-Loop AI</h3><p>AI supports drafting, summarization, and validation but never replaces accountable clinical decisions.</p><p class="support-th">AI ช่วยร่าง สรุป และตรวจสอบข้อมูล แต่ไม่ทดแทนการตัดสินใจของบุคลากรที่รับผิดชอบ</p></article>
+          <article class="card guidance-card"><h3>Audit-Ready by Design</h3><p>Every material action records actor, timestamp, version, reason, and document integrity evidence.</p><p class="support-th">ทุกการดำเนินการสำคัญต้องบันทึกผู้ดำเนินการ เวลา เวอร์ชัน เหตุผล และหลักฐานความถูกต้องของเอกสาร</p></article>
+        </div>
+      </section>
+
+      <footer class="footer">Med AI NexSure — Enterprise Healthcare & Insurance Intelligence Platform • Medical Certificate Operations & Claim Evidence Dashboard</footer>
+    </main>
+  </div>
+</div>
+
+<div class="overlay" id="workspaceModal" role="dialog" aria-modal="true" aria-labelledby="workspaceTitle">
+  <div class="modal">
+    <div class="modal-head"><div><h2 id="workspaceTitle">Certificate Workspace</h2><div class="support">Autosaved 10:23 ICT · Version 3 · Modified by Clinic Staff</div></div><button class="close" id="closeWorkspace" aria-label="Close workspace">×</button></div>
+    <div class="workspace">
+      <section class="card">
+        <div class="patient-context"><div class="mini"><b>HN</b><span>HN-000238</span></div><div class="mini"><b>Name</b><span>Somchai K.</span></div><div class="mini"><b>Age</b><span>42</span></div><div class="mini"><b>Visit Type</b><span>OPD</span></div></div>
+        <div class="field"><label for="certType">Certificate Type *</label><select class="select" id="certType"><option>Medical Certificate for Sick Leave</option><option>Medical Certificate for Insurance Claim</option><option>Fitness to Work Certificate</option></select></div>
+        <div class="field"><label for="diagnosis">Diagnosis *</label><input class="input" id="diagnosis" value="Acute upper respiratory infection (J06.9)" /></div>
+        <div class="field"><label for="visitDate">Visit Date *</label><input class="input" id="visitDate" type="date" value="2026-07-12" /></div>
+        <div class="field"><label for="clinicalStatement">Clinical Statement *</label><textarea class="textarea" id="clinicalStatement">Patient presented with fever, cough, and sore throat. Vital signs were stable. The physician assessed the condition as Acute upper respiratory infection and provided symptomatic treatment.</textarea></div>
+        <div class="field"><label for="restDays">Recommended Rest Days *</label><input class="input" id="restDays" value="2 days" /></div>
+        <div class="field"><label for="followup">Treatment / Follow-up</label><textarea class="textarea" id="followup">Prescribed antipyretic and cough medication. Advised rest, adequate hydration, and follow-up within three days if symptoms do not improve.</textarea></div>
+        <div class="ai-panel"><b>AI Draft Recommendation</b><p class="support">AI generates a structured draft from SOAP, Diagnosis, Treatment, and Follow-up data. Physician review is required before approval.<br><span class="support-th">AI ช่วยร่างเอกสาร โดยแพทย์ต้องตรวจสอบก่อนยืนยัน</span></p><button class="btn btn-primary" id="generateDraft">Generate AI Draft</button></div>
+        <div class="validation"><div><b>Validation Summary</b><br><span class="status s-success">Passed 8/8</span></div><div><b>Claim Evidence</b><br><span class="status s-success">Ready</span></div><div><b>Document Version</b><br><span class="status s-info">v3 Draft</span></div></div>
+        <div class="actions" style="justify-content:flex-start"><button class="btn btn-secondary" id="saveDraft">Save Draft</button><button class="btn btn-primary" id="submitSignature">Submit for Signature</button><button class="btn btn-secondary" id="previewPdf">Preview PDF</button><button class="btn btn-secondary" id="exportPdf">Export PDF</button></div>
+      </section>
+      <section class="preview" id="printableCertificate">
+        <div class="preview-header"><h2>ใบรับรองแพทย์</h2><p>Medical Certificate</p></div>
+        <div class="doc-meta"><div class="doc-box"><b>Document No.</b><br>MC-20260712-0001</div><div class="doc-box"><b>Issued Date</b><br>12 Jul 2026</div><div class="doc-box"><b>Patient</b><br>Somchai K. / HN-000238</div><div class="doc-box"><b>Doctor</b><br>Dr. Anan T.</div></div>
+        <p>This is to certify that the patient received medical examination and treatment at the clinic on 12 Jul 2026.<br><span class="support-th">ขอรับรองว่าผู้ป่วยเข้ารับการตรวจรักษา ณ คลินิกตามวันที่ระบุ</span></p>
+        <p><b>Diagnosis:</b> Acute upper respiratory infection (J06.9)</p>
+        <p><b>Clinical Summary:</b> The patient presented with fever, cough, and sore throat. Vital signs were stable, symptomatic treatment was provided, and medical rest was recommended.</p>
+        <p><b>Recommended Rest:</b> 2 days</p>
+        <p><b>Follow-up:</b> Return for follow-up within three days if symptoms do not improve.<br><span class="support-th">หากอาการไม่ดีขึ้นภายใน 3 วัน ให้กลับมาตรวจซ้ำ</span></p>
+        <div class="signature"><div class="signature-line">Physician Signature<br><span class="support">Electronic Signature Ready</span></div></div>
+      </section>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/scripts/medical-certificate-dashboard.js"></script>
+</body>
+</html>

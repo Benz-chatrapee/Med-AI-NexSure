@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Audit Event Detail | Med AI NexSure — Enterprise Healthcare & Insurance Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--navy:#0f2a5f;--blue:#1e3a8a;--ai:#2563eb;--sky:#38bdf8;--bg:#F8FAFC;--surface:#FFFFFF;--line:#E2E8F0;--text:#0F172A;--muted:#64748B;--green:#059669;--green-bg:#ecfdf5;--amber:#D97706;--amber-bg:#fff7e6;--red:#DC2626;--red-bg:#fff1f1;--gray-bg:#f1f5f9;--shadow:0 10px 30px rgba(15,42,95,.08);--radius:14px}
+    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,"Noto Sans Thai",sans-serif;font-size:15px;line-height:1.45} button,input,select,textarea{font:inherit}
+    button{cursor:pointer}.app{display:grid;grid-template-columns:252px minmax(0,1fr);min-height:100vh}.sidebar{position:fixed;inset:0 auto 0 0;width:252px;background:#0F2A5F;color:white;padding:22px 16px;display:flex;flex-direction:column;z-index:30}.brand{display:flex;gap:11px;align-items:center;padding:0 8px 24px}.brandmark{width:38px;height:38px;border-radius:11px;background:#2563EB;display:grid;place-items:center;font-weight:800;font-size:18px;box-shadow:0 8px 22px rgba(37,99,235,.28)}.brand strong{font-size:16px}.brand span{display:block;font-size:10px;color:#b9c8e7;margin-top:2px}.navlabel{font-size:10px;color:#8fa7d2;letter-spacing:.12em;padding:8px 12px}.nav{display:grid;gap:5px}.nav a{color:#d6e0f3;text-decoration:none;padding:10px 12px;border-radius:9px;display:flex;gap:10px;align-items:center;font-size:13px}.nav a:hover,.nav a.active{background:rgba(255,255,255,.12);color:#fff}.nav a.active{box-shadow:inset 3px 0 #38BDF8}.nav .ico{width:18px;text-align:center}.sidebar-foot{margin-top:auto;border-top:1px solid rgba(255,255,255,.12);padding:16px 9px 0}.profile{display:flex;align-items:center;gap:10px}.avatar{width:36px;height:36px;border-radius:50%;background:#dce8ff;color:var(--blue);display:grid;place-items:center;font-weight:700}.profile small{display:block;color:#9db1d7}.main{grid-column:2;min-width:0}.topbar{height:66px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;display:flex;align-items:center;padding:0 28px;gap:18px}.search{flex:1;max-width:560px;position:relative}.search input{width:100%;height:40px;border:1px solid var(--line);border-radius:10px;background:#F8FAFC;padding:0 40px;color:var(--text)}.search:before{content:'⌕';position:absolute;left:14px;top:7px;font-size:22px;color:var(--muted)}.topactions{margin-left:auto;display:flex;gap:8px;align-items:center}.iconbtn,.btn{border:1px solid var(--line);background:#fff;border-radius:9px;height:39px;padding:0 13px;color:var(--text);display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:13px}.iconbtn{width:39px;padding:0}.btn:hover,.iconbtn:hover{border-color:#BFDBFE;background:#EFF6FF}.btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}.btn.primary:hover{background:#0F2A5F}.btn.danger{color:var(--red);border-color:#efc5c5}.content{padding:22px 28px 100px;max-width:1800px;margin:auto}.breadcrumb{display:flex;gap:8px;color:var(--muted);font-size:12px;margin-bottom:14px}.breadcrumb b{color:var(--text)}.audit-head{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px;margin-bottom:16px}.head-row{display:flex;gap:20px;justify-content:space-between;align-items:flex-start}.eyebrow{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);font-weight:600}.head-title{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:7px 0 6px}.head-title h1{font-size:25px;margin:0;letter-spacing:-.03em}.head-sub{color:var(--muted);font-size:13px}.head-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.badges{display:flex;gap:7px;flex-wrap:wrap}.badge{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:700;border:1px solid transparent}.badge:before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}.badge.medium{background:var(--amber-bg);color:var(--amber);border-color:#f5d89e}.badge.verified,.badge.passed{background:var(--green-bg);color:var(--green);border-color:#b9ead7}.badge.ai{background:#EFF6FF;color:var(--ai);border-color:#BFDBFE}.badge.review{background:#fff6df;color:#9b5c00;border-color:#f2d49b}.badge.updated{background:#EFF6FF;color:#1E3A8A}.badge.warn{background:var(--amber-bg);color:var(--amber)}.badge.fail{background:var(--red-bg);color:var(--red)}.badge.gray{background:var(--gray-bg);color:#64748b}.readonly{margin-top:17px;border-top:1px solid var(--line);padding-top:13px;display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:12px}.readonly strong{color:var(--blue)}
+    .kpis{display:grid;grid-template-columns:repeat(6,minmax(150px,1fr));gap:12px;margin-bottom:16px}.kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;min-height:112px;transition:.2s;cursor:pointer}.kpi:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:#BFDBFE}.kpi-top{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}.kpi-icon{width:28px;height:28px;border-radius:8px;background:#EFF6FF;display:grid;place-items:center;color:var(--ai)}.kpi-value{font-size:21px;font-weight:800;margin-top:12px;letter-spacing:-.03em}.kpi-foot{color:var(--muted);font-size:11px;margin-top:4px}.riskbar{height:5px;background:#edf1f7;border-radius:8px;margin-top:8px;overflow:hidden}.riskbar i{display:block;width:42%;height:100%;background:#e5a52f}
+    .layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(330px,.86fr);gap:16px}.left,.right{display:grid;gap:16px;align-content:start}.right{position:sticky;top:82px}.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 3px 16px rgba(15,42,95,.035);overflow:hidden}.card-head{padding:17px 19px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;align-items:center}.card-head h2{font-size:15px;margin:0}.card-head p{font-size:11px;color:var(--muted);margin:2px 0 0}.card-body{padding:18px 19px}.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 28px}.field label{display:block;color:var(--muted);font-size:11px;margin-bottom:4px}.field .value{font-weight:600;font-size:13px;overflow-wrap:anywhere}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.copy{border:0;background:transparent;color:var(--ai);padding:2px 4px}.tabs{display:flex;gap:4px;background:#f2f5fa;padding:4px;border-radius:9px}.tabs button{border:0;background:transparent;padding:6px 10px;border-radius:7px;font-size:11px;font-weight:700;color:var(--muted)}.tabs button.active{background:white;color:var(--blue);box-shadow:0 1px 4px rgba(15,42,95,.14)}.filter-row{padding:12px 19px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.filters{display:flex;gap:5px;flex-wrap:wrap}.chip{border:1px solid var(--line);background:white;color:var(--muted);border-radius:999px;padding:6px 10px;font-size:11px}.chip.active{background:#EFF6FF;border-color:#BFDBFE;color:var(--blue);font-weight:700}.diff-table{width:100%;border-collapse:collapse}.diff-table th{background:#f8fafc;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.06em;text-align:left;padding:11px 14px;border-bottom:1px solid var(--line)}.diff-table td{padding:13px 14px;border-bottom:1px solid #edf1f5;vertical-align:top;font-size:12px}.diff-table tr:last-child td{border-bottom:0}.diff-field{font-weight:700}.old,.new{padding:9px 10px;border-radius:8px;white-space:pre-wrap}.old{background:#fff5f5;border-left:3px solid #e97777}.new{background:#effcf6;border-left:3px solid #35a977}.json-view{display:none;background:#0F2A5F;color:#EFF6FF;padding:18px;font:12px/1.7 ui-monospace,monospace;overflow:auto}.ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.mini{border:1px solid var(--line);border-radius:10px;padding:13px}.mini label{display:block;font-size:10px;color:var(--muted);margin-bottom:5px;text-transform:uppercase}.mini strong{font-size:12px}.confidence{height:7px;background:#e8eef7;border-radius:99px;margin-top:7px;overflow:hidden}.confidence i{display:block;width:91%;height:100%;background:var(--ai)}.disclaimer{margin-top:13px;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:9px;padding:11px;color:#1E3A8A;font-size:11px}.score-row{display:grid;grid-template-columns:1.4fr .6fr .6fr .6fr;gap:8px;padding:10px 0;border-bottom:1px solid #edf1f5;align-items:center;font-size:12px}.score-row:last-child{border-bottom:0}.timeline{position:relative;padding-left:25px}.timeline:before{content:'';position:absolute;left:7px;top:6px;bottom:8px;width:2px;background:#dce5f2}.event{position:relative;padding:0 0 18px 10px}.event:before{content:'';position:absolute;left:-23px;top:4px;width:10px;height:10px;border:3px solid white;background:#9eb2cf;border-radius:50%;box-shadow:0 0 0 2px #c9d6e8}.event.current{background:#EFF6FF;border:1px solid #BFDBFE;border-radius:9px;padding:10px 12px 10px 20px;margin:0 0 14px -10px}.event.current:before{left:-14px;top:14px;background:var(--ai);box-shadow:0 0 0 3px #BFDBFE}.event time{color:var(--muted);font-size:10px}.event b{display:block;font-size:12px;margin:3px 0}.event p{margin:0;color:var(--muted);font-size:11px}.actor-head{display:flex;gap:12px;align-items:center;margin-bottom:15px}.actor-head .avatar{width:46px;height:46px}.actor-head h3{font-size:14px;margin:0}.actor-head p{color:var(--muted);font-size:11px;margin:2px 0 0}.detail-list{display:grid;gap:10px}.detail-item{display:flex;justify-content:space-between;gap:16px;font-size:11px}.detail-item span{color:var(--muted)}.detail-item b{text-align:right}.policy{display:flex;align-items:flex-start;gap:9px;padding:9px 0;border-bottom:1px solid #edf1f5}.policy:last-child{border-bottom:0}.policy-icon{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:800;background:var(--green-bg);color:var(--green);flex:0 0 auto}.policy.warning .policy-icon{background:var(--amber-bg);color:var(--amber)}.policy b{font-size:11px;display:block}.policy p{font-size:10px;color:var(--muted);margin:2px 0 0}.risk-circle{width:92px;height:92px;border-radius:50%;background:conic-gradient(#e6a62f 0 42%,#edf1f6 42%);display:grid;place-items:center;margin:auto}.risk-circle:before{content:'';width:68px;height:68px;border-radius:50%;background:#fff;position:absolute}.risk-circle b{z-index:1;font-size:22px}.risk-circle small{font-size:9px;display:block;color:var(--muted)}.entity{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #edf1f5}.entity:last-child{border-bottom:0}.entity-icon{width:32px;height:32px;border-radius:9px;background:#EFF6FF;color:var(--blue);display:grid;place-items:center}.entity b{font-size:11px;display:block}.entity span{font-size:10px;color:var(--muted)}.entity button{margin-left:auto;border:0;background:transparent;color:var(--ai);font-size:11px;font-weight:700}.review-step{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.select,textarea{border:1px solid var(--line);border-radius:9px;background:white;color:var(--text)}.select{height:36px;padding:0 10px;width:100%}textarea{width:100%;min-height:88px;padding:10px;resize:vertical}.note-meta{display:flex;justify-content:space-between;color:var(--muted);font-size:10px;margin-top:6px}.integrity{background:#ECFDF5;border:1px solid #bce8d5;border-radius:10px;padding:13px}.integrity-top{display:flex;align-items:center;gap:9px;color:var(--green);font-weight:700;font-size:12px}.integrity code{display:block;background:white;border:1px solid #d9eee5;border-radius:7px;padding:8px;margin-top:9px;color:#49615a;font-size:9px;word-break:break-all}.bottom-bar{position:fixed;left:252px;right:0;bottom:0;height:66px;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1px solid var(--line);z-index:25;display:flex;align-items:center;justify-content:space-between;padding:0 28px}.bottom-bar p{font-size:11px;color:var(--muted);margin:0}.bottom-actions{display:flex;gap:8px}.modal{position:fixed;inset:0;background:rgba(15,42,95,.58);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}.modal.open{display:flex}.modal-card{background:white;border-radius:16px;width:min(520px,100%);box-shadow:0 30px 80px rgba(0,0,0,.28);overflow:hidden}.modal-card .card-head,.modal-card .card-body{padding:18px 20px}.toast{position:fixed;right:24px;bottom:84px;background:#0F2A5F;color:white;border-radius:10px;padding:12px 16px;font-size:12px;opacity:0;transform:translateY(10px);transition:.25s;z-index:120}.toast.show{opacity:1;transform:none}
+    :focus-visible{outline:3px solid rgba(56,189,248,.45);outline-offset:2px}
+    .card-head{background:linear-gradient(180deg,#FFFFFF 0%,#FBFDFF 100%)}
+    .audit-head{border-top:4px solid var(--blue)}
+    .kpi:first-child{border-top:3px solid var(--amber)}
+    .kpi:nth-child(4){border-top:3px solid var(--blue)}
+    .kpi:nth-child(5){border-top:3px solid var(--ai)}
+    .kpi:nth-child(6){border-top:3px solid var(--green)}
+    #ai-trace{border-color:#BFDBFE}
+    #ai-trace>.card-head{background:#EFF6FF}
+    .sidebar .nav a.active{background:rgba(37,99,235,.34)}
+    .btn.primary{box-shadow:0 6px 14px rgba(30,58,138,.18)}
+    .btn.primary:active{transform:translateY(1px)}
+    .select:focus,textarea:focus,.search input:focus{border-color:#2563EB;box-shadow:0 0 0 3px rgba(37,99,235,.12);outline:none}
+    .old{background:#FEF2F2;border-left-color:#DC2626}.new{background:#ECFDF5;border-left-color:#059669}
+    .badge.medium,.badge.review,.badge.warn{color:#D97706}.badge.fail{color:#DC2626}
+    .badge.verified,.badge.passed{color:#059669}
+    .entity-icon,.kpi-icon{border:1px solid #BFDBFE}
+    @media(max-width:1250px){.kpis{grid-template-columns:repeat(3,1fr)}.layout{grid-template-columns:1fr}.right{position:static;grid-template-columns:repeat(2,1fr)}.bottom-bar{left:252px}}
+    @media(max-width:850px){.app{display:block}.sidebar{transform:translateX(-100%)}.main{grid-column:auto}.content{padding:16px 15px 95px}.topbar{padding:0 15px}.head-row{display:block}.head-actions{justify-content:flex-start;margin-top:16px}.kpis{grid-template-columns:repeat(2,1fr)}.grid2,.ai-grid,.right{grid-template-columns:1fr}.bottom-bar{left:0;padding:0 15px}.bottom-bar p{display:none}.diff-table th:nth-child(2),.diff-table td:nth-child(2){display:none}.search{display:none}}
+    @media(max-width:520px){body{font-size:14px}.kpis{grid-template-columns:1fr 1fr}.kpi{min-height:100px;padding:13px}.head-title h1{font-size:21px}.audit-head{padding:18px}.head-actions .btn:nth-child(2){display:none}.bottom-actions .btn:not(.primary){display:none}.score-row{grid-template-columns:1.5fr .6fr .6fr}.score-row span:last-child{display:none}.card-head{align-items:flex-start;flex-direction:column}.tabs{width:100%}.tabs button{flex:1}.diff-table th,.diff-table td{padding:10px 8px}}
+  
+    /* =========================================================
+       Full Screen + Larger Typography Overrides
+       Med AI NexSure — Audit Detail
+       ========================================================= */
+    html, body {
+      width: 100%;
+      min-height: 100%;
+    }
+
+    body {
+      font-size: 18px;
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font-size: 16px;
+    }
+
+    .app {
+      grid-template-columns: 284px minmax(0, 1fr);
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 284px;
+      padding: 26px 18px;
+    }
+
+    .brand {
+      gap: 13px;
+      padding: 0 10px 28px;
+    }
+
+    .brandmark {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      font-size: 22px;
+    }
+
+    .brand strong {
+      font-size: 18px;
+    }
+
+    .brand span {
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .navlabel {
+      font-size: 12px;
+      padding: 10px 14px;
+    }
+
+    .nav {
+      gap: 7px;
+    }
+
+    .nav a {
+      padding: 13px 14px;
+      border-radius: 11px;
+      gap: 12px;
+      font-size: 15px;
+    }
+
+    .nav .ico {
+      width: 21px;
+      font-size: 17px;
+    }
+
+    .sidebar-foot {
+      padding: 18px 10px 0;
+    }
+
+    .profile {
+      gap: 12px;
+    }
+
+    .profile .avatar {
+      width: 42px;
+      height: 42px;
+      font-size: 16px;
+    }
+
+    .profile b {
+      font-size: 14px;
+    }
+
+    .profile small {
+      font-size: 12px;
+    }
+
+    .main {
+      grid-column: 2;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .topbar {
+      height: 78px;
+      padding: 0 36px;
+      gap: 22px;
+    }
+
+    .search {
+      max-width: 760px;
+    }
+
+    .search input {
+      height: 48px;
+      border-radius: 12px;
+      padding: 0 48px;
+      font-size: 16px;
+    }
+
+    .search:before {
+      left: 16px;
+      top: 8px;
+      font-size: 26px;
+    }
+
+    .iconbtn,
+    .btn {
+      min-height: 46px;
+      height: auto;
+      padding: 10px 16px;
+      border-radius: 11px;
+      gap: 9px;
+      font-size: 15px;
+    }
+
+    .iconbtn {
+      width: 46px;
+      padding: 0;
+    }
+
+    .content {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 30px 36px 118px;
+    }
+
+    .breadcrumb {
+      gap: 10px;
+      font-size: 14px;
+      margin-bottom: 18px;
+    }
+
+    .audit-head {
+      border-radius: 18px;
+      padding: 28px 30px;
+      margin-bottom: 20px;
+    }
+
+    .head-row {
+      gap: 26px;
+    }
+
+    .eyebrow {
+      gap: 10px;
+      font-size: 14px;
+    }
+
+    .head-title {
+      gap: 14px;
+      margin: 10px 0 8px;
+    }
+
+    .head-title h1 {
+      font-size: clamp(34px, 3vw, 46px);
+      line-height: 1.16;
+    }
+
+    .head-sub {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .head-actions {
+      gap: 10px;
+    }
+
+    .badges {
+      gap: 9px;
+    }
+
+    .badge {
+      gap: 7px;
+      padding: 7px 11px;
+      font-size: 13px;
+    }
+
+    .badge:before {
+      width: 7px;
+      height: 7px;
+    }
+
+    .readonly {
+      margin-top: 20px;
+      padding-top: 16px;
+      gap: 20px;
+      font-size: 14px;
+    }
+
+    .kpis {
+      grid-template-columns: repeat(6, minmax(170px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .kpi {
+      border-radius: 15px;
+      padding: 20px;
+      min-height: 142px;
+    }
+
+    .kpi-top {
+      font-size: 13px;
+    }
+
+    .kpi-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    .kpi-value {
+      font-size: 30px;
+      margin-top: 16px;
+    }
+
+    .kpi-foot {
+      font-size: 13px;
+      margin-top: 7px;
+      line-height: 1.5;
+    }
+
+    .riskbar {
+      height: 7px;
+      margin-top: 11px;
+    }
+
+    .layout {
+      grid-template-columns: minmax(0, 2.1fr) minmax(390px, 0.9fr);
+      gap: 20px;
+    }
+
+    .left,
+    .right {
+      gap: 20px;
+    }
+
+    .right {
+      top: 94px;
+    }
+
+    .card {
+      border-radius: 18px;
+    }
+
+    .card-head {
+      padding: 22px 24px;
+      gap: 16px;
+    }
+
+    .card-head h2 {
+      font-size: 21px;
+      line-height: 1.3;
+    }
+
+    .card-head p {
+      font-size: 14px;
+      margin-top: 5px;
+      line-height: 1.55;
+    }
+
+    .card-body {
+      padding: 24px;
+    }
+
+    .grid2 {
+      gap: 22px 34px;
+    }
+
+    .field label {
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .field .value {
+      font-size: 16px;
+      line-height: 1.55;
+    }
+
+    .copy {
+      font-size: 14px;
+      padding: 4px 6px;
+    }
+
+    .tabs {
+      gap: 5px;
+      padding: 5px;
+      border-radius: 11px;
+    }
+
+    .tabs button {
+      padding: 8px 13px;
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    .filter-row {
+      padding: 16px 24px;
+      gap: 12px;
+    }
+
+    .filters {
+      gap: 7px;
+    }
+
+    .chip {
+      padding: 8px 13px;
+      font-size: 13px;
+    }
+
+    .diff-table th {
+      font-size: 12px;
+      padding: 14px 18px;
+    }
+
+    .diff-table td {
+      padding: 17px 18px;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .diff-field {
+      font-size: 16px;
+    }
+
+    .diff-table small {
+      font-size: 12px;
+    }
+
+    .old,
+    .new {
+      padding: 12px 13px;
+      border-radius: 10px;
+    }
+
+    .json-view {
+      padding: 24px;
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .ai-grid {
+      gap: 15px;
+    }
+
+    .mini {
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .mini label {
+      font-size: 12px;
+      margin-bottom: 7px;
+    }
+
+    .mini strong {
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .confidence {
+      height: 9px;
+      margin-top: 9px;
+    }
+
+    .disclaimer {
+      margin-top: 16px;
+      border-radius: 11px;
+      padding: 15px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .score-row {
+      gap: 10px;
+      padding: 13px 0;
+      font-size: 15px;
+    }
+
+    .timeline {
+      padding-left: 30px;
+    }
+
+    .timeline:before {
+      left: 9px;
+    }
+
+    .event {
+      padding: 0 0 22px 14px;
+    }
+
+    .event:before {
+      left: -26px;
+      width: 12px;
+      height: 12px;
+    }
+
+    .event.current {
+      border-radius: 11px;
+      padding: 14px 16px 14px 24px;
+    }
+
+    .event time {
+      font-size: 12px;
+    }
+
+    .event b {
+      font-size: 15px;
+      margin: 5px 0;
+    }
+
+    .event p {
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .actor-head {
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .actor-head .avatar {
+      width: 54px;
+      height: 54px;
+      font-size: 17px;
+    }
+
+    .actor-head h3 {
+      font-size: 18px;
+    }
+
+    .actor-head p {
+      font-size: 13px;
+    }
+
+    .detail-list {
+      gap: 13px;
+    }
+
+    .detail-item {
+      gap: 18px;
+      font-size: 14px;
+    }
+
+    .policy {
+      gap: 11px;
+      padding: 12px 0;
+    }
+
+    .policy-icon {
+      width: 25px;
+      height: 25px;
+      font-size: 12px;
+    }
+
+    .policy b {
+      font-size: 14px;
+    }
+
+    .policy p {
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .risk-circle {
+      width: 112px;
+      height: 112px;
+    }
+
+    .risk-circle:before {
+      width: 82px;
+      height: 82px;
+    }
+
+    .risk-circle b {
+      font-size: 28px;
+    }
+
+    .risk-circle small {
+      font-size: 11px;
+    }
+
+    .entity {
+      gap: 12px;
+      padding: 13px 0;
+    }
+
+    .entity-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
+      font-size: 15px;
+    }
+
+    .entity b {
+      font-size: 14px;
+    }
+
+    .entity span {
+      font-size: 12px;
+    }
+
+    .entity button {
+      font-size: 13px;
+    }
+
+    .select {
+      height: 44px;
+      padding: 0 13px;
+      font-size: 15px;
+    }
+
+    textarea {
+      min-height: 116px;
+      padding: 13px;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .note-meta {
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    .integrity {
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .integrity-top {
+      gap: 10px;
+      font-size: 15px;
+    }
+
+    .integrity code {
+      border-radius: 9px;
+      padding: 11px;
+      margin-top: 11px;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .bottom-bar {
+      left: 284px;
+      height: 78px;
+      padding: 0 36px;
+    }
+
+    .bottom-bar p {
+      font-size: 13px;
+    }
+
+    .bottom-actions {
+      gap: 10px;
+    }
+
+    .modal-card {
+      width: min(620px, 100%);
+      border-radius: 18px;
+    }
+
+    .modal-card .card-head,
+    .modal-card .card-body {
+      padding: 24px 26px;
+    }
+
+    .toast {
+      right: 30px;
+      bottom: 96px;
+      border-radius: 12px;
+      padding: 15px 19px;
+      font-size: 14px;
+    }
+
+    @media (max-width: 1500px) {
+      .kpis {
+        grid-template-columns: repeat(3, minmax(180px, 1fr));
+      }
+
+      .layout {
+        grid-template-columns: minmax(0, 1.75fr) minmax(360px, 0.9fr);
+      }
+    }
+
+    @media (max-width: 1250px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .right {
+        position: static;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .bottom-bar {
+        left: 284px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      body {
+        font-size: 17px;
+      }
+
+      .app {
+        display: block;
+      }
+
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .main {
+        grid-column: auto;
+      }
+
+      .content {
+        padding: 22px 18px 106px;
+      }
+
+      .topbar {
+        padding: 0 18px;
+      }
+
+      .head-row {
+        display: block;
+      }
+
+      .head-actions {
+        justify-content: flex-start;
+        margin-top: 18px;
+      }
+
+      .kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .grid2,
+      .ai-grid,
+      .right {
+        grid-template-columns: 1fr;
+      }
+
+      .bottom-bar {
+        left: 0;
+        padding: 0 18px;
+      }
+
+      .bottom-bar p {
+        display: none;
+      }
+
+      .diff-table th:nth-child(2),
+      .diff-table td:nth-child(2) {
+        display: none;
+      }
+
+      .search {
+        display: none;
+      }
+    }
+
+    @media (max-width: 560px) {
+      body {
+        font-size: 16px;
+      }
+
+      .content {
+        padding: 16px 14px 96px;
+      }
+
+      .kpis {
+        grid-template-columns: 1fr;
+      }
+
+      .kpi {
+        min-height: 124px;
+      }
+
+      .head-title h1 {
+        font-size: 31px;
+      }
+
+      .audit-head {
+        padding: 22px 18px;
+      }
+
+      .readonly {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .bottom-actions .btn:not(.primary) {
+        display: none;
+      }
+
+      .score-row {
+        grid-template-columns: 1.5fr .6fr .6fr;
+      }
+
+      .score-row span:last-child {
+        display: none;
+      }
+
+      .card-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .tabs {
+        width: 100%;
+      }
+
+      .tabs button {
+        flex: 1;
+      }
+
+      .diff-table th,
+      .diff-table td {
+        padding: 12px 9px;
+      }
+    }
+
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="brandmark">N</div><div><strong>Med AI NexSure</strong><span>HEALTHCARE & INSURANCE INTELLIGENCE</span></div></div>
+    <div class="navlabel">WORKSPACE</div>
+    <nav class="nav">
+      <a href="#"><span class="ico">⌂</span>Main Dashboard</a><a href="#"><span class="ico">♙</span>Patient Management</a><a href="#"><span class="ico">✚</span>Visit Management</a><a href="#"><span class="ico">◇</span>Claim Readiness</a><a href="#"><span class="ico">✦</span>AI Copilot</a>
+    </nav>
+    <div class="navlabel" style="margin-top:18px">GOVERNANCE</div>
+    <nav class="nav"><a href="#"><span class="ico">▤</span>Evidence Package</a><a class="active" href="#"><span class="ico">◉</span>Audit & Compliance</a><a href="#"><span class="ico">⚑</span>Investigation Center</a><a href="#"><span class="ico">⚙</span>Admin Settings</a></nav>
+    <div class="sidebar-foot"><div class="profile"><div class="avatar">SC</div><div><b>Sirin Chantarat</b><small>Compliance Officer</small></div></div></div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar"><div class="search"><input aria-label="Global Search — ค้นหาข้อมูลทั้งระบบ" placeholder="Search patients, visits, claims, evidence, or audit IDs..." /></div><div class="topactions"><button class="iconbtn" aria-label="AI Copilot">✦</button><button class="iconbtn" aria-label="Notifications">♢</button><button class="iconbtn" aria-label="Help">?</button></div></header>
+    <div class="content">
+      <div class="breadcrumb"><span>Audit & Compliance</span><span>/</span><span>Audit Logs</span><span>/</span><b>AUD-20260710-000128</b></div>
+      <section class="audit-head">
+        <div class="head-row"><div><div class="eyebrow"><span>CLINICAL DOCUMENTATION</span><span>•</span><span>10 Jul 2026, 14:25:37 ICT</span></div><div class="head-title"><h1>SOAP Note Updated</h1><span class="badge medium">Medium Severity</span><span class="badge verified">Integrity Verified</span><span class="badge review">Review Required</span></div><div class="head-sub">ตรวจสอบผู้ดำเนินการ รายการเปลี่ยนแปลง ความเสี่ยง และหลักฐานที่เกี่ยวข้องกับเหตุการณ์นี้</div><div class="head-sub" style="margin-top:5px">Audit ID: <span class="mono" id="auditId">AUD-20260710-000128</span> <button class="copy" onclick="copyText('AUD-20260710-000128')">Copy</button> · Source: Med AI NexSure Web</div></div>
+        <div class="head-actions"><button class="btn" onclick="history.back()">← Back to Audit Logs</button><button class="btn primary" onclick="openModal('exportModal')">⇩ Export Audit Record</button><button class="iconbtn" onclick="openModal('actionModal')">•••</button></div></div>
+        <div class="readonly"><span>🔒 <strong>Immutable Audit Record</strong> — รายการนี้เป็นข้อมูลแบบ Read-only ไม่สามารถแก้ไขหรือลบจากระบบได้</span><span>Production · v1.4.2</span></div>
+      </section>
+
+      <section class="kpis">
+        <div class="kpi" onclick="location.hash='risk'"><div class="kpi-top"><span>Event Severity</span><span class="kpi-icon">!</span></div><div class="kpi-value" style="color:var(--amber)">Medium</div><div class="kpi-foot">ตรวจพบการแก้ไขข้อมูลทางคลินิก</div></div>
+        <div class="kpi" onclick="location.hash='changes'"><div class="kpi-top"><span>Changes Detected</span><span class="kpi-icon">↔</span></div><div class="kpi-value">4 Fields</div><div class="kpi-foot">3 business fields · 1 system field</div></div>
+        <div class="kpi" onclick="location.hash='entities'"><div class="kpi-top"><span>Related Entity Context</span><span class="kpi-icon">⌘</span></div><div class="kpi-value">4 Records</div><div class="kpi-foot">Patient, Visit, SOAP, Claim</div></div>
+        <div class="kpi" onclick="location.hash='risk'"><div class="kpi-top"><span>Risk Score</span><span class="kpi-icon">△</span></div><div class="kpi-value">42 <small style="font-size:11px;color:var(--muted)">/ 100</small></div><div class="riskbar"><i></i></div></div>
+        <div class="kpi" onclick="location.hash='ai-trace'"><div class="kpi-top"><span>AI Involvement</span><span class="kpi-icon">✦</span></div><div class="kpi-value" style="font-size:17px;color:var(--ai)">AI Suggested</div><div class="kpi-foot">ผ่านการตรวจสอบและปรับแก้โดยแพทย์</div></div>
+        <div class="kpi" onclick="location.hash='risk'"><div class="kpi-top"><span>Policy Checks</span><span class="kpi-icon">✓</span></div><div class="kpi-value">5 Passed</div><div class="kpi-foot"><span style="color:var(--amber)">1 warning</span> · 0 failed</div></div>
+      </section>
+
+      <div class="layout">
+        <div class="left">
+          <section class="card"><div class="card-head"><div><h2>Audit Event Overview</h2><p>สรุปข้อมูลเหตุการณ์ เวลา ระบบต้นทาง และ Technical Identifiers</p></div><span class="badge passed">Success</span></div><div class="card-body grid2">
+            <div class="field"><label>Event Type</label><div class="value mono">SOAP_NOTE_UPDATED</div></div><div class="field"><label>Action / Result</label><div class="value">Update · Success</div></div><div class="field"><label>Occurred At</label><div class="value">10 Jul 2026, 14:25:37 ICT <small>(UTC+7)</small></div></div><div class="field"><label>Recorded At</label><div class="value">10 Jul 2026, 14:25:38 ICT</div></div><div class="field"><label>Processing Time</label><div class="value">245 ms</div></div><div class="field"><label>Environment</label><div class="value">Production · v1.4.2</div></div><div class="field"><label>Correlation ID</label><div class="value mono">COR-8XK29A <button class="copy" onclick="copyText('COR-8XK29A')">Copy</button></div></div><div class="field"><label>Request ID</label><div class="value mono">REQ-P8K2X9 <button class="copy" onclick="copyText('REQ-P8K2X9')">Copy</button></div></div>
+          </div></section>
+
+          <section class="card" id="changes"><div class="card-head"><div><h2>Change Comparison</h2><p>เปรียบเทียบค่าก่อนและหลังในระดับ Field พร้อมระบุประเภทการเปลี่ยนแปลง</p></div><div class="tabs" id="diffTabs"><button class="active" data-mode="structured">Structured</button><button data-mode="inline">Inline Diff</button><button data-mode="json">JSON</button></div></div>
+            <div class="filter-row"><div class="filters"><button class="chip active">All Changes</button><button class="chip">Clinical</button><button class="chip">Claim</button><button class="chip">System Metadata</button><button class="chip">Sensitive Fields</button></div><span style="font-size:11px;color:var(--muted)">4 fields changed</span></div>
+            <div id="structuredView"><table class="diff-table"><thead><tr><th>Field</th><th>Previous Value</th><th>New Value</th><th>Change Type</th></tr></thead><tbody>
+              <tr><td><div class="diff-field">Visit Status</div><small>visit.status</small></td><td><div class="old">In Consultation</div></td><td><div class="new">Pharmacy</div></td><td><span class="badge updated">Updated</span></td></tr>
+              <tr><td><div class="diff-field">Diagnosis Code</div><small>assessment.primary_icd10</small></td><td><div class="old mono">R05</div></td><td><div class="new mono">J06.9</div></td><td><span class="badge updated">Updated</span></td></tr>
+              <tr><td><div class="diff-field">SOAP Assessment</div><small>soap.assessment</small></td><td><div class="old">Acute cough, likely viral infection.</div></td><td><div class="new">Acute upper respiratory infection with cough. No red-flag symptoms identified.</div></td><td><span class="badge updated">Updated</span></td></tr>
+              <tr><td><div class="diff-field">Claim Readiness Score</div><small>claim_readiness.score</small></td><td><div class="old">72</div></td><td><div class="new">86</div></td><td><span class="badge updated">Updated</span></td></tr>
+            </tbody></table></div>
+            <pre class="json-view" id="jsonView">{
+  "event_type": "SOAP_NOTE_UPDATED",
+  "previous_values": {
+    "visit_status": "in_consultation",
+    "diagnosis_code": "R05",
+    "claim_score": 72
+  },
+  "new_values": {
+    "visit_status": "pharmacy",
+    "diagnosis_code": "J06.9",
+    "claim_score": 86
+  },
+  "change_reason": "Clinical assessment updated after examination"
+}</pre>
+          </section>
+
+          <section class="card" id="ai-trace"><div class="card-head"><div><h2>AI Decision Trace</h2><p>ติดตามตั้งแต่คำแนะนำของ AI จนถึงการตัดสินใจของผู้เชี่ยวชาญ</p></div><span class="badge ai">AI Suggested</span></div><div class="card-body"><div class="ai-grid">
+            <div class="mini"><label>AI Feature</label><strong>ICD-10 Suggestion</strong></div><div class="mini"><label>Model / Prompt Version</label><strong class="mono">NexSure-Clinical-v3.2 · ICD-PROMPT-2.4</strong></div><div class="mini"><label>Confidence Score</label><strong>91%</strong><div class="confidence"><i></i></div></div><div class="mini"><label>Safety Validation</label><strong style="color:var(--green)">Passed</strong></div><div class="mini"><label>AI Recommendation</label><strong>J06.9 — Acute upper respiratory infection, unspecified</strong></div><div class="mini"><label>Human Decision</label><strong>Modified and Accepted by Dr. Narin</strong></div><div class="mini"><label>Override Reason</label><strong>Updated diagnosis after physical examination findings.</strong></div><div class="mini"><label>Processing Time</label><strong>1,284 ms · 1,462 tokens</strong></div>
+          </div><div class="disclaimer"><b>Decision Support Notice:</b> AI-generated recommendations require professional review and must not replace clinical judgment.<br>คำแนะนำจาก AI ต้องได้รับการตรวจสอบโดยผู้เชี่ยวชาญก่อนนำไปใช้</div></div></section>
+
+          <section class="card"><div class="card-head"><div><h2>Claim Readiness Trace</h2><p>แสดงการเปลี่ยนแปลงคะแนนและปัจจัยที่มีผลต่อความพร้อมส่งเคลม</p></div><span class="badge passed">Needs Review → Ready</span></div><div class="card-body"><div class="score-row" style="color:var(--muted);font-size:10px;font-weight:700;text-transform:uppercase"><span>Factor</span><span>Previous</span><span>New</span><span>Weight</span></div><div class="score-row"><b>SOAP Completeness</b><span>18</span><b style="color:var(--green)">25</b><span>25%</span></div><div class="score-row"><b>Diagnosis & ICD</b><span>15</span><b style="color:var(--green)">18</b><span>20%</span></div><div class="score-row"><b>Prescription</b><span>12</span><span>12</span><span>15%</span></div><div class="score-row"><b>Evidence</b><span>10</span><b style="color:var(--green)">18</b><span>20%</span></div><div class="score-row"><b>Insurance Rule</b><span>8</span><span>8</span><span>10%</span></div><div class="score-row"><b>Economic</b><span>9</span><span>9</span><span>10%</span></div></div></section>
+
+          <section class="card"><div class="card-head"><div><h2>Access Decision Trace</h2><p>อธิบายเหตุผลการอนุญาตหรือปฏิเสธ โดยไม่เปิดเผย Security Rules ที่มีความอ่อนไหว</p></div><span class="badge passed">Allowed</span></div><div class="card-body grid2"><div class="field"><label>Requested Action</label><div class="value">Update SOAP Note</div></div><div class="field"><label>Resource</label><div class="value mono">VIS-20260710-0124</div></div><div class="field"><label>Role / Permission</label><div class="value">Doctor · <span class="mono">soap_note.update</span></div></div><div class="field"><label>Clinic Scope</label><div class="value mono">CLINIC-001</div></div><div class="field"><label>RLS Policy</label><div class="value mono">doctor_same_clinic_policy</div></div><div class="field"><label>Decision Reason</label><div class="value">User belongs to the same clinic and is assigned to this visit.</div></div></div></section>
+
+          <section class="card"><div class="card-head"><div><h2>Related Event Timeline</h2><p>ลำดับเหตุการณ์ที่เชื่อมโยงก่อนและหลัง Audit Event ปัจจุบัน</p></div><div class="tabs"><button class="active">All</button><button>Entity</button><button>Actor</button></div></div><div class="card-body"><div class="timeline"><div class="event"><time>14:22:04 · 3m 33s before</time><b>User opened Visit Detail</b><p>Dr. Narin opened VIS-20260710-0124</p></div><div class="event"><time>14:23:18 · 2m 19s before</time><b>AI generated ICD suggestion</b><p>Suggested J06.9 with 91% confidence</p></div><div class="event current"><time>14:25:37 · Current event</time><b>SOAP Note Updated</b><p>3 clinical fields and 1 claim field changed</p></div><div class="event"><time>14:25:38 · 1s after</time><b>Claim Readiness recalculated</b><p>Score increased from 72 to 86 — status changed to Ready</p></div><div class="event"><time>14:26:12 · 35s after</time><b>Evidence Package marked complete</b><p>Mandatory SOAP and ICD evidence validated</p></div></div></div></section>
+        </div>
+
+        <aside class="right">
+          <section class="card"><div class="card-head"><div><h2>Actor & Access Context</h2><p>ข้อมูลผู้ดำเนินการ บทบาท วิธี Authentication และขอบเขตการเข้าถึง</p></div></div><div class="card-body"><div class="actor-head"><div class="avatar">NS</div><div><h3>Dr. Narin Sutham</h3><p>Doctor · Clinical Department</p></div><span class="badge verified" style="margin-left:auto">MFA</span></div><div class="detail-list"><div class="detail-item"><span>User ID</span><b class="mono">USR-00492</b></div><div class="detail-item"><span>Organization</span><b>NexSure Health Network</b></div><div class="detail-item"><span>Clinic</span><b>Sukhumvit Clinic</b></div><div class="detail-item"><span>Authentication</span><b>SSO + MFA</b></div><div class="detail-item"><span>Session ID</span><b class="mono">SES-8F21••••</b></div><div class="detail-item"><span>Delegated Access</span><b>No</b></div></div><button class="btn" style="width:100%;margin-top:15px">View User Detail ↗</button></div></section>
+
+          <section class="card" id="risk"><div class="card-head"><div><h2>Risk & Compliance Assessment</h2><p>สรุปผลการตรวจสอบ Policy, Security Anomaly และ Compliance Risk</p></div><span class="badge medium">Medium Risk</span></div><div class="card-body"><div class="risk-circle"><b>42<small>/ 100</small></b></div><div style="text-align:center;font-size:11px;color:var(--muted);margin:8px 0 14px">ไม่พบความผิดปกติด้านความปลอดภัยระดับ Critical</div><div class="policy"><div class="policy-icon">✓</div><div><b>Valid permission</b><p>ผู้ใช้งานมีสิทธิ์ soap_note.update ตาม Role และ Access Scope</p></div></div><div class="policy"><div class="policy-icon">✓</div><div><b>Clinic scope matched</b><p>ผู้ดำเนินการและ Visit อยู่ภายใต้ CLINIC-001 เดียวกัน</p></div></div><div class="policy"><div class="policy-icon">✓</div><div><b>Patient consent active</b><p>Patient Consent มีสถานะ Active ณ เวลาที่เข้าถึงข้อมูล</p></div></div><div class="policy"><div class="policy-icon">✓</div><div><b>MFA verified</b><p>ผ่านการยืนยันตัวตนเพิ่มเติมตาม Security Policy</p></div></div><div class="policy"><div class="policy-icon">✓</div><div><b>AI override policy followed</b><p>ระบบบันทึกเหตุผลและ Human Decision ครบถ้วน</p></div></div><div class="policy warning"><div class="policy-icon">!</div><div><b>Diagnosis change after AI suggestion</b><p>แนะนำให้ตรวจสอบเพิ่มเติม เนื่องจากมีผลต่อ Claim Readiness Score อย่างมีนัยสำคัญ</p></div></div></div></section>
+
+          <section class="card" id="entities"><div class="card-head"><div><h2>Related Entity Context</h2><p>ข้อมูลอ้างอิงที่เกี่ยวข้องจะแสดงตามสิทธิ์และขอบเขตการเข้าถึง</p></div></div><div class="card-body"><div class="entity"><div class="entity-icon">P</div><div><b>Patient</b><span>HN-000238 · Anong S•••••</span></div><button>Open ↗</button></div><div class="entity"><div class="entity-icon">V</div><div><b>Visit</b><span>VIS-20260710-0124</span></div><button>Open ↗</button></div><div class="entity"><div class="entity-icon">S</div><div><b>SOAP Note</b><span>SOAP-00129 · Version 6</span></div><button>View ↗</button></div><div class="entity"><div class="entity-icon">C</div><div><b>Claim Readiness</b><span>CRA-0291 · Score 86</span></div><button>View ↗</button></div></div></section>
+
+          <section class="card"><div class="card-head"><div><h2>Source, Device & Network</h2><p>ข้อมูลอุปกรณ์และเครือข่ายถูก Mask ตาม Privacy Policy และสิทธิ์ผู้ใช้งาน</p></div></div><div class="card-body detail-list"><div class="detail-item"><span>Source</span><b>Med AI NexSure Web</b></div><div class="detail-item"><span>Device</span><b>Desktop · Windows 11</b></div><div class="detail-item"><span>Browser</span><b>Chrome 150</b></div><div class="detail-item"><span>IP Address</span><b class="mono">10.24.***.***</b></div><div class="detail-item"><span>Location</span><b>Bangkok, Thailand</b></div><div class="detail-item"><span>Endpoint</span><b class="mono">PATCH /api/soap-notes/123</b></div><div class="detail-item"><span>Response</span><b style="color:var(--green)">200 Success</b></div></div></section>
+
+          <section class="card"><div class="card-head"><div><h2>Compliance Review Workflow</h2><p>บันทึกการตรวจสอบแยกจาก Audit Event เดิมและไม่กระทบข้อมูลต้นฉบับ</p></div><span class="badge review">In Review</span></div><div class="card-body"><div class="review-step"><div><small style="color:var(--muted)">Assigned Reviewer</small><b style="display:block;font-size:12px">Sirin Chantarat</b></div><button class="btn">Reassign</button></div><select class="select" aria-label="Review status"><option>In Review</option><option>Information Requested</option><option>Resolved</option><option>Escalated</option></select><label style="display:block;font-size:11px;font-weight:700;margin:13px 0 6px">Review Note</label><textarea id="note" placeholder="ระบุเหตุผลหรือข้อสังเกตอย่างน้อย 10 ตัวอักษร..."></textarea><div class="note-meta"><span>การเพิ่ม Note จะสร้าง Audit Event ใหม่โดยอัตโนมัติ</span><span id="chars">0 / 5,000</span></div><button class="btn primary" style="width:100%;margin-top:10px" onclick="addNote()">Add Review Note</button></div></section>
+
+          <section class="card"><div class="card-head"><div><h2>Data Integrity Verification</h2><p>ตรวจสอบความสมบูรณ์ของข้อมูลด้วย Append-only Hash Chain</p></div></div><div class="card-body"><div class="integrity"><div class="integrity-top">✓ Record integrity verified</div><code>SHA-256: 7c82e2f84b5aa9c816e6f2a03f418267...e197</code><div style="font-size:10px;color:var(--muted);margin-top:7px">Verified 10 Jul 2026, 14:25:39 ICT · Hash Chain v2</div></div><button class="btn" style="width:100%;margin-top:11px" onclick="toast('Integrity verified successfully. ตรวจสอบความสมบูรณ์ของข้อมูลเรียบร้อยแล้ว')">Verify Again</button></div></section>
+        </aside>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="bottom-bar"><p>Last integrity verification: 10 Jul 2026, 14:25:39 ICT · Audit records are append-only · ข้อมูลต้นฉบับไม่สามารถแก้ไขได้</p><div class="bottom-actions"><button class="btn" onclick="openModal('noteModal')">＋ Add Review Note</button><button class="btn danger" onclick="toast('Event flagged for review. ระบบได้ส่งรายการเข้าสู่ Compliance Review แล้ว')">⚑ Flag for Review</button><button class="btn primary" onclick="openModal('exportModal')">⇩ Export Evidence Package</button></div></div>
+
+<div class="modal" id="exportModal"><div class="modal-card"><div class="card-head"><div><h2>Export Audit Evidence</h2><p>การ Export ข้อมูล PHI ต้องระบุเหตุผล และระบบจะสร้าง Audit Event ใหม่ทุกครั้ง</p></div><button class="iconbtn" onclick="closeModal('exportModal')">×</button></div><div class="card-body"><label style="font-size:11px;font-weight:700">Export Format</label><select class="select" style="margin:6px 0 14px"><option>PDF — Compliance Evidence</option><option>JSON — Complete Record</option><option>CSV — Field Changes</option></select><label style="font-size:11px;font-weight:700">Data Version</label><select class="select" style="margin:6px 0 14px"><option>Redacted Version (Recommended)</option><option>Full Version — Step-up authentication required</option></select><label style="font-size:11px;font-weight:700">Export Reason</label><textarea placeholder="ระบุวัตถุประสงค์และเหตุผลที่ต้องการ Export ข้อมูล..."></textarea><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px"><button class="btn" onclick="closeModal('exportModal')">Cancel</button><button class="btn primary" onclick="closeModal('exportModal');toast('Evidence package generated. ระบบสร้าง Signed URL เรียบร้อยแล้ว')">Generate Evidence</button></div></div></div></div>
+<div class="modal" id="actionModal"><div class="modal-card" style="width:min(390px,100%)"><div class="card-head"><h2>More Actions</h2><button class="iconbtn" onclick="closeModal('actionModal')">×</button></div><div class="card-body" style="display:grid;gap:8px"><button class="btn">View Related Visit</button><button class="btn">View Actor Activity</button><button class="btn">Create Investigation</button><button class="btn danger">Escalate to Security Admin</button></div></div></div>
+<div class="modal" id="noteModal"><div class="modal-card"><div class="card-head"><div><h2>Add Review Note</h2><p>ทุก Review Note จะสร้าง Audit Event ใหม่ พร้อมบันทึกผู้เขียนและเวลา</p></div><button class="iconbtn" onclick="closeModal('noteModal')">×</button></div><div class="card-body"><select class="select"><option>Compliance Review</option><option>General Note</option><option>Security Review</option><option>Investigation Note</option><option>Resolution</option></select><textarea style="margin-top:12px" placeholder="เพิ่มรายละเอียด ข้อสังเกต หรือผลการตรวจสอบ..."></textarea><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px"><button class="btn" onclick="closeModal('noteModal')">Cancel</button><button class="btn primary" onclick="closeModal('noteModal');toast('Review note saved successfully. บันทึกข้อมูลการตรวจสอบแล้ว')">Save Note</button></div></div></div></div>
+<div class="toast" id="toast"></div>
+<script>
+  const tabs=document.querySelectorAll('#diffTabs button');
+  tabs.forEach(btn=>btn.addEventListener('click',()=>{tabs.forEach(x=>x.classList.remove('active'));btn.classList.add('active');const json=btn.dataset.mode==='json';document.getElementById('jsonView').style.display=json?'block':'none';document.getElementById('structuredView').style.display=json?'none':'block';if(btn.dataset.mode==='inline') toast('Inline diff mode enabled.');}));
+  document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));c.classList.add('active');toast('Change filter: '+c.textContent);}));
+  const note=document.getElementById('note');note.addEventListener('input',()=>document.getElementById('chars').textContent=note.value.length+' / 5,000');
+  function addNote(){if(note.value.trim().length<10){toast('กรุณาระบุ Review Note อย่างน้อย 10 ตัวอักษร');return}toast('Review note saved successfully. บันทึกข้อมูลการตรวจสอบแล้ว');note.value='';document.getElementById('chars').textContent='0 / 5,000'}
+  function openModal(id){document.getElementById(id).classList.add('open')}function closeModal(id){document.getElementById(id).classList.remove('open')}
+  document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
+  function copyText(t){navigator.clipboard?.writeText(t);toast('Copied: '+t)}
+  let timer;function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(timer);timer=setTimeout(()=>t.classList.remove('show'),2500)}
+</script>
+</body>
+</html>

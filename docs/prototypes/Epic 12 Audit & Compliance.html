@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Audit & Compliance | Med AI NexSure</title>
+
+  <style>
+    :root {
+      --navy: #0f2a5f;
+      --blue: #1e3a8a;
+      --ai-blue: #2563eb;
+      --soft-blue: #eff6ff;
+      --border: #dbeafe;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --green: #059669;
+      --amber: #d97706;
+      --red: #dc2626;
+      --purple: #7c3aed;
+      --shadow: 0 20px 50px rgba(15, 42, 95, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #f8fbff 0%, #eef4ff 100%);
+      color: var(--text);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      min-height: 100vh;
+    }
+
+    aside {
+      background: linear-gradient(180deg, var(--navy), #071a3d);
+      padding: 28px 22px;
+      color: white;
+    }
+
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 34px;
+    }
+
+    .logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #60a5fa, #2563eb);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .brand p {
+      margin: 3px 0 0;
+      font-size: 12px;
+      color: #bfdbfe;
+    }
+
+    .nav-title {
+      margin: 24px 0 10px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: #93c5fd;
+    }
+
+    .nav-item {
+      padding: 12px 14px;
+      border-radius: 12px;
+      color: #dbeafe;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .nav-item.active {
+      background: rgba(255,255,255,.14);
+      color: white;
+    }
+
+    main {
+      padding: 30px;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--ai-blue);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin: 8px 0;
+      font-size: 34px;
+      letter-spacing: -0.04em;
+    }
+
+    .subtitle {
+      margin: 0;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 0;
+      padding: 11px 16px;
+      border-radius: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .primary {
+      background: var(--ai-blue);
+      color: white;
+      box-shadow: 0 14px 28px rgba(37, 99, 235, .25);
+    }
+
+    .secondary {
+      background: white;
+      color: var(--blue);
+      border: 1px solid var(--border);
+    }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      background: rgba(255,255,255,.94);
+      border: 1px solid #e2e8f0;
+      border-radius: 22px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .kpi-label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .kpi-value {
+      font-size: 30px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    .kpi-desc {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap: 18px;
+    }
+
+    .section-head {
+      margin-bottom: 16px;
+    }
+
+    .section-head h3 {
+      margin: 0 0 6px;
+      font-size: 19px;
+    }
+
+    .section-head p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .feature {
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+    }
+
+    .feature-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 12px;
+      background: var(--soft-blue);
+      color: var(--ai-blue);
+      font-weight: 900;
+    }
+
+    .feature h4 {
+      margin: 0 0 6px;
+      font-size: 16px;
+    }
+
+    .feature p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 13px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+    }
+
+    th {
+      text-align: left;
+      padding: 12px 10px;
+      font-size: 12px;
+      color: var(--muted);
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    td {
+      padding: 14px 10px;
+      font-size: 14px;
+      border-bottom: 1px solid #eef2f7;
+      vertical-align: middle;
+    }
+
+    .badge {
+      display: inline-flex;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .view { background: #eff6ff; color: #1d4ed8; }
+    .edit { background: #faf5ff; color: var(--purple); }
+    .export { background: #fff7ed; color: var(--amber); }
+    .risk { background: #fef2f2; color: var(--red); }
+
+    .side-stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .alert {
+      padding: 16px;
+      border-radius: 18px;
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      margin-bottom: 12px;
+    }
+
+    .alert strong {
+      display: block;
+      color: #9a3412;
+      margin-bottom: 6px;
+    }
+
+    .alert p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #9a3412;
+    }
+
+    .status-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 13px 14px;
+      border-radius: 14px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+    }
+
+    .status-row span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .status-row strong {
+      font-size: 15px;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 14px;
+    }
+
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 26px 1fr;
+      gap: 10px;
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--ai-blue);
+      margin-top: 5px;
+      box-shadow: 0 0 0 6px #dbeafe;
+    }
+
+    .timeline-item strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .timeline-item p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 1100px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      aside {
+        display: none;
+      }
+
+      .kpis,
+      .content-grid,
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+    <aside>
+      <div class="brand">
+        <div class="logo">NX</div>
+        <div>
+          <h1>Med AI NexSure</h1>
+          <p>Enterprise Healthcare Intelligence</p>
+        </div>
+      </div>
+
+      <div class="nav-title">Clinical Operations</div>
+      <div class="nav-item">Main Dashboard</div>
+      <div class="nav-item">Patient Management</div>
+      <div class="nav-item">Visit Management</div>
+      <div class="nav-item">SOAP Note</div>
+      <div class="nav-item">Prescription</div>
+
+      <div class="nav-title">Insurance Intelligence</div>
+      <div class="nav-item">Claim Readiness</div>
+      <div class="nav-item">Evidence Package</div>
+      <div class="nav-item">Payer Rules</div>
+      <div class="nav-item">Economic Intelligence</div>
+
+      <div class="nav-title">AI & Governance</div>
+      <div class="nav-item">AI Copilot</div>
+      <div class="nav-item active">Audit & Compliance</div>
+      <div class="nav-item">Admin Settings</div>
+    </aside>
+
+    <main>
+      <section class="hero">
+        <div>
+          <div class="eyebrow">Audit-Ready Governance Layer</div>
+          <h2>Audit & Compliance</h2>
+          <p class="subtitle">
+            ติดตามประวัติการใช้งานและรองรับการตรวจสอบตาม PDPA พร้อมควบคุมการเข้าถึงข้อมูลสุขภาพ เอกสารเคลม และกิจกรรมสำคัญในระบบอย่างเป็นมาตรฐาน Enterprise
+          </p>
+        </div>
+
+        <div class="actions">
+          <button class="secondary">Apply Filter</button>
+          <button class="primary">Export Audit Report</button>
+        </div>
+      </section>
+
+      <section class="kpis">
+        <div class="card">
+          <div class="kpi-label">Today Audit Events</div>
+          <div class="kpi-value">1,284</div>
+          <div class="kpi-desc">กิจกรรมที่ถูกบันทึกในวันนี้</div>
+        </div>
+
+        <div class="card">
+          <div class="kpi-label">PHI Access Logged</div>
+          <div class="kpi-value">100%</div>
+          <div class="kpi-desc">ทุกการเข้าถึงข้อมูลสุขภาพถูกบันทึก</div>
+        </div>
+
+        <div class="card">
+          <div class="kpi-label">PDPA Consent Coverage</div>
+          <div class="kpi-value">96.8%</div>
+          <div class="kpi-desc">ผู้ป่วยที่มี Consent พร้อมใช้งาน</div>
+        </div>
+
+        <div class="card">
+          <div class="kpi-label">Compliance Alerts</div>
+          <div class="kpi-value">7</div>
+          <div class="kpi-desc">กิจกรรมเสี่ยงที่ต้องตรวจสอบ</div>
+        </div>
+      </section>
+
+      <section class="content-grid">
+        <div class="card">
+          <div class="section-head">
+            <h3>Governance Modules</h3>
+            <p>ศูนย์กลางการตรวจสอบย้อนหลัง ควบคุมการใช้งานข้อมูล และรองรับมาตรฐาน PDPA สำหรับ Healthcare & Insurance workflow</p>
+          </div>
+
+          <div class="feature-grid">
+            <div class="feature">
+              <div class="feature-icon">01</div>
+              <h4>Access History</h4>
+              <p>ตรวจสอบว่าใครเข้าถึงข้อมูลผู้ป่วย Visit หรือเอกสารสำคัญ พร้อมเวลา Role และบริบทการใช้งาน</p>
+            </div>
+
+            <div class="feature">
+              <div class="feature-icon">02</div>
+              <h4>Version History</h4>
+              <p>ดูประวัติการแก้ไข SOAP, Prescription และ Evidence Package เพื่อรองรับการตรวจสอบย้อนหลัง</p>
+            </div>
+
+            <div class="feature">
+              <div class="feature-icon">03</div>
+              <h4>PDPA Consent</h4>
+              <p>ตรวจสอบสถานะ Consent ก่อนเข้าถึงหรือ Export ข้อมูล ลดความเสี่ยงด้านข้อมูลส่วนบุคคล</p>
+            </div>
+
+            <div class="feature">
+              <div class="feature-icon">04</div>
+              <h4>Compliance Alerts</h4>
+              <p>แจ้งเตือนกิจกรรมที่มีความเสี่ยงด้านข้อมูลสุขภาพและประกัน เช่น Export ผิดปกติ หรือเข้าถึง PHI บ่อยเกินไป</p>
+            </div>
+          </div>
+
+          <div class="section-head" style="margin-top: 26px;">
+            <h3>Recent Audit Log</h3>
+            <p>Immutable audit trail สำหรับ View, Edit, Export, Approve และ Access-sensitive events</p>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>User / Role</th>
+                <th>Action</th>
+                <th>Module</th>
+                <th>Patient / Visit</th>
+                <th>Risk</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>10:42</td>
+                <td>Dr. Anan<br><small>Doctor</small></td>
+                <td><span class="badge view">View</span></td>
+                <td>Patient Profile</td>
+                <td>HN-24891 / VS-1029</td>
+                <td>Low</td>
+              </tr>
+              <tr>
+                <td>10:31</td>
+                <td>Nicha S.<br><small>Claim Reviewer</small></td>
+                <td><span class="badge export">Export</span></td>
+                <td>Evidence Package</td>
+                <td>HN-77420 / VS-1017</td>
+                <td><span class="badge risk">High</span></td>
+              </tr>
+              <tr>
+                <td>10:18</td>
+                <td>Pharm. Kitt<br><small>Pharmacist</small></td>
+                <td><span class="badge edit">Edit</span></td>
+                <td>Prescription</td>
+                <td>HN-55201 / VS-1008</td>
+                <td>Medium</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="side-stack">
+          <div class="card">
+            <div class="section-head">
+              <h3>PDPA Consent</h3>
+              <p>ตรวจสอบสถานะ Consent ก่อนเข้าถึงหรือ Export ข้อมูล</p>
+            </div>
+
+            <div class="status-list">
+              <div class="status-row">
+                <span>Granted</span>
+                <strong style="color: var(--green);">842</strong>
+              </div>
+              <div class="status-row">
+                <span>Pending</span>
+                <strong style="color: var(--amber);">31</strong>
+              </div>
+              <div class="status-row">
+                <span>Revoked</span>
+                <strong style="color: var(--red);">12</strong>
+              </div>
+              <div class="status-row">
+                <span>Expired</span>
+                <strong style="color: var(--purple);">18</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="section-head">
+              <h3>Compliance Alerts</h3>
+              <p>แจ้งเตือนกิจกรรมที่มีความเสี่ยงด้านข้อมูลสุขภาพและประกัน</p>
+            </div>
+
+            <div class="alert">
+              <strong>High Export Activity Detected</strong>
+              <p>พบการ Export Evidence Package หลายรายการในช่วงเวลาสั้น กรุณาตรวจสอบเหตุผลและสิทธิ์การใช้งาน</p>
+            </div>
+
+            <div class="alert">
+              <strong>PDPA Consent Required</strong>
+              <p>ไม่สามารถ Export ข้อมูลได้ เนื่องจากผู้ป่วยยังไม่มี PDPA Consent ที่ใช้งานได้</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="section-head">
+              <h3>User Activity Timeline</h3>
+              <p>กิจกรรมล่าสุดจากผู้ใช้งานในระบบ</p>
+            </div>
+
+            <div class="timeline">
+              <div class="timeline-item">
+                <div class="dot"></div>
+                <div>
+                  <strong>Evidence Package Exported</strong>
+                  <p>Claim Reviewer exported VS-1017 for insurer review.</p>
+                </div>
+              </div>
+
+              <div class="timeline-item">
+                <div class="dot"></div>
+                <div>
+                  <strong>Prescription Updated</strong>
+                  <p>Pharmacist updated dosage with clinical justification.</p>
+                </div>
+              </div>
+
+              <div class="timeline-item">
+                <div class="dot"></div>
+                <div>
+                  <strong>Patient Profile Viewed</strong>
+                  <p>Doctor accessed PHI under active visit context.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enterprise Prescription Management | Med AI NexSure</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; width: 100%; }
+    body {
+      margin: 0;
+      background: #eef3f8;
+      color: #0f172a;
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+    }
+    .app {
+      display: flex;
+      width: 100vw;
+      min-height: 100vh;
+      background: linear-gradient(180deg, #f8fafc 0%, #eef3f8 48%, #e8eef6 100%);
+    }
+    .sidebar {
+      position: sticky;
+      top: 0;
+      width: 292px;
+      min-width: 292px;
+      height: 100vh;
+      overflow: auto;
+      padding: 24px;
+      color: #ffffff;
+      background: linear-gradient(180deg, #082457 0%, #0f2a5f 52%, #10213f 100%);
+      box-shadow: 12px 0 36px rgba(15, 42, 95, 0.18);
+    }
+    .brand {
+      margin-bottom: 28px;
+      padding-bottom: 22px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+    }
+    .brand p {
+      margin: 0;
+      color: #7dd3fc;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .brand h1 {
+      margin: 8px 0 0;
+      font-size: 20px;
+      line-height: 1.25;
+    }
+    .nav { display: grid; gap: 8px; font-size: 14px; }
+    .nav div {
+      padding: 12px 16px;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      color: #d9e8ff;
+    }
+    .nav .active {
+      color: #ffffff;
+      font-weight: 800;
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(125, 211, 252, 0.22);
+      box-shadow: inset 3px 0 0 #38bdf8;
+    }
+    .agent-summary {
+      margin-top: 22px;
+      padding: 16px;
+      border: 1px solid rgba(125, 211, 252, 0.18);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .agent-summary p {
+      margin: 0;
+      color: #bfdbfe;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    .content {
+      flex: 1;
+      width: calc(100vw - 292px);
+      min-width: 0;
+      padding: 20px 24px 24px;
+    }
+    .wrap {
+      display: grid;
+      align-content: start;
+      gap: 20px;
+      width: 100%;
+      min-height: calc(100vh - 44px);
+    }
+    .topbar, .card {
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid #d8e4f2;
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 14px 18px;
+    }
+    .topbar-title {
+      color: #1e3a8a;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .topbar-meta { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .status-chip, .badge {
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+      border-radius: 999px;
+      font-weight: 800;
+    }
+    .status-chip {
+      padding: 7px 12px;
+      border: 1px solid #c7d2fe;
+      background: #eef2ff;
+      color: #1e3a8a;
+      font-size: 12px;
+    }
+    .agent-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(150px, 1fr));
+      gap: 14px;
+    }
+    .agent-card {
+      padding: 16px;
+      border-top: 4px solid #dbeafe;
+    }
+    .agent-card.active { border-top-color: #2563eb; }
+    .agent-card.warning { border-top-color: #d97706; }
+    .agent-card.safe { border-top-color: #059669; }
+    .agent-name {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 900;
+      color: #0f172a;
+    }
+    .agent-role {
+      margin: 5px 0 12px;
+      color: #64748b;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .agent-state {
+      display: inline-flex;
+      border-radius: 999px;
+      padding: 5px 9px;
+      background: #f1f5f9;
+      color: #334155;
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+    .agent-state.ready { background: #ecfdf5; color: #047857; }
+    .agent-state.review { background: #fffbeb; color: #b45309; }
+    .agent-state.running { background: #eff6ff; color: #1d4ed8; }
+    .output-panel {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(340px, 0.8fr);
+      gap: 20px;
+    }
+    .output-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .output-row {
+      display: grid;
+      grid-template-columns: 150px minmax(0, 1fr);
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 14px;
+    }
+    .output-row:last-child { border-bottom: 0; }
+    .output-row strong {
+      color: #334155;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .header {
+      padding: 24px;
+      border-color: #b7d4f8;
+      background: linear-gradient(135deg, #ffffff 0%, #f8fbff 58%, #eef6ff 100%);
+    }
+    .crumb {
+      color: #2563eb;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .head-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      margin-top: 12px;
+    }
+    .header h1 { margin: 0; font-size: 32px; letter-spacing: -0.02em; }
+    .muted { color: #64748b; }
+    .header p { margin: 8px 0 0; font-size: 14px; }
+    .badge {
+      padding: 8px 16px;
+      border: 1px solid #bfdbfe;
+      background: #eff6ff;
+      color: #1e3a8a;
+      font-size: 14px;
+    }
+    .patient {
+      display: grid;
+      grid-template-columns: repeat(8, minmax(120px, 1fr));
+      gap: 1px;
+      padding: 0;
+      overflow: hidden;
+      background: #d8e4f2;
+      border-color: #b7d4f8;
+    }
+    .patient > div { padding: 16px; background: #ffffff; }
+    .label {
+      margin: 0 0 5px;
+      color: #64748b;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .value { margin: 0; font-weight: 900; }
+    .danger, .red { color: #dc2626; }
+    .green { color: #059669; }
+    .blue { color: #1e3a8a; }
+    .orange { color: #d97706; }
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(180px, 1fr));
+      gap: 16px;
+    }
+    .kpi { padding: 18px; border-top: 4px solid #dbeafe; }
+    .kpi p { margin: 0; }
+    .kpi h2 { margin: 8px 0 2px; font-size: 28px; letter-spacing: -0.02em; }
+    .allergy {
+      padding: 18px 20px;
+      color: #991b1b;
+      border-color: #fecaca;
+      background: linear-gradient(135deg, #fff7f7, #fef2f2);
+    }
+    .allergy h3 { margin: 0 0 6px; }
+    .allergy p { margin: 0; font-size: 14px; }
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 2.2fr) minmax(380px, 0.8fr);
+      gap: 20px;
+      align-items: start;
+    }
+    .stack { display: grid; align-content: start; gap: 20px; }
+    .safety {
+      padding: 20px;
+      color: #065f46;
+      border-color: rgba(5, 150, 105, 0.25);
+      background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+    }
+    .safety-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .safety h3 { margin: 0; font-size: 18px; }
+    .safety p { margin: 4px 0 0; }
+    .pill {
+      border: 1px solid currentColor;
+      border-radius: 999px;
+      background: #ffffff;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .form, .audit, .side { padding: 22px; }
+    .form-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .form h2, .side h2, .audit h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.01em;
+    }
+    .form-head p { margin: 4px 0 0; color: #64748b; font-size: 14px; }
+    .btn {
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      background: #ffffff;
+      color: #475569;
+      padding: 10px 16px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .btn.add { border-color: #bfdbfe; background: #eff6ff; color: #1e3a8a; }
+    .btn.primary { border-color: #1e3a8a; background: #1e3a8a; color: #ffffff; }
+    .btn.warning { border-color: #d97706; background: #d97706; color: #ffffff; }
+    .btn:disabled { border-color: #cbd5e1; background: #cbd5e1; color: #ffffff; cursor: not-allowed; }
+    .med-head, .med-row {
+      display: grid;
+      grid-template-columns: 3fr 2fr 2fr 2fr 1fr 2fr;
+      gap: 12px;
+    }
+    .med-head {
+      margin-bottom: 10px;
+      color: #64748b;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .med-list { display: grid; gap: 12px; }
+    .med-row {
+      padding: 14px;
+      border: 1px solid #dde7f2;
+      border-radius: 14px;
+      background: #f8fafc;
+    }
+    .input, textarea {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      background: #ffffff;
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+    .input:focus, textarea:focus { outline: 3px solid #bfdbfe; border-color: #2563eb; }
+    .actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
+    .audit-list { display: grid; gap: 12px; margin-top: 16px; font-size: 14px; }
+    .audit-item { border-left: 3px solid #2563eb; padding-left: 16px; }
+    .audit-item p { margin: 0; }
+    .audit-item .sub { margin-top: 4px; color: #64748b; }
+    .side.blue-panel {
+      border-color: #b7d4f8;
+      background: linear-gradient(135deg, #f8fbff, #eff6ff);
+    }
+    .side h2 { color: #1e3a8a; }
+    .checklist { display: grid; gap: 0; margin-top: 16px; font-size: 14px; }
+    .check {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .check:last-child { border-bottom: 0; }
+    .box {
+      margin-top: 16px;
+      border: 1px solid #dde7f2;
+      border-radius: 12px;
+      background: #f8fafc;
+      padding: 16px;
+      font-size: 14px;
+    }
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: rgba(15, 23, 42, 0.4);
+    }
+    .modal.open { display: flex; }
+    .dialog {
+      width: 100%;
+      max-width: 520px;
+      border-radius: 18px;
+      background: #ffffff;
+      padding: 24px;
+      box-shadow: 0 20px 60px rgba(15, 23, 42, 0.25);
+    }
+    .dialog h2 { margin: 0; }
+    .dialog p { color: #64748b; font-size: 14px; }
+    .dialog textarea { height: 128px; margin-top: 12px; }
+    .hidden { display: none; }
+    @media (min-width: 1600px) {
+      .content { padding: 28px; }
+      .wrap { gap: 24px; }
+      .grid { grid-template-columns: minmax(0, 2.4fr) minmax(400px, 0.8fr); }
+    }
+    @media (max-width: 1024px) {
+      .app { width: 100%; }
+      .sidebar { display: none; }
+      .content { width: 100%; padding: 24px 16px; }
+      .patient { grid-template-columns: repeat(4, 1fr); }
+      .kpis { grid-template-columns: repeat(2, 1fr); }
+      .grid { grid-template-columns: 1fr; }
+      .agent-grid { grid-template-columns: repeat(2, 1fr); }
+      .output-panel { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 720px) {
+      .content { padding: 16px; }
+      .wrap { gap: 16px; }
+      .topbar, .head-row, .form-head, .actions { flex-direction: column; align-items: stretch; }
+      .patient, .kpis { grid-template-columns: 1fr; }
+      .med-head { display: none; }
+      .med-row { grid-template-columns: 1fr; }
+      .btn { width: 100%; }
+      .agent-grid { grid-template-columns: 1fr; }
+      .output-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <p>Med AI NexSure</p>
+        <h1>Healthcare Intelligence</h1>
+      </div>
+      <nav class="nav">
+        <div class="active">Orchestrator</div>
+        <div>Clinical AI Agent</div>
+        <div>Prescription Agent</div>
+        <div>Claim Readiness Agent</div>
+        <div>Evidence Package Agent</div>
+        <div>Compliance Guard</div>
+        <div>Audit Agent</div>
+      </nav>
+      <div class="agent-summary">
+        <p><strong>Agent Frontend</strong></p>
+        <p>Every action routes through the Orchestrator, then delegates to specialist agents with audit and human review.</p>
+      </div>
+    </aside>
+
+    <section class="content">
+      <div class="wrap">
+        <section class="topbar">
+          <div>
+            <div class="topbar-title">Enterprise AI Orchestrator</div>
+            <div class="muted" style="font-size:13px;margin-top:4px">Agent frontend for prescription safety, claim evidence, pharmacist review, and audit governance</div>
+          </div>
+          <div class="topbar-meta">
+            <span class="status-chip">Route: Patient / Visit / Prescription</span>
+            <span class="status-chip">Human-in-the-loop</span>
+            <span class="status-chip">Audit: Enabled</span>
+          </div>
+        </section>
+
+        <header class="card header">
+          <div class="crumb">Orchestrator / Agent Frontend / EPIC 9</div>
+          <div class="head-row">
+            <div>
+              <h1>Prescription Agent Workspace</h1>
+              <p class="muted">Enterprise agent interface for clinical safety, claim readiness, pharmacist review, evidence completeness, and audit trail.</p>
+            </div>
+            <span class="badge">Orchestrated AI</span>
+          </div>
+        </header>
+
+        <section class="agent-grid">
+          <article class="card agent-card active">
+            <p class="agent-name">Orchestrator</p>
+            <p class="agent-role">Classifies request, delegates work, merges agent outputs.</p>
+            <span class="agent-state running">Running</span>
+          </article>
+          <article class="card agent-card safe">
+            <p class="agent-name">Clinical Safety</p>
+            <p class="agent-role">Checks allergy, duplicate drug, interaction, dose risks.</p>
+            <span class="agent-state ready">Ready</span>
+          </article>
+          <article class="card agent-card safe">
+            <p class="agent-name">Claim Readiness</p>
+            <p class="agent-role">Validates medication evidence against claim workflow.</p>
+            <span class="agent-state ready">Ready</span>
+          </article>
+          <article class="card agent-card warning">
+            <p class="agent-name">Pharmacist Review</p>
+            <p class="agent-role">Receives warning or override cases for human review.</p>
+            <span class="agent-state review">On Demand</span>
+          </article>
+          <article class="card agent-card safe">
+            <p class="agent-name">Compliance Guard</p>
+            <p class="agent-role">Checks policy, PDPA posture, and safety disclaimers.</p>
+            <span class="agent-state ready">Monitoring</span>
+          </article>
+          <article class="card agent-card safe">
+            <p class="agent-name">Audit Agent</p>
+            <p class="agent-role">Records actor, reason, timestamp, before and after.</p>
+            <span class="agent-state ready">Enabled</span>
+          </article>
+        </section>
+
+        <section class="output-panel">
+          <article class="card side">
+            <h2 style="color:#0f172a">Structured Agent Output</h2>
+            <div class="output-list">
+              <div class="output-row"><strong>Summary</strong><span>Prescription workflow initialized for patient context and medication safety review.</span></div>
+              <div class="output-row"><strong>Reasoning</strong><span>Agents evaluate allergy, duplicate medication, drug interaction, claim evidence, and audit readiness.</span></div>
+              <div class="output-row"><strong>Confidence</strong><span class="green">High for rule-based safety checks; human review required for clinical decisions.</span></div>
+              <div class="output-row"><strong>Risks</strong><span>Penicillin allergy and Warfarin + NSAID interaction are actively monitored.</span></div>
+              <div class="output-row"><strong>Next Action</strong><span>Add medication rows, review dynamic safety result, then save or justify warning cases.</span></div>
+            </div>
+          </article>
+          <article class="card side blue-panel">
+            <h2>Agent Governance</h2>
+            <div class="checklist">
+              <div class="check"><span>Orchestrator Required</span><strong class="green">Active</strong></div>
+              <div class="check"><span>Human Final Decision</span><strong class="green">Required</strong></div>
+              <div class="check"><span>Clinical Diagnosis by AI</span><strong class="red">Disabled</strong></div>
+              <div class="check"><span>Auto Claim Approval</span><strong class="red">Disabled</strong></div>
+              <div class="check"><span>Audit Trail</span><strong class="green">Enabled</strong></div>
+            </div>
+          </article>
+        </section>
+
+        <section class="card patient">
+          <div><p class="label">HN</p><p class="value">HN24000021</p></div>
+          <div><p class="label">Name</p><p class="value">Somchai Jaidee</p></div>
+          <div><p class="label">Age</p><p class="value">52 ปี</p></div>
+          <div><p class="label">Allergy</p><p class="value danger">Penicillin</p></div>
+          <div><p class="label">Diagnosis</p><p class="value">J18.9</p></div>
+          <div><p class="label">Visit Type</p><p class="value">OPD</p></div>
+          <div><p class="label">Payer</p><p class="value">AIA</p></div>
+          <div><p class="label">Claim Type</p><p class="value">Health Rider</p></div>
+        </section>
+
+        <section class="kpis">
+          <div class="card kpi"><p class="muted">Prescription Safety</p><h2 id="kpiSafety" class="green">Safe</h2><p id="kpiSafetyDesc" class="label">ผ่านการตรวจสอบ</p></div>
+          <div class="card kpi"><p class="muted">Review Status</p><h2 id="kpiReview" class="blue">Ready</h2><p class="label">Pharmacist workflow</p></div>
+          <div class="card kpi"><p class="muted">AI Confidence</p><h2 class="blue">96%</h2><p class="label">Safety evaluation</p></div>
+          <div class="card kpi"><p class="muted">Claim Ready</p><h2 id="kpiClaim" class="green">92%</h2><p class="label">Medication evidence linked</p></div>
+        </section>
+
+        <section class="card allergy">
+          <h3>Allergy History</h3>
+          <p>ผู้ป่วยมีประวัติแพ้ยา <strong>Penicillin</strong> ระดับ Severe - ต้องหลีกเลี่ยงยาที่เกี่ยวข้อง</p>
+        </section>
+
+        <div class="grid">
+          <section class="stack">
+            <div id="safetyCard" class="card safety">
+              <div class="safety-top">
+                <div>
+                  <h3 id="safetyTitle">Safe to Prescribe</h3>
+                  <p id="safetySummary">ไม่พบความเสี่ยงสำคัญ</p>
+                </div>
+                <span id="safetyBadge" class="pill green">SAFE</span>
+              </div>
+              <div id="safetyMessage" style="margin-top:12px;font-size:14px"></div>
+            </div>
+
+            <div class="card form">
+              <div class="form-head">
+                <div>
+                  <h2>Create Prescription</h2>
+                  <p>เพิ่มรายการยาและตรวจสอบ Safety Result แบบ Dynamic</p>
+                </div>
+                <button class="btn add" onclick="addMedicationRow()">+ Add Medication</button>
+              </div>
+              <div class="med-head">
+                <div>Drug Name</div>
+                <div>Generic</div>
+                <div>Dosage</div>
+                <div>Frequency</div>
+                <div>Qty</div>
+                <div>Action</div>
+              </div>
+              <div id="medicationList" class="med-list"></div>
+              <div class="actions">
+                <button class="btn">Save Draft</button>
+                <button id="justifyButton" onclick="openModal()" class="btn warning hidden">Add Justification</button>
+                <button id="submitButton" class="btn primary">Save Prescription</button>
+              </div>
+            </div>
+
+            <div class="card audit">
+              <h2>Prescription Audit Trail</h2>
+              <div id="auditTrail" class="audit-list">
+                <div class="audit-item">
+                  <p><strong>10:22 Prescription workspace opened</strong></p>
+                  <p class="sub">By Dr. Benz · Audit enabled</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <aside class="stack">
+            <div class="card side blue-panel">
+              <h2>Clinical Safety Agent</h2>
+              <div class="checklist">
+                <div class="check"><span>Allergy Check</span><strong id="checkAllergy" class="green">Safe</strong></div>
+                <div class="check"><span>Duplicate Drug</span><strong id="checkDuplicate" class="green">Safe</strong></div>
+                <div class="check"><span>Drug Interaction</span><strong id="checkInteraction" class="green">Safe</strong></div>
+                <div class="check"><span>Max Dose</span><strong class="green">Safe</strong></div>
+                <div class="check"><span>Renal Dose</span><strong class="green">Safe</strong></div>
+              </div>
+            </div>
+
+            <div class="card side">
+              <h2 style="color:#0f172a">Drug Interaction Agent</h2>
+              <div id="interactionPanel" class="box muted">ไม่พบ drug interaction</div>
+            </div>
+
+            <div class="card side">
+              <h2 style="color:#0f172a">Pharmacist Review Agent Queue</h2>
+              <div id="pharmacistQueue" class="box">
+                <p class="green"><strong>No review required</strong></p>
+                <p class="muted">Prescription can proceed</p>
+              </div>
+            </div>
+
+            <div class="card side">
+              <div style="display:flex;justify-content:space-between;gap:12px;align-items:center">
+                <h2 style="color:#0f172a">Claim Readiness Agent</h2>
+                <span class="badge">92%</span>
+              </div>
+              <div class="checklist">
+                <div class="check"><span>SOAP</span><strong class="green">Complete</strong></div>
+                <div class="check"><span>Diagnosis</span><strong class="green">Complete</strong></div>
+                <div class="check"><span>Medication</span><strong id="claimMedication" class="green">Complete</strong></div>
+                <div class="check"><span>Doctor Signature</span><strong class="orange">Needs Review</strong></div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="modal" class="modal">
+    <div class="dialog">
+      <h2>Clinical Justification Required</h2>
+      <p>กรณี Warning ต้องระบุเหตุผลก่อนบันทึก เพื่อรองรับ audit และ pharmacist review</p>
+      <textarea id="justificationText" placeholder="ระบุเหตุผลทางคลินิก..."></textarea>
+      <div class="actions">
+        <button class="btn" onclick="closeModal()">Cancel</button>
+        <button class="btn primary" onclick="saveJustification()">Save Justification</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const patientAllergies = ["penicillin"];
+    const medicationList = document.getElementById("medicationList");
+    let hasJustification = false;
+
+    function createMedicationRow(value = {}) {
+      const row = document.createElement("div");
+      row.className = "med-row";
+      row.innerHTML =
+        '<input class="input drugName" placeholder="Amoxicillin / Warfarin" value="' + (value.drugName || "") + '" oninput="runSafetyCheck()">' +
+        '<input class="input genericName" placeholder="Generic" value="' + (value.genericName || "") + '" oninput="runSafetyCheck()">' +
+        '<input class="input" placeholder="500 mg">' +
+        '<input class="input" placeholder="After meal">' +
+        '<input type="number" class="input" placeholder="10">' +
+        '<button onclick="this.parentElement.remove();runSafetyCheck();" class="btn" style="color:#dc2626;border-color:#fecaca">Remove</button>';
+      medicationList.appendChild(row);
+      runSafetyCheck();
+    }
+
+    function addMedicationRow() {
+      createMedicationRow();
+    }
+
+    function runSafetyCheck() {
+      const rows = Array.from(document.querySelectorAll("#medicationList > .med-row"));
+      const drugs = rows.map(function(row) {
+        return {
+          drugName: row.querySelector(".drugName").value.trim().toLowerCase(),
+          genericName: row.querySelector(".genericName").value.trim().toLowerCase()
+        };
+      });
+
+      const issues = [];
+      let level = "safe";
+
+      drugs.forEach(function(drug, index) {
+        const text = drug.drugName + " " + drug.genericName;
+        patientAllergies.forEach(function(allergy) {
+          if (text.indexOf(allergy) !== -1) {
+            level = "critical";
+            issues.push("Critical: ผู้ป่วยมีประวัติแพ้ Penicillin ห้าม Submit");
+          }
+        });
+
+        const duplicate = drugs.findIndex(function(other, otherIndex) {
+          return otherIndex !== index && other.drugName && other.drugName === drug.drugName;
+        });
+
+        if (duplicate !== -1) {
+          level = "critical";
+          issues.push("Critical: พบรายการยาซ้ำ " + drug.drugName);
+        }
+      });
+
+      const hasWarfarin = drugs.some(function(drug) {
+        return drug.drugName.indexOf("warfarin") !== -1;
+      });
+      const hasNsaid = drugs.some(function(drug) {
+        return drug.drugName.indexOf("ibuprofen") !== -1 || drug.drugName.indexOf("diclofenac") !== -1;
+      });
+
+      if (hasWarfarin && hasNsaid && level !== "critical") {
+        level = "warning";
+        issues.push("Warning: พบ Interaction ระหว่าง Warfarin และ NSAIDs ต้องระบุเหตุผล");
+      }
+
+      updateUI(level, issues);
+    }
+
+    function setText(id, text, className) {
+      const element = document.getElementById(id);
+      element.textContent = text;
+      if (className) element.className = className;
+    }
+
+    function updateUI(level, issues) {
+      const safetyCard = document.getElementById("safetyCard");
+      const submitButton = document.getElementById("submitButton");
+      const justifyButton = document.getElementById("justifyButton");
+      document.getElementById("safetyMessage").innerHTML = issues.map(function(issue) {
+        return "<div>" + issue + "</div>";
+      }).join("");
+
+      if (level === "critical") {
+        safetyCard.style.background = "#fef2f2";
+        safetyCard.style.borderColor = "rgba(220,38,38,.3)";
+        safetyCard.style.color = "#991b1b";
+        setText("safetyTitle", "Critical Safety Risk");
+        setText("safetySummary", "ห้าม Submit จนกว่าจะปรับรายการยา");
+        setText("safetyBadge", "CRITICAL", "pill red");
+        submitButton.disabled = true;
+        justifyButton.classList.add("hidden");
+        setText("kpiSafety", "Critical", "red");
+        setText("kpiSafetyDesc", "พบความเสี่ยงต่อผู้ป่วย", "label");
+        setText("kpiReview", "Blocked", "red");
+        setText("checkAllergy", "Critical", "red");
+        setText("checkDuplicate", "Check Required", "red");
+        setText("checkInteraction", "Blocked", "red");
+        document.getElementById("pharmacistQueue").innerHTML = '<p class="red"><strong>Blocked</strong></p><p class="muted">ต้องแก้ไข Critical Risk ก่อนส่งต่อ</p>';
+        setText("claimMedication", "Blocked", "red");
+        return;
+      }
+
+      if (level === "warning") {
+        safetyCard.style.background = "#fffbeb";
+        safetyCard.style.borderColor = "rgba(217,119,6,.3)";
+        safetyCard.style.color = "#92400e";
+        setText("safetyTitle", "Warning - Review Required");
+        setText("safetySummary", "ต้องระบุเหตุผลหรือส่ง Pharmacist Review");
+        setText("safetyBadge", "WARNING", "pill orange");
+        submitButton.disabled = !hasJustification;
+        justifyButton.classList.remove("hidden");
+        setText("kpiSafety", "Warning", "orange");
+        setText("kpiSafetyDesc", "ต้อง Review", "label");
+        setText("kpiReview", "Needs Review", "orange");
+        setText("checkAllergy", "Safe", "green");
+        setText("checkDuplicate", "Safe", "green");
+        setText("checkInteraction", "Warning", "orange");
+        document.getElementById("interactionPanel").innerHTML = '<p class="orange"><strong>Warfarin + NSAIDs</strong></p><p class="muted">เพิ่มความเสี่ยงเลือดออก ควรพิจารณาทางเลือกหรือส่ง Pharmacist Review</p>';
+        document.getElementById("pharmacistQueue").innerHTML = '<p class="orange"><strong>Review Required</strong></p><p class="muted">Priority: Medium · Reason: Drug Interaction</p>';
+        setText("claimMedication", "Needs Review", "orange");
+        return;
+      }
+
+      hasJustification = false;
+      safetyCard.style.background = "#ecfdf5";
+      safetyCard.style.borderColor = "rgba(5,150,105,.3)";
+      safetyCard.style.color = "#065f46";
+      setText("safetyTitle", "Safe to Prescribe");
+      setText("safetySummary", "ไม่พบความเสี่ยงสำคัญ");
+      setText("safetyBadge", "SAFE", "pill green");
+      submitButton.disabled = false;
+      justifyButton.classList.add("hidden");
+      setText("kpiSafety", "Safe", "green");
+      setText("kpiSafetyDesc", "ผ่านการตรวจสอบ", "label");
+      setText("kpiReview", "Ready", "blue");
+      setText("checkAllergy", "Safe", "green");
+      setText("checkDuplicate", "Safe", "green");
+      setText("checkInteraction", "Safe", "green");
+      document.getElementById("interactionPanel").innerHTML = "ไม่พบ drug interaction";
+      document.getElementById("pharmacistQueue").innerHTML = '<p class="green"><strong>No review required</strong></p><p class="muted">Prescription can proceed</p>';
+      setText("claimMedication", "Complete", "green");
+    }
+
+    function openModal() {
+      document.getElementById("modal").classList.add("open");
+    }
+
+    function closeModal() {
+      document.getElementById("modal").classList.remove("open");
+    }
+
+    function saveJustification() {
+      hasJustification = true;
+      closeModal();
+      document.getElementById("auditTrail").innerHTML += '<div class="audit-item" style="border-color:#d97706"><p><strong>10:27 Clinical justification added</strong></p><p class="sub">By Dr. Benz · Warning override recorded</p></div>';
+      runSafetyCheck();
+    }
+
+    createMedicationRow();
+  </script>
+</body>
+</html>

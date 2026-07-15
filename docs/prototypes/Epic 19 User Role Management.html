@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Med AI NexSure | User Role Management - Blue Enterprise Theme</title>
+  <style>
+    :root {
+      --primary-blue: #1E3A8A;
+      --deep-blue: #0F2A5F;
+      --ai-blue: #2563EB;
+      --soft-blue: #EFF6FF;
+      --blue-border: #BFDBFE;
+      --azure: #38BDF8;
+      --background: #F8FAFC;
+      --surface: #FFFFFF;
+      --surface-soft: #F1F5F9;
+      --border: #E2E8F0;
+      --text-primary: #0F172A;
+      --text-secondary: #64748B;
+      --success: #059669;
+      --warning: #D97706;
+      --danger: #DC2626;
+      --shadow-sm: 0 8px 22px rgba(15, 23, 42, 0.05);
+      --shadow-md: 0 18px 48px rgba(15, 23, 42, 0.08);
+      --radius-md: 14px;
+      --radius-lg: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+      background: var(--background);
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 286px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      background: linear-gradient(180deg, var(--deep-blue) 0%, #071936 100%);
+      color: #FFFFFF;
+      padding: 28px 22px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 15px;
+      background: linear-gradient(135deg, var(--azure), var(--ai-blue));
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      box-shadow: 0 14px 30px rgba(37, 99, 235, 0.26);
+    }
+
+    .brand-title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .brand-subtitle {
+      margin: 2px 0 0;
+      color: #BFDBFE;
+      font-size: 12px;
+    }
+
+    .nav-section-label {
+      margin: 22px 10px 8px;
+      color: #93C5FD;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      color: #DBEAFE;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      background: rgba(255, 255, 255, 0.12);
+      color: #FFFFFF;
+    }
+
+    .main {
+      padding: 28px;
+      min-width: 0;
+    }
+
+    .hero {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+
+    .eyebrow {
+      color: var(--ai-blue);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 6px 0 8px;
+      font-size: 32px;
+      letter-spacing: -0.045em;
+      line-height: 1.15;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    .subtitle {
+      max-width: 900px;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .thai-helper {
+      margin-top: 6px;
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 14px;
+      background: var(--surface);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--ai-blue);
+      border-color: var(--ai-blue);
+      color: #FFFFFF;
+      box-shadow: 0 12px 24px rgba(37, 99, 235, 0.22);
+    }
+
+    .btn-danger {
+      color: var(--danger);
+      border-color: #FECACA;
+      background: #FEF2F2;
+    }
+
+    .grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .kpi-grid {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      margin-bottom: 18px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 18px;
+    }
+
+    .kpi-card {
+      min-height: 142px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .kpi-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .kpi-label {
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.045em;
+    }
+
+    .kpi-value {
+      margin-top: 8px;
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+    }
+
+    .kpi-note {
+      color: var(--text-secondary);
+      font-size: 12px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .pill-info {
+      background: var(--soft-blue);
+      color: var(--ai-blue);
+      border: 1px solid var(--blue-border);
+    }
+
+    .pill-success {
+      background: #ECFDF5;
+      color: var(--success);
+      border: 1px solid #A7F3D0;
+    }
+
+    .pill-warning {
+      background: #FFFBEB;
+      color: var(--warning);
+      border: 1px solid #FDE68A;
+    }
+
+    .pill-danger {
+      background: #FEF2F2;
+      color: var(--danger);
+      border: 1px solid #FECACA;
+    }
+
+    .pill-neutral {
+      background: var(--surface-soft);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    .main-grid {
+      grid-template-columns: minmax(0, 1.55fr) minmax(360px, 0.8fr);
+      align-items: start;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    input,
+    select {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      padding: 11px 13px;
+      color: var(--text-primary);
+      font-size: 13px;
+    }
+
+    input {
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .table-wrap {
+      overflow: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+      font-size: 13px;
+    }
+
+    th {
+      color: var(--text-secondary);
+      text-align: left;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+      padding: 12px;
+      background: #F8FAFC;
+    }
+
+    td {
+      padding: 14px 12px;
+      border-bottom: 1px solid #EEF2F7;
+      vertical-align: middle;
+    }
+
+    tr:hover td {
+      background: #F8FAFC;
+    }
+
+    .user-cell {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--soft-blue);
+      color: var(--primary-blue);
+      font-weight: 800;
+      border: 1px solid var(--blue-border);
+    }
+
+    .muted {
+      color: var(--text-secondary);
+      font-size: 12px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .mini-btn {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-primary);
+      border-radius: 10px;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .ai-panel {
+      background: var(--soft-blue);
+      border-color: var(--blue-border);
+      box-shadow: none;
+    }
+
+    .permission-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .permission {
+      background: var(--surface);
+      border: 1px solid var(--blue-border);
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .toggle {
+      width: 42px;
+      height: 24px;
+      border-radius: 999px;
+      background: var(--ai-blue);
+      position: relative;
+      flex: 0 0 auto;
+    }
+
+    .toggle::after {
+      content: "";
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      right: 3px;
+      top: 3px;
+      border-radius: 50%;
+      background: #FFFFFF;
+    }
+
+    .toggle.off {
+      background: #CBD5E1;
+    }
+
+    .toggle.off::after {
+      left: 3px;
+      right: auto;
+    }
+
+    .alert-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .alert {
+      display: flex;
+      gap: 12px;
+      padding: 13px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: #FFFFFF;
+    }
+
+    .alert.clinical {
+      border-color: #FCA5A5;
+      background: #FFF7F7;
+    }
+
+    .alert-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-top: 5px;
+      flex: 0 0 auto;
+    }
+
+    .dot-blue { background: var(--ai-blue); }
+    .dot-green { background: var(--success); }
+    .dot-yellow { background: var(--warning); }
+    .dot-red { background: var(--danger); }
+    .dot-azure { background: var(--azure); }
+
+    .matrix {
+      overflow: auto;
+    }
+
+    .matrix table {
+      min-width: 760px;
+    }
+
+    .check {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--ai-blue);
+    }
+
+    .timeline {
+      display: grid;
+      gap: 12px;
+    }
+
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 12px 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .timeline-line {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-top: 5px;
+      background: var(--ai-blue);
+      box-shadow: 0 0 0 4px var(--soft-blue);
+    }
+
+    .drawer {
+      position: fixed;
+      right: -460px;
+      top: 0;
+      width: 440px;
+      max-width: 92vw;
+      height: 100vh;
+      background: var(--surface);
+      box-shadow: -28px 0 70px rgba(15,23,42,.18);
+      padding: 24px;
+      z-index: 20;
+      transition: 0.25s ease;
+      overflow: auto;
+    }
+
+    .drawer.open {
+      right: 0;
+    }
+
+    .toast {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      background: var(--text-primary);
+      color: #FFFFFF;
+      padding: 14px 18px;
+      border-radius: 14px;
+      display: none;
+      z-index: 30;
+      box-shadow: var(--shadow-md);
+      font-size: 13px;
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    @media (max-width: 1280px) {
+      .kpi-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: relative;
+        height: auto;
+      }
+
+      .hero {
+        flex-direction: column;
+      }
+
+      .kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .permission-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .main {
+        padding: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">NX</div>
+        <div>
+          <p class="brand-title">Med AI NexSure</p>
+          <p class="brand-subtitle">Enterprise Healthcare Intelligence</p>
+        </div>
+      </div>
+
+      <div class="nav-section-label">Clinical Operations</div>
+      <a class="nav-link" href="#">Main Dashboard <span>›</span></a>
+      <a class="nav-link" href="#">Patient Management <span>›</span></a>
+      <a class="nav-link" href="#">Visit Management <span>›</span></a>
+      <a class="nav-link" href="#">Enterprise SOAP Note <span>›</span></a>
+      <a class="nav-link" href="#">Prescription <span>›</span></a>
+
+      <div class="nav-section-label">Insurance Intelligence</div>
+      <a class="nav-link" href="#">Claim Readiness <span>›</span></a>
+      <a class="nav-link" href="#">Evidence Package <span>›</span></a>
+      <a class="nav-link" href="#">Payer Rules <span>›</span></a>
+      <a class="nav-link" href="#">Economic Intelligence <span>›</span></a>
+      <a class="nav-link" href="#">AI Copilot <span>›</span></a>
+
+      <div class="nav-section-label">Governance</div>
+      <a class="nav-link" href="#">Audit & Compliance <span>›</span></a>
+      <a class="nav-link active" href="#">Admin Settings <span>›</span></a>
+    </aside>
+
+    <main class="main">
+      <section class="hero">
+        <div>
+          <div class="eyebrow">Admin Settings / Access Governance</div>
+          <h1>User Role Management</h1>
+          <p class="subtitle">
+            Centralized identity, role, clinic access, AI Clinical Engine permission, PDPA consent validation,
+            and audit governance for enterprise healthcare and insurance operations.
+          </p>
+          <p class="thai-helper">
+            บริหารผู้ใช้งาน สิทธิ์ บทบาท คลินิก และการใช้ AI อย่างปลอดภัย ตรวจสอบได้ และพร้อมรองรับ Compliance
+          </p>
+        </div>
+        <div class="hero-actions">
+          <button class="btn">Review Security</button>
+          <button class="btn">Export Audit</button>
+          <button class="btn btn-primary">Create Invite</button>
+        </div>
+      </section>
+
+      <section class="grid kpi-grid">
+        <div class="card kpi-card">
+          <div class="kpi-top">
+            <div>
+              <div class="kpi-label">Active Users</div>
+              <div class="kpi-value">128</div>
+            </div>
+            <span class="pill pill-success">✓ Ready</span>
+          </div>
+          <p class="kpi-note">บัญชีที่พร้อมใช้งานในองค์กร</p>
+        </div>
+
+        <div class="card kpi-card">
+          <div class="kpi-top">
+            <div>
+              <div class="kpi-label">Pending Invites</div>
+              <div class="kpi-value">12</div>
+            </div>
+            <span class="pill pill-warning">! Needs Review</span>
+          </div>
+          <p class="kpi-note">รอผู้ใช้ยืนยันคำเชิญ</p>
+        </div>
+
+        <div class="card kpi-card">
+          <div class="kpi-top">
+            <div>
+              <div class="kpi-label">Locked Accounts</div>
+              <div class="kpi-value">4</div>
+            </div>
+            <span class="pill pill-danger">● Critical</span>
+          </div>
+          <p class="kpi-note">บัญชีที่ถูกล็อกจากความเสี่ยง</p>
+        </div>
+
+        <div class="card kpi-card">
+          <div class="kpi-top">
+            <div>
+              <div class="kpi-label">High Privilege Users</div>
+              <div class="kpi-value">9</div>
+            </div>
+            <span class="pill pill-warning">! Review</span>
+          </div>
+          <p class="kpi-note">Admin / Super Admin / Auditor</p>
+        </div>
+
+        <div class="card kpi-card">
+          <div class="kpi-top">
+            <div>
+              <div class="kpi-label">AI Enabled Users</div>
+              <div class="kpi-value">46</div>
+            </div>
+            <span class="pill pill-info">AI Assisted</span>
+          </div>
+          <p class="kpi-note">มีสิทธิ์ใช้ AI Clinical Engine</p>
+        </div>
+
+        <div class="card kpi-card">
+          <div class="kpi-top">
+            <div>
+              <div class="kpi-label">Consent Required Access</div>
+              <div class="kpi-value">18</div>
+            </div>
+            <span class="pill pill-warning">PDPA Gate</span>
+          </div>
+          <p class="kpi-note">ต้องตรวจสอบ Consent ก่อนเข้าถึงข้อมูล</p>
+        </div>
+      </section>
+
+      <section class="grid main-grid">
+        <div class="grid">
+          <div class="card">
+            <div class="section-head">
+              <div>
+                <h2>User Directory</h2>
+                <p class="thai-helper">ค้นหา กรอง แก้ไข ปิดใช้งาน และตรวจสอบสิทธิ์ผู้ใช้ในองค์กร</p>
+              </div>
+              <span class="pill pill-info">RBAC Enabled</span>
+            </div>
+
+            <div class="toolbar">
+              <input id="searchInput" onkeyup="filterUsers()" placeholder="Search by name, email, role, department..." />
+              <select id="statusFilter" onchange="filterUsers()">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="pending">Pending</option>
+                <option value="locked">Locked</option>
+                <option value="disabled">Disabled</option>
+              </select>
+              <select id="aiFilter" onchange="filterUsers()">
+                <option value="">All AI Access</option>
+                <option value="enabled">Enabled</option>
+                <option value="restricted">Restricted</option>
+                <option value="notallowed">Not Allowed</option>
+              </select>
+            </div>
+
+            <div class="table-wrap">
+              <table id="userTable">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Department</th>
+                    <th>Clinic / Organization</th>
+                    <th>AI Access</th>
+                    <th>Status</th>
+                    <th>Last Login</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr data-status="active" data-ai="enabled">
+                    <td>
+                      <div class="user-cell">
+                        <div class="avatar">DB</div>
+                        <div>
+                          <strong>Dr. Benz Clinical</strong>
+                          <div class="muted">doctor@medai.co</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>Doctor</td>
+                    <td>OPD</td>
+                    <td>Bangkok Clinic Group</td>
+                    <td><span class="pill pill-info">AI Enabled</span></td>
+                    <td><span class="pill pill-success">✓ Active</span></td>
+                    <td>Today, 09:42</td>
+                    <td>
+                      <div class="actions">
+                        <button class="mini-btn" onclick="openDrawer('Dr. Benz Clinical','Doctor','AI Enabled','Active')">View Detail</button>
+                        <button class="mini-btn">Edit</button>
+                        <button class="mini-btn">Audit Log</button>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr data-status="active" data-ai="restricted">
+                    <td>
+                      <div class="user-cell">
+                        <div class="avatar">CR</div>
+                        <div>
+                          <strong>Claim Reviewer A</strong>
+                          <div class="muted">claim.reviewer@medai.co</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>Claim Reviewer</td>
+                    <td>Claim</td>
+                    <td>Assigned Clinics</td>
+                    <td><span class="pill pill-warning">! Restricted</span></td>
+                    <td><span class="pill pill-success">✓ Active</span></td>
+                    <td>Yesterday, 16:20</td>
+                    <td>
+                      <div class="actions">
+                        <button class="mini-btn" onclick="openDrawer('Claim Reviewer A','Claim Reviewer','Restricted','Active')">View Detail</button>
+                        <button class="mini-btn">Edit</button>
+                        <button class="mini-btn">Audit Log</button>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr data-status="locked" data-ai="notallowed">
+                    <td>
+                      <div class="user-cell">
+                        <div class="avatar">AD</div>
+                        <div>
+                          <strong>Admin Security</strong>
+                          <div class="muted">admin.security@medai.co</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>Admin</td>
+                    <td>Compliance</td>
+                    <td>Enterprise HQ</td>
+                    <td><span class="pill pill-neutral">Not Allowed</span></td>
+                    <td><span class="pill pill-danger">● Locked</span></td>
+                    <td>2 days ago</td>
+                    <td>
+                      <div class="actions">
+                        <button class="mini-btn" onclick="openDrawer('Admin Security','Admin','Not Allowed','Locked')">View Detail</button>
+                        <button class="mini-btn">Reset</button>
+                        <button class="mini-btn">Audit Log</button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card matrix">
+            <div class="section-head">
+              <div>
+                <h2>Role & Permission Matrix</h2>
+                <p class="thai-helper">กำหนดสิทธิ์ตามบทบาท พร้อมหลัก Least Privilege และ Audit Trail</p>
+              </div>
+              <span class="pill pill-success">✓ Audit-ready</span>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Role</th>
+                  <th>Patient Data</th>
+                  <th>Visit Detail</th>
+                  <th>Prescription</th>
+                  <th>Claim Case</th>
+                  <th>Evidence Export</th>
+                  <th>User Admin</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Admin</strong></td>
+                  <td><input class="check" type="checkbox" checked /></td>
+                  <td><input class="check" type="checkbox" checked /></td>
+                  <td><input class="check" type="checkbox" /></td>
+                  <td><input class="check" type="checkbox" checked /></td>
+                  <td><input class="check" type="checkbox" checked /></td>
+                  <td><input class="check" type="checkbox" checked /></td>
+                </tr>
+                <tr>
+                  <td><strong>Doctor</strong></td>
+                  <td><input class="check" type="checkbox" checked /></td>
+                  <td><input class="check" type="checkbox" checked /></td>
+                  <td><input class="check" type="checkbox" checked /></td>
+                  <td><input class="check" type="checkbox" /></td>
+                  <td><input class="check" type="checkbox" /></td>
+                  <td><input class="check" type="checkbox" /></td>
+                </tr>
+                <tr>
+                  <td><strong>Claim Reviewer</strong></td>
+                  <td><input class="check" type="checkbox" checked /></td>
+                  <td><input class="check" type="checkbox" checked /></td>
+                  <td><input class="check" type="checkbox" /></td>
+                  <td><input class="check" type="checkbox" checked /></td>
+                  <td><input class="check" type="checkbox" checked /></td>
+                  <td><input class="check" type="checkbox" /></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card ai-panel">
+            <div class="section-head">
+              <div>
+                <h2>AI Clinical Engine Access</h2>
+                <p class="thai-helper">ควบคุมการใช้ AI Summary, ICD Suggestion, Claim Readiness และ Evidence Validation</p>
+              </div>
+              <span class="pill pill-info">AI Governance</span>
+            </div>
+            <div class="permission-grid">
+              <div class="permission">
+                <div>
+                  <strong>AI SOAP Summary</strong>
+                  <div class="muted">Generate structured clinical summary</div>
+                </div>
+                <div class="toggle"></div>
+              </div>
+              <div class="permission">
+                <div>
+                  <strong>AI ICD Suggestion</strong>
+                  <div class="muted">Suggest ICD-10 / ICD-9 with confidence</div>
+                </div>
+                <div class="toggle"></div>
+              </div>
+              <div class="permission">
+                <div>
+                  <strong>AI Claim Readiness</strong>
+                  <div class="muted">Validate claim completeness before submission</div>
+                </div>
+                <div class="toggle"></div>
+              </div>
+              <div class="permission">
+                <div>
+                  <strong>AI Evidence Validation</strong>
+                  <div class="muted">Detect missing medical evidence</div>
+                </div>
+                <div class="toggle"></div>
+              </div>
+              <div class="permission">
+                <div>
+                  <strong>AI Economic Intelligence</strong>
+                  <div class="muted">Analyze cost signal and abnormal utilization</div>
+                </div>
+                <div class="toggle off"></div>
+              </div>
+              <div class="permission">
+                <div>
+                  <strong>AI Recommendation Override</strong>
+                  <div class="muted">Require reason before overriding AI recommendation</div>
+                </div>
+                <div class="toggle off"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="grid">
+          <div class="card">
+            <div class="section-head">
+              <div>
+                <h2>Clinical Safety Alerts</h2>
+                <p class="thai-helper">Clinical risk มีความสำคัญสูงสุดและต้องเห็นชัดก่อน Claim / Finance alerts</p>
+              </div>
+              <span class="pill pill-danger">● Critical Priority</span>
+            </div>
+            <div class="alert-list">
+              <div class="alert clinical">
+                <div class="alert-dot dot-red"></div>
+                <div>
+                  <strong>Critical Login Risk</strong>
+                  <div class="muted">พบการเข้าสู่ระบบผิดปกติในบัญชีสิทธิ์สูง กรุณาตรวจสอบก่อนปลดล็อก</div>
+                </div>
+              </div>
+              <div class="alert">
+                <div class="alert-dot dot-yellow"></div>
+                <div>
+                  <strong>High Privilege Review</strong>
+                  <div class="muted">ควรทบทวนสิทธิ์ระดับ Admin / Auditor ตามรอบ Compliance</div>
+                </div>
+              </div>
+              <div class="alert">
+                <div class="alert-dot dot-blue"></div>
+                <div>
+                  <strong>PDPA Consent Gate</strong>
+                  <div class="muted">ข้อมูลผู้ป่วยต้องผ่าน Consent validation ก่อนเข้าถึงหรือ Export</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="section-head">
+              <div>
+                <h2>Queue Snapshot</h2>
+                <p class="thai-helper">ภาพรวมสถานะงานสำหรับผู้ดูแลระบบและทีม Compliance</p>
+              </div>
+            </div>
+            <div class="alert-list">
+              <div class="alert">
+                <div class="alert-dot dot-green"></div>
+                <div><strong>Ready</strong><div class="muted">96 users verified and safe</div></div>
+              </div>
+              <div class="alert">
+                <div class="alert-dot dot-yellow"></div>
+                <div><strong>Needs Review</strong><div class="muted">21 permissions require governance review</div></div>
+              </div>
+              <div class="alert">
+                <div class="alert-dot dot-red"></div>
+                <div><strong>Critical Risk</strong><div class="muted">4 locked accounts require action</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="section-head">
+              <div>
+                <h2>Recent Activity Timeline</h2>
+                <p class="thai-helper">บันทึกกิจกรรมล่าสุดเพื่อรองรับ Audit Investigation</p>
+              </div>
+              <span class="pill pill-neutral">Live Audit</span>
+            </div>
+            <div class="timeline">
+              <div class="timeline-item">
+                <div class="timeline-line"></div>
+                <div>
+                  <strong>Role Updated</strong>
+                  <div class="muted">Nurse changed to Doctor · recorded by Admin</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-line"></div>
+                <div>
+                  <strong>AI Claim Readiness Used</strong>
+                  <div class="muted">Claim Reviewer A · Case #CLM-2026-0182</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-line"></div>
+                <div>
+                  <strong>Evidence Package Exported</strong>
+                  <div class="muted">PDPA consent verified before export</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="section-head">
+              <div>
+                <h2>Economic Intelligence Signal</h2>
+                <p class="thai-helper">ใช้สี Azure เฉพาะ insight สำคัญ ไม่ใช้เป็นพื้นหลักทุกส่วน</p>
+              </div>
+              <span class="pill pill-info">Smart Insight</span>
+            </div>
+            <div class="alert" style="border-color:#BAE6FD;background:#F0F9FF;">
+              <div class="alert-dot dot-azure"></div>
+              <div>
+                <strong>Cost Alert Pattern</strong>
+                <div class="muted">3 claim cases show higher-than-normal visit cost. Review before export.</div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <div id="drawer" class="drawer">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">User Detail Drawer</div>
+        <h1 id="drawerName" style="font-size:24px;">User Name</h1>
+        <p class="thai-helper">ตรวจสอบรายละเอียดผู้ใช้ สิทธิ์ AI และ Audit Summary</p>
+      </div>
+      <button class="btn" onclick="closeDrawer()">Close</button>
+    </div>
+
+    <div class="card" style="box-shadow:none;margin-bottom:14px;">
+      <p><strong>Role:</strong> <span id="drawerRole"></span></p>
+      <p><strong>AI Access:</strong> <span id="drawerAI"></span></p>
+      <p><strong>Status:</strong> <span id="drawerStatus"></span></p>
+      <p><strong>Clinic Scope:</strong> Bangkok Clinic Group</p>
+      <p><strong>PDPA Validation:</strong> Required before patient export</p>
+      <p><strong>Audit Policy:</strong> Every permission change must be recorded</p>
+    </div>
+
+    <div class="hero-actions">
+      <button class="btn btn-primary" onclick="showToast('Changes saved and audit log recorded')">Save Changes</button>
+      <button class="btn" onclick="showToast('Reset password confirmation opened')">Reset</button>
+      <button class="btn btn-danger" onclick="showToast('Disable user confirmation opened')">Disable</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">Action completed</div>
+
+  <script>
+    function openDrawer(name, role, ai, status) {
+      document.getElementById("drawerName").innerText = name;
+      document.getElementById("drawerRole").innerText = role;
+      document.getElementById("drawerAI").innerText = ai;
+      document.getElementById("drawerStatus").innerText = status;
+      document.getElementById("drawer").classList.add("open");
+    }
+
+    function closeDrawer() {
+      document.getElementById("drawer").classList.remove("open");
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.innerText = message;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2600);
+    }
+
+    function filterUsers() {
+      const search = document.getElementById("searchInput").value.toLowerCase();
+      const status = document.getElementById("statusFilter").value;
+      const ai = document.getElementById("aiFilter").value;
+      const rows = document.querySelectorAll("#userTable tbody tr");
+
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        const matchSearch = text.includes(search);
+        const matchStatus = !status || row.dataset.status === status;
+        const matchAI = !ai || row.dataset.ai === ai;
+        row.style.display = matchSearch && matchStatus && matchAI ? "" : "none";
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,1346 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Med AI NexSure Task Center — Enterprise Healthcare & Insurance Intelligence Platform" />
+  <title>Task Center — Med AI NexSure</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1E3A8A;
+      --deep: #0F2A5F;
+      --deep-2: #0A1F46;
+      --ai: #2563EB;
+      --soft-blue: #EFF6FF;
+      --blue-border: #BFDBFE;
+      --azure: #38BDF8;
+      --bg: #F8FAFC;
+      --surface: #FFFFFF;
+      --surface-soft: #F8FAFC;
+      --border: #E2E8F0;
+      --border-strong: #CBD5E1;
+      --text: #0F172A;
+      --text-secondary: #64748B;
+      --text-soft: #94A3B8;
+      --success: #059669;
+      --success-soft: #ECFDF5;
+      --warning: #D97706;
+      --warning-soft: #FFFBEB;
+      --danger: #DC2626;
+      --danger-soft: #FEF2F2;
+      --purple: #7C3AED;
+      --purple-soft: #F5F3FF;
+      --orange: #EA580C;
+      --orange-soft: #FFF7ED;
+      --shadow-xs: 0 1px 2px rgba(15, 23, 42, .04);
+      --shadow-sm: 0 8px 24px rgba(15, 42, 95, .06);
+      --shadow-md: 0 18px 48px rgba(15, 42, 95, .10);
+      --shadow-lg: 0 28px 72px rgba(15, 42, 95, .18);
+      --radius-sm: 10px;
+      --radius-md: 14px;
+      --radius-lg: 18px;
+      --sidebar-width: 278px;
+      --topbar-height: 76px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      font-family: Inter, "Noto Sans Thai", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--text);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; }
+    :focus-visible { outline: 3px solid rgba(37, 99, 235, .28); outline-offset: 2px; }
+
+    .app-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      padding: 22px 16px 18px;
+      color: #fff;
+      background: linear-gradient(180deg, var(--deep-2) 0%, var(--deep) 56%, #0B244F 100%);
+      border-right: 1px solid rgba(255, 255, 255, .06);
+      z-index: 40;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 2px 10px 22px;
+      border-bottom: 1px solid rgba(255, 255, 255, .08);
+    }
+
+    .brand-mark {
+      width: 43px;
+      height: 43px;
+      flex: 0 0 43px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      color: var(--deep);
+      font-size: 20px;
+      font-weight: 800;
+      background: #fff;
+      box-shadow: 0 8px 22px rgba(56, 189, 248, .22);
+    }
+
+    .brand-copy strong { display: block; font-size: 15px; letter-spacing: -.02em; }
+    .brand-copy span { display: block; margin-top: 3px; color: #BBD0EF; font-size: 10px; letter-spacing: .025em; }
+
+    .nav-section { margin-top: 20px; }
+    .nav-label {
+      padding: 0 12px;
+      margin-bottom: 8px;
+      color: #86A6D3;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    .nav-list { display: grid; gap: 4px; }
+    .nav-link {
+      min-height: 43px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      color: #D8E5F8;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      transition: .18s ease;
+    }
+
+    .nav-link:hover { color: #fff; background: rgba(255, 255, 255, .07); }
+    .nav-link.active {
+      color: #fff;
+      background: rgba(255, 255, 255, .12);
+      box-shadow: inset 3px 0 0 var(--azure), 0 8px 20px rgba(3, 15, 40, .14);
+    }
+    .nav-icon { width: 22px; text-align: center; font-size: 16px; }
+    .nav-count {
+      margin-left: auto;
+      min-width: 24px;
+      height: 22px;
+      padding: 0 7px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .10);
+      color: #DDEBFF;
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .nav-link.active .nav-count { background: var(--azure); color: #08234E; }
+
+    .sidebar-bottom { margin-top: auto; padding-top: 22px; }
+    .compliance-card {
+      padding: 14px;
+      border: 1px solid rgba(255, 255, 255, .10);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, .055);
+    }
+    .compliance-card .eyebrow { color: #7DD3FC; font-size: 10px; font-weight: 800; letter-spacing: .10em; text-transform: uppercase; }
+    .compliance-card strong { display: block; margin-top: 6px; font-size: 13px; }
+    .compliance-card p { margin: 6px 0 0; color: #B9CAE4; font-size: 11px; line-height: 1.5; }
+    .system-status { display: flex; align-items: center; gap: 7px; margin-top: 12px; color: #D6F8E8; font-size: 11px; }
+    .status-pulse { width: 8px; height: 8px; border-radius: 50%; background: #34D399; box-shadow: 0 0 0 5px rgba(52, 211, 153, .11); }
+
+    .main { min-width: 0; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      height: var(--topbar-height);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 0 30px;
+      background: rgba(255, 255, 255, .94);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .topbar-search { position: relative; width: min(620px, 52vw); }
+    .topbar-search input {
+      width: 100%;
+      height: 44px;
+      padding: 0 88px 0 42px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      background: var(--surface-soft);
+      transition: .18s ease;
+    }
+    .topbar-search input:focus { background: #fff; border-color: #93C5FD; box-shadow: 0 0 0 4px rgba(37, 99, 235, .08); outline: none; }
+    .topbar-search::before { content: "⌕"; position: absolute; left: 14px; top: 9px; color: var(--text-secondary); font-size: 21px; }
+    .search-shortcut { position: absolute; right: 10px; top: 9px; padding: 4px 8px; border: 1px solid var(--border); border-radius: 7px; color: var(--text-secondary); background: #fff; font-size: 10px; font-weight: 700; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 9px; }
+    .icon-button {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text-secondary);
+      background: #fff;
+      transition: .18s ease;
+      position: relative;
+    }
+    .icon-button:hover { color: var(--primary); border-color: var(--blue-border); background: var(--soft-blue); }
+    .notification-dot { position: absolute; right: 8px; top: 8px; width: 7px; height: 7px; border-radius: 50%; background: var(--danger); box-shadow: 0 0 0 2px #fff; }
+    .profile-button { display: flex; align-items: center; gap: 10px; padding-left: 8px; }
+    .avatar {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      color: #fff;
+      background: var(--deep);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .profile-copy strong { display: block; font-size: 12px; }
+    .profile-copy span { display: block; color: var(--text-secondary); font-size: 10px; }
+
+    .content { max-width: 1900px; margin: 0 auto; padding: 28px 30px 40px; }
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 22px;
+    }
+    .breadcrumb { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; color: var(--text-secondary); font-size: 11px; }
+    .breadcrumb strong { color: var(--primary); }
+    .page-title-row { display: flex; align-items: center; gap: 12px; }
+    .page-title h1 { margin: 0; font-size: clamp(28px, 3vw, 36px); line-height: 1.1; letter-spacing: -.04em; }
+    .page-title p { margin: 8px 0 0; color: var(--text-secondary); font-size: 14px; }
+    .enterprise-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 9px; border: 1px solid var(--blue-border); border-radius: 999px; color: var(--ai); background: var(--soft-blue); font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+
+    .header-actions { display: flex; align-items: center; justify-content: flex-end; gap: 9px; flex-wrap: wrap; }
+    .updated-time { width: 100%; margin-top: 5px; color: var(--text-secondary); font-size: 11px; text-align: right; }
+
+    .button {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 15px;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      color: var(--text);
+      background: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      box-shadow: var(--shadow-xs);
+      transition: .18s ease;
+    }
+    .button:hover { border-color: #AFC3DD; background: var(--surface-soft); transform: translateY(-1px); }
+    .button.primary { color: #fff; border-color: var(--deep); background: var(--deep); box-shadow: 0 10px 24px rgba(15, 42, 95, .18); }
+    .button.primary:hover { background: #12356F; }
+    .button.ai { color: var(--ai); border-color: var(--blue-border); background: var(--soft-blue); }
+    .button.ghost { border-color: transparent; background: transparent; box-shadow: none; }
+    .button.danger { color: var(--danger); }
+    .button.small { min-height: 34px; padding: 0 11px; font-size: 11px; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(6, minmax(150px, 1fr)); gap: 13px; margin-bottom: 16px; }
+    .kpi-card {
+      position: relative;
+      min-height: 132px;
+      padding: 17px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: #fff;
+      box-shadow: var(--shadow-xs);
+      overflow: hidden;
+      transition: .2s ease;
+      cursor: pointer;
+    }
+    .kpi-card::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: transparent; }
+    .kpi-card:hover, .kpi-card.active { border-color: #A7C7F7; box-shadow: var(--shadow-sm); transform: translateY(-2px); }
+    .kpi-card.active::after { background: var(--ai); }
+    .kpi-card.danger::after { background: var(--danger); }
+    .kpi-card.warning::after { background: var(--warning); }
+    .kpi-card.success::after { background: var(--success); }
+    .kpi-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .kpi-label { color: var(--text-secondary); font-size: 11px; font-weight: 700; }
+    .kpi-icon { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; color: var(--ai); background: var(--soft-blue); font-size: 15px; }
+    .kpi-card.danger .kpi-icon { color: var(--danger); background: var(--danger-soft); }
+    .kpi-card.warning .kpi-icon { color: var(--warning); background: var(--warning-soft); }
+    .kpi-card.success .kpi-icon { color: var(--success); background: var(--success-soft); }
+    .kpi-value { margin: 9px 0 3px; font-size: 28px; line-height: 1; font-weight: 800; letter-spacing: -.04em; }
+    .kpi-meta { display: flex; align-items: center; gap: 6px; color: var(--text-secondary); font-size: 10px; }
+    .delta { font-weight: 800; }
+    .delta.positive { color: var(--success); }
+    .delta.negative { color: var(--danger); }
+
+    .overview-grid { display: grid; grid-template-columns: 1.45fr 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+    .card {
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: #fff;
+      box-shadow: var(--shadow-xs);
+    }
+    .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 16px; }
+    .card-header h2 { margin: 0; font-size: 14px; letter-spacing: -.01em; }
+    .card-header p { margin: 4px 0 0; color: var(--text-secondary); font-size: 10px; }
+    .icon-chip { min-width: 32px; height: 32px; display: grid; place-items: center; border-radius: 10px; color: var(--ai); background: var(--soft-blue); }
+
+    .status-segments { height: 13px; display: flex; overflow: hidden; margin: 18px 0; border-radius: 999px; background: #EEF2F7; }
+    .segment { height: 100%; }
+    .segment.open { width: 35%; background: var(--ai); }
+    .segment.progress { width: 25%; background: #0891B2; }
+    .segment.review { width: 18%; background: var(--purple); }
+    .segment.blocked { width: 9%; background: var(--orange); }
+    .segment.completed { width: 13%; background: var(--success); }
+    .status-legend { display: grid; grid-template-columns: repeat(3, 1fr); gap: 11px; }
+    .legend-item { display: flex; gap: 8px; align-items: flex-start; color: var(--text-secondary); font-size: 10px; }
+    .legend-dot { width: 9px; height: 9px; flex: 0 0 9px; margin-top: 3px; border-radius: 50%; }
+    .legend-item strong { display: block; color: var(--text); font-size: 13px; }
+
+    .sla-wrap { display: flex; align-items: center; gap: 20px; }
+    .donut {
+      width: 116px;
+      height: 116px;
+      flex: 0 0 116px;
+      position: relative;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: conic-gradient(var(--success) 0 77%, var(--warning) 77% 89%, var(--danger) 89% 97%, var(--purple) 97% 100%);
+    }
+    .donut::after { content: ""; position: absolute; inset: 15px; border-radius: 50%; background: #fff; }
+    .donut-label { position: relative; z-index: 2; text-align: center; }
+    .donut-label strong { display: block; font-size: 22px; letter-spacing: -.04em; }
+    .donut-label span { color: var(--text-secondary); font-size: 9px; font-weight: 700; }
+    .metric-list { flex: 1; display: grid; gap: 9px; }
+    .metric-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--text-secondary); font-size: 10px; }
+    .metric-row strong { color: var(--text); font-size: 12px; }
+
+    .workload-list { display: grid; gap: 13px; }
+    .person-row { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; align-items: center; gap: 10px; }
+    .mini-avatar { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; color: var(--primary); background: #E8F1FF; font-size: 10px; font-weight: 800; }
+    .person-info strong { display: block; font-size: 11px; }
+    .person-info span { color: var(--text-secondary); font-size: 9px; }
+    .capacity-bar { height: 5px; margin-top: 5px; border-radius: 999px; background: #EEF2F7; overflow: hidden; }
+    .capacity-fill { height: 100%; border-radius: inherit; background: var(--ai); }
+    .capacity-fill.warning { background: var(--warning); }
+    .capacity-fill.danger { background: var(--danger); }
+    .capacity-value { color: var(--text-secondary); font-size: 10px; font-weight: 700; }
+
+    .workspace {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: #fff;
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    .workspace-toolbar { display: flex; align-items: center; gap: 9px; padding: 14px 16px; border-bottom: 1px solid var(--border); background: #fff; flex-wrap: wrap; }
+    .workspace-search { position: relative; flex: 1; min-width: 280px; }
+    .workspace-search::before { content: "⌕"; position: absolute; left: 12px; top: 7px; color: var(--text-secondary); font-size: 19px; }
+    .workspace-search input, .filter-select {
+      height: 39px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      background: #fff;
+    }
+    .workspace-search input { width: 100%; padding: 0 12px 0 36px; }
+    .filter-select { min-width: 138px; padding: 0 31px 0 11px; }
+    .workspace-search input:focus, .filter-select:focus { outline: none; border-color: #93C5FD; box-shadow: 0 0 0 4px rgba(37, 99, 235, .07); }
+    .toolbar-right { margin-left: auto; display: flex; gap: 8px; }
+
+    .active-filters { min-height: 43px; display: flex; align-items: center; gap: 7px; padding: 8px 16px; border-bottom: 1px solid var(--border); background: #FCFDFE; flex-wrap: wrap; }
+    .filter-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 9px; border: 1px solid var(--blue-border); border-radius: 999px; color: #1D4ED8; background: var(--soft-blue); font-size: 10px; font-weight: 700; }
+    .filter-chip button { padding: 0; border: 0; color: inherit; background: transparent; }
+    .filter-hint { margin-left: auto; color: var(--text-secondary); font-size: 10px; }
+
+    .bulk-bar { display: none; align-items: center; justify-content: space-between; gap: 14px; padding: 10px 16px; border-bottom: 1px solid #A7C7F7; background: var(--soft-blue); }
+    .bulk-bar.show { display: flex; }
+    .bulk-bar strong { color: var(--primary); font-size: 11px; }
+    .bulk-actions { display: flex; gap: 7px; flex-wrap: wrap; }
+
+    .table-scroll { max-height: 620px; overflow: auto; }
+    table { width: 100%; min-width: 1490px; border-collapse: separate; border-spacing: 0; }
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 4;
+      padding: 12px 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+      background: #F8FAFC;
+      text-align: left;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .045em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    tbody td { padding: 13px 12px; border-bottom: 1px solid #EDF2F7; font-size: 11px; vertical-align: middle; }
+    tbody tr { cursor: pointer; transition: .15s ease; }
+    tbody tr:hover { background: #F8FBFF; }
+    tbody tr.critical-row { background: linear-gradient(90deg, #FFF4F4 0%, #FFFFFF 30%); }
+    tbody tr.critical-row:hover { background: linear-gradient(90deg, #FEEEEE 0%, #F8FBFF 30%); }
+    tbody tr.selected { background: #EFF6FF; }
+    .table-check { width: 15px; height: 15px; accent-color: var(--ai); }
+    .task-number { color: #334155; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10px; font-weight: 700; }
+    .task-name { max-width: 310px; }
+    .task-name strong { color: var(--text); font-size: 12px; }
+    .task-name p { max-width: 290px; margin: 4px 0 0; overflow: hidden; color: var(--text-secondary); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+    .inline-ai { margin-left: 5px; vertical-align: middle; }
+    .source-label { color: #334155; font-weight: 600; }
+    .patient-cell strong { display: block; font-size: 11px; }
+    .patient-cell span { color: var(--text-secondary); font-size: 9px; }
+    .assignee-cell { display: flex; align-items: center; gap: 7px; }
+    .assignee-cell .mini-avatar { width: 29px; height: 29px; border-radius: 9px; font-size: 9px; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 8px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      font-size: 9px;
+      font-weight: 800;
+      line-height: 1;
+      white-space: nowrap;
+    }
+    .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .badge.ai-badge { color: var(--ai); border-color: var(--blue-border); background: var(--soft-blue); }
+    .badge.ai-badge::before { content: "✦"; width: auto; height: auto; background: none; }
+    .priority-critical { color: #B91C1C; background: var(--danger-soft); border-color: #FECACA; }
+    .priority-high { color: #C2410C; background: var(--orange-soft); border-color: #FED7AA; }
+    .priority-medium { color: #1D4ED8; background: var(--soft-blue); border-color: var(--blue-border); }
+    .priority-low { color: #475569; background: #F1F5F9; border-color: #E2E8F0; }
+    .status-open { color: #1D4ED8; background: var(--soft-blue); border-color: var(--blue-border); }
+    .status-progress { color: #0E7490; background: #ECFEFF; border-color: #A5F3FC; }
+    .status-review { color: #6D28D9; background: var(--purple-soft); border-color: #DDD6FE; }
+    .status-blocked { color: #C2410C; background: var(--orange-soft); border-color: #FED7AA; }
+    .status-completed { color: #047857; background: var(--success-soft); border-color: #A7F3D0; }
+    .status-reopened { color: #A21CAF; background: #FDF4FF; border-color: #F5D0FE; }
+    .sla-text { font-weight: 800; }
+    .sla-overdue { color: var(--danger); }
+    .sla-due { color: var(--warning); }
+    .sla-track { color: var(--success); }
+    .readiness { font-weight: 800; }
+    .readiness.ready { color: var(--success); }
+    .readiness.review { color: var(--warning); }
+    .readiness.not-ready { color: var(--danger); }
+    .row-menu { border: 0; color: var(--text-secondary); background: transparent; font-size: 17px; }
+
+    .table-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 16px; color: var(--text-secondary); font-size: 10px; }
+    .pagination { display: flex; gap: 5px; }
+    .page-button { width: 32px; height: 32px; display: grid; place-items: center; border: 1px solid var(--border); border-radius: 9px; color: var(--text-secondary); background: #fff; font-size: 10px; font-weight: 700; }
+    .page-button.active { color: #fff; border-color: var(--deep); background: var(--deep); }
+
+    .drawer { position: fixed; inset: 0; z-index: 80; pointer-events: none; }
+    .drawer.open { pointer-events: auto; }
+    .drawer-scrim { position: absolute; inset: 0; background: rgba(15, 23, 42, .40); opacity: 0; transition: .24s ease; }
+    .drawer.open .drawer-scrim { opacity: 1; }
+    .drawer-panel {
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: min(650px, 96vw);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      box-shadow: -28px 0 74px rgba(15, 42, 95, .20);
+      transform: translateX(105%);
+      transition: .3s cubic-bezier(.22, .61, .36, 1);
+    }
+    .drawer.open .drawer-panel { transform: translateX(0); }
+    .drawer-header { position: sticky; top: 0; z-index: 3; padding: 20px 22px 17px; border-bottom: 1px solid var(--border); background: rgba(255, 255, 255, .97); backdrop-filter: blur(12px); }
+    .drawer-header-row { display: flex; justify-content: space-between; gap: 18px; }
+    .drawer-id { color: var(--text-secondary); font-family: ui-monospace, monospace; font-size: 10px; font-weight: 700; }
+    .drawer-header h2 { margin: 7px 0 8px; font-size: 21px; line-height: 1.25; letter-spacing: -.025em; }
+    .drawer-badges { display: flex; gap: 7px; flex-wrap: wrap; }
+    .close-button { width: 36px; height: 36px; flex: 0 0 36px; display: grid; place-items: center; border: 1px solid var(--border); border-radius: 10px; color: var(--text-secondary); background: #fff; }
+    .drawer-tabs { display: flex; gap: 18px; margin-top: 17px; overflow-x: auto; }
+    .drawer-tab { padding: 0 0 10px; border: 0; border-bottom: 2px solid transparent; color: var(--text-secondary); background: transparent; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .drawer-tab.active { color: var(--primary); border-bottom-color: var(--ai); }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 18px 22px 100px; background: #FBFCFE; }
+    .drawer-section { margin-bottom: 15px; padding: 17px; border: 1px solid var(--border); border-radius: 14px; background: #fff; }
+    .drawer-section h3 { margin: 0 0 13px; font-size: 12px; }
+    .details-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 13px 18px; }
+    .detail-item label { display: block; margin-bottom: 4px; color: var(--text-secondary); font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+    .detail-item strong { font-size: 11px; }
+    .ai-panel { border-color: var(--blue-border); background: var(--soft-blue); }
+    .ai-panel-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .ai-panel-title { display: flex; gap: 10px; }
+    .ai-symbol { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; color: #fff; background: var(--ai); box-shadow: 0 8px 18px rgba(37, 99, 235, .20); }
+    .ai-panel h3 { color: var(--primary); margin-bottom: 3px; }
+    .ai-panel p { margin: 0; color: #36527D; font-size: 10px; line-height: 1.55; }
+    .confidence { color: var(--ai); font-size: 10px; font-weight: 800; }
+    .ai-evidence { display: grid; gap: 7px; margin-top: 12px; }
+    .evidence-row { display: flex; gap: 8px; align-items: flex-start; color: #28456F; font-size: 10px; }
+    .evidence-row span:first-child { color: var(--ai); font-weight: 800; }
+    .ai-actions { display: flex; gap: 8px; margin-top: 14px; }
+    .ai-disclaimer { margin-top: 10px !important; color: var(--text-secondary) !important; font-size: 9px !important; }
+
+    .safety-alert { border-color: #FECACA; background: var(--danger-soft); }
+    .alert-header { display: flex; gap: 10px; }
+    .alert-icon { width: 34px; height: 34px; flex: 0 0 34px; display: grid; place-items: center; border-radius: 10px; color: #fff; background: var(--danger); }
+    .safety-alert h3 { color: #991B1B; margin-bottom: 4px; }
+    .safety-alert p { margin: 0; color: #7F1D1D; font-size: 10px; line-height: 1.55; }
+
+    .checklist { display: grid; gap: 9px; }
+    .check-row { display: flex; align-items: flex-start; gap: 10px; padding: 10px; border: 1px solid var(--border); border-radius: 10px; background: #fff; }
+    .check-row input { margin-top: 2px; accent-color: var(--ai); }
+    .check-copy { flex: 1; }
+    .check-copy strong { display: block; font-size: 10px; }
+    .check-copy span { color: var(--text-secondary); font-size: 9px; }
+    .required-tag { color: var(--danger); font-size: 8px; font-weight: 800; text-transform: uppercase; }
+
+    .timeline { position: relative; display: grid; gap: 14px; }
+    .timeline::before { content: ""; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 1px; background: var(--border); }
+    .timeline-item { position: relative; display: grid; grid-template-columns: 15px 1fr; gap: 10px; }
+    .timeline-dot { width: 15px; height: 15px; z-index: 1; border: 4px solid #DBEAFE; border-radius: 50%; background: var(--ai); }
+    .timeline-copy strong { display: block; font-size: 10px; }
+    .timeline-copy p { margin: 3px 0 0; color: var(--text-secondary); font-size: 9px; }
+
+    .drawer-footer { position: sticky; bottom: 0; z-index: 4; display: flex; justify-content: flex-end; gap: 8px; padding: 14px 22px; border-top: 1px solid var(--border); background: rgba(255, 255, 255, .98); backdrop-filter: blur(10px); }
+
+    .modal { position: fixed; inset: 0; z-index: 90; display: none; align-items: center; justify-content: center; padding: 18px; background: rgba(15, 23, 42, .46); }
+    .modal.open { display: flex; }
+    .modal-card { width: min(760px, 96vw); max-height: 92vh; display: flex; flex-direction: column; border-radius: 18px; background: #fff; box-shadow: var(--shadow-lg); overflow: hidden; }
+    .modal-header, .modal-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 20px; border-bottom: 1px solid var(--border); }
+    .modal-footer { justify-content: flex-end; border-top: 1px solid var(--border); border-bottom: 0; }
+    .modal-header h2 { margin: 0; font-size: 18px; }
+    .modal-header p { margin: 4px 0 0; color: var(--text-secondary); font-size: 10px; }
+    .modal-body { padding: 20px; overflow-y: auto; background: #FBFCFE; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .form-field { display: grid; gap: 6px; }
+    .form-field.full { grid-column: 1 / -1; }
+    .form-field label { color: #334155; font-size: 10px; font-weight: 800; }
+    .form-field input, .form-field select, .form-field textarea { width: 100%; border: 1px solid var(--border); border-radius: 10px; color: var(--text); background: #fff; }
+    .form-field input, .form-field select { height: 41px; padding: 0 11px; }
+    .form-field textarea { min-height: 96px; padding: 10px 11px; resize: vertical; }
+    .form-field input:focus, .form-field select:focus, .form-field textarea:focus { outline: none; border-color: #93C5FD; box-shadow: 0 0 0 4px rgba(37, 99, 235, .07); }
+    .field-error { color: var(--danger); font-size: 9px; }
+
+    .toast {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 120;
+      max-width: 380px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 15px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: #fff;
+      background: var(--deep);
+      box-shadow: var(--shadow-md);
+      font-size: 11px;
+      font-weight: 700;
+      opacity: 0;
+      transform: translateY(14px);
+      pointer-events: none;
+      transition: .22s ease;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    .mobile-menu-button { display: none; }
+
+    @media (max-width: 1500px) {
+      .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+      .overview-grid { grid-template-columns: 1.4fr 1fr; }
+      .overview-grid .workload-card { grid-column: 1 / -1; }
+      .workload-list { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 1100px) {
+      :root { --sidebar-width: 88px; }
+      .brand-copy, .nav-label, .nav-link span:not(.nav-icon), .nav-count, .sidebar-bottom { display: none; }
+      .brand { justify-content: center; padding-left: 0; padding-right: 0; }
+      .nav-link { justify-content: center; padding: 11px 0; }
+      .nav-link.active { box-shadow: inset 0 -3px 0 var(--azure); }
+      .topbar { padding: 0 20px; }
+      .content { padding-left: 20px; padding-right: 20px; }
+      .profile-copy { display: none; }
+      .overview-grid { grid-template-columns: 1fr; }
+      .overview-grid .workload-card { grid-column: auto; }
+      .workload-list { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 760px) {
+      :root { --topbar-height: 66px; }
+      .app-shell { display: block; }
+      .sidebar { position: fixed; left: 0; top: 0; width: 278px; transform: translateX(-102%); transition: .24s ease; box-shadow: var(--shadow-lg); }
+      .sidebar.open { transform: translateX(0); }
+      .brand-copy, .nav-label, .nav-link span:not(.nav-icon), .nav-count, .sidebar-bottom { display: initial; }
+      .nav-link { justify-content: flex-start; padding: 10px 12px; }
+      .nav-link.active { box-shadow: inset 3px 0 0 var(--azure); }
+      .mobile-menu-button { display: grid; }
+      .topbar { padding: 0 14px; }
+      .topbar-search { width: 100%; }
+      .search-shortcut, .profile-button, .topbar-actions .icon-button:nth-of-type(2) { display: none; }
+      .content { padding: 20px 14px 32px; }
+      .page-header { flex-direction: column; }
+      .header-actions { width: 100%; justify-content: flex-start; }
+      .updated-time { text-align: left; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .overview-grid { grid-template-columns: 1fr; }
+      .workload-list { grid-template-columns: 1fr; }
+      .status-legend { grid-template-columns: repeat(2, 1fr); }
+      .workspace-toolbar { align-items: stretch; }
+      .workspace-search, .filter-select { width: 100%; min-width: 100%; }
+      .toolbar-right { width: 100%; margin-left: 0; }
+      .table-scroll { max-height: none; }
+      .details-grid, .form-grid { grid-template-columns: 1fr; }
+      .form-field.full { grid-column: auto; }
+      .drawer-footer { flex-wrap: wrap; }
+      .drawer-footer .button { flex: 1; }
+    }
+
+    @media (max-width: 480px) {
+      .kpi-grid { grid-template-columns: 1fr; }
+      .page-title h1 { font-size: 29px; }
+      .header-actions .button { flex: 1; }
+      .sla-wrap { align-items: flex-start; flex-direction: column; }
+      .modal-footer { flex-direction: column-reverse; }
+      .modal-footer .button { width: 100%; }
+    }
+  
+
+    /* =========================================================
+       Full-screen enterprise layout + enhanced typography scale
+       ========================================================= */
+    :root {
+      --sidebar-width: 304px;
+      --topbar-height: 84px;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100%;
+    }
+
+    body {
+      font-size: 17px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    .app-shell {
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    .main {
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    .content {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 32px 36px 48px;
+    }
+
+    .sidebar {
+      padding: 24px 18px 20px;
+    }
+
+    .brand-mark {
+      width: 48px;
+      height: 48px;
+      flex-basis: 48px;
+      font-size: 22px;
+    }
+
+    .brand-copy strong { font-size: 17px; }
+    .brand-copy span { font-size: 12px; }
+    .nav-label { font-size: 12px; }
+    .nav-link {
+      min-height: 48px;
+      padding: 12px 14px;
+      font-size: 15px;
+    }
+    .nav-icon { font-size: 18px; }
+    .nav-count { min-width: 28px; height: 24px; font-size: 12px; }
+    .compliance-card .eyebrow { font-size: 12px; }
+    .compliance-card strong { font-size: 15px; }
+    .compliance-card p,
+    .system-status { font-size: 13px; }
+
+    .topbar {
+      width: 100%;
+      padding: 0 36px;
+    }
+
+    .topbar-search { width: min(760px, 58vw); }
+    .topbar-search input {
+      height: 50px;
+      padding-left: 46px;
+      font-size: 16px;
+    }
+    .topbar-search::before { top: 11px; font-size: 23px; }
+    .search-shortcut { top: 11px; font-size: 12px; }
+    .icon-button { width: 46px; height: 46px; font-size: 18px; }
+    .avatar { width: 44px; height: 44px; font-size: 14px; }
+    .profile-copy strong { font-size: 14px; }
+    .profile-copy span { font-size: 12px; }
+
+    .breadcrumb { font-size: 13px; }
+    .page-title h1 { font-size: clamp(34px, 3vw, 46px); }
+    .page-title p { font-size: 17px; }
+    .enterprise-badge { padding: 7px 11px; font-size: 12px; }
+    .updated-time { font-size: 13px; }
+
+    .button {
+      min-height: 48px;
+      padding: 0 18px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .kpi-label,
+    .section-kicker,
+    .card-eyebrow,
+    .table-caption,
+    .filter-label,
+    .field-label,
+    .meta-label { font-size: 13px !important; }
+
+    .kpi-value { font-size: clamp(34px, 3vw, 44px) !important; }
+    .kpi-description,
+    .section-description,
+    .helper-text,
+    .meta-value { font-size: 15px !important; }
+
+    .section-title,
+    .card-title,
+    .panel-title { font-size: 22px !important; }
+
+    table { font-size: 15px; }
+    th {
+      font-size: 13px !important;
+      padding-top: 15px !important;
+      padding-bottom: 15px !important;
+    }
+    td {
+      font-size: 15px !important;
+      padding-top: 16px !important;
+      padding-bottom: 16px !important;
+    }
+
+    .task-title,
+    .task-name { font-size: 16px !important; }
+    .task-description,
+    .cell-subtext { font-size: 13px !important; }
+
+    .badge,
+    .status-badge,
+    .priority-badge,
+    .sla-badge,
+    .tag,
+    .chip { font-size: 13px !important; }
+
+    input,
+    select,
+    textarea {
+      font-size: 16px;
+    }
+
+    .drawer,
+    .task-drawer {
+      width: min(680px, 48vw) !important;
+      max-width: 680px !important;
+    }
+
+    .drawer h2,
+    .drawer-title,
+    .modal h2,
+    .modal-title { font-size: 28px !important; }
+
+    .drawer p,
+    .drawer-body,
+    .modal p,
+    .modal-body { font-size: 15px; }
+
+    @media (min-width: 1920px) {
+      :root { --sidebar-width: 320px; }
+      .content { padding: 38px 44px 56px; }
+      .topbar { padding-left: 44px; padding-right: 44px; }
+      body { font-size: 18px; }
+      table, td { font-size: 16px !important; }
+    }
+
+    @media (max-width: 1180px) {
+      :root { --sidebar-width: 260px; }
+      .content { padding: 28px 24px 40px; }
+      .topbar { padding: 0 24px; }
+      .drawer,
+      .task-drawer { width: min(620px, 62vw) !important; }
+    }
+
+    @media (max-width: 900px) {
+      body { font-size: 16px; }
+      .content { padding: 24px 18px 36px; }
+      .topbar { padding: 0 18px; }
+      .page-title h1 { font-size: 34px; }
+      .page-title p { font-size: 16px; }
+      .drawer,
+      .task-drawer {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .content { padding: 20px 14px 30px; }
+      .button { min-height: 46px; font-size: 15px; }
+      .page-title h1 { font-size: 30px; }
+      .kpi-value { font-size: 34px !important; }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Primary navigation">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">N✦</div>
+        <div class="brand-copy">
+          <strong>Med AI NexSure</strong>
+          <span>Enterprise Healthcare & Insurance Intelligence</span>
+        </div>
+      </div>
+
+      <nav>
+        <div class="nav-section">
+          <div class="nav-label">Care Operations</div>
+          <div class="nav-list">
+            <a class="nav-link" href="#"><span class="nav-icon">▦</span><span>Main Dashboard</span></a>
+            <a class="nav-link" href="#"><span class="nav-icon">♙</span><span>Patient Management</span></a>
+            <a class="nav-link" href="#"><span class="nav-icon">✚</span><span>Visit Management</span><span class="nav-count">18</span></a>
+            <a class="nav-link active" href="#"><span class="nav-icon">✓</span><span>Task Center</span><span class="nav-count">148</span></a>
+          </div>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-label">Clinical Intelligence</div>
+          <div class="nav-list">
+            <a class="nav-link" href="#"><span class="nav-icon">✦</span><span>AI Copilot</span></a>
+            <a class="nav-link" href="#"><span class="nav-icon">◫</span><span>SOAP Note</span></a>
+            <a class="nav-link" href="#"><span class="nav-icon">⚕</span><span>Prescription</span></a>
+          </div>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-label">Insurance Intelligence</div>
+          <div class="nav-list">
+            <a class="nav-link" href="#"><span class="nav-icon">◈</span><span>Claim Readiness</span><span class="nav-count">23</span></a>
+            <a class="nav-link" href="#"><span class="nav-icon">▤</span><span>Evidence Package</span></a>
+            <a class="nav-link" href="#"><span class="nav-icon">⌘</span><span>Payer Rules</span></a>
+            <a class="nav-link" href="#"><span class="nav-icon">↗</span><span>Economic Intelligence</span></a>
+          </div>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-label">Governance & Administration</div>
+          <div class="nav-list">
+            <a class="nav-link" href="#"><span class="nav-icon">⌾</span><span>Audit & Compliance</span></a>
+            <a class="nav-link" href="#"><span class="nav-icon">⚙</span><span>Admin Settings</span></a>
+          </div>
+        </div>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="compliance-card">
+          <div class="eyebrow">Enterprise Governance</div>
+          <strong>Audit-ready by design</strong>
+          <p>ติดตาม PHI access, task changes, AI decisions และ export activity ภายใต้สิทธิ์ที่กำหนด</p>
+          <div class="system-status"><span class="status-pulse"></span>All enterprise services operational</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="icon-button mobile-menu-button" id="mobileMenuButton" aria-label="Open navigation">☰</button>
+        <div class="topbar-search" title="ค้นหาข้อมูลทั่วทั้งแพลตฟอร์ม">
+          <input type="search" placeholder="Search patients, visits, claims, tasks, or documents" aria-label="Global search" />
+          <span class="search-shortcut">⌘ K</span>
+        </div>
+        <div class="topbar-actions">
+          <button class="icon-button" aria-label="AI Copilot">✦</button>
+          <button class="icon-button" aria-label="Notifications">♢<span class="notification-dot"></span></button>
+          <div class="profile-button">
+            <div class="avatar">CT</div>
+            <div class="profile-copy"><strong>Chatrapee</strong><span>Clinic Operations Manager</span></div>
+          </div>
+        </div>
+      </header>
+
+      <div class="content">
+        <section class="page-header">
+          <div class="page-title">
+            <div class="breadcrumb"><span>Care Operations</span><span>/</span><strong>Task Center</strong></div>
+            <div class="page-title-row">
+              <h1>Task Center</h1>
+              <span class="enterprise-badge">Enterprise Task Operations</span>
+            </div>
+            <p>ติดตาม มอบหมาย และบริหารงานสำคัญ พร้อม SLA, Clinical Safety และ Claim Readiness ในมุมมองเดียว</p>
+          </div>
+          <div class="header-actions">
+            <button class="button">▣ Saved Views</button>
+            <button class="button">◷ Last 7 Days</button>
+            <button class="button" id="refreshButton">↻ Refresh</button>
+            <button class="button">⇩ Export</button>
+            <button class="button primary" id="createTaskButton">＋ Create Task</button>
+            <div class="updated-time" id="updatedTime">Last updated: Today, 14:48 ICT · ข้อมูลตามสิทธิ์การเข้าถึงปัจจุบัน</div>
+          </div>
+        </section>
+
+        <section class="kpi-grid" aria-label="Task KPIs">
+          <article class="kpi-card active" data-kpi="all" tabindex="0">
+            <div class="kpi-top"><span class="kpi-label">Open Tasks</span><span class="kpi-icon">▣</span></div>
+            <div class="kpi-value">148</div>
+            <div class="kpi-meta"><span class="delta positive">↓ 6.4%</span><span>ลดลงจากช่วงก่อนหน้า</span></div>
+          </article>
+          <article class="kpi-card warning" data-kpi="due" tabindex="0">
+            <div class="kpi-top"><span class="kpi-label">Due Today</span><span class="kpi-icon">◷</span></div>
+            <div class="kpi-value">24</div>
+            <div class="kpi-meta"><span class="delta negative">↑ 4</span><span>เพิ่มขึ้นตั้งแต่ช่วงเช้า</span></div>
+          </article>
+          <article class="kpi-card danger" data-kpi="overdue" tabindex="0">
+            <div class="kpi-top"><span class="kpi-label">Overdue Tasks</span><span class="kpi-icon">!</span></div>
+            <div class="kpi-value">11</div>
+            <div class="kpi-meta"><span class="delta negative">↑ 2</span><span>ต้องดำเนินการทันที</span></div>
+          </article>
+          <article class="kpi-card danger" data-kpi="critical" tabindex="0">
+            <div class="kpi-top"><span class="kpi-label">Critical Priority</span><span class="kpi-icon">⚠</span></div>
+            <div class="kpi-value">7</div>
+            <div class="kpi-meta"><span class="delta positive">↓ 3</span><span>หลังการทบทวน escalation</span></div>
+          </article>
+          <article class="kpi-card" data-kpi="unassigned" tabindex="0">
+            <div class="kpi-top"><span class="kpi-label">Unassigned</span><span class="kpi-icon">◎</span></div>
+            <div class="kpi-value">16</div>
+            <div class="kpi-meta"><span class="delta negative">↑ 5</span><span>ยังไม่มีผู้รับผิดชอบชัดเจน</span></div>
+          </article>
+          <article class="kpi-card success" data-kpi="completed" tabindex="0">
+            <div class="kpi-top"><span class="kpi-label">Completed Today</span><span class="kpi-icon">✓</span></div>
+            <div class="kpi-value">86</div>
+            <div class="kpi-meta"><span class="delta positive">↑ 12.8%</span><span>ประสิทธิภาพการดำเนินงานวันนี้</span></div>
+          </article>
+        </section>
+
+        <section class="overview-grid">
+          <article class="card">
+            <div class="card-header">
+              <div><h2>Task Status Overview</h2><p>สรุปสถานะงานภายใต้ Access Scope ปัจจุบัน</p></div>
+              <span class="icon-chip">▥</span>
+            </div>
+            <div class="status-segments" aria-label="Open 35%, In Progress 25%, Pending Review 18%, Blocked 9%, Completed 13%">
+              <div class="segment open" title="Open"></div><div class="segment progress" title="In Progress"></div><div class="segment review" title="Pending Review"></div><div class="segment blocked" title="Blocked"></div><div class="segment completed" title="Completed"></div>
+            </div>
+            <div class="status-legend">
+              <div class="legend-item"><span class="legend-dot" style="background:#2563EB"></span><div>Open<strong>52 · 35%</strong></div></div>
+              <div class="legend-item"><span class="legend-dot" style="background:#0891B2"></span><div>In Progress<strong>37 · 25%</strong></div></div>
+              <div class="legend-item"><span class="legend-dot" style="background:#7C3AED"></span><div>Pending Review<strong>27 · 18%</strong></div></div>
+              <div class="legend-item"><span class="legend-dot" style="background:#EA580C"></span><div>Blocked<strong>13 · 9%</strong></div></div>
+              <div class="legend-item"><span class="legend-dot" style="background:#059669"></span><div>Completed<strong>19 · 13%</strong></div></div>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-header">
+              <div><h2>SLA Performance</h2><p>ติดตาม SLA compliance ของ clinical และ claim queues</p></div>
+              <span class="icon-chip">◷</span>
+            </div>
+            <div class="sla-wrap">
+              <div class="donut"><div class="donut-label"><strong>77%</strong><span>SLA COMPLIANCE</span></div></div>
+              <div class="metric-list">
+                <div class="metric-row"><span>✓ On Track</span><strong>114</strong></div>
+                <div class="metric-row"><span>◷ Due Soon</span><strong>13</strong></div>
+                <div class="metric-row"><span>! Overdue</span><strong>11</strong></div>
+                <div class="metric-row"><span>↟ Escalated</span><strong>10</strong></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card workload-card">
+            <div class="card-header">
+              <div><h2>Workload Summary</h2><p>ประเมินภาระงานตามผู้รับผิดชอบและทีมปฏิบัติการ</p></div>
+              <span class="icon-chip">◎</span>
+            </div>
+            <div class="workload-list">
+              <div class="person-row"><div class="mini-avatar">KS</div><div class="person-info"><strong>Dr. K. Suriya</strong><span>14 open tasks</span><div class="capacity-bar"><div class="capacity-fill danger" style="width:91%"></div></div></div><span class="capacity-value">91%</span></div>
+              <div class="person-row"><div class="mini-avatar">PM</div><div class="person-info"><strong>P. Maneerat</strong><span>9 open tasks</span><div class="capacity-bar"><div class="capacity-fill warning" style="width:73%"></div></div></div><span class="capacity-value">73%</span></div>
+              <div class="person-row"><div class="mini-avatar">NT</div><div class="person-info"><strong>N. Thida</strong><span>7 open tasks</span><div class="capacity-bar"><div class="capacity-fill" style="width:58%"></div></div></div><span class="capacity-value">58%</span></div>
+            </div>
+          </article>
+        </section>
+
+        <section class="workspace">
+          <div class="workspace-toolbar">
+            <div class="workspace-search"><input id="taskSearch" type="search" placeholder="Search Task ID, patient, HN, visit, claim, or task title" aria-label="Search tasks" /></div>
+            <select class="filter-select" id="statusFilter" aria-label="Filter by status"><option value="all">All Status</option><option value="open">Open</option><option value="in progress">In Progress</option><option value="pending review">Pending Review</option><option value="blocked">Blocked</option><option value="completed">Completed</option></select>
+            <select class="filter-select" id="priorityFilter" aria-label="Filter by priority"><option value="all">All Priority</option><option value="critical">Critical</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select>
+            <select class="filter-select" id="sourceFilter" aria-label="Filter by source"><option value="all">All Sources</option><option>SOAP Note</option><option>Prescription Safety</option><option>Claim Readiness</option><option>Evidence Package</option><option>Diagnosis</option><option>Audit & Compliance</option></select>
+            <div class="toolbar-right"><button class="button small">☷ Filters</button><button class="button small">⚙ Columns</button></div>
+          </div>
+
+          <div class="active-filters" id="activeFilters">
+            <span class="filter-chip">View: All Operational Tasks</span>
+            <span class="filter-chip">Access Scope: Bangkok Clinic Network</span>
+            <span class="filter-hint">ระบบจะคง filter และ scroll position เมื่อเปิด Task Detail</span>
+          </div>
+
+          <div class="bulk-bar" id="bulkBar">
+            <strong><span id="selectedCount">0</span> Tasks Selected</strong>
+            <div class="bulk-actions"><button class="button small">Assign Tasks</button><button class="button small">Change Priority</button><button class="button small">Change Due Date</button><button class="button small">Export Selected</button><button class="button small ghost" id="clearSelection">Clear Selection</button></div>
+          </div>
+
+          <div class="table-scroll">
+            <table aria-label="Task worklist">
+              <thead><tr><th><input class="table-check" type="checkbox" id="selectAll" aria-label="Select all tasks" /></th><th>Task ID</th><th>Task</th><th>Source</th><th>Patient / Visit</th><th>Priority</th><th>Status</th><th>Assignee</th><th>Due Date</th><th>SLA</th><th>Readiness</th><th>Updated</th><th aria-label="Actions"></th></tr></thead>
+              <tbody id="taskRows"></tbody>
+            </table>
+          </div>
+
+          <div class="table-footer"><span id="resultCount">Showing 8 of 148 tasks · แสดงเฉพาะข้อมูลตาม Access Scope</span><div class="pagination"><button class="page-button">‹</button><button class="page-button active">1</button><button class="page-button">2</button><button class="page-button">3</button><button class="page-button">›</button></div></div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="drawer" id="taskDrawer" aria-hidden="true">
+    <div class="drawer-scrim" data-drawer-close></div>
+    <aside class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+      <header class="drawer-header">
+        <div class="drawer-header-row">
+          <div>
+            <div class="drawer-id" id="drawerTaskId">TASK-2837</div>
+            <h2 id="drawerTitle">Complete SOAP documentation</h2>
+            <div class="drawer-badges"><span class="badge priority-critical" id="drawerPriority">Critical</span><span class="badge status-progress" id="drawerStatus">In Progress</span><span class="badge ai-badge" id="drawerAI">AI Generated</span></div>
+          </div>
+          <button class="close-button" data-drawer-close aria-label="Close task detail">✕</button>
+        </div>
+        <div class="drawer-tabs" role="tablist"><button class="drawer-tab active">Overview</button><button class="drawer-tab">Checklist</button><button class="drawer-tab">Comments</button><button class="drawer-tab">Activity</button><button class="drawer-tab">Related Records</button></div>
+      </header>
+
+      <div class="drawer-body">
+        <section class="drawer-section safety-alert">
+          <div class="alert-header"><div class="alert-icon">⚠</div><div><h3>Clinical Safety Priority</h3><p>ข้อมูลนี้มีผลต่อความปลอดภัยของผู้ป่วย กรุณาตรวจสอบ source record และ clinical context ก่อนดำเนินการต่อ</p></div></div>
+        </section>
+
+        <section class="drawer-section">
+          <h3>Task Summary</h3>
+          <div class="details-grid">
+            <div class="detail-item"><label>Source Module</label><strong id="drawerSource">SOAP Note</strong></div>
+            <div class="detail-item"><label>Assignee</label><strong id="drawerAssignee">Dr. K. Suriya</strong></div>
+            <div class="detail-item"><label>Due Date</label><strong id="drawerDue">Today 15:30</strong></div>
+            <div class="detail-item"><label>SLA Status</label><strong id="drawerSLA" style="color:#D97706">Due in 42m</strong></div>
+            <div class="detail-item"><label>Patient</label><strong id="drawerPatient">Nattapong S.</strong></div>
+            <div class="detail-item"><label>Claim Readiness</label><strong id="drawerReadiness">62 · Needs Review</strong></div>
+          </div>
+        </section>
+
+        <section class="drawer-section ai-panel">
+          <div class="ai-panel-header">
+            <div class="ai-panel-title"><div class="ai-symbol">✦</div><div><h3>AI Recommended Next Action</h3><p>Complete Assessment and Plan, then validate diagnosis-to-ICD consistency before routing the case to Claim Review.</p></div></div>
+            <span class="confidence">92% confidence</span>
+          </div>
+          <div class="ai-evidence"><div class="evidence-row"><span>✓</span><span>Assessment field is incomplete in the latest SOAP version.</span></div><div class="evidence-row"><span>✓</span><span>Primary diagnosis is present but ICD-10 confirmation is pending.</span></div><div class="evidence-row"><span>✓</span><span>Claim readiness score is below the 85-point submission threshold.</span></div></div>
+          <div class="ai-actions"><button class="button ai small" id="acceptAI">Accept Recommendation</button><button class="button small" id="rejectAI">Reject</button></div>
+          <p class="ai-disclaimer">AI provides decision support only. การตัดสินใจด้าน Clinical และ Claim ต้องได้รับการยืนยันจากผู้มีอำนาจ</p>
+        </section>
+
+        <section class="drawer-section">
+          <h3>Required Checklist</h3>
+          <div class="checklist" id="taskChecklist">
+            <label class="check-row"><input type="checkbox" checked /><span class="check-copy"><strong>Review Subjective and Objective notes</strong><span>Completed by Dr. K. Suriya · 14:08</span></span></label>
+            <label class="check-row"><input type="checkbox" /><span class="check-copy"><strong>Complete Assessment</strong><span>Clinical rationale and differential must be documented</span></span><span class="required-tag">Required</span></label>
+            <label class="check-row"><input type="checkbox" /><span class="check-copy"><strong>Complete Treatment Plan</strong><span>Medication, procedure, advice and follow-up plan</span></span><span class="required-tag">Required</span></label>
+            <label class="check-row"><input type="checkbox" /><span class="check-copy"><strong>Validate diagnosis and ICD-10 mapping</strong><span>Confirm clinical consistency before claim review</span></span><span class="required-tag">Required</span></label>
+          </div>
+        </section>
+
+        <section class="drawer-section">
+          <h3>Activity Timeline</h3>
+          <div class="timeline">
+            <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-copy"><strong>Priority changed to Critical</strong><p>Today, 14:12 · Claim Readiness escalation rule</p></div></div>
+            <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-copy"><strong>Assigned to Dr. K. Suriya</strong><p>Today, 13:48 · Auto-assignment rule</p></div></div>
+            <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-copy"><strong>Task created from SOAP Note</strong><p>Today, 13:46 · Claim Readiness Engine</p></div></div>
+          </div>
+        </section>
+      </div>
+
+      <footer class="drawer-footer"><button class="button danger">Mark as Blocked</button><button class="button">Send to Review</button><button class="button primary" id="completeTaskButton">✓ Complete Task</button></footer>
+    </aside>
+  </div>
+
+  <div class="modal" id="createTaskModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="createTaskTitle">
+      <header class="modal-header"><div><h2 id="createTaskTitle">Create Task</h2><p>สร้างงานใหม่ พร้อมกำหนด Priority, Assignee และ related clinical or claim context</p></div><button class="close-button" data-modal-close aria-label="Close create task modal">✕</button></header>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-field full"><label for="newTaskTitle">Task Title *</label><input id="newTaskTitle" placeholder="Enter a concise, action-oriented task title" /><span class="field-error" id="titleError"></span></div>
+          <div class="form-field full"><label for="newTaskDescription">Description</label><textarea id="newTaskDescription" placeholder="Describe the required action, supporting context, and expected outcome"></textarea></div>
+          <div class="form-field"><label for="newTaskType">Task Type *</label><select id="newTaskType"><option>Clinical Documentation</option><option>Claim Review</option><option>Missing Evidence</option><option>Prescription Safety</option><option>Compliance Review</option><option>Manual Task</option></select></div>
+          <div class="form-field"><label for="newTaskPriority">Priority *</label><select id="newTaskPriority"><option>Medium</option><option>High</option><option>Critical</option><option>Low</option></select></div>
+          <div class="form-field"><label for="newTaskAssignee">Assignee</label><select id="newTaskAssignee"><option>Unassigned</option><option>Dr. K. Suriya</option><option>P. Maneerat</option><option>N. Thida</option><option>Compliance Team</option></select></div>
+          <div class="form-field"><label for="newTaskTeam">Assigned Team</label><select id="newTaskTeam"><option>Clinical Review Team</option><option>Claim Operations</option><option>Compliance Team</option><option>Clinic Operations</option></select></div>
+          <div class="form-field"><label for="newPatient">Related Patient</label><input id="newPatient" placeholder="Search patient name or HN" /></div>
+          <div class="form-field"><label for="newVisit">Related Visit</label><input id="newVisit" placeholder="Visit ID" /></div>
+          <div class="form-field"><label for="newDueDate">Due Date</label><input id="newDueDate" type="datetime-local" /></div>
+          <div class="form-field"><label for="newChecklist">Checklist Template</label><select id="newChecklist"><option>Standard Clinical Checklist</option><option>Claim Readiness Checklist</option><option>Compliance Review Checklist</option><option>No Checklist Template</option></select></div>
+        </div>
+      </div>
+      <footer class="modal-footer"><button class="button" data-modal-close>Cancel</button><button class="button primary" id="saveTaskButton">Create Task</button></footer>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">Task created successfully</div>
+
+  <script>
+    const tasks = [
+      { id:'TASK-2841', title:'Review critical drug interaction', desc:'Warfarin and clarithromycin interaction requires pharmacist confirmation.', source:'Prescription Safety', patient:'Somchai K.', hn:'HN-021884', visit:'VIS-240710-089', priority:'Critical', status:'Pending Review', assignee:'P. Maneerat', due:'Today 14:00', sla:'Overdue 1h 12m', slaType:'overdue', readiness:'54 · Not Ready', readinessType:'not-ready', updated:'4 min ago', ai:true },
+      { id:'TASK-2837', title:'Complete SOAP documentation', desc:'Assessment and Plan are incomplete after consultation.', source:'SOAP Note', patient:'Nattapong S.', hn:'HN-024817', visit:'VIS-240710-082', priority:'Critical', status:'In Progress', assignee:'Dr. K. Suriya', due:'Today 15:30', sla:'Due in 42m', slaType:'due', readiness:'62 · Needs Review', readinessType:'review', updated:'8 min ago', ai:true },
+      { id:'TASK-2829', title:'Upload mandatory claim evidence', desc:'Medical certificate and laboratory result are missing.', source:'Evidence Package', patient:'Pimchanok R.', hn:'HN-018229', visit:'VIS-240710-071', priority:'High', status:'Open', assignee:'Unassigned', due:'Today 17:00', sla:'Due in 2h 12m', slaType:'due', readiness:'71 · Needs Review', readinessType:'review', updated:'12 min ago', ai:false },
+      { id:'TASK-2824', title:'Validate payer coverage rule', desc:'Benefit limit requires manual claim reviewer validation.', source:'Claim Readiness', patient:'Woranuch T.', hn:'HN-030112', visit:'VIS-240710-066', priority:'High', status:'Pending Review', assignee:'N. Thida', due:'Tomorrow 10:00', sla:'On Track', slaType:'track', readiness:'78 · Needs Review', readinessType:'review', updated:'19 min ago', ai:true },
+      { id:'TASK-2818', title:'Investigate unusual record access', desc:'Multiple out-of-hours patient record views detected.', source:'Audit & Compliance', patient:'Restricted Record', hn:'Masked', visit:'Sensitive', priority:'Critical', status:'Blocked', assignee:'Compliance Team', due:'Today 13:00', sla:'Escalated', slaType:'overdue', readiness:'—', readinessType:'', updated:'24 min ago', ai:true },
+      { id:'TASK-2807', title:'Add diagnosis and ICD-10', desc:'Completed visit has no primary diagnosis code.', source:'Diagnosis', patient:'Anan P.', hn:'HN-019908', visit:'VIS-240710-052', priority:'Medium', status:'Open', assignee:'Dr. K. Suriya', due:'Tomorrow 12:00', sla:'On Track', slaType:'track', readiness:'58 · Not Ready', readinessType:'not-ready', updated:'31 min ago', ai:true },
+      { id:'TASK-2792', title:'Review economic cost alert', desc:'Visit cost exceeds payer benchmark by 34%.', source:'Economic Intelligence', patient:'Ratchanee M.', hn:'HN-027741', visit:'VIS-240709-226', priority:'Medium', status:'In Progress', assignee:'Claim Ops Team', due:'Jul 12, 16:00', sla:'On Track', slaType:'track', readiness:'84 · Needs Review', readinessType:'review', updated:'46 min ago', ai:true },
+      { id:'TASK-2771', title:'Obtain updated PDPA consent', desc:'Patient consent expired before the current visit.', source:'PDPA Consent', patient:'Kanda L.', hn:'HN-013652', visit:'VIS-240709-189', priority:'Low', status:'Completed', assignee:'Clinic Staff', due:'Completed', sla:'Met SLA', slaType:'track', readiness:'91 · Ready', readinessType:'ready', updated:'1h ago', ai:false }
+    ];
+
+    const state = { selected: new Set(), activeKPI: 'all' };
+
+    const priorityClass = p => `priority-${p.toLowerCase()}`;
+    const statusClass = s => `status-${s.toLowerCase().replaceAll(' ', '-')}`;
+    const initials = value => value === 'Unassigned' ? '?' : value.split(' ').map(x => x[0]).join('').slice(0, 2).toUpperCase();
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(window.toastTimer);
+      window.toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+    }
+
+    function filteredTasks() {
+      const q = document.getElementById('taskSearch').value.trim().toLowerCase();
+      const status = document.getElementById('statusFilter').value.toLowerCase();
+      const priority = document.getElementById('priorityFilter').value.toLowerCase();
+      const source = document.getElementById('sourceFilter').value.toLowerCase();
+      return tasks.filter(task => {
+        const text = Object.values(task).join(' ').toLowerCase();
+        const matchesSearch = !q || text.includes(q);
+        const matchesStatus = status === 'all' || task.status.toLowerCase() === status;
+        const matchesPriority = priority === 'all' || task.priority.toLowerCase() === priority;
+        const matchesSource = source === 'all' || task.source.toLowerCase() === source;
+        const matchesKPI = state.activeKPI === 'all' ||
+          (state.activeKPI === 'critical' && task.priority === 'Critical') ||
+          (state.activeKPI === 'overdue' && task.slaType === 'overdue') ||
+          (state.activeKPI === 'completed' && task.status === 'Completed') ||
+          (state.activeKPI === 'unassigned' && task.assignee === 'Unassigned') ||
+          (state.activeKPI === 'due' && task.slaType === 'due');
+        return matchesSearch && matchesStatus && matchesPriority && matchesSource && matchesKPI;
+      });
+    }
+
+    function renderTasks() {
+      const list = filteredTasks();
+      const rows = document.getElementById('taskRows');
+      rows.innerHTML = list.map(task => `
+        <tr class="${task.priority === 'Critical' ? 'critical-row' : ''} ${state.selected.has(task.id) ? 'selected' : ''}" data-id="${task.id}">
+          <td><input class="table-check row-check" type="checkbox" data-id="${task.id}" ${state.selected.has(task.id) ? 'checked' : ''} aria-label="Select ${task.id}" /></td>
+          <td><span class="task-number">${task.id}</span></td>
+          <td><div class="task-name"><strong>${task.title}</strong>${task.ai ? '<span class="badge ai-badge inline-ai">AI</span>' : ''}<p>${task.desc}</p></div></td>
+          <td><span class="source-label">${task.source}</span></td>
+          <td><div class="patient-cell"><strong>${task.patient}</strong><span>${task.hn} · ${task.visit}</span></div></td>
+          <td><span class="badge ${priorityClass(task.priority)}">${task.priority}</span></td>
+          <td><span class="badge ${statusClass(task.status)}">${task.status}</span></td>
+          <td><div class="assignee-cell"><span class="mini-avatar">${initials(task.assignee)}</span><span>${task.assignee}</span></div></td>
+          <td>${task.due}</td>
+          <td><span class="sla-text sla-${task.slaType}">${task.sla}</span></td>
+          <td><span class="readiness ${task.readinessType}">${task.readiness}</span></td>
+          <td>${task.updated}</td>
+          <td><button class="row-menu" aria-label="Task actions">•••</button></td>
+        </tr>`).join('');
+
+      document.getElementById('resultCount').textContent = `Showing ${list.length} of 148 tasks · แสดงเฉพาะข้อมูลตาม Access Scope`;
+      bindRowEvents();
+      updateBulkBar();
+    }
+
+    function bindRowEvents() {
+      document.querySelectorAll('#taskRows tr').forEach(row => {
+        row.addEventListener('click', event => {
+          if (event.target.closest('input, button')) return;
+          openDrawer(tasks.find(task => task.id === row.dataset.id));
+        });
+      });
+      document.querySelectorAll('.row-check').forEach(check => {
+        check.addEventListener('change', event => {
+          const id = event.target.dataset.id;
+          event.target.checked ? state.selected.add(id) : state.selected.delete(id);
+          renderTasks();
+        });
+      });
+    }
+
+    function updateBulkBar() {
+      document.getElementById('selectedCount').textContent = state.selected.size;
+      document.getElementById('bulkBar').classList.toggle('show', state.selected.size > 0);
+      const visible = filteredTasks();
+      document.getElementById('selectAll').checked = visible.length > 0 && visible.every(task => state.selected.has(task.id));
+    }
+
+    function openDrawer(task) {
+      document.getElementById('drawerTaskId').textContent = task.id;
+      document.getElementById('drawerTitle').textContent = task.title;
+      document.getElementById('drawerPriority').className = `badge ${priorityClass(task.priority)}`;
+      document.getElementById('drawerPriority').textContent = task.priority;
+      document.getElementById('drawerStatus').className = `badge ${statusClass(task.status)}`;
+      document.getElementById('drawerStatus').textContent = task.status;
+      document.getElementById('drawerAI').style.display = task.ai ? 'inline-flex' : 'none';
+      document.getElementById('drawerSource').textContent = task.source;
+      document.getElementById('drawerAssignee').textContent = task.assignee;
+      document.getElementById('drawerDue').textContent = task.due;
+      document.getElementById('drawerSLA').textContent = task.sla;
+      document.getElementById('drawerPatient').textContent = `${task.patient} · ${task.hn}`;
+      document.getElementById('drawerReadiness').textContent = task.readiness;
+      document.getElementById('taskDrawer').classList.add('open');
+      document.getElementById('taskDrawer').setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDrawer() {
+      document.getElementById('taskDrawer').classList.remove('open');
+      document.getElementById('taskDrawer').setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    function openModal() {
+      document.getElementById('createTaskModal').classList.add('open');
+      document.getElementById('createTaskModal').setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      setTimeout(() => document.getElementById('newTaskTitle').focus(), 50);
+    }
+
+    function closeModal() {
+      document.getElementById('createTaskModal').classList.remove('open');
+      document.getElementById('createTaskModal').setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('taskSearch').addEventListener('input', renderTasks);
+    ['statusFilter', 'priorityFilter', 'sourceFilter'].forEach(id => document.getElementById(id).addEventListener('change', renderTasks));
+
+    document.querySelectorAll('.kpi-card').forEach(card => {
+      const activate = () => {
+        document.querySelectorAll('.kpi-card').forEach(item => item.classList.remove('active'));
+        card.classList.add('active');
+        state.activeKPI = card.dataset.kpi;
+        renderTasks();
+      };
+      card.addEventListener('click', activate);
+      card.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') activate(); });
+    });
+
+    document.getElementById('selectAll').addEventListener('change', event => {
+      filteredTasks().forEach(task => event.target.checked ? state.selected.add(task.id) : state.selected.delete(task.id));
+      renderTasks();
+    });
+    document.getElementById('clearSelection').addEventListener('click', () => { state.selected.clear(); renderTasks(); });
+
+    document.querySelectorAll('[data-drawer-close]').forEach(button => button.addEventListener('click', closeDrawer));
+    document.getElementById('createTaskButton').addEventListener('click', openModal);
+    document.querySelectorAll('[data-modal-close]').forEach(button => button.addEventListener('click', closeModal));
+
+    document.getElementById('saveTaskButton').addEventListener('click', () => {
+      const title = document.getElementById('newTaskTitle').value.trim();
+      const error = document.getElementById('titleError');
+      if (title.length < 3) {
+        error.textContent = 'กรุณาระบุ Task Title อย่างน้อย 3 ตัวอักษร';
+        document.getElementById('newTaskTitle').focus();
+        return;
+      }
+      error.textContent = '';
+      const priority = document.getElementById('newTaskPriority').value;
+      const assignee = document.getElementById('newTaskAssignee').value;
+      if (priority === 'Critical' && assignee === 'Unassigned') {
+        error.textContent = 'Critical Task ต้องระบุ Assignee หรือ Assigned Team';
+        return;
+      }
+      tasks.unshift({ id:`TASK-${2900 + tasks.length}`, title, desc:document.getElementById('newTaskDescription').value.trim() || 'Manual task created from Task Center.', source:'Manual Task', patient:document.getElementById('newPatient').value.trim() || 'No related patient', hn:'—', visit:document.getElementById('newVisit').value.trim() || '—', priority, status:'Open', assignee, due:'Tomorrow 17:00', sla:'On Track', slaType:'track', readiness:'—', readinessType:'', updated:'Just now', ai:false });
+      closeModal();
+      document.getElementById('newTaskTitle').value = '';
+      document.getElementById('newTaskDescription').value = '';
+      state.activeKPI = 'all';
+      document.querySelectorAll('.kpi-card').forEach(item => item.classList.toggle('active', item.dataset.kpi === 'all'));
+      renderTasks();
+      showToast('Task created successfully · สร้างงานเรียบร้อยแล้ว');
+    });
+
+    document.getElementById('refreshButton').addEventListener('click', () => {
+      document.getElementById('updatedTime').textContent = 'Last updated: Just now';
+      showToast('Task data refreshed · อัปเดตข้อมูลล่าสุดแล้ว');
+    });
+
+    document.getElementById('completeTaskButton').addEventListener('click', () => {
+      const incomplete = [...document.querySelectorAll('#taskChecklist .check-row input')].some(input => !input.checked);
+      if (incomplete) showToast('ไม่สามารถปิดงานได้ กรุณาดำเนินการ Required Checklist ให้ครบถ้วน');
+      else { showToast('Task completed · ดำเนินงานเสร็จสิ้นแล้ว'); closeDrawer(); }
+    });
+
+    document.getElementById('acceptAI').addEventListener('click', () => showToast('AI recommendation accepted · บันทึกการยืนยันใน Audit Log แล้ว'));
+    document.getElementById('rejectAI').addEventListener('click', () => showToast('AI recommendation rejected · กรุณาระบุเหตุผลเพื่อบันทึกใน Audit Log'));
+
+    document.getElementById('mobileMenuButton').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        if (document.getElementById('createTaskModal').classList.contains('open')) closeModal();
+        else if (document.getElementById('taskDrawer').classList.contains('open')) closeDrawer();
+        document.getElementById('sidebar').classList.remove('open');
+      }
+    });
+
+    renderTasks();
+  </script>
+</body>
+</html>

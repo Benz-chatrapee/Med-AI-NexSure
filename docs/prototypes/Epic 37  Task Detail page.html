@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task Detail | Med AI NexSure — Enterprise Healthcare & Insurance Intelligence Platform</title>
+  <meta name="description" content="Enterprise task operations, claim readiness, clinical evidence, AI decision support, and audit visibility for Med AI NexSure." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --primary-deep: #0f2a5f;
+      --ai: #2563eb;
+      --ai-soft: #eff6ff;
+      --accent: #38bdf8;
+      --bg: #f3f6fb;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --border: #dbe4f0;
+      --border-strong: #c8d5e6;
+      --text: #0f172a;
+      --muted: #64748b;
+      --muted-2: #94a3b8;
+      --success: #059669;
+      --success-soft: #ecfdf5;
+      --warning: #d97706;
+      --warning-soft: #fff7ed;
+      --danger: #dc2626;
+      --danger-soft: #fef2f2;
+      --purple: #7c3aed;
+      --purple-soft: #f5f3ff;
+      --shadow: 0 10px 30px rgba(15, 42, 95, .07);
+      --shadow-sm: 0 2px 10px rgba(15, 42, 95, .06);
+      --radius: 16px;
+      --sidebar: 264px;
+      --topbar: 72px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, "Noto Sans Thai", sans-serif;
+      font-size: 17px;
+      line-height: 1.5;
+    }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; text-decoration: none; }
+    svg { display: block; }
+
+    .app-shell { min-height: 100vh; display: grid; grid-template-columns: var(--sidebar) 1fr; }
+    .sidebar {
+      position: fixed; inset: 0 auto 0 0; width: var(--sidebar);
+      background: linear-gradient(180deg, #0f2a5f 0%, #102f69 55%, #0b2452 100%);
+      color: #fff; z-index: 30; padding: 22px 16px; overflow-y: auto;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; padding: 0 10px 24px; }
+    .brand-mark {
+      width: 42px; height: 42px; border-radius: 13px;
+      display: grid; place-items: center; font-weight: 800; font-size: 18px;
+      background: linear-gradient(135deg, #60a5fa, #2563eb);
+      box-shadow: 0 10px 20px rgba(37, 99, 235, .32);
+    }
+    .brand-copy strong { display: block; font-size: 15px; letter-spacing: -.2px; }
+    .brand-copy span { display: block; margin-top: 2px; color: #bfdbfe; font-size: 13px; text-transform: uppercase; letter-spacing: .8px; }
+    .nav-label { margin: 12px 12px 8px; color: #89a6d0; font-size: 13px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; }
+    .nav-item {
+      display: flex; align-items: center; gap: 12px; padding: 11px 12px; margin: 3px 0;
+      border-radius: 11px; color: #dbeafe; font-size: 16px; font-weight: 500;
+    }
+    .nav-item:hover { background: rgba(255,255,255,.07); }
+    .nav-item.active { color: #fff; background: rgba(59,130,246,.28); box-shadow: inset 3px 0 0 #60a5fa; }
+    .nav-item svg { width: 18px; height: 18px; opacity: .94; }
+    .nav-badge { margin-left: auto; background: #2563eb; min-width: 22px; height: 22px; border-radius: 11px; display: grid; place-items: center; font-size: 13px; font-weight: 700; }
+    .sidebar-footer { margin-top: 28px; padding: 14px; border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.05); border-radius: 14px; }
+    .sidebar-footer .clinic { font-size: 15px; font-weight: 700; }
+    .sidebar-footer .org { font-size: 13px; color: #bfdbfe; margin-top: 3px; }
+
+    
+.main{
+  grid-column:2;
+  width:100%;
+  min-width:0;
+}
+
+    .topbar {
+      height: var(--topbar); position: sticky; top: 0; z-index: 20;
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
+      padding: 0 28px; background: rgba(255,255,255,.92); backdrop-filter: blur(15px);
+      border-bottom: 1px solid var(--border);
+    }
+    .top-search {
+      flex: 1; max-width: 520px; height: 42px; display: flex; align-items: center; gap: 10px;
+      padding: 0 14px; background: #f8fafc; border: 1px solid var(--border); border-radius: 11px;
+      color: var(--muted);
+    }
+    .top-search input { border: 0; outline: 0; background: transparent; width: 100%; color: var(--text); }
+    .top-search kbd { margin-left: auto; font-size: 13px; color: var(--muted); background: #fff; border: 1px solid var(--border); border-radius: 5px; padding: 2px 6px; }
+    .top-actions { display: flex; align-items: center; gap: 9px; }
+    .icon-btn {
+      width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--border);
+      background: #fff; display: grid; place-items: center; color: var(--muted); position: relative;
+    }
+    .icon-btn:hover { color: var(--primary); border-color: #93c5fd; background: var(--ai-soft); }
+    .dot { position: absolute; top: 8px; right: 8px; width: 7px; height: 7px; border-radius: 50%; background: var(--danger); border: 2px solid #fff; }
+    .profile { display: flex; align-items: center; gap: 10px; padding-left: 8px; }
+    .avatar { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; color: #fff; background: linear-gradient(135deg, #1e3a8a, #3b82f6); }
+    .profile strong { display: block; font-size: 15px; }
+    .profile span { display: block; color: var(--muted); font-size: 13px; }
+
+    
+.page{
+  width:100%;
+  max-width:none;
+  margin:0;
+  padding:24px 32px 120px;
+}
+
+    .breadcrumb { display: flex; gap: 8px; align-items: center; color: var(--muted); font-size: 15px; margin-bottom: 15px; }
+    .breadcrumb a:hover { color: var(--primary); }
+    .breadcrumb .current { color: var(--text); font-weight: 600; }
+
+    .hero {
+      background: linear-gradient(135deg, #fff 0%, #f8fbff 66%, #eff6ff 100%);
+      border: 1px solid var(--border); border-radius: 20px; box-shadow: var(--shadow-sm);
+      padding: 24px; margin-bottom: 16px; position: relative; overflow: hidden;
+    }
+    .hero::after { content: ""; position: absolute; right: -90px; top: -110px; width: 280px; height: 280px; background: radial-gradient(circle, rgba(59,130,246,.16), transparent 68%); pointer-events: none; }
+    .hero-top { display: flex; justify-content: space-between; gap: 22px; align-items: flex-start; position: relative; z-index: 1; }
+    .eyebrow { display: flex; align-items: center; gap: 8px; color: var(--primary); font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; }
+    .task-title { margin: 9px 0 4px; font-size: clamp(34px, 3vw, 46px); line-height: 1.2; letter-spacing: -.8px; }
+    .task-subtitle { color: var(--muted); font-size: 17px; }
+    .hero-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .btn {
+      min-height: 40px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      border: 1px solid transparent; border-radius: 10px; padding: 0 15px; font-weight: 650; font-size: 15px;
+      transition: .18s ease;
+    }
+    .btn svg { width: 16px; height: 16px; }
+    .btn-primary { color: #fff; background: var(--primary); box-shadow: 0 7px 18px rgba(30,58,138,.18); }
+    .btn-primary:hover { background: var(--primary-deep); transform: translateY(-1px); }
+    .btn-secondary { color: var(--text); background: #fff; border-color: var(--border); }
+    .btn-secondary:hover { border-color: #93c5fd; color: var(--primary); background: var(--ai-soft); }
+    .btn-danger { color: var(--danger); background: #fff; border-color: #fecaca; }
+    .btn-success { color: #fff; background: var(--success); }
+    .hero-metrics { display: grid; grid-template-columns:repeat(5,minmax(240px,1fr)); gap: 10px; margin-top: 22px; position: relative; z-index: 1; }
+    .metric { padding: 13px 14px; border: 1px solid var(--border); background: rgba(255,255,255,.76); border-radius: 12px; }
+    .metric-label { color: var(--muted); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+    .metric-value { display: flex; align-items: center; gap: 7px; margin-top: 5px; font-size: 16px; font-weight: 700; }
+    .metric-sub { margin-top: 2px; color: var(--muted); font-size: 13px; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px; min-height: 26px; padding: 3px 9px;
+      border-radius: 999px; font-size: 13px; font-weight: 750; white-space: nowrap; border: 1px solid transparent;
+    }
+    .badge .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .badge-blue { color: #1d4ed8; background: #eff6ff; border-color: #bfdbfe; }
+    .badge-orange { color: #c2410c; background: #fff7ed; border-color: #fed7aa; }
+    .badge-red { color: #b91c1c; background: #fef2f2; border-color: #fecaca; }
+    .badge-green { color: #047857; background: #ecfdf5; border-color: #a7f3d0; }
+    .badge-purple { color: #6d28d9; background: #f5f3ff; border-color: #ddd6fe; }
+    .badge-slate { color: #475569; background: #f8fafc; border-color: #e2e8f0; }
+
+    .alert-banner {
+      display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; padding: 14px 16px;
+      border-radius: 13px; border: 1px solid #fed7aa; background: #fffaf2;
+    }
+    .alert-icon { width: 32px; height: 32px; flex: 0 0 auto; border-radius: 9px; display: grid; place-items: center; color: var(--warning); background: #ffedd5; }
+    .alert-banner strong { display: block; font-size: 15px; }
+    .alert-banner p { margin: 2px 0 0; color: #9a3412; font-size: 14px; }
+    .alert-banner .btn { margin-left: auto; flex: 0 0 auto; }
+
+    .tabs {
+      display: flex; align-items: center; gap: 5px; overflow-x: auto; background: #fff;
+      border: 1px solid var(--border); border-radius: 13px; padding: 5px; margin-bottom: 16px;
+      scrollbar-width: none;
+    }
+    .tab {
+      min-height: 38px; border: 0; background: transparent; color: var(--muted); border-radius: 9px;
+      padding: 0 14px; font-size: 14px; font-weight: 700; white-space: nowrap;
+    }
+    .tab:hover { color: var(--primary); background: var(--ai-soft); }
+    .tab.active { color: #fff; background: var(--primary); box-shadow: 0 5px 12px rgba(30,58,138,.18); }
+    .tab .count { margin-left: 5px; padding: 1px 6px; border-radius: 8px; background: rgba(255,255,255,.18); }
+
+    .layout { display: grid; grid-template-columns:minmax(0,1fr) 460px; gap: 16px; align-items: start; }
+    .main-col, .side-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+    .side-col { position: sticky; top: calc(var(--topbar) + 16px); }
+
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); }
+    .card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 15px; padding: 18px 20px 14px; }
+    .card-title-wrap { display: flex; gap: 11px; align-items: flex-start; }
+    .card-icon { width: 34px; height: 34px; flex: 0 0 auto; border-radius: 10px; display: grid; place-items: center; color: var(--primary); background: var(--ai-soft); }
+    .card-title { margin: 0; font-size: 17px; letter-spacing: -.2px; }
+    .card-desc { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+    .card-body { padding: 0 20px 20px; }
+    .card-divider { height: 1px; background: var(--border); margin: 0 20px 17px; }
+
+    .summary-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 18px; }
+    .field .label { color: var(--muted); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .55px; }
+    .field .value { margin-top: 4px; font-size: 15px; font-weight: 650; }
+    .field .helper { color: var(--muted); font-size: 12px; margin-top: 1px; }
+    .description-box { margin-bottom: 17px; padding: 14px; border: 1px solid var(--border); border-radius: 11px; background: var(--surface-soft); color: #334155; font-size: 14px; }
+
+    .progress-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .progress-row strong { font-size: 14px; }
+    .progress-row span { color: var(--muted); font-size: 13px; }
+    .progress-track { height: 7px; background: #e8eef7; border-radius: 999px; overflow: hidden; }
+    .progress-bar { height: 100%; width: 60%; background: linear-gradient(90deg, #2563eb, #38bdf8); border-radius: inherit; }
+
+    .checklist { display: flex; flex-direction: column; }
+    .check-item { display: grid; grid-template-columns: 28px 1fr auto; gap: 10px; align-items: center; padding: 12px 0; border-top: 1px solid var(--border); }
+    .check-item:first-child { border-top: 0; padding-top: 0; }
+    .check {
+      width: 22px; height: 22px; border-radius: 7px; border: 1.5px solid #cbd5e1; background: #fff;
+      display: grid; place-items: center; color: #fff;
+    }
+    .check.completed { border-color: var(--success); background: var(--success); }
+    .check-title { font-size: 14px; font-weight: 650; }
+    .check-title.completed { text-decoration: line-through; color: var(--muted); }
+    .check-meta { color: var(--muted); font-size: 12px; margin-top: 2px; }
+    .required { color: var(--danger); font-size: 12px; font-weight: 700; }
+    .inline-action { border: 0; background: transparent; color: var(--ai); font-size: 13px; font-weight: 700; padding: 5px; }
+    .inline-action:hover { text-decoration: underline; }
+
+    .evidence-table { width: 100%; border-collapse: collapse; }
+    .evidence-table th { text-align: left; color: var(--muted); background: #f8fafc; font-size: 12px; text-transform: uppercase; letter-spacing: .4px; padding: 9px 10px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .evidence-table td { padding: 12px 10px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+    .evidence-table tr:last-child td { border-bottom: 0; }
+    .evidence-name { font-weight: 650; font-size: 14px; }
+    .evidence-note { color: var(--muted); font-size: 12px; margin-top: 2px; }
+    .severity { width: 8px; height: 8px; display: inline-block; border-radius: 50%; margin-right: 5px; }
+    .sev-critical { background: var(--danger); } .sev-high { background: var(--warning); } .sev-medium { background: #3b82f6; }
+
+    .ai-card { border-color: #bfdbfe; background: linear-gradient(145deg, #fff 0%, #f5f9ff 100%); }
+    .ai-head { padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid #dbeafe; }
+    .ai-brand { display: flex; align-items: center; gap: 11px; }
+    .ai-orb { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; color: #fff; background: linear-gradient(135deg, #1d4ed8, #38bdf8); box-shadow: 0 9px 18px rgba(37,99,235,.2); }
+    .ai-head h3 { margin: 0; font-size: 17px; }
+    .ai-head p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+    .ai-body { padding: 18px 20px 20px; }
+    .ai-label { color: var(--ai); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .7px; }
+    .ai-action { margin-top: 5px; font-size: 16px; font-weight: 750; line-height: 1.45; }
+    .ai-reason { margin-top: 13px; padding: 12px; border: 1px solid #dbeafe; background: rgba(255,255,255,.76); border-radius: 10px; color: #334155; font-size: 13px; }
+    .confidence { display: flex; align-items: center; gap: 10px; margin-top: 13px; }
+    .confidence strong { font-size: 14px; white-space: nowrap; }
+    .confidence .progress-track { flex: 1; }
+    .confidence .progress-bar { width: 92%; }
+    .ai-actions { display: flex; gap: 8px; margin-top: 15px; flex-wrap: wrap; }
+    .ai-disclaimer { display: flex; gap: 7px; align-items: flex-start; margin-top: 12px; color: var(--muted); font-size: 12px; }
+
+    .person { display: flex; align-items: center; gap: 10px; }
+    .person .avatar { width: 34px; height: 34px; font-size: 14px; }
+    .person strong { display: block; font-size: 14px; }
+    .person span { display: block; color: var(--muted); font-size: 12px; }
+    .side-list { display: flex; flex-direction: column; gap: 12px; }
+    .side-row { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
+    .side-row .key { color: var(--muted); font-size: 13px; }
+    .side-row .val { text-align: right; font-size: 13px; font-weight: 650; }
+    .sla-box { padding: 13px; background: var(--warning-soft); border: 1px solid #fed7aa; border-radius: 11px; }
+    .sla-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .sla-time { font-size: 17px; font-weight: 800; color: #9a3412; }
+    .sla-meta { margin-top: 5px; color: #9a3412; font-size: 12px; }
+    .sla-box .progress-track { margin-top: 9px; background: #ffedd5; }
+    .sla-box .progress-bar { width: 82%; background: linear-gradient(90deg, #f59e0b, #ea580c); }
+
+    .context-identity { display: flex; align-items: center; gap: 12px; margin-bottom: 13px; }
+    .patient-avatar { width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center; font-weight: 800; color: #1e3a8a; background: #dbeafe; }
+    .context-identity h4 { margin: 0; font-size: 16px; }
+    .context-identity p { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
+    .clinical-alert { display: flex; gap: 9px; padding: 10px; margin: 11px 0; border: 1px solid #fecaca; background: #fff5f5; border-radius: 10px; color: #991b1b; font-size: 12px; }
+    .context-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 13px; }
+    .context-actions .btn { min-height: 35px; padding: 0 9px; font-size: 12px; }
+
+    .visit-score { display: flex; align-items: center; justify-content: space-between; padding: 11px; background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 11px; }
+    .score-ring {
+      width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center;
+      background: conic-gradient(var(--warning) 0 76%, #e2e8f0 76%);
+      position: relative;
+    }
+    .score-ring::after { content: ""; position: absolute; inset: 5px; border-radius: 50%; background: white; }
+    .score-ring strong { position: relative; z-index: 1; font-size: 15px; }
+    .score-copy strong { font-size: 13px; display: block; }
+    .score-copy span { color: var(--muted); font-size: 12px; }
+
+    .timeline { position: relative; }
+    .timeline::before { content: ""; position: absolute; top: 5px; bottom: 5px; left: 12px; width: 1px; background: var(--border); }
+    .timeline-item { display: grid; grid-template-columns: 25px 1fr; gap: 11px; position: relative; padding-bottom: 16px; }
+    .timeline-item:last-child { padding-bottom: 0; }
+    .timeline-dot { width: 25px; height: 25px; border-radius: 50%; display: grid; place-items: center; color: var(--primary); background: var(--ai-soft); border: 1px solid #bfdbfe; z-index: 1; }
+    .timeline-copy strong { display: block; font-size: 13px; }
+    .timeline-copy p { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
+    .timeline-copy time { display: block; color: var(--muted-2); font-size: 8px; margin-top: 3px; }
+
+    .comment-box { display: flex; gap: 10px; }
+    .comment-box textarea { flex: 1; min-height: 74px; resize: vertical; border: 1px solid var(--border); border-radius: 11px; padding: 11px 12px; outline: none; font-size: 13px; }
+    .comment-box textarea:focus { border-color: #60a5fa; box-shadow: 0 0 0 3px rgba(59,130,246,.1); }
+    .comment-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 9px; }
+    .comment-tools { display: flex; gap: 5px; }
+    .comment-tools .icon-btn { width: 33px; height: 33px; }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .overview-panel.active { display: contents; }
+
+    .sticky-bar {
+      position: fixed; z-index: 25; left: var(--sidebar); right: 0; bottom: 0;
+      display: flex; align-items: center; justify-content: space-between; gap: 18px;
+      padding: 13px 28px; background: rgba(255,255,255,.95); backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border); box-shadow: 0 -12px 30px rgba(15,42,95,.08);
+    }
+    .sticky-info { display: flex; align-items: center; gap: 11px; min-width: 0; }
+    .sticky-info strong { display: block; font-size: 14px; }
+    .sticky-info span { display: block; color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 420px; }
+    .sticky-actions { display: flex; gap: 8px; }
+
+    .toast {
+      position: fixed; z-index: 100; top: 90px; right: 24px; min-width: 280px; max-width: 360px;
+      background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--success);
+      border-radius: 12px; padding: 13px 15px; box-shadow: 0 18px 45px rgba(15,42,95,.18);
+      display: none; animation: slideIn .24s ease;
+    }
+    .toast.show { display: block; }
+    .toast strong { display: block; font-size: 14px; }
+    .toast span { color: var(--muted); font-size: 12px; }
+    @keyframes slideIn { from { transform: translateX(30px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+    .modal-backdrop {
+      position: fixed; inset: 0; z-index: 80; background: rgba(15,23,42,.45);
+      display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-backdrop.show { display: flex; }
+    .modal { width: min(520px, 100%); background: #fff; border-radius: 17px; box-shadow: 0 25px 60px rgba(15,23,42,.24); overflow: hidden; }
+    .modal-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 19px 20px; border-bottom: 1px solid var(--border); }
+    .modal-head h3 { margin: 0; font-size: 15px; }
+    .modal-head p { margin: 3px 0 0; color: var(--muted); font-size: 13px; }
+    .modal-body { padding: 18px 20px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 700; }
+    .form-control { width: 100%; min-height: 40px; border: 1px solid var(--border); border-radius: 9px; padding: 8px 10px; outline: none; background: #fff; font-size: 14px; }
+    textarea.form-control { min-height: 90px; resize: vertical; }
+    .modal-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 14px 20px; background: #f8fafc; border-top: 1px solid var(--border); }
+
+    @media (max-width: 1180px) {
+      :root { --sidebar: 86px; }
+      .brand-copy, .nav-item span:not(.nav-badge), .nav-label, .sidebar-footer { display: none; }
+      .brand { justify-content: center; padding-inline: 0; }
+      .nav-item { justify-content: center; }
+      .nav-badge { position: absolute; transform: translate(12px,-10px); min-width: 17px; height: 17px; }
+      .layout { grid-template-columns: minmax(0, 1fr) 320px; }
+      .hero-metrics { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .side-col { position: static; }
+      .hero-top { flex-direction: column; }
+      .hero-actions { justify-content: flex-start; }
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+      .profile-copy { display: none; }
+    }
+    @media (max-width: 700px) {
+      :root { --sidebar: 0px; }
+      .sidebar { display: none; }
+      
+.main{
+  grid-column:2;
+  width:100%;
+  min-width:0;
+}
+
+      .topbar { padding: 0 14px; }
+      
+.page{
+  width:100%;
+  max-width:none;
+  margin:0;
+  padding:24px 32px 120px;
+}
+
+      .top-search { max-width: none; }
+      .top-search kbd, .top-actions .icon-btn:nth-child(1) { display: none; }
+      .hero { padding: 18px; }
+      .hero-metrics { grid-template-columns: 1fr 1fr; }
+      .summary-grid { grid-template-columns: 1fr; }
+      .alert-banner { flex-wrap: wrap; }
+      .alert-banner .btn { margin-left: 44px; }
+      .sticky-bar { left: 0; padding: 10px 14px; }
+      .sticky-info { display: none; }
+      .sticky-actions { width: 100%; display: grid; grid-template-columns: 1fr 1fr; }
+      .sticky-actions .btn:nth-child(2) { display: none; }
+      .evidence-table thead { display: none; }
+      .evidence-table, .evidence-table tbody, .evidence-table tr, .evidence-table td { display: block; width: 100%; }
+      .evidence-table tr { padding: 10px 0; border-bottom: 1px solid var(--border); }
+      .evidence-table td { border: 0; padding: 4px 0; }
+      .context-actions { grid-template-columns: 1fr; }
+    }
+  
+
+    /* =========================================================
+       MED AI ENTERPRISE — PREMIUM BLUE DESIGN SYSTEM OVERRIDES
+       Blue Enterprise Theme = Primary + Deep + Soft + White + Slate
+       ========================================================= */
+    :root {
+      --primary: #1E3A8A;
+      --primary-deep: #0F2A5F;
+      --primary-hover: #17347A;
+      --ai: #2563EB;
+      --ai-soft: #EFF6FF;
+      --ai-border: #BFDBFE;
+      --accent: #38BDF8;
+      --bg: #F8FAFC;
+      --surface: #FFFFFF;
+      --surface-soft: #F8FAFC;
+      --surface-muted: #F1F5F9;
+      --border: #E2E8F0;
+      --border-strong: #CBD5E1;
+      --text: #0F172A;
+      --muted: #64748B;
+      --muted-2: #94A3B8;
+      --success: #059669;
+      --success-soft: #ECFDF5;
+      --warning: #D97706;
+      --warning-soft: #FFF7ED;
+      --danger: #DC2626;
+      --danger-soft: #FEF2F2;
+      --info: #2563EB;
+      --purple: #6D28D9;
+      --purple-soft: #F5F3FF;
+      --shadow: 0 18px 45px rgba(15, 42, 95, .08);
+      --shadow-sm: 0 6px 20px rgba(15, 42, 95, .06);
+      --shadow-xs: 0 1px 3px rgba(15, 23, 42, .06);
+      --radius: 16px;
+      --sidebar: 276px;
+      --topbar: 76px;
+    }
+
+    html { background: var(--bg); }
+    body {
+      font-size: 15.5px;
+      background:
+        linear-gradient(180deg, rgba(239,246,255,.52) 0, rgba(248,250,252,0) 260px),
+        var(--bg);
+      letter-spacing: -.01em;
+    }
+
+    .sidebar {
+      background: #0F2A5F;
+      border-right: 1px solid rgba(191,219,254,.12);
+      box-shadow: 14px 0 36px rgba(15,42,95,.12);
+      padding: 22px 16px 24px;
+    }
+    .brand { padding-bottom: 28px; }
+    .brand-mark {
+      width: 44px; height: 44px; border-radius: 14px;
+      background: #2563EB;
+      box-shadow: 0 10px 24px rgba(37,99,235,.35), inset 0 0 0 1px rgba(255,255,255,.18);
+    }
+    .brand-copy strong { font-size: 15.5px; font-weight: 700; }
+    .brand-copy span { color: #93C5FD; font-size: 12px; letter-spacing: 1px; }
+    .nav-label { color: #7EA3D7; font-size: 12px; letter-spacing: 1.45px; margin-top: 16px; }
+    .nav-item {
+      min-height: 44px;
+      color: #D6E4F7;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      font-size: 12.5px;
+      transition: background .18s ease, border-color .18s ease, transform .18s ease;
+    }
+    .nav-item:hover { background: rgba(255,255,255,.055); border-color: rgba(191,219,254,.09); transform: translateX(1px); }
+    .nav-item.active {
+      background: rgba(37,99,235,.22);
+      border-color: rgba(147,197,253,.20);
+      box-shadow: inset 3px 0 0 #38BDF8, 0 8px 20px rgba(3,17,47,.16);
+    }
+    .nav-badge { background: #2563EB; box-shadow: 0 4px 12px rgba(37,99,235,.35); }
+    .sidebar-footer {
+      background: rgba(255,255,255,.045);
+      border-color: rgba(191,219,254,.13);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+    }
+
+    .topbar {
+      height: var(--topbar);
+      padding-inline: 32px;
+      background: rgba(255,255,255,.97);
+      backdrop-filter: blur(10px);
+      border-bottom-color: var(--border);
+      box-shadow: 0 1px 0 rgba(15,42,95,.03);
+    }
+    .top-search {
+      height: 44px;
+      max-width: 560px;
+      background: #FFFFFF;
+      border-color: var(--border);
+      box-shadow: var(--shadow-xs);
+    }
+    .top-search:focus-within {
+      border-color: #93C5FD;
+      box-shadow: 0 0 0 4px rgba(37,99,235,.08);
+    }
+    .icon-btn {
+      border-color: var(--border);
+      background: #fff;
+      box-shadow: var(--shadow-xs);
+    }
+
+    
+.page{
+  width:100%;
+  max-width:none;
+  margin:0;
+  padding:24px 32px 120px;
+}
+
+    .breadcrumb { margin-bottom: 16px; font-size: 11.5px; }
+
+    .hero {
+      padding: 28px;
+      margin-bottom: 18px;
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-top: 4px solid var(--primary);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+    }
+    .hero::after {
+      width: 360px; height: 360px; right: -150px; top: -180px;
+      background: radial-gradient(circle, rgba(37,99,235,.09), transparent 68%);
+    }
+    .eyebrow { font-size: 13px; letter-spacing: .9px; }
+    .task-title {
+      margin-top: 11px;
+      font-size: clamp(28px, 2.45vw, 38px);
+      font-weight: 700;
+      letter-spacing: -1.15px;
+      color: var(--text);
+    }
+    .task-subtitle { font-size: 14.5px; color: #52647A; max-width: 780px; }
+    .hero-actions { gap: 9px; }
+    .btn {
+      min-height: 42px;
+      border-radius: 11px;
+      padding-inline: 16px;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -.01em;
+    }
+    .btn-primary { background: var(--primary); box-shadow: 0 8px 20px rgba(30,58,138,.18); }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-secondary { border-color: var(--border); box-shadow: var(--shadow-xs); }
+    .btn-secondary:hover { background: var(--ai-soft); border-color: var(--ai-border); }
+    .btn-success { background: var(--success); box-shadow: 0 8px 18px rgba(5,150,105,.18); }
+
+    .hero-metrics { grid-template-columns: repeat(5, minmax(150px, 1fr)); gap: 12px; margin-top: 26px; }
+    .metric {
+      min-height: 92px;
+      padding: 15px 16px;
+      border-radius: 14px;
+      background: #FFFFFF;
+      border-color: var(--border);
+      box-shadow: var(--shadow-xs);
+    }
+    .metric-label { color: #64748B; font-size: 12px; letter-spacing: .7px; }
+    .metric-value { margin-top: 7px; font-size: 13.5px; }
+    .metric-sub { margin-top: 4px; font-size: 9.5px; }
+
+    .badge { min-height: 27px; padding-inline: 10px; font-size: 13px; font-weight: 700; }
+    .badge-blue { color: #1D4ED8; background: #EFF6FF; border-color: #BFDBFE; }
+    .badge-green { color: #047857; background: #ECFDF5; border-color: #A7F3D0; }
+    .badge-orange { color: #B45309; background: #FFF7ED; border-color: #FED7AA; }
+    .badge-red { color: #B91C1C; background: #FEF2F2; border-color: #FECACA; }
+
+    .alert-banner {
+      padding: 16px 18px;
+      border-radius: 14px;
+      border-left: 4px solid var(--danger);
+      border-color: #FECACA;
+      background: #FFF7F7;
+      box-shadow: var(--shadow-xs);
+    }
+    .alert-icon { background: #FEE2E2; color: var(--danger); }
+    .alert-banner strong { font-size: 12.5px; color: #7F1D1D; }
+    .alert-banner p { color: #991B1B; font-size: 10.5px; }
+
+    .tabs {
+      padding: 6px;
+      margin-bottom: 18px;
+      border-radius: 14px;
+      box-shadow: var(--shadow-xs);
+    }
+    .tab { min-height: 40px; padding-inline: 16px; border-radius: 10px; font-size: 14px; }
+    .tab.active { background: var(--primary); box-shadow: 0 6px 14px rgba(30,58,138,.18); }
+
+    .layout { grid-template-columns: minmax(0, 1.85fr) minmax(350px, .78fr); gap: 18px; }
+    .main-col, .side-col { gap: 18px; }
+    .side-col { top: calc(var(--topbar) + 18px); }
+
+    .card {
+      border-radius: 16px;
+      border-color: var(--border);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    .card-header { padding: 20px 22px 15px; }
+    .card-body { padding: 0 22px 22px; }
+    .card-divider { margin-inline: 22px; }
+    .card-title { font-size: 15px; font-weight: 700; }
+    .card-desc { font-size: 10.5px; }
+    .card-icon {
+      width: 36px; height: 36px;
+      background: #EFF6FF;
+      color: var(--ai);
+      border: 1px solid #DBEAFE;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
+    }
+    .description-box {
+      padding: 15px 16px;
+      background: #F8FAFC;
+      border-color: var(--border);
+      font-size: 11.5px;
+      line-height: 1.65;
+    }
+    .summary-grid { gap: 16px 20px; }
+    .field .label { font-size: 12px; letter-spacing: .65px; }
+    .field .value { font-size: 12.5px; }
+    .field .helper { font-size: 9.5px; }
+
+    .progress-track { height: 8px; background: #E8EEF6; }
+    .progress-bar { background: #2563EB; }
+    .check-item { padding: 13px 0; }
+    .check { width: 23px; height: 23px; border-radius: 7px; }
+    .check-title { font-size: 11.5px; }
+    .check-meta { font-size: 9.5px; }
+
+    .evidence-table th { background: #F8FAFC; color: #64748B; padding-block: 10px; }
+    .evidence-table td { padding-block: 13px; }
+    .evidence-table tr:hover td { background: #FAFCFF; }
+
+    .ai-card {
+      border: 1px solid var(--ai-border);
+      background: #FFFFFF;
+      box-shadow: 0 12px 28px rgba(37,99,235,.08);
+    }
+    .ai-head {
+      background: #EFF6FF;
+      border-bottom-color: #DCEAFE;
+      padding: 19px 22px;
+    }
+    .ai-orb {
+      width: 40px; height: 40px;
+      background: #2563EB;
+      box-shadow: 0 8px 18px rgba(37,99,235,.24);
+    }
+    .ai-head h3 { font-size: 15px; }
+    .ai-body { padding: 20px 22px 22px; }
+    .ai-action { font-size: 13.5px; line-height: 1.55; }
+    .ai-reason {
+      background: #F8FBFF;
+      border-color: #DCEAFE;
+      padding: 14px;
+      font-size: 10.5px;
+      line-height: 1.6;
+    }
+    .ai-disclaimer { padding-top: 2px; }
+
+    .sla-box {
+      background: #FFF8EE;
+      border-color: #FED7AA;
+      border-left: 4px solid var(--warning);
+      padding: 14px;
+    }
+    .sla-time { font-size: 19px; }
+    .clinical-alert {
+      padding: 11px;
+      border-left: 4px solid var(--danger);
+      background: #FEF2F2;
+      font-size: 9.5px;
+    }
+    .visit-score { background: #F8FAFC; }
+    .score-ring { background: conic-gradient(var(--warning) 0 76%, #E2E8F0 76%); }
+
+    .timeline::before { background: #D9E3EF; }
+    .timeline-dot {
+      background: #EFF6FF;
+      border-color: #BFDBFE;
+      color: #1D4ED8;
+      box-shadow: 0 0 0 3px #fff;
+    }
+    .timeline-copy strong { font-size: 10.5px; }
+
+    .sticky-bar {
+      padding: 14px 32px;
+      background: rgba(255,255,255,.98);
+      backdrop-filter: blur(8px);
+      border-top-color: var(--border);
+      box-shadow: 0 -10px 28px rgba(15,42,95,.08);
+    }
+    .sticky-info strong { font-size: 11.5px; }
+
+    .modal { border-radius: 18px; border: 1px solid var(--border); }
+    .modal-head { padding: 21px 22px; }
+    .modal-body { padding: 20px 22px; }
+    .modal-foot { padding: 15px 22px; }
+    .form-control:focus { border-color: #60A5FA; box-shadow: 0 0 0 4px rgba(37,99,235,.08); }
+
+    @media (max-width: 1180px) {
+      :root { --sidebar: 90px; }
+      .layout { grid-template-columns: minmax(0, 1fr) 330px; }
+    }
+    @media (max-width: 900px) {
+      
+.page{
+  width:100%;
+  max-width:none;
+  margin:0;
+  padding:24px 32px 120px;
+}
+
+      .hero-metrics { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 700px) {
+      
+.page{
+  width:100%;
+  max-width:none;
+  margin:0;
+  padding:24px 32px 120px;
+}
+
+      .hero { padding: 20px; border-top-width: 3px; }
+      .task-title { font-size: 27px; }
+      .hero-metrics { grid-template-columns: 1fr; }
+      .metric { min-height: auto; }
+      .topbar { height: 68px; }
+    }
+
+
+    /* =========================================================
+       EPIC 37 ENTERPRISE OPERATIONAL ENHANCEMENTS
+       ========================================================= */
+    :root { --focus: rgba(37,99,235,.22); }
+    :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+    .workflow-stepper { margin-top: 18px; padding: 16px 18px; border: 1px solid var(--border); border-radius: 14px; background: #f8fbff; position: relative; z-index: 1; }
+    .stepper-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:13px; }
+    .stepper-head strong { font-size:15px; }
+    .stepper-head span { color:var(--muted); font-size:13px; }
+    .stepper-track { display:grid; grid-template-columns:repeat(4,1fr); gap:0; }
+    .workflow-step { position:relative; text-align:center; color:var(--muted); font-size:13px; font-weight:700; padding-top:30px; }
+    .workflow-step::before { content:""; position:absolute; top:8px; left:0; right:0; height:4px; background:#dbe4f0; }
+    .workflow-step:first-child::before { left:50%; }
+    .workflow-step:last-child::before { right:50%; }
+    .workflow-step::after { content:""; position:absolute; top:1px; left:50%; transform:translateX(-50%); width:18px; height:18px; border-radius:50%; border:4px solid #dbe4f0; background:#fff; z-index:1; }
+    .workflow-step.done { color:var(--success); }
+    .workflow-step.done::before { background:var(--success); }
+    .workflow-step.done::after { border-color:var(--success); background:var(--success); box-shadow:inset 0 0 0 3px #fff; }
+    .workflow-step.current { color:var(--primary); }
+    .workflow-step.current::before { background:linear-gradient(90deg,var(--success) 0 50%,#dbe4f0 50%); }
+    .workflow-step.current::after { border-color:var(--ai); background:var(--ai); box-shadow:0 0 0 5px rgba(37,99,235,.12), inset 0 0 0 3px #fff; }
+
+    .operational-health { display:grid; grid-template-columns:minmax(0,1.3fr) minmax(360px,.7fr); gap:16px; margin-bottom:16px; }
+    .health-card { background:#fff; border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow-sm); padding:20px; }
+    .health-title { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:16px; }
+    .health-title h2 { margin:0; font-size:18px; }
+    .health-title p { margin:3px 0 0; color:var(--muted); font-size:13px; }
+    .health-summary-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+    .health-stat { padding:13px; border:1px solid var(--border); border-radius:12px; background:#f8fafc; }
+    .health-stat label { display:block; color:var(--muted); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+    .health-stat strong { display:block; margin-top:6px; font-size:21px; }
+    .health-stat small { color:var(--muted); font-size:12px; }
+    .health-stat.danger { background:var(--danger-soft); border-color:#fecaca; }
+    .health-stat.warning { background:var(--warning-soft); border-color:#fed7aa; }
+
+    .segmented-summary { margin-top:16px; }
+    .segmented-header { display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-bottom:9px; }
+    .segmented-header strong { font-size:15px; }
+    .segmented-header span { color:var(--muted); font-size:13px; }
+    .segmented-progress { display:flex; height:14px; overflow:hidden; border-radius:999px; background:#e2e8f0; }
+    .segmented-progress button { border:0; min-width:0; padding:0; transition:filter .15s ease; }
+    .segmented-progress button:hover { filter:brightness(.93); }
+    .seg-complete { background:var(--success); }
+    .seg-required { background:var(--danger); }
+    .seg-waiting { background:#94a3b8; }
+    .segment-legend { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:11px; }
+    .segment-legend button { display:flex; justify-content:space-between; align-items:center; gap:8px; width:100%; padding:10px; border:1px solid var(--border); border-radius:10px; background:#fff; color:var(--text); }
+    .segment-legend button:hover { background:#f8fafc; }
+    .legend-label { display:flex; align-items:center; gap:7px; font-size:13px; }
+    .legend-swatch { width:9px; height:9px; border-radius:50%; }
+
+    .sla-bullet { margin-top:14px; }
+    .sla-labels { display:flex; justify-content:space-between; color:var(--muted); font-size:11px; margin-bottom:5px; }
+    .sla-threshold { position:relative; height:18px; border-radius:999px; overflow:visible; background:linear-gradient(90deg,#d1fae5 0 60%,#fef3c7 60% 80%,#ffedd5 80% 95%,#fee2e2 95% 100%); }
+    .sla-consumed { position:absolute; inset:0 auto 0 0; width:82%; border-radius:999px; background:linear-gradient(90deg,#059669,#d97706); opacity:.82; }
+    .sla-current-marker { position:absolute; left:82%; top:-5px; width:3px; height:28px; background:#9a3412; border-radius:2px; }
+    .sla-current-marker::after { content:"82%"; position:absolute; top:-22px; left:50%; transform:translateX(-50%); font-size:11px; font-weight:800; color:#9a3412; }
+    .sla-due-marker { position:absolute; right:0; top:-4px; width:2px; height:26px; background:var(--danger); }
+    .sla-footer-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:12px; }
+    .sla-mini { padding:9px; border:1px solid #fed7aa; border-radius:9px; background:#fff; }
+    .sla-mini label { display:block; color:#9a3412; font-size:11px; }
+    .sla-mini strong { font-size:13px; }
+
+    .impact-chart { padding:0 22px 18px; }
+    .impact-row { display:grid; grid-template-columns:minmax(180px,1fr) minmax(160px,1.2fr) 72px; gap:12px; align-items:center; padding:10px 0; cursor:pointer; }
+    .impact-row:hover { background:#fafcff; }
+    .impact-label strong { display:block; font-size:13px; }
+    .impact-label span { color:var(--muted); font-size:12px; }
+    .impact-track { height:10px; background:#e8eef6; border-radius:999px; overflow:hidden; }
+    .impact-fill { height:100%; border-radius:inherit; }
+    .impact-fill.critical { width:100%; background:var(--danger); }
+    .impact-fill.high { width:58%; background:var(--warning); }
+    .impact-fill.medium { width:25%; background:var(--ai); }
+    .impact-value { text-align:right; font-size:13px; font-weight:800; }
+    .evidence-table tr.highlight-row td { animation:rowPulse 1.4s ease; background:#eff6ff; }
+    @keyframes rowPulse { 0%,100%{background:#eff6ff} 50%{background:#dbeafe} }
+    .evidence-table tr.critical-evidence td:first-child { border-left:4px solid var(--danger); background:#fff8f8; }
+
+    .readiness-card .card-body { padding-top:0; }
+    .score-forecast { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:center; margin-bottom:18px; padding:16px; border:1px solid var(--border); border-radius:13px; background:#f8fafc; }
+    .forecast-value { font-size:32px; font-weight:800; line-height:1; }
+    .forecast-label { color:var(--muted); font-size:12px; margin-bottom:5px; }
+    .forecast-arrow { color:var(--ai); font-size:24px; font-weight:800; }
+    .readiness-threshold { position:relative; height:11px; border-radius:999px; background:linear-gradient(90deg,#fee2e2 0 60%,#fef3c7 60% 85%,#d1fae5 85% 100%); margin:8px 0 18px; }
+    .readiness-marker { position:absolute; left:76%; top:-6px; width:3px; height:23px; background:var(--primary); }
+    .readiness-marker.expected { left:84%; background:var(--ai); }
+    .readiness-breakdown { display:grid; gap:12px; }
+    .readiness-row { display:grid; grid-template-columns:180px 1fr 68px; gap:12px; align-items:center; padding:5px; border-radius:9px; cursor:pointer; }
+    .readiness-row:hover { background:#f8fafc; }
+    .readiness-row.focus { background:#fff7ed; border:1px solid #fed7aa; padding:10px; }
+    .readiness-row label { font-size:13px; font-weight:650; }
+    .score-track { height:9px; border-radius:999px; background:#e8eef6; overflow:hidden; }
+    .score-fill { height:100%; border-radius:inherit; background:var(--ai); }
+    .score-fill.warning { background:var(--warning); }
+    .score-value { text-align:right; font-size:13px; font-weight:800; }
+
+    .confidence-panel { margin-top:15px; padding:14px; border:1px solid #dbeafe; border-radius:12px; background:#fff; }
+    .confidence-threshold { position:relative; height:10px; margin:28px 0 8px; border-radius:999px; background:linear-gradient(90deg,#fee2e2 0 60%,#fef3c7 60% 85%,#dbeafe 85% 100%); cursor:pointer; }
+    .confidence-marker { position:absolute; left:92%; top:-7px; width:16px; height:16px; transform:translateX(-50%); border:4px solid #fff; border-radius:50%; background:var(--ai); box-shadow:0 0 0 2px var(--ai); }
+    .confidence-marker::after { content:"92%"; position:absolute; bottom:18px; left:50%; transform:translateX(-50%); color:var(--ai); font-size:12px; font-weight:800; }
+    .confidence-labels { display:flex; justify-content:space-between; color:var(--muted); font-size:11px; }
+    .ai-factors { display:grid; grid-template-columns:repeat(4,1fr); gap:9px; margin-top:14px; }
+    .ai-factor { padding:10px; border:1px solid var(--border); border-radius:10px; background:#f8fafc; }
+    .ai-factor label { display:block; color:var(--muted); font-size:11px; }
+    .ai-factor strong { font-size:13px; }
+    .human-state { margin-top:14px; padding:14px; border:1px solid #ddd6fe; border-radius:11px; background:#faf8ff; }
+    .human-state-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:10px; }
+    .human-state-item label { display:block; color:var(--muted); font-size:11px; }
+    .human-state-item strong { font-size:13px; }
+
+    .btn:disabled { cursor:not-allowed; opacity:.48; transform:none!important; box-shadow:none; }
+    .timeline-copy time { font-size:12px!important; }
+    .card-title { font-size:17px!important; }
+    .card-desc,.metric-sub,.field .helper,.check-meta,.evidence-note,.ai-reason,.clinical-alert { font-size:12px!important; }
+    .field .value,.check-title,.evidence-table td,.side-row .key,.side-row .val { font-size:14px!important; }
+
+    @media (max-width:1200px){ .operational-health{grid-template-columns:1fr}.health-summary-grid{grid-template-columns:repeat(2,1fr)} }
+    @media (max-width:900px){ .ai-factors{grid-template-columns:repeat(2,1fr)} .impact-row{grid-template-columns:1fr}.impact-value{text-align:left}.readiness-row{grid-template-columns:150px 1fr 60px} }
+    @media (max-width:700px){ .page{padding:18px 14px 128px}.health-summary-grid{grid-template-columns:1fr 1fr}.segment-legend{grid-template-columns:1fr}.score-forecast{grid-template-columns:1fr}.forecast-arrow{transform:rotate(90deg);text-align:center}.readiness-row{grid-template-columns:1fr}.score-value{text-align:left}.human-state-grid{grid-template-columns:1fr}.workflow-step{font-size:11px}.operational-health{gap:12px} }
+    @media (prefers-reduced-motion:reduce){ *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important} }
+
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">N</div>
+        <div class="brand-copy">
+          <strong>Med AI NexSure</strong>
+          <span>Healthcare Intelligence Platform</span>
+        </div>
+      </div>
+
+      <div class="nav-label">Core Operations</div>
+      <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg><span>Main Dashboard</span></a>
+      <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg><span>Patient Management</span></a>
+      <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 2v4M16 2v4M3 10h18"/><rect x="3" y="4" width="18" height="17" rx="2"/></svg><span>Visit Management</span></a>
+      <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>SOAP Note</span></a>
+      <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10.5 20.5 3.5 13.5a4.95 4.95 0 0 1 7-7l7 7a4.95 4.95 0 0 1-7 7Z"/><path d="m8 11 5-5"/></svg><span>Prescription</span></a>
+      <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7h-9M14 17H5M17 4l3 3-3 3M8 14l-3 3 3 3"/></svg><span>Claim Readiness</span></a>
+
+      <div class="nav-label">Insurance Operations</div>
+      <a class="nav-item active" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Task Center</span><span class="nav-badge">12</span></a>
+      <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg><span>Evidence Package</span></a>
+      <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 4 7v5c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V7l-8-4Z"/><path d="m9 12 2 2 4-4"/></svg><span>Payer Rules</span></a>
+      <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/></svg><span>Audit & Compliance</span></a>
+
+      <div class="nav-label">Intelligence & Governance</div>
+      <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="4"/></svg><span>AI Copilot</span></a>
+      <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M7 16l4-5 4 3 4-7"/></svg><span>Economic Intelligence</span></a>
+      <a class="nav-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21h-4v-.09A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-4h.09A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.09A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.38.3.6.66.6 1.1V10h1v4h-.09A1.7 1.7 0 0 0 19.4 15Z"/></svg><span>Admin Settings</span></a>
+
+      <div class="sidebar-footer">
+        <div class="clinic">Med AI NexSure Network</div>
+        <div class="org">Healthcare & Insurance Operations</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <label class="top-search">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input aria-label="Global search" placeholder="Search patients, visits, claims or tasks..." />
+          <kbd>⌘ K</kbd>
+        </label>
+        <div class="top-actions">
+          <button class="icon-btn" aria-label="Open AI Copilot" title="AI Copilot"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a7 7 0 0 0-7 7v3a4 4 0 0 1-2 3.46V18h18v-2.54A4 4 0 0 1 19 12V9a7 7 0 0 0-7-7Z"/><path d="M9 22h6"/></svg></button>
+          <button class="icon-btn" aria-label="Notifications" title="Notifications"><span class="dot"></span><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg></button>
+          <div class="profile">
+            <div class="avatar">NT</div>
+            <div class="profile-copy"><strong>Nattaya T.</strong><span>Claim Reviewer</span></div>
+          </div>
+        </div>
+      </header>
+
+      <div class="page">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="#">Task Center</a><span>/</span><a href="#">Review Readiness</a><span>/</span><span class="current">TASK-2026-000124</span>
+        </nav>
+
+        <section class="hero">
+          <div class="hero-top">
+            <div>
+              <div class="eyebrow">
+                <span class="badge badge-purple">ICD Review</span>
+                <span>•</span>
+                <span>TASK-2026-000124</span>
+                <span class="badge badge-slate">Enterprise Workflow</span>
+              </div>
+              <h1 class="task-title">Review Missing ICD-10 Code</h1>
+              <div class="task-subtitle">ตรวจสอบรหัสวินิจฉัยที่ยังไม่ครบ เพื่อให้ข้อมูลพร้อมก่อนส่งเคลมประกัน</div>
+            </div>
+            <div class="hero-actions">
+              <button class="btn btn-secondary" onclick="showToast('Task link copied', 'คัดลอกลิงก์ Task เรียบร้อยแล้ว')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy Link
+              </button>
+              <button class="btn btn-secondary" onclick="showToast('Follower added', 'ระบบจะแจ้งเตือนเมื่อ Task นี้มีการเปลี่ยนแปลง')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>Follow
+              </button>
+              <button class="btn btn-secondary" onclick="openModal('reassignModal')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>Reassign
+              </button>
+              <button class="icon-btn" aria-label="More actions" title="More actions" onclick="showToast('More actions', 'Edit, Duplicate, Archive and Delete actions')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="hero-metrics">
+            <div class="metric"><div class="metric-label">Status</div><div class="metric-value"><span class="badge badge-blue"><span class="status-dot"></span>In Progress</span></div><div class="metric-sub">งานอยู่ระหว่างการตรวจสอบและดำเนินการ</div></div>
+            <div class="metric"><div class="metric-label">Priority</div><div class="metric-value"><span class="badge badge-orange">▲ High</span></div><div class="metric-sub">Impacts claim readiness</div></div>
+            <div class="metric"><div class="metric-label">Assignee</div><div class="metric-value">Nattaya T.</div><div class="metric-sub">Claim Review Team</div></div>
+            <div class="metric"><div class="metric-label">Due Date</div><div class="metric-value">Today, 16:00</div><div class="metric-sub">10 Jul 2026 • GMT+7</div></div>
+            <div class="metric"><div class="metric-label">SLA Remaining</div><div class="metric-value" style="color:#c2410c">2h 15m</div><div class="metric-sub">Due soon • Level 1</div></div>
+          </div>
+
+          <div class="workflow-stepper" aria-label="Task workflow: In Progress">
+            <div class="stepper-head"><strong>Task Workflow</strong><span>Current stage: In Progress</span></div>
+            <div class="stepper-track">
+              <div class="workflow-step done">Open</div>
+              <div class="workflow-step current">In Progress</div>
+              <div class="workflow-step">Pending Information</div>
+              <div class="workflow-step">Completed</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="operational-health" aria-label="Task operational health">
+          <article class="health-card">
+            <div class="health-title"><div><h2>Task Operational Health</h2><p>สรุปความคืบหน้า จุดติดขัด และความพร้อมในการปิดงาน</p></div><span class="badge badge-red" id="claimBlockBadge">Claim Blocked</span></div>
+            <div class="health-summary-grid">
+              <div class="health-stat"><label>Task Completion</label><strong id="healthCompletion">60%</strong><small id="healthCompletionMeta">3 of 5 completed</small></div>
+              <div class="health-stat warning"><label>Required Remaining</label><strong id="healthRequired">2</strong><small>Must complete before closure</small></div>
+              <div class="health-stat danger"><label>Blocking Items</label><strong id="healthBlocking">1</strong><small>Critical evidence issue</small></div>
+              <div class="health-stat"><label>Expected Readiness</label><strong id="healthExpectedScore">84</strong><small>After ICD resolution</small></div>
+            </div>
+            <div class="segmented-summary">
+              <div class="segmented-header"><strong>Checklist Composition</strong><span id="segmentSummaryText">3 Complete · 1 Required · 1 Waiting</span></div>
+              <div class="segmented-progress" role="img" aria-label="Checklist progress: 3 complete, 1 required, 1 waiting">
+                <button id="segComplete" class="seg-complete" style="width:60%" title="Show completed items" onclick="filterChecklist('completed')"></button>
+                <button id="segRequired" class="seg-required" style="width:20%" title="Show required items" onclick="filterChecklist('required')"></button>
+                <button id="segWaiting" class="seg-waiting" style="width:20%" title="Show waiting items" onclick="filterChecklist('waiting')"></button>
+              </div>
+              <div class="segment-legend">
+                <button onclick="filterChecklist('completed')"><span class="legend-label"><span class="legend-swatch" style="background:var(--success)"></span>Complete</span><strong id="legendComplete">3</strong></button>
+                <button onclick="filterChecklist('required')"><span class="legend-label"><span class="legend-swatch" style="background:var(--danger)"></span>Required</span><strong id="legendRequired">1</strong></button>
+                <button onclick="filterChecklist('waiting')"><span class="legend-label"><span class="legend-swatch" style="background:#94a3b8"></span>Waiting</span><strong id="legendWaiting">1</strong></button>
+              </div>
+            </div>
+          </article>
+          <article class="health-card">
+            <div class="health-title"><div><h2>SLA Health</h2><p>ติดตามเวลาที่ใช้ไป เทียบกับเกณฑ์ Escalation</p></div><span class="badge badge-orange">Due Soon</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:flex-end"><div><div class="metric-label">SLA Consumption</div><div class="sla-time">82% consumed</div></div><strong style="color:#9a3412">2h 15m left</strong></div>
+            <div class="sla-bullet" onclick="openModal('slaModal')" role="button" tabindex="0" aria-label="Open SLA details">
+              <div class="sla-labels"><span>Normal 0–60%</span><span>Monitor 61–80%</span><span>Critical 96–100%</span></div>
+              <div class="sla-threshold"><div class="sla-consumed"></div><div class="sla-current-marker"></div><div class="sla-due-marker"></div></div>
+            </div>
+            <div class="sla-footer-grid"><div class="sla-mini"><label>Remaining</label><strong>18%</strong></div><div class="sla-mini"><label>Due</label><strong>16:00 ICT</strong></div><div class="sla-mini"><label>Escalation</label><strong>Level 1</strong></div></div>
+          </article>
+        </section>
+
+        <div class="alert-banner">
+          <div class="alert-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 2.9 1.8 17a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 2.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></svg></div>
+          <div><strong>Claim submission is blocked by critical missing evidence.</strong><p>ข้อมูลยังไม่ครบถ้วน กรุณาตรวจสอบ ICD-10 ที่สอดคล้องกับ Primary Diagnosis ก่อนส่งเคลม</p></div>
+          <button class="btn btn-secondary" onclick="document.getElementById('evidenceCard').scrollIntoView({behavior:'smooth'})">Review Evidence</button>
+        </div>
+
+        <nav class="tabs" aria-label="Task detail tabs">
+          <button class="tab active" data-tab="overview">Overview</button>
+          <button class="tab" data-tab="checklist">Checklist <span class="count">5</span></button>
+          <button class="tab" data-tab="evidence">Evidence <span class="count">4</span></button>
+          <button class="tab" data-tab="comments">Comments <span class="count">3</span></button>
+          <button class="tab" data-tab="activity">Activity</button>
+          <button class="tab" data-tab="audit">Audit Log</button>
+        </nav>
+
+        <div class="layout overview-panel tab-panel active" id="overview">
+          <div class="main-col">
+            <section class="card">
+              <div class="card-header">
+                <div class="card-title-wrap">
+                  <div class="card-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+                  <div><h2 class="card-title">Task Summary</h2><p class="card-desc">สรุปข้อมูลสำคัญเพื่อให้เข้าใจงานและสิ่งที่ต้องดำเนินการได้อย่างรวดเร็ว</p></div>
+                </div>
+                <button class="inline-action" onclick="showToast('Edit mode enabled', 'เปิดโหมดแก้ไขรายละเอียด Task แล้ว')">Edit Task</button>
+              </div>
+              <div class="card-body">
+                <div class="description-box">
+                  Review the documented primary diagnosis and assign the appropriate ICD-10 code before claim submission. The current SOAP assessment confirms acute upper respiratory infection; however, no matching diagnosis code has been added to the visit.
+                </div>
+                <div class="summary-grid">
+                  <div class="field"><div class="label">Task Type</div><div class="value">ICD Review</div><div class="helper">Clinical coding validation</div></div>
+                  <div class="field"><div class="label">Source</div><div class="value">Claim Rule Engine</div><div class="helper">Auto-generated by system</div></div>
+                  <div class="field"><div class="label">Assigned Team</div><div class="value">Claim Review Team</div><div class="helper">Bangkok Clinic Network</div></div>
+                  <div class="field"><div class="label">Reporter</div><div class="value">NexSure System</div><div class="helper">Automated task creation</div></div>
+                  <div class="field"><div class="label">Started At</div><div class="value">10 Jul 2026, 13:18</div><div class="helper">Started by Nattaya T.</div></div>
+                  <div class="field"><div class="label">Last Updated</div><div class="value">10 Jul 2026, 14:42</div><div class="helper">Version 8</div></div>
+                </div>
+              </div>
+            </section>
+
+            <section class="card">
+              <div class="card-header">
+                <div class="card-title-wrap">
+                  <div class="card-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+                  <div><h2 class="card-title">Task Checklist</h2><p class="card-desc">3 of 5 items completed • Required items must be completed</p></div>
+                </div>
+                <button class="btn btn-secondary" onclick="showToast('Checklist item added', 'เพิ่ม Checklist Item ใหม่เรียบร้อยแล้ว')">Add Checklist Item</button>
+              </div>
+              <div class="card-divider"></div>
+              <div class="card-body">
+                <div class="segmented-header"><strong>Overall progress</strong><span><span id="progressText">60%</span> · <span id="checkCountText">3 of 5 completed</span></span></div>
+                <div class="segmented-progress" style="margin-bottom:15px" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="60" id="checkProgressAria">
+                  <div class="seg-complete" id="checkProgressComplete" style="width:60%"></div><div class="seg-required" id="checkProgressRequired" style="width:20%"></div><div class="seg-waiting" id="checkProgressWaiting" style="width:20%"></div>
+                </div>
+                <div class="checklist">
+                  <div class="check-item" data-state="completed">
+                    <button class="check completed" aria-label="Toggle checklist" onclick="toggleCheck(this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 4 4L19 6"/></svg></button>
+                    <div><div class="check-title completed">Review SOAP completeness</div><div class="check-meta">Completed by Nattaya T. • 14:20</div></div><span class="badge badge-green">Complete</span>
+                  </div>
+                  <div class="check-item" data-state="completed">
+                    <button class="check completed" aria-label="Toggle checklist" onclick="toggleCheck(this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 4 4L19 6"/></svg></button>
+                    <div><div class="check-title completed">Confirm primary diagnosis</div><div class="check-meta">Completed by Dr. Ploy S. • 14:28</div></div><span class="badge badge-green">Complete</span>
+                  </div>
+                  <div class="check-item" data-state="completed">
+                    <button class="check completed" aria-label="Toggle checklist" onclick="toggleCheck(this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 4 4L19 6"/></svg></button>
+                    <div><div class="check-title completed">Validate payer coding rule</div><div class="check-meta">Completed by Claim Rule Engine • 14:35</div></div><span class="badge badge-green">Complete</span>
+                  </div>
+                  <div class="check-item" data-state="required">
+                    <button class="check" aria-label="Toggle checklist" onclick="toggleCheck(this)"></button>
+                    <div><div class="check-title">Add missing ICD-10 code <span class="required">Required</span></div><div class="check-meta">Evidence required • Owner: Nattaya T.</div></div><button class="inline-action" onclick="showToast('Diagnosis opened', 'เปิด Diagnosis workspace แล้ว')">Open Diagnosis</button>
+                  </div>
+                  <div class="check-item" data-state="waiting">
+                    <button class="check" aria-label="Toggle checklist" onclick="toggleCheck(this)"></button>
+                    <div><div class="check-title">Recalculate Claim Readiness Score <span class="required">Required</span></div><div class="check-meta">Available after ICD code is saved</div></div><button class="inline-action" onclick="recalculateReadiness()">Recalculate</button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="card" id="evidenceCard">
+              <div class="card-header">
+                <div class="card-title-wrap">
+                  <div class="card-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 15h6M9 11h2"/></svg></div>
+                  <div><h2 class="card-title">Missing Evidence</h2><p class="card-desc">ตรวจสอบข้อมูลทางคลินิกและเอกสารที่ยังขาดก่อนส่งเคลม</p></div>
+                </div>
+                <button class="btn btn-secondary" onclick="showToast('Upload ready', 'เลือกไฟล์หรือเชื่อมโยง Patient Document เพื่อแนบเป็นหลักฐาน')">Add Evidence</button>
+              </div>
+              
+              <div class="impact-chart" aria-label="Blocking evidence impact">
+                <div class="segmented-header"><strong>Blocking Evidence Impact</strong><span>Estimated readiness point impact</span></div>
+                <div class="impact-row" onclick="focusEvidence('evidence-icd')"><div class="impact-label"><strong>ICD-10 code missing</strong><span>Critical · Claim Reviewer</span></div><div class="impact-track"><div class="impact-fill critical"></div></div><div class="impact-value">−8 pts</div></div>
+                <div class="impact-row" onclick="focusEvidence('evidence-soap')"><div class="impact-label"><strong>SOAP assessment correlation</strong><span>High · Doctor</span></div><div class="impact-track"><div class="impact-fill high"></div></div><div class="impact-value">−4 pts</div></div>
+                <div class="impact-row" onclick="focusEvidence('evidence-cert')"><div class="impact-label"><strong>Medical certificate</strong><span>Medium · Optional</span></div><div class="impact-track"><div class="impact-fill medium"></div></div><div class="impact-value">−2 pts</div></div>
+              </div>
+<div class="card-body" style="padding-inline:0">
+                <table class="evidence-table">
+                  <thead><tr><th style="padding-left:20px">Evidence</th><th>Severity</th><th>Owner</th><th>Payer Requirement</th><th>Claim Impact</th><th>Status</th><th>Action</th></tr></thead>
+                  <tbody>
+                    <tr id="evidence-icd" class="critical-evidence" data-blocking="true"><td style="padding-left:20px"><div class="evidence-name">ICD-10 code missing</div><div class="evidence-note">No code linked to primary diagnosis</div></td><td><span class="severity sev-critical"></span>Critical</td><td>Claim Reviewer</td><td><span class="badge badge-red">Required</span></td><td><strong>−8 pts · Blocking</strong></td><td><span class="badge badge-red evidence-status">Open</span></td><td><button class="inline-action" onclick="resolveEvidence(this)">Resolve</button></td></tr>
+                    <tr id="evidence-soap"><td style="padding-left:20px"><div class="evidence-name">SOAP assessment correlation</div><div class="evidence-note">Confirm diagnosis matches clinical note</div></td><td><span class="severity sev-high"></span>High</td><td>Doctor</td><td><span class="badge badge-orange">Required</span></td><td>−4 pts</td><td><span class="badge badge-orange evidence-status">In Review</span></td><td><button class="inline-action" onclick="showToast('SOAP opened','เปิด SOAP workspace แล้ว')">View SOAP</button></td></tr>
+                    <tr id="evidence-cert"><td style="padding-left:20px"><div class="evidence-name">Medical certificate</div><div class="evidence-note">Optional for this payer rule</div></td><td><span class="severity sev-medium"></span>Medium</td><td>Clinic Staff</td><td><span class="badge badge-slate">Optional</span></td><td>−2 pts</td><td><span class="badge badge-slate evidence-status">Pending</span></td><td><button class="inline-action" onclick="showToast('Request created','สร้างคำขอ Medical Certificate แล้ว')">Request</button></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="card ai-card">
+              <div class="ai-head">
+                <div class="ai-brand">
+                  <div class="ai-orb"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="4"/></svg></div>
+                  <div><h3>AI Assistance</h3><p>Decision support generated by NexSure Clinical Engine</p></div>
+                </div>
+                <span class="badge badge-blue">AI Analysis Ready</span>
+              </div>
+              <div class="ai-body">
+                <div class="ai-label">Suggested next action</div>
+                <div class="ai-action">Add ICD-10 code J06.9 for the documented acute upper respiratory infection before claim submission.</div>
+                <div class="ai-reason"><strong>Why this suggestion?</strong><br>The SOAP assessment contains a confirmed diagnosis of acute upper respiratory infection, but no matching ICD-10 code exists in the diagnosis record. The suggested code is consistent with the documented clinical context and payer rule set.</div>
+                <div class="confidence-panel">
+                  <div class="segmented-header"><strong>AI Confidence — High</strong><span>92%</span></div>
+                  <div class="confidence-threshold" onclick="openModal('explainModal')" role="button" tabindex="0" aria-label="Open AI explainability"><div class="confidence-marker"></div></div>
+                  <div class="confidence-labels"><span>Low</span><span>Medium 60%</span><span>High 85%+</span></div>
+                  <div class="ai-factors"><div class="ai-factor"><label>Clinical Match</label><strong>High</strong></div><div class="ai-factor"><label>Payer Rule Match</label><strong>Passed</strong></div><div class="ai-factor"><label>Evidence Source</label><strong>SOAP Assessment</strong></div><div class="ai-factor"><label>Human Review</label><strong>Required</strong></div></div>
+                </div>
+                <div class="human-state" id="humanDecisionState"><strong>Human Decision State</strong><div class="human-state-grid"><div class="human-state-item"><label>AI Suggestion</label><strong>J06.9</strong></div><div class="human-state-item"><label>Human Review</label><strong id="humanReviewValue">Required</strong></div><div class="human-state-item"><label>Final Decision</label><strong id="finalDecisionValue">Not Confirmed</strong></div></div></div>
+                <div class="ai-actions">
+                  <button class="btn btn-primary" onclick="acceptAISuggestion()">Accept Suggestion</button>
+                  <button class="btn btn-secondary" onclick="showToast('Suggestion opened for editing', 'ปรับแก้คำแนะนำก่อนยืนยันการดำเนินการได้')">Modify</button>
+                  <button class="btn btn-secondary" onclick="openModal('rejectModal')">Reject</button>
+                  <button class="inline-action" onclick="openModal('explainModal')">View Explainability</button>
+                </div>
+                <div class="ai-disclaimer"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>AI provides decision support only. โปรดตรวจสอบข้อมูลทางคลินิก กฎของ Payer และสิทธิ์การรักษาก่อนยืนยัน</span></div>
+              </div>
+            </section>
+
+
+            <section class="card readiness-card" id="readinessCard">
+              <div class="card-header"><div class="card-title-wrap"><div class="card-icon">%</div><div><h2 class="card-title">Claim Readiness Impact</h2><p class="card-desc">แสดงคะแนนปัจจุบัน ผลกระทบจากงานนี้ และคะแนนคาดการณ์หลังแก้ไข</p></div></div><span class="badge badge-orange" id="readinessStatusBadge">Needs Review</span></div>
+              <div class="card-body">
+                <div class="score-forecast" onclick="openModal('scoreModal')" role="button" tabindex="0">
+                  <div><div class="forecast-label">Current Score</div><div class="forecast-value" id="currentScoreValue">76</div><span class="badge badge-orange">Needs Review</span></div>
+                  <div class="forecast-arrow">→</div>
+                  <div><div class="forecast-label">Expected After Resolution</div><div class="forecast-value" id="expectedScoreValue">84</div><span class="badge badge-orange" id="expectedStatusBadge">Needs Review</span></div>
+                </div>
+                <div class="readiness-threshold"><div class="readiness-marker" title="Current 76"></div><div class="readiness-marker expected" id="expectedMarker" title="Expected 84"></div></div>
+                <div style="display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-top:-10px;margin-bottom:14px"><span>Not Ready 0–59</span><span>Needs Review 60–84</span><span>Ready 85–100</span></div>
+                <div class="readiness-breakdown">
+                  <div class="readiness-row" onclick="showToast('SOAP details','เปิด SOAP Completeness breakdown แล้ว')"><label>SOAP Completeness</label><div class="score-track"><div class="score-fill" style="width:100%"></div></div><div class="score-value">25 / 25</div></div>
+                  <div class="readiness-row focus" onclick="showToast('Diagnosis workspace','เปิด Diagnosis & ICD workspace แล้ว')"><label>Diagnosis & ICD</label><div class="score-track"><div class="score-fill warning" id="diagnosisScoreFill" style="width:60%"></div></div><div class="score-value" id="diagnosisScoreValue">12 / 20</div></div>
+                  <div class="readiness-row"><label>Prescription / Procedure</label><div class="score-track"><div class="score-fill" style="width:100%"></div></div><div class="score-value">15 / 15</div></div>
+                  <div class="readiness-row" onclick="document.getElementById('evidenceCard').scrollIntoView({behavior:'smooth'})"><label>Evidence</label><div class="score-track"><div class="score-fill warning" style="width:65%"></div></div><div class="score-value">13 / 20</div></div>
+                  <div class="readiness-row"><label>Insurance Rule</label><div class="score-track"><div class="score-fill" style="width:80%"></div></div><div class="score-value">8 / 10</div></div>
+                  <div class="readiness-row"><label>Economic Review</label><div class="score-track"><div class="score-fill warning" style="width:30%"></div></div><div class="score-value">3 / 10</div></div>
+                </div>
+                <div class="description-box" id="forecastHelper" style="margin:16px 0 0">Resolving the missing ICD-10 is expected to improve the score by 8 points. Additional action is still required before claim submission.</div>
+              </div>
+            </section>
+
+            <section class="card">
+              <div class="card-header">
+                <div class="card-title-wrap">
+                  <div class="card-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg></div>
+                  <div><h2 class="card-title">Comments & Collaboration</h2><p class="card-desc">เพิ่ม Comment, Internal Note และประสานงานกับผู้เกี่ยวข้อง</p></div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="timeline" id="overviewCommentTimeline" style="margin-bottom:16px"><div class="timeline-item"><div class="timeline-dot">PS</div><div class="timeline-copy"><strong>Dr. Ploy S.</strong><p>Confirmed clinical diagnosis. Please proceed with coding review.</p><time>Today, 14:29</time></div></div></div>
+                <div class="comment-box"><div class="avatar">NT</div><textarea id="commentInput" placeholder="Add a comment or mention a teammate with @name..."></textarea></div>
+                <div class="comment-actions">
+                  <div class="comment-tools"><button class="icon-btn" aria-label="Attach file" title="Attach file">📎</button><button class="icon-btn" aria-label="Mention user" title="Mention user">@</button><button class="icon-btn" aria-label="Internal note" title="Internal note">🔒</button></div>
+                  <button class="btn btn-primary" onclick="addComment()">Post Comment</button>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <aside class="side-col">
+            <section class="card">
+              <div class="card-header"><div><h2 class="card-title">Ownership & SLA</h2><p class="card-desc">ตรวจสอบ Assignee, Team Ownership, Due Date และ SLA</p></div></div>
+              <div class="card-body">
+                <div class="person" style="margin-bottom:14px"><div class="avatar">NT</div><div><strong>Nattaya Thanaporn</strong><span>Claim Reviewer • Primary Assignee</span></div><button class="inline-action" style="margin-left:auto" onclick="openModal('reassignModal')">Change</button></div>
+                <div class="side-list">
+                  <div class="side-row"><span class="key">Assigned Team</span><span class="val">Claim Review Team</span></div>
+                  <div class="side-row"><span class="key">Reporter</span><span class="val">NexSure System</span></div>
+                  <div class="side-row"><span class="key">Followers</span><span class="val">3 users</span></div>
+                  <div class="side-row"><span class="key">Escalation Owner</span><span class="val">Pimchanok L.</span></div>
+                </div>
+                <div class="sla-box" style="margin-top:15px">
+                  <div class="sla-top"><div><div class="metric-label">SLA Remaining</div><div class="sla-time">2h 15m</div></div><span class="badge badge-orange">Due Soon</span></div>
+                  <div class="sla-meta">Due today at 16:00 • Escalation level 1 • Next escalation in 45m</div>
+                  <div class="sla-bullet" onclick="openModal('slaModal')"><div class="sla-labels"><span>Normal</span><span>Monitor</span><span>Critical</span></div><div class="sla-threshold"><div class="sla-consumed"></div><div class="sla-current-marker"></div><div class="sla-due-marker"></div></div></div>
+                  <div style="display:flex;justify-content:space-between;margin-top:10px;color:#9a3412;font-size:12px"><span>82% consumed</span><span>18% remaining</span></div>
+                </div>
+              </div>
+            </section>
+
+            <section class="card">
+              <div class="card-header"><div><h2 class="card-title">Patient Context</h2><p class="card-desc">บริบทผู้ป่วยที่จำเป็นต่อการตัดสินใจและดำเนินงาน</p></div><span class="badge badge-green">Active</span></div>
+              <div class="card-body">
+                <div class="context-identity"><div class="patient-avatar">SK</div><div><h4>Siriporn Kanjana</h4><p>HN: ••••4821 • Female • 39 years</p></div></div>
+                <div class="clinical-alert"><strong>Allergy:</strong><span>Penicillin • Moderate reaction</span></div>
+                <div class="side-list">
+                  <div class="side-row"><span class="key">Chronic Conditions</span><span class="val">Hypertension</span></div>
+                  <div class="side-row"><span class="key">PDPA Consent</span><span class="val"><span class="badge badge-green">Valid</span></span></div>
+                  <div class="side-row"><span class="key">Last Visit</span><span class="val">10 Jul 2026</span></div>
+                </div>
+                <div class="context-actions"><button class="btn btn-secondary">View Patient</button><button class="btn btn-secondary">View History</button></div>
+              </div>
+            </section>
+
+            <section class="card">
+              <div class="card-header"><div><h2 class="card-title">Visit & Claim Context</h2><p class="card-desc">ข้อมูล Visit, Payer และสถานะความพร้อมก่อนส่งเคลม</p></div></div>
+              <div class="card-body">
+                <div class="visit-score"><div class="score-copy"><strong>Claim Readiness Score</strong><span>Needs Review • 2 issues remaining</span></div><div class="score-ring"><strong>76</strong></div></div>
+                <div class="side-list">
+                  <div class="side-row"><span class="key">Visit ID</span><span class="val">VIS-2026-0710-0842</span></div>
+                  <div class="side-row"><span class="key">Department</span><span class="val">General Medicine</span></div>
+                  <div class="side-row"><span class="key">Doctor</span><span class="val">Dr. Ploy S.</span></div>
+                  <div class="side-row"><span class="key">Primary Diagnosis</span><span class="val">Acute URI</span></div>
+                  <div class="side-row"><span class="key">Payer</span><span class="val">AIA Thailand</span></div>
+                  <div class="side-row"><span class="key">Claim Amount</span><span class="val">฿3,850.00</span></div>
+                  <div class="side-row"><span class="key">Economic Alert</span><span class="val"><span class="badge badge-green">Normal</span></span></div>
+                </div>
+                <div class="context-actions"><button class="btn btn-secondary">View Visit</button><button class="btn btn-secondary">Review Readiness</button><button class="btn btn-secondary">View SOAP</button><button class="btn btn-secondary">View Evidence</button></div>
+              </div>
+            </section>
+
+            <section class="card">
+              <div class="card-header"><div><h2 class="card-title">Recent Activity</h2><p class="card-desc">ติดตามเหตุการณ์ล่าสุดและการดำเนินการของผู้ใช้งาน</p></div><button class="inline-action">View Activity</button></div>
+              <div class="card-body">
+                <div class="timeline">
+                  <div class="timeline-item"><div class="timeline-dot">↻</div><div class="timeline-copy"><strong>Nattaya updated status</strong><p>Open → In Progress</p><time>Today, 14:42</time></div></div>
+                  <div class="timeline-item"><div class="timeline-dot">✦</div><div class="timeline-copy"><strong>AI detected missing ICD-10 code</strong><p>Confidence score 92%</p><time>Today, 14:35</time></div></div>
+                  <div class="timeline-item"><div class="timeline-dot">✓</div><div class="timeline-copy"><strong>Dr. Ploy confirmed diagnosis</strong><p>Checklist item completed</p><time>Today, 14:28</time></div></div>
+                  <div class="timeline-item"><div class="timeline-dot">＋</div><div class="timeline-copy"><strong>Task created by system</strong><p>Triggered by Claim Readiness Rule</p><time>Today, 14:18</time></div></div>
+                </div>
+              </div>
+            </section>
+          </aside>
+        </div>
+
+        <section class="tab-panel" id="checklist">
+          <div class="card"><div class="card-header"><div><h2 class="card-title">Checklist Management</h2><p class="card-desc">จัดการ Checklist, Ownership และ Evidence Requirement ของงาน</p></div></div><div class="card-body"><div class="description-box">Checklist workspace is represented in the Overview prototype. Select Overview to interact with checklist items.</div></div></div>
+        </section>
+        <section class="tab-panel" id="evidence">
+          <div class="card"><div class="card-header"><div><h2 class="card-title">Evidence Management</h2><p class="card-desc">ตรวจสอบ Missing Evidence, Attachments และผลการตรวจสอบเอกสาร</p></div></div><div class="card-body"><div class="description-box">Evidence management supports upload, preview, versioning, private storage and claim readiness recalculation.</div></div></div>
+        </section>
+        <section class="tab-panel" id="comments">
+          <div class="card"><div class="card-header"><div><h2 class="card-title">Comments & Collaboration</h2><p class="card-desc">ประวัติ Comment, Mention และ Internal Note ที่เกี่ยวข้องกับ Task</p></div></div><div class="card-body"><div class="timeline"><div class="timeline-item"><div class="timeline-dot">NT</div><div class="timeline-copy"><strong>Nattaya Thanaporn</strong><p>ตรวจสอบ SOAP แล้ว Diagnosis สอดคล้องกับ Acute URI กำลังรอยืนยันรหัส ICD-10</p><time>Today, 14:38</time></div></div><div class="timeline-item"><div class="timeline-dot">PS</div><div class="timeline-copy"><strong>Dr. Ploy S.</strong><p>Confirmed clinical diagnosis. Please proceed with coding review.</p><time>Today, 14:29</time></div></div></div></div></div>
+        </section>
+        <section class="tab-panel" id="activity">
+          <div class="card"><div class="card-header"><div><h2 class="card-title">Activity Timeline</h2><p class="card-desc">แสดงว่าใครดำเนินการอะไร เมื่อใด และผ่าน Workflow ใด</p></div></div><div class="card-body"><div class="timeline"><div class="timeline-item"><div class="timeline-dot">↻</div><div class="timeline-copy"><strong>Status changed to In Progress</strong><p>Actor: Nattaya Thanaporn</p><time>10 Jul 2026, 14:42:08</time></div></div><div class="timeline-item"><div class="timeline-dot">✦</div><div class="timeline-copy"><strong>AI suggestion generated</strong><p>Suggested ICD-10: J06.9 • Confidence 92%</p><time>10 Jul 2026, 14:35:40</time></div></div><div class="timeline-item"><div class="timeline-dot">＋</div><div class="timeline-copy"><strong>Task created</strong><p>Source: Claim Rule Engine</p><time>10 Jul 2026, 14:18:02</time></div></div></div></div></div>
+        </section>
+        <section class="tab-panel" id="audit">
+          <div class="card"><div class="card-header"><div><h2 class="card-title">Immutable Audit Log</h2><p class="card-desc">ประวัติแบบ Append-only สำหรับการตรวจสอบและแสดงเฉพาะผู้มีสิทธิ์</p></div><span class="badge badge-purple">Auditor Access</span></div><div class="card-body" style="padding-inline:0"><table class="evidence-table"><thead><tr><th style="padding-left:20px">Timestamp</th><th>Actor</th><th>Action</th><th>Previous Value</th><th>New Value</th><th>Correlation ID</th></tr></thead><tbody id="auditBody"><tr><td style="padding-left:20px">10 Jul 2026, 14:42:08</td><td>Nattaya T.</td><td>task.change_status</td><td>Open</td><td>In Progress</td><td>cor-7f2a…91c</td></tr><tr><td style="padding-left:20px">10 Jul 2026, 14:35:40</td><td>AI Engine</td><td>task.ai_suggestion.created</td><td>—</td><td>ICD J06.9</td><td>cor-d12e…6a4</td></tr><tr><td style="padding-left:20px">10 Jul 2026, 14:18:02</td><td>System Rule</td><td>task.create</td><td>—</td><td>TASK-2026-000124</td><td>cor-8b33…a20</td></tr></tbody></table></div></div>
+        </section>
+      </div>
+
+      <div class="sticky-bar">
+        <div class="sticky-info"><span class="badge badge-orange" id="stickyRequirementBadge">2 required items · 1 blocking issue</span><div><strong>Completion Requirements Not Met</strong><span>กรุณาเพิ่ม ICD-10 และคำนวณ Claim Readiness ใหม่ก่อนปิด Task</span></div></div>
+        <div class="sticky-actions">
+          <button class="btn btn-secondary" onclick="showToast('Information request prepared', 'สร้าง Information Request และเปลี่ยนสถานะเป็น Pending Information')">Request Information</button>
+          <button class="btn btn-secondary" onclick="showToast('Changes saved', 'บันทึกการเปลี่ยนแปลงของ Task เรียบร้อยแล้ว')">Save Changes</button>
+          <button class="btn btn-success" id="markCompleteBtn" onclick="attemptComplete()" disabled>Mark Complete</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"><strong id="toastTitle">Success</strong><span id="toastText">Action completed.</span></div>
+
+  <div class="modal-backdrop" id="reassignModal" role="dialog" aria-modal="true" aria-labelledby="reassignTitle">
+    <div class="modal">
+      <div class="modal-head"><div><h3 id="reassignTitle">Reassign Task</h3><p>เลือก Assignee ใหม่และระบุเหตุผล เพื่อรองรับ Accountability และ Audit Trail</p></div><button class="icon-btn" onclick="closeModal('reassignModal')" aria-label="Close">×</button></div>
+      <div class="modal-body">
+        <div class="form-group"><label>New Assignee</label><select class="form-control"><option>Worawut K. — Senior Claim Reviewer</option><option>Dr. Ploy S. — Physician</option><option>Pimchanok L. — Claim Team Lead</option></select></div>
+        <div class="form-group"><label>Reason for Reassignment *</label><textarea class="form-control" placeholder="Explain why this task is being reassigned..."></textarea></div>
+      </div>
+      <div class="modal-foot"><button class="btn btn-secondary" onclick="closeModal('reassignModal')">Cancel</button><button class="btn btn-primary" onclick="closeModal('reassignModal');showToast('Task reassigned', 'Reassign Task เรียบร้อยแล้ว พร้อมบันทึกเหตุผลใน Audit Log')">Reassign Task</button></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="completeModal" role="dialog" aria-modal="true" aria-labelledby="completeTitle">
+    <div class="modal">
+      <div class="modal-head"><div><h3 id="completeTitle">Complete Task Validation</h3><p>ข้อมูลที่จำเป็นยังไม่ครบถ้วน ระบบจึงยังไม่อนุญาตให้ Complete Task</p></div><button class="icon-btn" onclick="closeModal('completeModal')" aria-label="Close">×</button></div>
+      <div class="modal-body">
+        <div class="alert-banner" style="margin:0"><div class="alert-icon">!</div><div><strong>2 required items are incomplete</strong><p>• Add missing ICD-10 code<br>• Recalculate Claim Readiness Score</p></div></div>
+        <div class="form-group" style="margin-top:16px"><label>Resolution Summary</label><textarea class="form-control" placeholder="Describe the resolution and outcome..."></textarea></div>
+      </div>
+      <div class="modal-foot"><button class="btn btn-secondary" onclick="closeModal('completeModal')">Back to Task</button><button class="btn btn-primary" onclick="closeModal('completeModal');document.getElementById('evidenceCard').scrollIntoView({behavior:'smooth'})">Review Requirements</button></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="rejectModal" role="dialog" aria-modal="true"><div class="modal"><div class="modal-head"><div><h3>Reject AI Suggestion</h3><p>กรุณาระบุเหตุผลเพื่อรองรับ AI Governance และ Audit Trail</p></div><button class="icon-btn" onclick="closeModal('rejectModal')">×</button></div><div class="modal-body"><div class="form-group"><label>Rejection Reason *</label><textarea id="rejectReason" class="form-control" placeholder="Explain why J06.9 is not appropriate..."></textarea></div></div><div class="modal-foot"><button class="btn btn-secondary" onclick="closeModal('rejectModal')">Cancel</button><button class="btn btn-primary" onclick="rejectAISuggestion()">Reject Suggestion</button></div></div></div>
+  <div class="modal-backdrop" id="explainModal" role="dialog" aria-modal="true"><div class="modal"><div class="modal-head"><div><h3>AI Explainability</h3><p>Evidence and rule trace supporting the suggested ICD-10 code</p></div><button class="icon-btn" onclick="closeModal('explainModal')">×</button></div><div class="modal-body"><div class="description-box"><strong>Clinical evidence</strong><br>SOAP Assessment documents acute upper respiratory infection with no contradictory findings.</div><div class="description-box"><strong>Coding rationale</strong><br>J06.9 maps to acute upper respiratory infection, unspecified, and aligns with the documented diagnostic specificity.</div><div class="description-box"><strong>Payer rule</strong><br>Primary diagnosis requires a valid ICD-10 code before claim submission.</div><div class="ai-disclaimer">AI decision support only. Final validation remains with an authorized user.</div></div><div class="modal-foot"><button class="btn btn-primary" onclick="closeModal('explainModal')">Close</button></div></div></div>
+  <div class="modal-backdrop" id="slaModal" role="dialog" aria-modal="true"><div class="modal"><div class="modal-head"><div><h3>SLA Detail</h3><p>Timeline, threshold, and escalation information</p></div><button class="icon-btn" onclick="closeModal('slaModal')">×</button></div><div class="modal-body"><div class="summary-grid"><div class="field"><div class="label">Created</div><div class="value">10 Jul 2026, 13:10</div></div><div class="field"><div class="label">Started</div><div class="value">13:18</div></div><div class="field"><div class="label">Current Snapshot</div><div class="value">13:45</div></div><div class="field"><div class="label">Due</div><div class="value">16:00</div></div><div class="field"><div class="label">Escalation Level</div><div class="value">Level 1</div></div><div class="field"><div class="label">Next Escalation</div><div class="value">In 45 minutes</div></div></div></div><div class="modal-foot"><button class="btn btn-primary" onclick="closeModal('slaModal')">Close</button></div></div></div>
+  <div class="modal-backdrop" id="scoreModal" role="dialog" aria-modal="true"><div class="modal"><div class="modal-head"><div><h3>Claim Readiness Calculation</h3><p>Current and expected score calculation details</p></div><button class="icon-btn" onclick="closeModal('scoreModal')">×</button></div><div class="modal-body"><div class="description-box"><strong>Current score:</strong> 76/100<br><strong>Expected after ICD confirmation:</strong> 84/100<br><strong>Ready threshold:</strong> 85/100</div><div class="description-box">The ICD resolution adds 8 points to Diagnosis & ICD. At least one additional point is still required from remaining evidence or economic justification.</div></div><div class="modal-foot"><button class="btn btn-primary" onclick="closeModal('scoreModal')">Close</button></div></div></div>
+
+  <script>
+    const tabs = document.querySelectorAll('.tab');
+    const panels = document.querySelectorAll('.tab-panel');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        panels.forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        const panel = document.getElementById(tab.dataset.tab);
+        panel.classList.add('active');
+        window.scrollTo({top: 0, behavior: 'smooth'});
+      });
+    });
+
+    function showToast(title, text) {
+      document.getElementById('toastTitle').textContent = title;
+      document.getElementById('toastText').textContent = text;
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      clearTimeout(window.toastTimer);
+      window.toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
+    }
+
+    function openModal(id) { document.getElementById(id).classList.add('show'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+    document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+      backdrop.addEventListener('click', e => { if (e.target === backdrop) backdrop.classList.remove('show'); });
+    });
+
+    function toggleCheck(btn) {
+      btn.classList.toggle('completed');
+      const title = btn.parentElement.querySelector('.check-title');
+      title.classList.toggle('completed');
+      btn.innerHTML = btn.classList.contains('completed')
+        ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 4 4L19 6"/></svg>'
+        : '';
+      const all = document.querySelectorAll('.check');
+      const done = document.querySelectorAll('.check.completed').length;
+      const pct = Math.round((done / all.length) * 100);
+      document.getElementById('checkProgress').style.width = pct + '%';
+      document.getElementById('progressText').textContent = pct + '%';
+      showToast('Checklist updated', 'อัปเดต Checklist Progress เรียบร้อยแล้ว');
+    }
+
+    function resolveEvidence(button) {
+      const row = button.closest('tr');
+      const statusCell = row.children[3];
+      statusCell.innerHTML = '<span class="badge badge-green">Resolved</span>';
+      button.textContent = 'View';
+      showToast('Evidence resolved', 'ระบบจะ Recalculate Claim Readiness Score จากข้อมูลล่าสุด');
+    }
+
+    function addComment() {
+      const input = document.getElementById('commentInput');
+      if (!input.value.trim()) {
+        showToast('Comment required', 'กรุณาระบุ Comment หรือ Internal Note ก่อนบันทึก');
+        return;
+      }
+      input.value = '';
+      showToast('Comment added', 'เพิ่ม Comment แล้ว และแจ้งเตือน Followers ที่เกี่ยวข้อง');
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') document.querySelectorAll('.modal-backdrop.show').forEach(m => m.classList.remove('show'));
+    });
+  </script>
+  <script>
+    const taskState = { aiAccepted:false, icdResolved:false, readinessRecalculated:false, completed:false, checklistFilter:'all', currentScore:76, expectedScore:84 };
+
+    function addActivity(actor, action, detail, icon='•') {
+      const timeline = document.querySelector('.side-col .timeline');
+      if (!timeline) return;
+      const item = document.createElement('div'); item.className='timeline-item';
+      const now = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+      item.innerHTML=`<div class="timeline-dot">${icon}</div><div class="timeline-copy"><strong>${action}</strong><p>${actor} · ${detail}</p><time>Today, ${now}</time></div>`;
+      timeline.prepend(item);
+    }
+    function addAudit(actor,type,action,previousValue,newValue,source='Task Detail',result='Success') {
+      const body=document.getElementById('auditBody'); if(!body)return;
+      const row=document.createElement('tr');
+      const now=new Date().toLocaleString([], {year:'numeric',month:'short',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+      const correlation='cor-'+Math.random().toString(16).slice(2,6)+'…'+Math.random().toString(16).slice(2,5);
+      row.innerHTML=`<td style="padding-left:20px">${now}</td><td>${actor}<br><small>${type}</small></td><td>${action}</td><td>${previousValue}</td><td>${newValue}<br><small>${source} · ${result}</small></td><td>${correlation}</td>`;
+      body.prepend(row);
+    }
+    function focusEvidence(id){ const row=document.getElementById(id); if(!row)return; row.scrollIntoView({behavior:'smooth',block:'center'}); row.classList.add('highlight-row'); setTimeout(()=>row.classList.remove('highlight-row'),1600); }
+    function filterChecklist(filter){ taskState.checklistFilter=filter; document.querySelectorAll('.check-item').forEach(item=>{ item.style.display=(filter==='all'||item.dataset.state===filter)?'grid':'none'; }); showToast('Checklist filtered',`Showing ${filter} checklist items`); }
+    function resetChecklistFilter(){ filterChecklist('all'); }
+
+    function updateChecklistUI(){
+      const items=[...document.querySelectorAll('.check-item')];
+      items.forEach(item=>{ const check=item.querySelector('.check'); if(check?.classList.contains('completed')) item.dataset.state='completed'; });
+      const complete=items.filter(i=>i.dataset.state==='completed').length;
+      const required=items.filter(i=>i.dataset.state==='required').length;
+      const waiting=items.filter(i=>i.dataset.state==='waiting').length;
+      const total=items.length; const pct=Math.round(complete/total*100);
+      const setText=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};
+      setText('progressText',pct+'%'); setText('checkCountText',`${complete} of ${total} completed`); setText('healthCompletion',pct+'%'); setText('healthCompletionMeta',`${complete} of ${total} completed`);
+      setText('healthRequired',required+waiting); setText('legendComplete',complete); setText('legendRequired',required); setText('legendWaiting',waiting); setText('segmentSummaryText',`${complete} Complete · ${required} Required · ${waiting} Waiting`);
+      ['segComplete','checkProgressComplete'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.width=(complete/total*100)+'%'});
+      ['segRequired','checkProgressRequired'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.width=(required/total*100)+'%'});
+      ['segWaiting','checkProgressWaiting'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.width=(waiting/total*100)+'%'});
+      const aria=document.getElementById('checkProgressAria'); if(aria)aria.setAttribute('aria-valuenow',pct);
+      updateCompletionState();
+    }
+    const originalToggleCheck=window.toggleCheck;
+    window.toggleCheck=function(btn){ originalToggleCheck(btn); const item=btn.closest('.check-item'); if(btn.classList.contains('completed')) item.dataset.state='completed'; else if(item.textContent.includes('Recalculate')) item.dataset.state='waiting'; else item.dataset.state='required'; updateChecklistUI(); };
+
+    window.resolveEvidence=function(button){
+      const row=button.closest('tr'); const status=row.querySelector('.evidence-status');
+      status.className='badge badge-green evidence-status'; status.textContent='Resolved'; row.dataset.blocking='false'; button.textContent='View'; button.onclick=()=>focusEvidence(row.id);
+      taskState.icdResolved=true; document.getElementById('healthBlocking').textContent='0'; document.getElementById('claimBlockBadge').className='badge badge-orange'; document.getElementById('claimBlockBadge').textContent='Recalculation Required';
+      const icdItem=[...document.querySelectorAll('.check-item')].find(i=>i.textContent.includes('Add missing ICD-10'));
+      if(icdItem){ const check=icdItem.querySelector('.check'); if(!check.classList.contains('completed')) window.toggleCheck(check); }
+      const recalcItem=[...document.querySelectorAll('.check-item')].find(i=>i.textContent.includes('Recalculate Claim Readiness'));
+      if(recalcItem){ recalcItem.dataset.state='required'; const badge=recalcItem.querySelector('.badge'); if(badge){badge.className='badge badge-orange';badge.textContent='Action Required'} }
+      addActivity('Nattaya T.','Critical evidence resolved','ICD-10 J06.9 linked to primary diagnosis','✓'); addAudit('Nattaya T.','Human','task.evidence.resolve','ICD missing','ICD J06.9 linked','Evidence');
+      recalculateReadiness(); updateChecklistUI(); showToast('Evidence resolved','ICD-10 was linked. Claim Readiness recalculation is now required.');
+    };
+    function recalculateReadiness(){
+      if(!taskState.icdResolved){showToast('ICD required','Resolve the missing ICD-10 before recalculation.');return;}
+      taskState.readinessRecalculated=true; taskState.currentScore=84; taskState.expectedScore=84;
+      document.getElementById('currentScoreValue').textContent='84'; document.getElementById('expectedScoreValue').textContent='84'; document.getElementById('diagnosisScoreFill').style.width='100%'; document.getElementById('diagnosisScoreValue').textContent='20 / 20'; document.querySelector('.readiness-marker').style.left='84%'; document.getElementById('expectedMarker').style.left='84%';
+      document.getElementById('healthExpectedScore').textContent='84'; document.getElementById('forecastHelper').textContent='ICD resolution added 8 points. One additional point is still required before the claim reaches Ready status.';
+      const recalcItem=[...document.querySelectorAll('.check-item')].find(i=>i.textContent.includes('Recalculate Claim Readiness')); if(recalcItem){const check=recalcItem.querySelector('.check'); if(!check.classList.contains('completed'))window.toggleCheck(check)}
+      addActivity('NexSure Engine','Claim Readiness recalculated','Score updated from 76 to 84','↻'); addAudit('NexSure Engine','System','claim.readiness.recalculate','76','84','Claim Readiness'); updateCompletionState(); showToast('Readiness recalculated','Claim Readiness updated to 84/100.');
+    }
+    function acceptAISuggestion(){
+      if(taskState.aiAccepted){showToast('Already confirmed','AI suggestion has already been human-confirmed.');return;}
+      taskState.aiAccepted=true; document.getElementById('humanReviewValue').textContent='Confirmed by Nattaya T.'; document.getElementById('finalDecisionValue').textContent='Accepted · J06.9'; document.getElementById('humanDecisionState').style.borderColor='#a7f3d0'; document.getElementById('humanDecisionState').style.background='#ecfdf5';
+      addActivity('Nattaya T.','AI suggestion accepted','J06.9 confirmed with no modification','✓'); addAudit('Nattaya T.','Human','task.ai_suggestion.accept','Not Confirmed','J06.9 accepted · Confidence 92%','AI Assistance'); showToast('Human confirmation recorded','J06.9 accepted and recorded in the immutable Audit Log.');
+      if(!taskState.icdResolved){const btn=document.querySelector('#evidence-icd .inline-action'); if(btn)window.resolveEvidence(btn)}
+    }
+    function rejectAISuggestion(){ const reason=document.getElementById('rejectReason').value.trim(); if(reason.length<8){showToast('Reason required','กรุณาระบุเหตุผลอย่างน้อย 8 ตัวอักษร');return;} document.getElementById('finalDecisionValue').textContent='Rejected'; addActivity('Nattaya T.','AI suggestion rejected',reason,'×'); addAudit('Nattaya T.','Human','task.ai_suggestion.reject','J06.9',reason,'AI Assistance'); closeModal('rejectModal'); showToast('Suggestion rejected','Reason recorded for AI Governance.'); }
+    function updateCompletionState(){
+      const requiredIncomplete=[...document.querySelectorAll('.check-item')].filter(i=>i.dataset.state==='required'||i.dataset.state==='waiting').length;
+      const blocking=[...document.querySelectorAll('[data-blocking="true"]')].length;
+      const btn=document.getElementById('markCompleteBtn'); const badge=document.getElementById('stickyRequirementBadge');
+      if(badge)badge.textContent=`${requiredIncomplete} required items · ${blocking} blocking issue${blocking===1?'':'s'}`;
+      const canComplete=requiredIncomplete===0&&blocking===0&&taskState.readinessRecalculated;
+      btn.disabled=!canComplete; btn.title=canComplete?'All completion requirements are met':'Complete required items and clear blocking evidence first';
+      const sticky=document.querySelector('.sticky-info strong'); const helper=document.querySelector('.sticky-info span:last-child');
+      if(canComplete){sticky.textContent='Completion Requirements Met'; helper.textContent='ตรวจสอบ Resolution Summary และดำเนินการปิด Task ได้';}
+      else {sticky.textContent='Completion Requirements Not Met'; helper.textContent='กรุณาดำเนินการ Required Checklist และแก้ Blocking Evidence ก่อนปิด Task';}
+    }
+    function attemptComplete(){ if(document.getElementById('markCompleteBtn').disabled){openModal('completeModal');return;} const summary=prompt('Resolution Summary:','ICD-10 J06.9 confirmed, evidence resolved, and Claim Readiness recalculated.'); if(!summary)return; taskState.completed=true; document.querySelector('.workflow-step.current').className='workflow-step done'; document.querySelectorAll('.workflow-step')[3].className='workflow-step current'; addActivity('Nattaya T.','Task completed',summary,'✓'); addAudit('Nattaya T.','Human','task.complete','In Progress','Completed','Task Detail'); showToast('Task completed','Task was completed and the audit record was created.'); }
+
+    const originalAddComment=window.addComment;
+    window.addComment=function(){ const input=document.getElementById('commentInput'); const value=input.value.trim(); if(!value){originalAddComment();return;} const timeline=document.getElementById('overviewCommentTimeline'); const item=document.createElement('div'); item.className='timeline-item'; item.innerHTML=`<div class="timeline-dot">NT</div><div class="timeline-copy"><strong>Nattaya Thanaporn</strong><p>${value.replace(/</g,'&lt;')}</p><time>Just now</time></div>`; timeline.prepend(item); input.value=''; addAudit('Nattaya T.','Human','task.comment.create','—',value.slice(0,60),'Comments'); showToast('Comment added','Followers were notified and the comment was added to the activity history.'); };
+
+    document.querySelectorAll('.sla-bullet[tabindex], .confidence-threshold[tabindex], .score-forecast[tabindex]').forEach(el=>el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();el.click()}}));
+    updateChecklistUI(); updateCompletionState();
+  </script>
+
+</body>
+</html>

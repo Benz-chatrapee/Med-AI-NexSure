@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Med AI NexSure | Enterprise RBAC</title>
+
+<style>
+:root{
+  --primary-blue:#1E3A8A;
+  --deep-blue:#0F2A5F;
+  --ai-blue:#2563EB;
+  --soft-blue:#EFF6FF;
+  --blue-border:#BFDBFE;
+  --azure:#38BDF8;
+
+  --bg:#F8FAFC;
+  --surface:#FFFFFF;
+  --border:#E2E8F0;
+  --text:#0F172A;
+  --muted:#64748B;
+
+  --success:#059669;
+  --warning:#D97706;
+  --danger:#DC2626;
+  --info:#2563EB;
+
+  --radius:16px;
+  --shadow:0 14px 34px rgba(15,42,95,.08);
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Inter,"IBM Plex Sans",Segoe UI,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+.app{
+  display:grid;
+  grid-template-columns:280px 1fr;
+  min-height:100vh;
+}
+
+/* Sidebar */
+.sidebar{
+  background:linear-gradient(180deg,var(--deep-blue) 0%,#071A3D 100%);
+  color:white;
+  padding:24px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:32px;
+}
+
+.logo{
+  width:44px;
+  height:44px;
+  border-radius:14px;
+  background:var(--ai-blue);
+  color:white;
+  display:grid;
+  place-items:center;
+  font-weight:700;
+  box-shadow:0 12px 28px rgba(37,99,235,.32);
+}
+
+.brand h1{
+  margin:0;
+  font-size:16px;
+}
+
+.brand p{
+  margin:4px 0 0;
+  font-size:12px;
+  color:#BFDBFE;
+}
+
+.nav a{
+  display:flex;
+  justify-content:space-between;
+  padding:13px 14px;
+  border-radius:14px;
+  color:#DBEAFE;
+  text-decoration:none;
+  font-size:14px;
+  margin-bottom:6px;
+}
+
+.nav a.active,
+.nav a:hover{
+  background:rgba(239,246,255,.14);
+  color:white;
+}
+
+/* Main */
+.main{
+  padding:28px;
+  background:var(--bg);
+}
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  margin-bottom:24px;
+}
+
+.eyebrow{
+  color:var(--ai-blue);
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+
+h2{
+  margin:6px 0;
+  font-size:30px;
+  color:var(--deep-blue);
+}
+
+h3{
+  margin:0;
+  font-size:17px;
+  color:var(--deep-blue);
+}
+
+.subtitle{
+  color:var(--muted);
+  margin:0;
+  font-size:14px;
+}
+
+.thai{
+  margin-top:4px;
+  font-size:12px;
+  color:var(--muted);
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+}
+
+button{
+  border:0;
+  border-radius:12px;
+  padding:11px 15px;
+  font-weight:700;
+  cursor:pointer;
+  font-size:13px;
+}
+
+.btn-primary{
+  background:var(--primary-blue);
+  color:white;
+}
+
+.btn-primary:hover{
+  background:var(--deep-blue);
+}
+
+.btn-soft{
+  background:var(--soft-blue);
+  color:var(--primary-blue);
+  border:1px solid var(--blue-border);
+}
+
+.btn-ghost,
+.mini{
+  background:white;
+  color:var(--primary-blue);
+  border:1px solid var(--border);
+}
+
+/* KPI */
+.kpi-grid{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:14px;
+  margin-bottom:18px;
+}
+
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+}
+
+.kpi{
+  padding:18px;
+  background:white;
+}
+
+.kpi label{
+  font-size:12px;
+  color:var(--muted);
+  font-weight:600;
+}
+
+.kpi strong{
+  display:block;
+  color:var(--deep-blue);
+  font-size:26px;
+  margin:8px 0 4px;
+}
+
+.kpi span{
+  color:var(--muted);
+  font-size:12px;
+}
+
+/* Layout */
+.grid{
+  display:grid;
+  grid-template-columns:1.35fr .65fr;
+  gap:18px;
+}
+
+.panel{
+  padding:18px;
+  margin-bottom:18px;
+}
+
+.panel-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:14px;
+}
+
+/* Filters */
+.filters{
+  display:grid;
+  grid-template-columns:1.5fr repeat(4,1fr);
+  gap:10px;
+  margin-bottom:14px;
+}
+
+input,select{
+  width:100%;
+  padding:11px 12px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:white;
+  color:var(--text);
+}
+
+input:focus,
+select:focus{
+  border-color:var(--ai-blue);
+  box-shadow:0 0 0 3px rgba(37,99,235,.12);
+  outline:none;
+}
+
+/* Table */
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th{
+  text-align:left;
+  padding:12px;
+  font-size:12px;
+  color:var(--muted);
+  background:#F8FAFC;
+  border-bottom:1px solid var(--border);
+}
+
+td{
+  padding:14px 12px;
+  border-bottom:1px solid var(--border);
+  font-size:13px;
+}
+
+tr:hover{
+  background:#F8FAFC;
+}
+
+.user{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.avatar{
+  width:38px;
+  height:38px;
+  border-radius:13px;
+  background:var(--soft-blue);
+  color:var(--primary-blue);
+  display:grid;
+  place-items:center;
+  font-weight:700;
+}
+
+.name{
+  font-weight:700;
+}
+
+.email{
+  color:var(--muted);
+  font-size:12px;
+}
+
+/* Badges */
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:5px 9px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:700;
+  border:1px solid;
+  white-space:nowrap;
+}
+
+.badge.role{
+  background:var(--soft-blue);
+  color:var(--primary-blue);
+  border-color:var(--blue-border);
+}
+
+.badge.info{
+  background:var(--soft-blue);
+  color:var(--info);
+  border-color:var(--blue-border);
+}
+
+.badge.success{
+  background:#ECFDF5;
+  color:var(--success);
+  border-color:#A7F3D0;
+}
+
+.badge.warning{
+  background:#FFFBEB;
+  color:var(--warning);
+  border-color:#FDE68A;
+}
+
+.badge.danger{
+  background:#FEF2F2;
+  color:var(--danger);
+  border-color:#FECACA;
+}
+
+.row-actions{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+}
+
+.mini{
+  padding:7px 9px;
+  font-size:11px;
+}
+
+/* AI Panel */
+.ai-panel{
+  background:var(--soft-blue);
+  border:1px solid var(--blue-border);
+  border-radius:var(--radius);
+  padding:16px;
+}
+
+.ai-title{
+  color:var(--ai-blue);
+  font-weight:700;
+  margin-bottom:10px;
+}
+
+.azure-highlight{
+  background:linear-gradient(90deg,rgba(56,189,248,.16),rgba(239,246,255,.8));
+  border:1px solid var(--blue-border);
+  border-radius:14px;
+  padding:12px;
+  color:var(--deep-blue);
+}
+
+/* Status Cards */
+.status-card{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:10px;
+}
+
+.status-card strong{
+  display:block;
+  color:var(--text);
+  margin-bottom:4px;
+}
+
+.status-card p{
+  margin:0;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.status-card.critical{
+  border-left:6px solid var(--danger);
+  background:#FFF7F7;
+}
+
+.status-card.review{
+  border-left:6px solid var(--warning);
+  background:#FFFBEB;
+}
+
+.status-card.ready{
+  border-left:6px solid var(--success);
+  background:#F0FDF4;
+}
+
+.status-card.info{
+  border-left:6px solid var(--ai-blue);
+  background:var(--soft-blue);
+}
+
+.clinical-safety{
+  border:1px solid #FECACA;
+  border-left:7px solid var(--danger);
+  background:#FEF2F2;
+  box-shadow:0 16px 36px rgba(220,38,38,.10);
+}
+
+.claim-card{
+  border-left:6px solid var(--primary-blue);
+  background:white;
+}
+
+.economic-card{
+  border-left:6px solid var(--azure);
+  background:white;
+}
+
+.audit-card{
+  border-left:6px solid var(--deep-blue);
+  background:white;
+}
+
+/* Info Line */
+.info-line{
+  display:flex;
+  justify-content:space-between;
+  padding:11px 0;
+  border-bottom:1px solid var(--border);
+  font-size:13px;
+}
+
+.info-line:last-child{
+  border-bottom:0;
+}
+
+/* Matrix */
+.matrix{
+  display:grid;
+  grid-template-columns:220px repeat(6,1fr);
+  border:1px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;
+  font-size:12px;
+}
+
+.matrix div{
+  padding:11px;
+  background:white;
+  border-right:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+}
+
+.matrix .head{
+  background:#F8FAFC;
+  color:var(--deep-blue);
+  font-weight:700;
+}
+
+.yes{
+  color:var(--success);
+  font-weight:700;
+}
+
+.no{
+  color:#CBD5E1;
+}
+
+/* Timeline */
+.timeline{
+  border-left:2px solid var(--blue-border);
+  padding-left:14px;
+}
+
+.timeline-item{
+  margin-bottom:14px;
+  font-size:13px;
+}
+
+.timeline-item strong{
+  color:var(--deep-blue);
+  display:block;
+}
+
+.timeline-item span{
+  color:var(--muted);
+  font-size:12px;
+}
+
+/* Responsive */
+@media(max-width:1200px){
+  .app{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .kpi-grid{grid-template-columns:repeat(3,1fr)}
+  .grid{grid-template-columns:1fr}
+}
+
+@media(max-width:760px){
+  .kpi-grid{grid-template-columns:1fr 1fr}
+  .filters{grid-template-columns:1fr}
+  .header{flex-direction:column;gap:14px}
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<aside class="sidebar">
+  <div class="brand">
+    <div class="logo">AI</div>
+    <div>
+      <h1>Med AI NexSure</h1>
+      <p>Enterprise Healthcare Intelligence</p>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <a href="#">Main Dashboard <span>⌘</span></a>
+    <a href="#">Patient List</a>
+    <a href="#">Visit Detail</a>
+    <a href="#">Enterprise SOAP Note</a>
+    <a href="#">AI SOAP Summary</a>
+    <a href="#">Claim Readiness</a>
+    <a href="#">Evidence Package</a>
+    <a href="#">Economic Intelligence</a>
+    <a href="#">Audit & Compliance</a>
+    <a class="active" href="#">User Manage / RBAC</a>
+  </nav>
+</aside>
+
+<main class="main">
+
+<section class="header">
+  <div>
+    <div class="eyebrow">Enterprise Access Governance</div>
+    <h2>Role-Based Access Control</h2>
+    <p class="subtitle">
+      Premium blue-first access management for clinics, hospitals, insurers, claim reviewers, executives and compliance teams.
+    </p>
+  </div>
+
+  <div class="actions">
+    <button class="btn-soft">Export Access Report</button>
+    <button class="btn-primary">Invite User</button>
+  </div>
+</section>
+
+<section class="kpi-grid">
+  <div class="card kpi">
+    <label>Total Users</label>
+    <strong>248</strong>
+    <span>All organization accounts</span>
+  </div>
+
+  <div class="card kpi">
+    <label>Active Users</label>
+    <strong>219</strong>
+    <span>✅ Ready — ผู้ใช้ที่ใช้งานได้</span>
+  </div>
+
+  <div class="card kpi">
+    <label>Pending Invites</label>
+    <strong>14</strong>
+    <span>⏳ Needs Action — รอ Accept Invite</span>
+  </div>
+
+  <div class="card kpi">
+    <label>Locked Accounts</label>
+    <strong>5</strong>
+    <span>🚨 Critical — ต้องตรวจสอบความเสี่ยง</span>
+  </div>
+
+  <div class="card kpi">
+    <label>Admin Users</label>
+    <strong>11</strong>
+    <span>Privileged access monitored</span>
+  </div>
+
+  <div class="card kpi">
+    <label>Last 24h Login</label>
+    <strong>137</strong>
+    <span>Recent authenticated access</span>
+  </div>
+</section>
+
+<section class="grid">
+
+<div>
+  <section class="card panel">
+    <div class="panel-head">
+      <div>
+        <h3>User Directory</h3>
+        <div class="thai">
+          ค้นหา กรอง และจัดการสิทธิ์ผู้ใช้งานตาม Role, Clinic, Department และ Organization
+        </div>
+      </div>
+      <button class="btn-ghost">Bulk Action</button>
+    </div>
+
+    <div class="filters">
+      <input placeholder="Search name, email, role, department" />
+      <select>
+        <option>All Roles</option>
+        <option>Doctor</option>
+        <option>Nurse</option>
+        <option>Claim Reviewer</option>
+        <option>Compliance Officer</option>
+      </select>
+      <select>
+        <option>All Status</option>
+        <option>Active</option>
+        <option>Pending</option>
+        <option>Locked</option>
+        <option>Suspended</option>
+      </select>
+      <select>
+        <option>All Departments</option>
+        <option>Clinical</option>
+        <option>Claim</option>
+        <option>Compliance</option>
+        <option>Administration</option>
+      </select>
+      <select>
+        <option>All Clinics</option>
+        <option>Bangkok Clinic</option>
+        <option>Hospital Branch A</option>
+        <option>Insurer HQ</option>
+      </select>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Role</th>
+          <th>Department</th>
+          <th>Scope</th>
+          <th>Status</th>
+          <th>Risk Signal</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr>
+          <td>
+            <div class="user">
+              <div class="avatar">DR</div>
+              <div>
+                <div class="name">Dr. Arisa Clinical</div>
+                <div class="email">arisa@medai.co</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="badge role">Doctor</span></td>
+          <td>Clinical</td>
+          <td>Own Clinic</td>
+          <td><span class="badge success">✅ Active</span></td>
+          <td><span class="badge info">ℹ Normal Access</span></td>
+          <td class="row-actions">
+            <button class="mini">View</button>
+            <button class="mini">Edit</button>
+            <button class="mini">Reset</button>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <div class="user">
+              <div class="avatar">NS</div>
+              <div>
+                <div class="name">Mali Nurse</div>
+                <div class="email">mali@clinic.co</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="badge role">Nurse</span></td>
+          <td>Clinical Operation</td>
+          <td>Department</td>
+          <td><span class="badge warning">⏳ Pending</span></td>
+          <td><span class="badge info">ℹ Invite Sent</span></td>
+          <td class="row-actions">
+            <button class="mini">View</button>
+            <button class="mini">Resend</button>
+            <button class="mini">Cancel</button>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <div class="user">
+              <div class="avatar">CR</div>
+              <div>
+                <div class="name">Narin ClaimOps</div>
+                <div class="email">narin@insurer.co</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="badge role">Claim Reviewer</span></td>
+          <td>Claim Review</td>
+          <td>Assigned Cases</td>
+          <td><span class="badge success">✅ Active</span></td>
+          <td><span class="badge warning">⚠ PHI Masked</span></td>
+          <td class="row-actions">
+            <button class="mini">View</button>
+            <button class="mini">Edit Role</button>
+            <button class="mini">Suspend</button>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <div class="user">
+              <div class="avatar">CO</div>
+              <div>
+                <div class="name">Suda Compliance</div>
+                <div class="email">suda@hospital.co</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="badge role">Compliance Officer</span></td>
+          <td>Compliance</td>
+          <td>Organization</td>
+          <td><span class="badge danger">🚨 Locked</span></td>
+          <td><span class="badge danger">🚨 Failed Login</span></td>
+          <td class="row-actions">
+            <button class="mini">Review</button>
+            <button class="mini">Unlock</button>
+            <button class="mini">Audit</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="card panel">
+    <div class="panel-head">
+      <div>
+        <h3>Role Permission Matrix</h3>
+        <div class="thai">
+          สิทธิ์การเข้าถึงแยกตามบทบาท พร้อมแนวคิด Least Privilege
+        </div>
+      </div>
+    </div>
+
+    <div class="matrix">
+      <div class="head">Role / Permission</div>
+      <div class="head">Patient</div>
+      <div class="head">Visit</div>
+      <div class="head">SOAP</div>
+      <div class="head">Prescription</div>
+      <div class="head">Claim</div>
+      <div class="head">Audit</div>
+
+      <div class="head">Doctor</div>
+      <div class="yes">View/Edit</div>
+      <div class="yes">Create</div>
+      <div class="yes">Edit</div>
+      <div class="yes">Create</div>
+      <div class="yes">View</div>
+      <div class="no">—</div>
+
+      <div class="head">Nurse</div>
+      <div class="yes">View/Edit</div>
+      <div class="yes">Create</div>
+      <div class="yes">View</div>
+      <div class="no">—</div>
+      <div class="yes">Evidence</div>
+      <div class="no">—</div>
+
+      <div class="head">Pharmacist</div>
+      <div class="yes">View</div>
+      <div class="yes">View</div>
+      <div class="no">—</div>
+      <div class="yes">Verify</div>
+      <div class="no">—</div>
+      <div class="no">—</div>
+
+      <div class="head">Claim Reviewer</div>
+      <div class="yes">Masked</div>
+      <div class="yes">View</div>
+      <div class="yes">View</div>
+      <div class="yes">View</div>
+      <div class="yes">Review</div>
+      <div class="no">—</div>
+
+      <div class="head">Compliance Officer</div>
+      <div class="yes">Masked</div>
+      <div class="yes">History</div>
+      <div class="yes">Version</div>
+      <div class="yes">Audit</div>
+      <div class="yes">Export Log</div>
+      <div class="yes">Full</div>
+    </div>
+  </section>
+</div>
+
+<aside>
+  <section class="card panel">
+    <h3>AI Clinical Access Control</h3>
+    <div class="thai">
+      ควบคุมการเข้าถึง AI Result, SOAP Summary, ICD Suggestion และ Override AI
+    </div>
+
+    <div class="ai-panel" style="margin-top:14px">
+      <div class="ai-title">AI Intelligent Blue Panel</div>
+
+      <div class="status-card ready">
+        <strong>✅ AI Result Access — Ready</strong>
+        <p>Doctor, Claim Reviewer and Admin can view AI-assisted clinical insights.</p>
+      </div>
+
+      <div class="status-card review">
+        <strong>⚠ Override AI — Needs Review</strong>
+        <p>Override requires clinical justification and audit trail.</p>
+      </div>
+
+      <div class="azure-highlight">
+        Luxury Azure is used only for premium intelligence highlights.
+      </div>
+    </div>
+  </section>
+
+  <section class="card panel">
+    <h3>Clinical Safety Priority</h3>
+    <div class="thai">
+      Clinical safety alerts must appear before claim or financial alerts.
+    </div>
+
+    <div class="status-card clinical-safety">
+      <strong>🚨 Critical Risk — Allergy Conflict</strong>
+      <p>Prescription action must be blocked until doctor/pharmacist review is completed.</p>
+    </div>
+
+    <div class="status-card review">
+      <strong>⚠ Missing Evidence — Needs Review</strong>
+      <p>SOAP incomplete and ICD code missing for claim readiness.</p>
+    </div>
+
+    <div class="status-card ready">
+      <strong>✅ Claim Ready — Completed</strong>
+      <p>Evidence package is complete and ready for PDF export.</p>
+    </div>
+  </section>
+
+  <section class="card panel economic-card">
+    <h3>Economic Intelligence</h3>
+    <div class="thai">
+      Executive cost visibility and operational performance
+    </div>
+
+    <div class="info-line">
+      <span>Average Visit Cost</span>
+      <strong>฿1,420</strong>
+    </div>
+
+    <div class="info-line">
+      <span>Cost Alert Cases</span>
+      <strong>12</strong>
+    </div>
+
+    <div class="info-line">
+      <span>AI Assisted Productivity</span>
+      <strong>68%</strong>
+    </div>
+  </section>
+
+  <section class="card panel audit-card">
+    <h3>Audit & Compliance</h3>
+    <div class="thai">
+      PDPA-ready access monitoring and export governance
+    </div>
+
+    <div class="info-line">
+      <span>Role Change Log</span>
+      <strong>Enabled</strong>
+    </div>
+
+    <div class="info-line">
+      <span>Export Log</span>
+      <strong>Required</strong>
+    </div>
+
+    <div class="info-line">
+      <span>Route Protection</span>
+      <strong>Active</strong>
+    </div>
+  </section>
+
+  <section class="card panel">
+    <h3>Recent Activity</h3>
+    <div class="thai">
+      บันทึกเหตุการณ์สำคัญสำหรับ audit-ready operation
+    </div>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <strong>Role changed: Nurse → Clinic Admin</strong>
+        <span>By Organization Admin · 10:42</span>
+      </div>
+
+      <div class="timeline-item">
+        <strong>Evidence Package exported</strong>
+        <span>Claim Reviewer · PDF export logged</span>
+      </div>
+
+      <div class="timeline-item">
+        <strong>Unauthorized access blocked</strong>
+        <span>Reception attempted User Manage route</span>
+      </div>
+    </div>
+  </section>
+</aside>
+
+</section>
+
+</main>
+</div>
+</body>
+</html>
