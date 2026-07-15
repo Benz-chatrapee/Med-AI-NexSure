@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 export function StickyActions({
   dirty,
   saving,
@@ -21,7 +23,7 @@ export function StickyActions({
           ระบบจะแจ้งเตือนก่อนออกจากหน้าเมื่อมี Unsaved Changes
         </div>
         <div className="grid grid-cols-2 gap-2 sm:flex">
-          <a href="/admin/users" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-5 font-bold">Cancel</a>
+          <Link href="/admin/users" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-5 font-bold">Cancel</Link>
           <button type="button" disabled={Boolean(saving)} onClick={onDraft} className="min-h-11 rounded-xl border border-blue-200 bg-blue-50 px-5 font-bold text-blue-700 disabled:opacity-60">{saving === "draft" ? "Saving..." : "Save Draft"}</button>
           <button type="button" disabled={Boolean(saving)} onClick={onCreate} className="col-span-2 min-h-11 rounded-xl bg-blue-900 px-5 font-bold text-white disabled:opacity-60">{saving === "create" ? "Creating..." : sendInvitation ? "Create & Invite" : "Create User"}</button>
         </div>
