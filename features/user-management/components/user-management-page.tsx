@@ -2,6 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AlertTriangle, BarChart3, ClipboardCheck, FileClock, LayoutDashboard, Settings, ShieldCheck, Stethoscope, Users } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { BulkUserActions } from "./bulk-user-actions";
@@ -38,12 +39,17 @@ export function UserManagementPage() {
 
 function ClinicUsersWorkspace() {
   const workspace = useUserManagement();
+  const router = useRouter();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [confirm, setConfirm] = useState<{ user: ClinicUser; action: UserAction } | null>(null);
   const data = workspace.usersQuery.data;
 
   function handleAction(user: ClinicUser, action: UserAction) {
-    if (action === "view" || action === "audit" || action === "edit" || action === "roles" || action === "clinic_access" || action === "ai_access") {
+    if (action === "view") {
+      router.push(`/admin/users/${user.id}`);
+      return;
+    }
+    if (action === "audit" || action === "edit" || action === "roles" || action === "clinic_access" || action === "ai_access") {
       workspace.setSelectedUserId(user.id);
       return;
     }
@@ -86,6 +92,10 @@ function ClinicUsersWorkspace() {
     });
   }
 
+  function openUserDetail(userId: string) {
+    router.push(`/admin/users/${userId}`);
+  }
+
   function suspendSelected(reason: string) {
     const [firstId] = Array.from(selectedIds);
     if (!firstId) return;
@@ -104,9 +114,9 @@ function ClinicUsersWorkspace() {
             <ClinicUsersKpis summary={data?.summary} loading={workspace.usersQuery.isLoading} />
             <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm" aria-labelledby="clinic-users-directory-title">
               <div className="flex flex-col gap-2 p-4 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                  <h2 id="clinic-users-directory-title" className="text-lg font-black text-[#0F2A5F]">User Directory</h2>
-                  <p className="text-sm leading-6 text-slate-500">Search, filter and manage clinic users by Role, Status, Department and AI Access.</p>
+              <div>
+                  <h2 id="clinic-users-directory-title" className="text-lg font-black text-[#0F2A5F]">User List</h2>
+                  <p className="text-sm leading-6 text-slate-500">Search, filter and manage users by status, role, clinic scope, access scope and AI permission.</p>
                 </div>
                 {workspace.usersQuery.isFetching && !workspace.usersQuery.isLoading ? <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-black text-blue-800">Refreshing...</span> : null}
               </div>
@@ -121,7 +131,7 @@ function ClinicUsersWorkspace() {
                   selectedIds={selectedIds}
                   onToggleUser={toggleUser}
                   onTogglePage={togglePage}
-                  onOpenUser={workspace.setSelectedUserId}
+                  onOpenUser={openUserDetail}
                   onAction={handleAction}
                   onPage={(page) => workspace.updateQuery({ page })}
                   onClearFilters={workspace.clearFilters}

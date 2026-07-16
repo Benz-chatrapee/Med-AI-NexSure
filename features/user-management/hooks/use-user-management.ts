@@ -90,9 +90,12 @@ export function useUserManagement() {
     setParam(params, "search", next.search);
     setParam(params, "role", next.role);
     setParam(params, "status", next.status);
+    setParam(params, "invitationStatus", next.invitationStatus);
     setParam(params, "departmentId", next.departmentId);
     setParam(params, "aiAccessStatus", next.aiAccessStatus);
     setParam(params, "clinicId", next.clinicId);
+    setParam(params, "accessScope", next.accessScope);
+    setParam(params, "sort", next.sort);
     if (next.page !== defaultQuery.page) params.set("page", String(next.page));
     if (next.pageSize !== defaultQuery.pageSize) params.set("pageSize", String(next.pageSize));
     router.replace(`${pathname}${params.size ? `?${params.toString()}` : ""}`, { scroll: false });
@@ -136,9 +139,12 @@ function parseQuery(params: URLSearchParams): ClinicUsersQuery {
     search: params.get("search") || undefined,
     role: parseOption(params.get("role"), ["clinic_admin", "clinic_manager", "doctor", "nurse", "pharmacist", "clinic_staff", "claim_reviewer", "compliance_officer", "executive"]),
     status: parseOption(params.get("status"), ["active", "invited", "locked", "suspended", "inactive"]),
+    invitationStatus: parseOption(params.get("invitationStatus"), ["sent", "expired"]),
     departmentId: params.get("departmentId") || undefined,
     aiAccessStatus: parseOption(params.get("aiAccessStatus"), ["enabled", "restricted", "disabled"]),
     clinicId: params.get("clinicId") || undefined,
+    accessScope: parseOption(params.get("accessScope"), ["assigned_department", "assigned_clinic", "cross_clinic_view_only"]),
+    sort: parseOption(params.get("sort"), ["name", "recently_updated", "last_login", "status"]),
     page: parsePositiveNumber(params.get("page"), defaultQuery.page),
     pageSize: parsePositiveNumber(params.get("pageSize"), defaultQuery.pageSize),
   };

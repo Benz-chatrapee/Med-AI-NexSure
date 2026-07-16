@@ -24,14 +24,18 @@ export const userManagementService = {
     const search = query.search?.trim().toLowerCase() ?? "";
     const filtered = clinicUsers
       .filter((user) => {
-        const searchable = `${user.fullName} ${user.email} ${user.employeeId} ${user.professionalLicense ?? ""}`.toLowerCase();
+        const clinics = user.clinicScopes.map((scope) => scope.clinicName).join(" ");
+        const searchable = `${user.fullName} ${user.email} ${user.employeeId} ${user.professionalLicense ?? ""} ${user.departmentName ?? ""} ${clinics}`.toLowerCase();
         return !search || searchable.includes(search);
       })
       .filter((user) => !query.role || user.primaryRole === query.role || user.additionalRoles.includes(query.role))
       .filter((user) => !query.status || user.status === query.status)
+      .filter((user) => !query.invitationStatus || user.status === "invited")
       .filter((user) => !query.departmentId || user.departmentId === query.departmentId)
       .filter((user) => !query.aiAccessStatus || user.aiAccessStatus === query.aiAccessStatus)
-      .filter((user) => !query.clinicId || user.clinicScopes.some((scope) => scope.clinicId === query.clinicId));
+      .filter((user) => !query.clinicId || user.clinicScopes.some((scope) => scope.clinicId === query.clinicId))
+      .filter((user) => !query.accessScope || user.clinicScopes.some((scope) => scope.dataAccessLevel === query.accessScope))
+      .sort((left, right) => compareUsers(left, right, query.sort));
 
     const pageSize = query.pageSize;
     const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
@@ -255,9 +259,20 @@ function getSummary(users: ClinicUser[]): ClinicUsersSummary {
     totalUsers: users.length,
     activeUsers: users.filter((user) => user.status === "active").length,
     pendingInvitations: users.filter((user) => user.status === "invited").length,
-    suspendedUsers: users.filter((user) => user.status === "suspended").length,
+    suspendedUsers: users.filter((user) => user.status === "suspended" || user.status === "locked" || user.status === "inactive").length,
     aiEnabledUsers: users.filter((user) => user.aiAccessStatus === "enabled").length,
   };
+}
+
+function compareUsers(left: ClinicUser, right: ClinicUser, sort: ClinicUsersQuery["sort"] = "recently_updated") {
+  if (sort === "name") return left.fullName.localeCompare(right.fullName);
+  if (sort === "last_login") return dateValue(right.lastLoginAt) - dateValue(left.lastLoginAt);
+  if (sort === "status") return left.status.localeCompare(right.status) || left.fullName.localeCompare(right.fullName);
+  return dateValue(right.updatedAt) - dateValue(left.updatedAt);
+}
+
+function dateValue(value?: string) {
+  return value ? new Date(value).getTime() : 0;
 }
 
 function createAuditEvent(event: string, actor: string, reason: string, source: string): ClinicUserAuditEvent {

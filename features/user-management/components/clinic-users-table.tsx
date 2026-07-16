@@ -36,7 +36,7 @@ export function ClinicUsersTable({
   const users = response?.data ?? [];
   const pageUserIds = users.map((user) => user.id);
   const allSelected = pageUserIds.length > 0 && pageUserIds.every((id) => selectedIds.has(id));
-  const filtered = Boolean(query.search || query.role || query.status || query.departmentId || query.aiAccessStatus);
+  const filtered = Boolean(query.search || query.role || query.status || query.departmentId || query.aiAccessStatus || query.clinicId || query.accessScope || query.invitationStatus);
 
   if (loading) return <TableSkeleton />;
 
@@ -49,26 +49,27 @@ export function ClinicUsersTable({
 
   return (
     <>
-      <div className="hidden overflow-x-auto lg:block">
-        <table className="w-full min-w-[1180px] border-separate border-spacing-0 text-left text-sm" aria-label="Clinic users directory">
+      <div className="hidden max-h-[calc(100vh-19rem)] overflow-auto lg:block">
+        <table className="w-full min-w-[1420px] border-separate border-spacing-0 text-left text-sm" aria-label="User management directory">
           <caption className="sr-only">Clinic users with role, clinic access, AI access, account status and actions</caption>
-          <thead>
-            <tr className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+          <thead className="sticky top-0 z-20">
+            <tr className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500 shadow-[0_1px_0_#E2E8F0]">
               <th className="border-b border-slate-200 px-4 py-3">
                 <Checkbox checked={allSelected} onChange={(event) => onTogglePage(event.currentTarget.checked, pageUserIds)} aria-label="Select all users on current page" className="h-4 w-4 accent-blue-800" />
               </th>
-              {["User", "Email", "Role", "Department", "Clinic Access", "AI Access", "Status", "Last Active", "Actions"].map((head) => (
+              <th scope="col" className="sticky left-0 z-30 border-b border-slate-200 bg-slate-50 px-4 py-3 font-black">User</th>
+              {["Email", "Role", "Organization", "Clinic / Access Scope", "AI Permission", "Status", "Invitation Status", "Last Login", "Updated At", "Actions"].map((head) => (
                 <th key={head} scope="col" className="border-b border-slate-200 px-4 py-3 font-black">{head}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {users.map((user) => (
-              <tr key={user.id} className="align-middle hover:bg-blue-50/50">
+              <tr key={user.id} className="group align-middle hover:bg-blue-50/50">
                 <td className="border-b border-slate-100 px-4 py-4">
                   <Checkbox checked={selectedIds.has(user.id)} onChange={(event) => onToggleUser(user.id, event.currentTarget.checked)} aria-label={`Select ${user.fullName}`} className="h-4 w-4 accent-blue-800" />
                 </td>
-                <td className="border-b border-slate-100 px-4 py-4">
+                <td className="sticky left-0 z-10 border-b border-slate-100 bg-white px-4 py-4 group-hover:bg-blue-50">
                   <div className="flex items-center gap-3">
                     <button type="button" onClick={() => onOpenUser(user.id)} className="grid h-10 w-10 place-items-center rounded-xl bg-blue-50 text-sm font-black text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500">{user.initials}</button>
                     <div>
@@ -79,7 +80,10 @@ export function ClinicUsersTable({
                 </td>
                 <td className="border-b border-slate-100 px-4 py-4 text-slate-700">{user.email}</td>
                 <td className="border-b border-slate-100 px-4 py-4"><Badge tone="neutral">{roleLabels[user.primaryRole]}</Badge></td>
-                <td className="border-b border-slate-100 px-4 py-4 font-semibold text-slate-700">{user.departmentName ?? "Unassigned"}</td>
+                <td className="border-b border-slate-100 px-4 py-4">
+                  <strong className="text-xs text-slate-800">NexSure Health</strong>
+                  <div className="mt-1 text-xs font-semibold text-slate-500">{user.departmentName ?? "Unassigned"}</div>
+                </td>
                 <td className="border-b border-slate-100 px-4 py-4">
                   <div className="max-w-48">
                     <strong className="text-xs text-slate-800">{user.clinicScopes[0]?.clinicName}</strong>
@@ -91,10 +95,15 @@ export function ClinicUsersTable({
                 </td>
                 <td className="border-b border-slate-100 px-4 py-4"><AiAccessBadge status={user.aiAccessStatus} level={user.aiAccessLevel} /></td>
                 <td className="border-b border-slate-100 px-4 py-4"><StatusBadge status={user.status} /></td>
+                <td className="border-b border-slate-100 px-4 py-4"><InvitationBadge invited={user.status === "invited"} /></td>
                 <td className="border-b border-slate-100 px-4 py-4">
-                  <strong className="text-xs text-slate-800">{formatRelative(user.lastActiveAt)}</strong>
-                  <div className="text-xs text-slate-500">{formatDate(user.lastActiveAt)}</div>
+                  <strong className="text-xs text-slate-800">{formatRelative(user.lastLoginAt ?? user.lastActiveAt)}</strong>
+                  <div className="text-xs text-slate-500">{formatDate(user.lastLoginAt ?? user.lastActiveAt)}</div>
                   <span className="sr-only">AI access level {aiAccessLevelLabels[user.aiAccessLevel]}</span>
+                </td>
+                <td className="border-b border-slate-100 px-4 py-4">
+                  <strong className="text-xs text-slate-800">{formatRelative(user.updatedAt)}</strong>
+                  <div className="text-xs text-slate-500">{formatDate(user.updatedAt)}</div>
                 </td>
                 <td className="border-b border-slate-100 px-4 py-4"><ClinicUserActions user={user} onAction={onAction} /></td>
               </tr>
@@ -125,12 +134,22 @@ export function ClinicUsersTable({
 
 function TableSkeleton() {
   return (
-    <div className="p-4">
+    <div className="p-4" aria-label="Loading user table">
       {Array.from({ length: 6 }, (_, index) => (
-        <div key={index} className="mb-3 h-16 animate-pulse rounded-xl bg-slate-100" />
+        <div key={index} className="mb-3 grid h-16 animate-pulse grid-cols-[220px_1fr_120px_160px_140px] gap-3 rounded-xl bg-slate-50 p-3">
+          <div className="rounded bg-slate-100" />
+          <div className="rounded bg-slate-100" />
+          <div className="rounded bg-slate-100" />
+          <div className="rounded bg-slate-100" />
+          <div className="rounded bg-slate-100" />
+        </div>
       ))}
     </div>
   );
+}
+
+function InvitationBadge({ invited }: { invited: boolean }) {
+  return invited ? <Badge tone="warning">Invitation Sent</Badge> : <Badge tone="neutral">Not Invited</Badge>;
 }
 
 function formatDate(value?: string) {

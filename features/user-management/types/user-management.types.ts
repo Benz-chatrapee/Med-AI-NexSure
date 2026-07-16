@@ -21,6 +21,7 @@ export type CreateUserAccessScope = "own_clinic" | "assigned_clinics" | "organiz
 export type AiAccessStatus = "enabled" | "restricted" | "disabled";
 export type AiAccessLevel = "disabled" | "view_only" | "clinical_assist" | "clinical_review" | "ai_administrator";
 export type DataAccessLevel = "assigned_department" | "assigned_clinic" | "cross_clinic_view_only";
+export type ClinicUsersSort = "name" | "recently_updated" | "last_login" | "status";
 export type AuditResult = "success" | "warning" | "blocked";
 export type PermissionTemplate = "role_recommended" | "custom_permissions" | "claim_review";
 
@@ -90,9 +91,12 @@ export interface ClinicUsersQuery {
   search?: string;
   role?: ClinicUserRole;
   status?: ClinicUserStatus;
+  invitationStatus?: "sent" | "expired";
   departmentId?: string;
   aiAccessStatus?: AiAccessStatus;
   clinicId?: string;
+  accessScope?: DataAccessLevel;
+  sort?: ClinicUsersSort;
   page: number;
   pageSize: number;
 }

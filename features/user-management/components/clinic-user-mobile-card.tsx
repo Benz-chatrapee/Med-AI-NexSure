@@ -1,5 +1,5 @@
 import { Checkbox } from "@/components/ui/checkbox";
-import { roleLabels } from "../constants/clinic-user-options";
+import { dataAccessLevelLabels, roleLabels } from "../constants/clinic-user-options";
 import type { ClinicUser } from "../types/user-management.types";
 import { AiAccessBadge, StatusBadge } from "./status-badges";
 import { ClinicUserActions, type UserAction } from "./clinic-user-actions";
@@ -27,13 +27,15 @@ export function ClinicUserMobileCard({
           </button>
           <div className="min-w-0">
             <button type="button" onClick={onOpen} className="truncate text-left font-black text-[#0F2A5F] underline-offset-2 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500">{user.fullName}</button>
-            <div className="text-xs font-semibold text-slate-500">{roleLabels[user.primaryRole]} - {user.departmentName}</div>
+            <div className="truncate text-xs font-semibold text-slate-500">{user.email}</div>
           </div>
         </div>
         <ClinicUserActions user={user} onAction={onAction} />
       </div>
       <div className="mt-4 grid gap-3 border-t border-slate-100 pt-3 text-sm">
+        <Info label="Role" value={roleLabels[user.primaryRole]} />
         <Info label="Clinic" value={user.clinicScopes[0]?.clinicName ?? "Assigned clinic"} />
+        <Info label="Access Scope" value={dataAccessLevelLabels[user.clinicScopes[0]?.dataAccessLevel ?? "assigned_clinic"]} />
         <div className="flex items-center justify-between gap-3">
           <span className="text-slate-500">Status</span>
           <StatusBadge status={user.status} />

@@ -39,16 +39,14 @@ export function ClinicUsersHeader({
 
       <div className="mb-6">
         <nav className="mb-4 flex flex-wrap items-center gap-2 text-xs font-bold text-slate-500" aria-label="Breadcrumb">
-          <span>Admin Settings</span>
+          <span>Administration</span>
           <span aria-hidden="true">/</span>
-          <span>Identity & Access</span>
-          <span aria-hidden="true">/</span>
-          <span className="text-slate-800">Clinic Users</span>
+          <span className="text-slate-800">User Management</span>
         </nav>
 
         <section className="mb-4 flex flex-col gap-3 rounded-2xl border border-blue-200 bg-blue-50 p-4 md:flex-row md:items-center md:justify-between" aria-label="Identity and access governance context">
           <div>
-            <div className="font-black text-[#0F2A5F]">Identity & Access Governance</div>
+            <div className="font-black text-[#0F2A5F]">Clinical Intelligence Access Framework</div>
             <p className="text-sm text-slate-600">ควบคุม Role, Clinic Scope, Department Scope และ AI Permission พร้อม audit trail ทุกการเปลี่ยนแปลง</p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -60,9 +58,9 @@ export function ClinicUsersHeader({
 
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-[#0F2A5F]">Clinic Users</h1>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Manage user directory, role-based access, clinic scope, AI permission, account security and audit readiness.</p>
-            <p className="text-sm leading-6 text-slate-500">จัดการผู้ใช้งานภายในองค์กรหรือคลินิกตามหลัก Least Privilege และ Human-in-the-Loop</p>
+            <h1 className="text-3xl font-black tracking-tight text-[#0F2A5F]">User Management</h1>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Enterprise administration workspace for reviewing users, roles, clinic access, AI permissions, account security and audit readiness.</p>
+            <p className="text-sm leading-7 text-slate-500">ผู้ดูแลระบบสามารถจัดการผู้ใช้งาน บทบาท สิทธิ์การเข้าถึงคลินิก และสิทธิ์ AI ภายใต้หลัก Least Privilege และ Human-in-the-Loop</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <label className="flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold text-slate-700">
@@ -78,7 +76,7 @@ export function ClinicUsersHeader({
             </Button>
             <Link href="/admin/users/new" className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-blue-800 bg-[#1E3A8A] px-3 text-sm font-black text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
               <UserPlus size={16} aria-hidden="true" />
-              New User
+              Add User
             </Link>
           </div>
         </div>

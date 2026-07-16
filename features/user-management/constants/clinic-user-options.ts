@@ -11,6 +11,7 @@ import type {
   AiAccessLevel,
   AiAccessStatus,
   ClinicUserRole,
+  ClinicUsersSort,
   ClinicUserStatus,
   DataAccessLevel,
   KpiCardDefinition,
@@ -60,6 +61,18 @@ export const aiAccessStatusOptions: SelectOption<AiAccessStatus>[] = [
   { value: "disabled", label: "Disabled" },
 ];
 
+export const invitationStatusOptions: SelectOption<"sent" | "expired">[] = [
+  { value: "sent", label: "Invitation Sent" },
+  { value: "expired", label: "Invitation Expired" },
+];
+
+export const sortOptions: SelectOption<ClinicUsersSort>[] = [
+  { value: "name", label: "Name" },
+  { value: "recently_updated", label: "Recently Updated" },
+  { value: "last_login", label: "Last Login" },
+  { value: "status", label: "Status" },
+];
+
 export const aiAccessLevelOptions: SelectOption<AiAccessLevel>[] = [
   { value: "disabled", label: "Disabled" },
   { value: "view_only", label: "View Only" },
@@ -83,8 +96,10 @@ export const permissionTemplateOptions: SelectOption<PermissionTemplate>[] = [
 export const roleLabels = Object.fromEntries(roleOptions.map((option) => [option.value, option.label])) as Record<ClinicUserRole, string>;
 export const statusLabels = Object.fromEntries(statusOptions.map((option) => [option.value, option.label])) as Record<ClinicUserStatus, string>;
 export const aiAccessStatusLabels = Object.fromEntries(aiAccessStatusOptions.map((option) => [option.value, option.label])) as Record<AiAccessStatus, string>;
+export const invitationStatusLabels = Object.fromEntries(invitationStatusOptions.map((option) => [option.value, option.label])) as Record<"sent" | "expired", string>;
 export const aiAccessLevelLabels = Object.fromEntries(aiAccessLevelOptions.map((option) => [option.value, option.label])) as Record<AiAccessLevel, string>;
 export const dataAccessLevelLabels = Object.fromEntries(dataAccessLevelOptions.map((option) => [option.value, option.label])) as Record<DataAccessLevel, string>;
+export const sortLabels = Object.fromEntries(sortOptions.map((option) => [option.value, option.label])) as Record<ClinicUsersSort, string>;
 
 export function getKpiDefinitions(summary: {
   totalUsers: number;
@@ -97,7 +112,7 @@ export function getKpiDefinitions(summary: {
     { label: "Total Users", value: summary.totalUsers, helper: "All clinic and organization accounts", semantic: "info", icon: Users },
     { label: "Active Users", value: summary.activeUsers, helper: "พร้อมใช้งานภายในสิทธิ์ที่กำหนด", semantic: "success", icon: CheckCircle2 },
     { label: "Pending Invitations", value: summary.pendingInvitations, helper: "รอผู้ใช้งานตอบรับคำเชิญ", semantic: "warning", icon: UserPlus },
-    { label: "Suspended Users", value: summary.suspendedUsers, helper: "ต้องมีเหตุผลและ audit trail", semantic: "danger", icon: UserX },
+    { label: "Disabled / Locked Users", value: summary.suspendedUsers, helper: "ต้องมีเหตุผลและ audit trail", semantic: "danger", icon: UserX },
     { label: "AI-Enabled Users", value: summary.aiEnabledUsers, helper: "Decision support access only", semantic: "info", icon: BrainCircuit },
   ];
 }
