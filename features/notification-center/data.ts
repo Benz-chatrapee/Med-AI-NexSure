@@ -1,0 +1,240 @@
+import {
+  BadgeAlert,
+  BadgeDollarSign,
+  CircleCheck,
+  FileWarning,
+  Info,
+  ListChecks,
+  OctagonAlert,
+  ShieldAlert,
+  Sparkles,
+} from "lucide-react";
+import type { NotificationItem } from "./types";
+
+export const initialNotifications: NotificationItem[] = [
+  {
+    id: "N-240710-8842",
+    severity: "critical",
+    category: "clinical",
+    status: "unread",
+    mine: true,
+    actionRequired: true,
+    sla: "overdue",
+    title: "Drug Allergy Conflict Detected",
+    description: "Amoxicillin was prescribed while Penicillin allergy is documented. กรุณาตรวจสอบก่อนจ่ายยา",
+    entity: ["Patient: Anong S.", "VN-20260710-0142", "Prescription Safety"],
+    time: "8 min ago",
+    slaLabel: "Overdue 8m",
+    assignee: "Clinical Review",
+    assigneeInitials: "CR",
+    unread: true,
+    badges: [
+      { label: "Critical", tone: "critical", icon: OctagonAlert },
+      { label: "Action Required", tone: "action" },
+      { label: "AI-assisted", tone: "ai", icon: Sparkles },
+    ],
+  },
+  {
+    id: "N-240710-8837",
+    severity: "high",
+    category: "evidence",
+    status: "unread",
+    mine: false,
+    actionRequired: true,
+    sla: "due",
+    title: "Missing Evidence Before Claim Submission",
+    description: "Medical certificate is missing for the Evidence Package. กรุณาแนบเอกสารก่อนส่งเคลม",
+    entity: ["Claim: CLM-2026-10431", "VN-20260710-0140", "Evidence Package"],
+    time: "15 min ago",
+    slaLabel: "Due in 22m",
+    assignee: "Claim Team",
+    assigneeInitials: "CT",
+    unread: true,
+    badges: [
+      { label: "High", tone: "high", icon: FileWarning },
+      { label: "Pending Evidence", tone: "status" },
+    ],
+  },
+  {
+    id: "N-240710-8829",
+    severity: "critical",
+    category: "security",
+    status: "escalated",
+    mine: false,
+    actionRequired: true,
+    sla: "overdue",
+    title: "Unusual Login Attempt Detected",
+    description: "Multiple failed authentication attempts detected from an unfamiliar location. กรุณาตรวจสอบบัญชีผู้ใช้",
+    entity: ["User: clinic.ops@nexsure.co", "User & Security", "Bangkok HQ"],
+    time: "26 min ago",
+    slaLabel: "Overdue 11m",
+    assignee: "Security Team",
+    assigneeInitials: "IT",
+    unread: true,
+    badges: [
+      { label: "Critical", tone: "critical", icon: ShieldAlert },
+      { label: "Escalated", tone: "escalated" },
+    ],
+  },
+  {
+    id: "N-240710-8814",
+    severity: "medium",
+    category: "claims",
+    status: "unread",
+    mine: true,
+    actionRequired: true,
+    sla: "track",
+    title: "Claim Readiness Score Decreased",
+    description: "Readiness score decreased from 86 to 72 after Payer Rule validation. กรุณาตรวจสอบเงื่อนไขที่ไม่ผ่าน",
+    entity: ["Claim: CLM-2026-10428", "VN-20260710-0121", "Claim Readiness"],
+    time: "41 min ago",
+    slaLabel: "On track",
+    assignee: "Assigned to me",
+    assigneeInitials: "BJ",
+    unread: true,
+    badges: [
+      { label: "Medium", tone: "medium", icon: BadgeAlert },
+      { label: "Review Required", tone: "action" },
+      { label: "AI-assisted", tone: "ai", icon: Sparkles },
+    ],
+  },
+  {
+    id: "N-240710-8788",
+    severity: "high",
+    category: "economic",
+    status: "acknowledged",
+    mine: false,
+    actionRequired: true,
+    sla: "due",
+    title: "Visit Cost Exceeds Benchmark",
+    description: "Estimated visit cost is 38% above the payer benchmark. กรุณาตรวจสอบเหตุผลด้านต้นทุน",
+    entity: ["Patient: Naree P.", "VN-20260710-0099", "Economic Intelligence"],
+    time: "1h ago",
+    slaLabel: "Due in 58m",
+    assignee: "Finance Review",
+    assigneeInitials: "FN",
+    unread: false,
+    badges: [
+      { label: "High", tone: "high", icon: BadgeDollarSign },
+      { label: "Acknowledged", tone: "status" },
+    ],
+  },
+  {
+    id: "N-240710-8751",
+    severity: "low",
+    category: "tasks",
+    status: "unread",
+    mine: true,
+    actionRequired: false,
+    sla: "track",
+    title: "Claim Review Task Assigned",
+    description: "You have been assigned to review the Evidence Package. กรุณาดำเนินการภายใน SLA",
+    entity: ["Task: TSK-20260710-184", "CLM-2026-10395", "Workflow"],
+    time: "2h ago",
+    slaLabel: "On track",
+    assignee: "Assigned to me",
+    assigneeInitials: "BJ",
+    unread: true,
+    badges: [
+      { label: "Low", tone: "low", icon: ListChecks },
+      { label: "Task Assigned", tone: "status" },
+    ],
+  },
+  {
+    id: "N-240710-8702",
+    severity: "info",
+    category: "system",
+    status: "resolved",
+    mine: false,
+    actionRequired: false,
+    sla: "track",
+    title: "Document Processing Service Restored",
+    description: "OCR and document classification services are operating normally. ระบบกลับมาให้บริการตามปกติแล้ว",
+    entity: ["System Notification", "Integration Services"],
+    time: "3h ago",
+    slaLabel: "No action",
+    assignee: "System",
+    assigneeInitials: "SY",
+    unread: false,
+    badges: [
+      { label: "Info", tone: "info", icon: Info },
+      { label: "Resolved", tone: "status" },
+    ],
+  },
+];
+
+export const kpis = [
+  { label: "All Notifications", sub: "Across all modules", value: "128", filter: "all", icon: Info, tone: "blue" },
+  { label: "Unread", sub: "Requires user attention", value: "46", filter: "mine", icon: CircleCheck, tone: "blue" },
+  { label: "Critical", sub: "Clinical or security risk", value: "9", filter: "critical", icon: OctagonAlert, tone: "red" },
+  { label: "Action Required", sub: "Pending human review", value: "31", filter: "action", icon: ListChecks, tone: "orange" },
+  { label: "Due Soon", sub: "Within SLA window", value: "17", filter: "due", icon: FileWarning, tone: "orange" },
+  { label: "Overdue", sub: "SLA breached", value: "6", filter: "overdue", icon: ShieldAlert, tone: "red" },
+] as const;
+
+export const executiveNotificationKpis = [
+  { label: "Total Notifications", value: "128", delta: "+12.4%", helper: "7-day enterprise volume", tone: "blue" },
+  { label: "Unread Notifications", value: "46", delta: "-8.1%", helper: "รอการตรวจสอบจากทีมที่ได้รับอนุญาต", tone: "amber" },
+  { label: "Critical Alerts", value: "9", delta: "+3", helper: "Clinical, security, and compliance risk", tone: "red" },
+  { label: "AI Generated Alerts", value: "37", delta: "28.9%", helper: "Decision support only", tone: "purple" },
+  { label: "Resolved Today", value: "62", delta: "+18", helper: "ปิดรายการแล้วพร้อม audit trail", tone: "green" },
+] as const;
+
+export const notificationTrend = [
+  { day: "Mon", total: 96, critical: 7, ai: 24 },
+  { day: "Tue", total: 108, critical: 8, ai: 29 },
+  { day: "Wed", total: 101, critical: 6, ai: 27 },
+  { day: "Thu", total: 119, critical: 10, ai: 34 },
+  { day: "Fri", total: 132, critical: 12, ai: 39 },
+  { day: "Sat", total: 88, critical: 5, ai: 21 },
+  { day: "Sun", total: 128, critical: 9, ai: 37 },
+] as const;
+
+export const priorityDistribution = [
+  { name: "Critical", value: 9, color: "#DC2626" },
+  { name: "High", value: 24, color: "#D97706" },
+  { name: "Medium", value: 41, color: "#2563EB" },
+  { name: "Low", value: 32, color: "#059669" },
+  { name: "Info", value: 22, color: "#64748B" },
+] as const;
+
+export const moduleDistribution = [
+  { module: "Claim Readiness", value: 31 },
+  { module: "Prescription Safety", value: 24 },
+  { module: "Evidence Package", value: 19 },
+  { module: "Security", value: 16 },
+  { module: "Economic Intelligence", value: 14 },
+] as const;
+
+export const criticalTimeline = [
+  { time: "08:20", label: "Security escalation", status: "Escalated" },
+  { time: "10:45", label: "Allergy conflict", status: "Review" },
+  { time: "12:10", label: "Claim evidence blocker", status: "Assigned" },
+  { time: "14:40", label: "Prescription safety", status: "Overdue" },
+] as const;
+
+export const queueSnapshot = [
+  { label: "Critical", value: 9, tone: "red" },
+  { label: "Waiting Review", value: 31, tone: "amber" },
+  { label: "Assigned", value: 44, tone: "blue" },
+  { label: "Resolved", value: 62, tone: "green" },
+  { label: "Dismissed", value: 11, tone: "slate" },
+] as const;
+
+export const topCategories = [
+  { category: "Missing Evidence", value: 28 },
+  { category: "Prescription Safety", value: 22 },
+  { category: "SLA Breach", value: 18 },
+  { category: "Payer Rule", value: 15 },
+  { category: "Security Event", value: 12 },
+] as const;
+
+export const notificationHeatmap = [
+  { day: "Mon", hours: [2, 4, 6, 9, 13, 18] },
+  { day: "Tue", hours: [3, 5, 8, 12, 16, 21] },
+  { day: "Wed", hours: [4, 7, 9, 14, 19, 24] },
+  { day: "Thu", hours: [5, 8, 13, 18, 25, 31] },
+  { day: "Fri", hours: [6, 9, 15, 22, 29, 34] },
+  { day: "Sat", hours: [1, 3, 5, 8, 11, 15] },
+  { day: "Sun", hours: [2, 4, 7, 11, 16, 20] },
+] as const;
