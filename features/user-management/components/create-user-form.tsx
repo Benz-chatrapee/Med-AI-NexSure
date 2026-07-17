@@ -7,9 +7,9 @@ import { AI_PERMISSION_OPTIONS, CLINICS, CREATE_USER_ROLES, DEPARTMENTS, ORGANIZ
 import type { AiPermissionLevel, CreateUserAccessScope, CreateUserFormValues, CreateUserRole, PermissionAction } from "../types/user-management.types";
 import { cx } from "../utils/create-user-utils";
 
-const inputClass = "min-h-11 w-full rounded-lg border border-[var(--nx-control)] bg-[var(--nx-surface)] px-3 font-['Inter'] text-[14px] leading-5 text-[var(--nx-text)] outline-none placeholder:text-[var(--nx-muted)] focus:border-[var(--nx-ai)] focus:ring-2 focus:ring-[color:rgba(37,99,235,0.15)] disabled:bg-slate-100 disabled:text-[var(--nx-secondary)] aria-[invalid=true]:border-[var(--nx-danger)]";
+const inputClass = "min-h-11 w-full rounded-lg border border-[var(--nx-control)] bg-[var(--nx-surface)] px-3 font-['Inter'] text-[14px] leading-5 text-[var(--nx-text)] outline-none placeholder:text-[var(--nx-muted)] focus:border-[var(--nx-ai)] focus:ring-2 focus:ring-ring-strong disabled:bg-[var(--nx-surface-low)] disabled:text-[var(--nx-secondary)] aria-[invalid=true]:border-[var(--nx-danger)]";
 const sectionClass = "rounded-xl border border-[var(--nx-border)] bg-[var(--nx-surface)] shadow-sm";
-const labelClass = "font-['Inter'] text-[13px] font-semibold leading-5 text-slate-700";
+const labelClass = "font-['Inter'] text-[13px] font-semibold leading-5 text-nav-foreground";
 const helperClass = "font-['Inter'] text-[13px] leading-5 text-[var(--nx-secondary)]";
 const actions: PermissionAction[] = ["view", "create", "edit", "approve", "export", "admin"];
 
@@ -127,7 +127,7 @@ export function CreateUserForm({ form }: { form: UseFormReturn<CreateUserFormVal
                 </label>
               ))}
             </div>
-            <div className={cx("mt-4 rounded-full px-3 py-1 font-['Inter'] text-[12px] font-semibold leading-4", values.primaryRole.includes("admin") ? "bg-[var(--nx-warning-bg)] text-amber-800" : "bg-slate-100 text-slate-700")}>Administrative Privilege: {values.primaryRole.includes("admin") ? "Elevated" : "Standard"}</div>
+            <div className={cx("mt-4 rounded-full px-3 py-1 font-['Inter'] text-[12px] font-semibold leading-4", values.primaryRole.includes("admin") ? "bg-[var(--nx-warning-bg)] text-warning" : "bg-background text-nav-foreground")}>Administrative Privilege: {values.primaryRole.includes("admin") ? "Elevated" : "Standard"}</div>
           </div>
         </div>
         {errors.primaryRole ? <p className="mt-2 font-['Inter'] text-[13px] font-semibold leading-5 text-[var(--nx-danger)]">{errors.primaryRole.message}</p> : null}

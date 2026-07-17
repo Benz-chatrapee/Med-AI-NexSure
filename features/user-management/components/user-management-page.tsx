@@ -110,7 +110,7 @@ function ClinicUsersWorkspace() {
   const selectedUser = workspace.selectedUserQuery.data;
 
   return (
-    <main className="min-h-screen bg-[#F8FAFC] text-slate-950">
+    <main className="min-h-screen bg-background text-foreground">
       <div className="grid min-h-screen grid-cols-1 min-[1040px]:grid-cols-[248px_minmax(0,1fr)]">
         <Sidebar />
         <div className="min-w-0">
@@ -118,13 +118,13 @@ function ClinicUsersWorkspace() {
           <div className="px-3 py-4 sm:px-5 2xl:px-7">
             <ClinicUsersKpis summary={data?.summary} loading={workspace.usersQuery.isLoading} />
             <SecurityIntelligencePanel summary={data?.summary} />
-            <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm" aria-labelledby="clinic-users-directory-title">
-              <div className="flex flex-col gap-2 border-b border-slate-100 p-4 sm:flex-row sm:items-start sm:justify-between">
+            <section className="overflow-hidden rounded-lg border border-border bg-card shadow-sm" aria-labelledby="clinic-users-directory-title">
+              <div className="flex flex-col gap-2 border-b border-border p-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
-                  <h2 id="clinic-users-directory-title" className="text-lg font-black text-[#0F2A5F]">Enterprise Identity & Access Directory</h2>
-                  <p className="text-sm leading-6 text-slate-500">Search, filter and manage users by role, organization, clinic scope, security posture, audit state and AI permission.</p>
+                  <h2 id="clinic-users-directory-title" className="text-lg font-black text-deep-blue">Enterprise Identity & Access Directory</h2>
+                  <p className="text-sm leading-6 text-muted-foreground">Search, filter and manage users by role, organization, clinic scope, security posture, audit state and AI permission.</p>
                 </div>
-                {workspace.usersQuery.isFetching && !workspace.usersQuery.isLoading ? <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-black text-blue-800">Refreshing...</span> : null}
+                {workspace.usersQuery.isFetching && !workspace.usersQuery.isLoading ? <span className="rounded-full border border-[var(--nexsure-blue-border)] bg-soft-background px-3 py-1 text-xs font-black text-primary">Refreshing...</span> : null}
               </div>
               <ClinicUsersToolbar query={workspace.query} onChange={workspace.updateQuery} onClear={workspace.clearFilters} />
               {workspace.usersQuery.isError ? (
@@ -202,12 +202,12 @@ function ClinicUsersWorkspace() {
 
 function Sidebar() {
   return (
-    <aside className="hidden h-screen sticky top-0 overflow-y-auto bg-[#0F2A5F] px-4 py-6 text-white min-[1040px]:block" aria-label="Main navigation">
-      <div className="flex items-center gap-3 border-b border-white/10 pb-5">
-        <div className="grid h-10 w-10 place-items-center rounded-xl bg-blue-600 text-sm font-black shadow-lg">N</div>
+    <aside className="hidden h-screen sticky top-0 overflow-y-auto border-r border-sidebar-border bg-sidebar px-4 py-6 text-sidebar-foreground min-[1040px]:block" aria-label="Main navigation">
+      <div className="flex items-center gap-3 border-b border-sidebar-border pb-5">
+        <div className="grid h-10 w-10 place-items-center rounded-xl bg-sidebar-primary text-sm font-black text-sidebar-primary-foreground shadow-sm">N</div>
         <div>
           <div className="font-black">Med AI NexSure</div>
-          <p className="text-xs text-blue-100">Healthcare & Insurance Intelligence</p>
+          <p className="text-xs text-nav-foreground">Healthcare & Insurance Intelligence</p>
         </div>
       </div>
       <nav className="mt-6 space-y-1" aria-label="Platform sections">
@@ -215,8 +215,8 @@ function Sidebar() {
           const Icon = item.icon;
           const active = item.label === "Clinic Users";
           return (
-            <a key={item.label} href={item.href} className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-300 ${active ? "bg-blue-600/35 text-white shadow-[inset_3px_0_0_#38BDF8]" : "text-blue-100 hover:bg-white/10"}`}>
-              <Icon size={17} aria-hidden="true" />
+            <a key={item.label} href={item.href} className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-ring-strong ${active ? "bg-nav-active text-nav-active-foreground shadow-[inset_3px_0_0_var(--nexsure-accent)]" : "text-nav-foreground hover:bg-nav-hover hover:text-nav-active-foreground"}`}>
+              <Icon className={active ? "text-nav-active-icon" : ""} size={17} aria-hidden="true" />
               <span>{item.label}</span>
             </a>
           );
@@ -230,9 +230,9 @@ function ErrorState({ onRetry }: { onRetry: () => void }) {
   return (
     <div className="grid place-items-center px-4 py-14 text-center">
       <AlertTriangle className="text-red-700" size={32} aria-hidden="true" />
-      <h2 className="mt-3 text-lg font-black text-slate-900">Unable to load clinic users</h2>
-      <p className="mt-2 max-w-xl text-sm leading-6 text-slate-500">ไม่สามารถโหลดข้อมูลผู้ใช้งานได้ กรุณาลองใหม่อีกครั้ง หรือตรวจสอบการเชื่อมต่อ</p>
-      <Button onClick={onRetry} className="mt-4 rounded-xl border border-blue-800 bg-[#1E3A8A] px-3 py-2 text-sm font-black text-white focus:outline-none focus:ring-2 focus:ring-blue-500">Retry</Button>
+      <h2 className="mt-3 text-lg font-black text-foreground">Unable to load clinic users</h2>
+      <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">ไม่สามารถโหลดข้อมูลผู้ใช้งานได้ กรุณาลองใหม่อีกครั้ง หรือตรวจสอบการเชื่อมต่อ</p>
+      <Button onClick={onRetry} className="mt-4 rounded-xl border border-primary bg-primary px-3 py-2 text-sm font-black text-primary-foreground focus:outline-none focus:ring-2 focus:ring-ring-strong">Retry</Button>
     </div>
   );
 }
@@ -252,23 +252,23 @@ function ConfirmationDialog({
   if (!confirmation) return null;
   const needsReason = confirmation.action === "suspend" || confirmation.action === "cancel_invite" || confirmation.action === "disable" || confirmation.action === "lock";
   return (
-    <div className="fixed inset-0 z-[70] grid place-items-center bg-slate-950/45 p-4">
+    <div className="fixed inset-0 z-[70] grid place-items-center bg-foreground/45 p-4">
       <section role="dialog" aria-modal="true" aria-labelledby="confirm-action-title" className="w-full max-w-lg rounded-2xl bg-white p-5 shadow-xl">
-        <h2 id="confirm-action-title" className="text-xl font-black text-[#0F2A5F]">Confirm action</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-600">This action affects access to clinical, insurance or audit data. กรุณายืนยันก่อนดำเนินการ</p>
+        <h2 id="confirm-action-title" className="text-xl font-black text-deep-blue">Confirm action</h2>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">This action affects access to clinical, insurance or audit data. กรุณายืนยันก่อนดำเนินการ</p>
         <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm font-bold text-amber-900">
           User: {confirmation.user.fullName}<br />
           Action: {confirmation.action.replaceAll("_", " ")}
         </div>
         {needsReason ? (
-          <label className="mt-4 block text-sm font-black text-slate-700">
-            Reason <span className="text-red-700">*</span>
-            <textarea value={reason} onChange={(event) => setReason(event.target.value)} className="mt-1 min-h-24 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500" />
+          <label className="mt-4 block text-sm font-black text-nav-foreground">
+            Reason <span className="text-danger">*</span>
+            <textarea value={reason} onChange={(event) => setReason(event.target.value)} className="mt-1 min-h-24 w-full rounded-xl border border-border px-3 py-2 text-sm font-semibold outline-none focus:ring-2 focus:ring-ring-strong" />
           </label>
         ) : null}
         <div className="mt-5 flex justify-end gap-2">
-          <Button onClick={onCancel} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-black text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">Cancel</Button>
-          <Button disabled={pending || (needsReason && reason.trim().length < 8)} onClick={() => { onConfirm(reason || "Security action confirmed by Clinic Admin"); setReason(""); }} className="rounded-xl border border-blue-800 bg-[#1E3A8A] px-3 py-2 text-sm font-black text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50">
+          <Button onClick={onCancel} className="rounded-xl border border-border bg-card px-3 py-2 text-sm font-black text-nav-foreground focus:outline-none focus:ring-2 focus:ring-ring-strong">Cancel</Button>
+          <Button disabled={pending || (needsReason && reason.trim().length < 8)} onClick={() => { onConfirm(reason || "Security action confirmed by Clinic Admin"); setReason(""); }} className="rounded-xl border border-primary bg-primary px-3 py-2 text-sm font-black text-primary-foreground focus:outline-none focus:ring-2 focus:ring-ring-strong disabled:opacity-50">
             {pending ? "Working..." : "Confirm"}
           </Button>
         </div>
@@ -278,12 +278,12 @@ function ConfirmationDialog({
 }
 
 function Toast({ title, tone, onClose }: { title: string; tone: "success" | "error" | "info"; onClose: () => void }) {
-  const classes = tone === "error" ? "border-red-200 bg-red-50 text-red-800" : tone === "success" ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-blue-200 bg-blue-50 text-blue-800";
+  const classes = tone === "error" ? "border-[color:color-mix(in_srgb,var(--danger)_24%,white)] bg-[var(--nx-danger-bg)] text-danger" : tone === "success" ? "border-[color:color-mix(in_srgb,var(--success)_24%,white)] bg-[var(--nx-success-bg)] text-success" : "border-[var(--nexsure-blue-border)] bg-soft-background text-primary";
   return (
     <div className={`fixed bottom-5 right-5 z-[80] max-w-md rounded-2xl border p-4 text-sm font-bold shadow-xl ${classes}`} role="status">
       <div className="flex items-start justify-between gap-4">
         <span>{title}</span>
-        <button type="button" onClick={onClose} className="font-black focus:outline-none focus:ring-2 focus:ring-blue-500">Close</button>
+        <button type="button" onClick={onClose} className="font-black focus:outline-none focus:ring-2 focus:ring-ring-strong">Close</button>
       </div>
     </div>
   );

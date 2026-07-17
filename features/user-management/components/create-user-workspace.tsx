@@ -142,7 +142,7 @@ export function CreateUserWorkspace() {
 
   return (
     <main
-      className="min-h-screen bg-[var(--nx-bg)] text-[var(--nx-text)] [--nx-accent:#38BDF8] [--nx-ai-bg:#DBEAFE] [--nx-ai:#2563EB] [--nx-bg:#F8FAFC] [--nx-border:#E2E8F0] [--nx-control:#CBD5E1] [--nx-danger-bg:#FEF2F2] [--nx-danger:#DC2626] [--nx-deep:#0F2A5F] [--nx-focus:#BFDBFE] [--nx-info-bg:#EFF6FF] [--nx-muted:#94A3B8] [--nx-primary:#1E3A8A] [--nx-secondary:#64748B] [--nx-success-bg:#ECFDF5] [--nx-success:#059669] [--nx-surface-low:#EFF6FF] [--nx-surface:#FFFFFF] [--nx-text:#0F172A] [--nx-warning-bg:#FFFBEB] [--nx-warning:#D97706]"
+      className="min-h-screen bg-[var(--nx-bg)] text-[var(--nx-text)]"
     >
       <div className="mx-auto max-w-[1440px] px-4 pb-28 pt-5 md:px-8">
         <div className="mb-3 font-['Inter'] text-[13px] font-semibold leading-5 text-[var(--nx-secondary)]">
@@ -171,12 +171,12 @@ export function CreateUserWorkspace() {
 }
 
 function Toast({ title, tone, onClose }: ToastState & { onClose: () => void }) {
-  const classes = tone === "error" ? "border-red-200 bg-[#FEF2F2] text-red-700" : tone === "success" ? "border-emerald-200 bg-[#ECFDF5] text-emerald-700" : "border-blue-200 bg-[#EFF6FF] text-[#1E3A8A]";
+  const classes = tone === "error" ? "border-[color:color-mix(in_srgb,var(--danger)_24%,white)] bg-[var(--nx-danger-bg)] text-danger" : tone === "success" ? "border-[color:color-mix(in_srgb,var(--success)_24%,white)] bg-[var(--nx-success-bg)] text-success" : "border-[var(--nexsure-blue-border)] bg-soft-background text-primary";
   return (
     <div className={`fixed bottom-24 right-5 z-[80] max-w-md rounded-xl border p-4 text-sm font-semibold shadow-sm ${classes}`} role="status">
       <div className="flex items-start justify-between gap-4">
         <span>{title}</span>
-        <button type="button" onClick={onClose} className="font-black focus:outline-none focus:ring-2 focus:ring-blue-500">Close</button>
+        <button type="button" onClick={onClose} className="font-black focus:outline-none focus:ring-2 focus:ring-ring-strong">Close</button>
       </div>
     </div>
   );

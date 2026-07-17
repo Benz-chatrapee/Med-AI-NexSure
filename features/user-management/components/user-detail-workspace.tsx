@@ -76,10 +76,10 @@ export function UserDetailWorkspace({ userId }: UserDetailWorkspaceProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[#f7f9fb] pb-24 font-sans text-[#191c1e]">
+    <div className="min-h-dvh w-full bg-background pb-24 font-sans text-foreground">
       <TopNav />
       <SideNav />
-      <main className="mx-auto max-w-[1200px] px-4 pt-20 md:ml-64">
+      <main className="min-w-0 px-4 pt-20 md:ml-64">
         <nav className="mb-6 flex items-center gap-2 text-sm" aria-label="Breadcrumb">
           <Link className="font-medium text-[#00236f]" href="/admin/users">User Management</Link>
           <ChevronRight className="h-4 w-4 text-[#444651]" />
@@ -169,14 +169,14 @@ export function UserDetailWorkspace({ userId }: UserDetailWorkspaceProps) {
         </form>
       </main>
 
-      <div className={`fixed bottom-0 left-0 right-0 z-50 flex flex-col items-center justify-between gap-4 border-t border-[#c5c5d3] bg-white px-4 py-4 md:left-64 md:flex-row ${isDirty ? "shadow-[0_-8px_24px_rgba(0,0,0,0.05)]" : ""}`}>
+      <div className={`fixed bottom-0 left-0 right-0 z-50 flex flex-col items-center justify-between gap-4 border-t border-border bg-card px-4 py-4 md:left-64 md:flex-row ${isDirty ? "shadow-[0_-8px_24px_color-mix(in_srgb,var(--foreground)_5%,transparent)]" : ""}`}>
         <div className="flex items-center gap-3">
-          <div className="grid h-8 w-8 place-items-center rounded-full bg-[#1e3a8a]/30"><ArrowLeftRight className="h-4 w-4 text-[#00236f]" /></div>
-          <div><p className="text-sm font-bold text-[#191c1e]">{isDirty ? "Unsaved changes / การเปลี่ยนแปลงยังไม่ได้บันทึก" : "No unsaved changes / ไม่มีข้อมูลที่รอบันทึก"}</p><p className="text-[11px] text-[#444651]">Last autosaved 2m ago</p></div>
+          <div className="grid h-8 w-8 place-items-center rounded-full bg-soft-background"><ArrowLeftRight className="h-4 w-4 text-primary" /></div>
+          <div><p className="text-sm font-bold text-foreground">{isDirty ? "Unsaved changes / การเปลี่ยนแปลงยังไม่ได้บันทึก" : "No unsaved changes / ไม่มีข้อมูลที่รอบันทึก"}</p><p className="text-[11px] text-muted-foreground">Last autosaved 2m ago</p></div>
         </div>
         <div className="flex w-full items-center gap-3 md:w-auto">
-          <button type="button" onClick={cancelEdit} className="flex-1 rounded-lg border border-[#c5c5d3] px-6 py-2 text-sm font-bold text-[#444651] transition hover:bg-[#e6e8ea] active:scale-95 md:flex-none">Cancel</button>
-          <button type="button" onClick={handleSubmit(save)} disabled={!isDirty || isSubmitting} className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#00236f] px-8 py-2 text-sm font-bold text-white transition hover:shadow-lg active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 md:flex-none"><Save className="h-4 w-4" />{isSubmitting ? "Saving..." : "Save Changes"}</button>
+          <button type="button" onClick={cancelEdit} className="flex-1 rounded-lg border border-border px-6 py-2 text-sm font-bold text-muted-foreground transition hover:bg-soft-background focus:outline-none focus:ring-2 focus:ring-ring-strong active:scale-95 md:flex-none">Cancel</button>
+          <button type="button" onClick={handleSubmit(save)} disabled={!isDirty || isSubmitting} className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-8 py-2 text-sm font-bold text-primary-foreground transition hover:bg-deep-blue focus:outline-none focus:ring-2 focus:ring-ring-strong active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 md:flex-none"><Save className="h-4 w-4" />{isSubmitting ? "Saving..." : "Save Changes"}</button>
         </div>
       </div>
 
@@ -187,12 +187,15 @@ export function UserDetailWorkspace({ userId }: UserDetailWorkspaceProps) {
 }
 
 function TopNav() {
-  return <header className="fixed left-0 top-0 z-50 flex h-14 w-full items-center justify-between border-b border-[#c5c5d3] bg-[#f7f9fb] px-4"><span className="text-lg font-bold text-[#00236f]">Med AI NexSure</span><div className="flex items-center gap-2"><button aria-label="Notifications" className="rounded-full p-2 transition-colors hover:bg-[#e6e8ea] focus:outline-none focus:ring-2 focus:ring-[#2563EB]"><Bell className="h-5 w-5 text-[#444651]" /></button><button aria-label="Settings" className="rounded-full p-2 transition-colors hover:bg-[#e6e8ea] focus:outline-none focus:ring-2 focus:ring-[#2563EB]"><Settings className="h-5 w-5 text-[#444651]" /></button><div className="ml-2 grid h-8 w-8 place-items-center rounded-full bg-[#e0e3e5] text-xs font-bold text-[#00236f]">BC</div></div></header>;
+  return <header className="fixed left-0 top-0 z-50 flex h-14 w-full items-center justify-between border-b border-border bg-card px-4 shadow-sm"><span className="text-lg font-bold text-primary">Med AI NexSure</span><div className="flex items-center gap-2"><button aria-label="Notifications" className="rounded-full p-2 transition-colors hover:bg-soft-background focus:outline-none focus:ring-2 focus:ring-ring-strong"><Bell className="h-5 w-5 text-muted-foreground" /></button><button aria-label="Settings" className="rounded-full p-2 transition-colors hover:bg-soft-background focus:outline-none focus:ring-2 focus:ring-ring-strong"><Settings className="h-5 w-5 text-muted-foreground" /></button><div className="ml-2 grid h-8 w-8 place-items-center rounded-full bg-soft-background text-xs font-bold text-primary">BC</div></div></header>;
 }
 
 function SideNav() {
   const items = [["dashboard", "Dashboard"], ["person_search", "Patients"], ["psychology", "AI Clinical"], ["manage_accounts", "User Management"], ["settings", "Settings"]];
-  return <aside className="fixed left-0 top-0 z-40 hidden h-full w-64 flex-col border-r border-[#c5c5d3] bg-[#f2f4f6] pt-14 md:flex"><div className="border-b border-[#c5c5d3] p-4"><div className="flex items-center gap-3"><div className="grid h-10 w-10 place-items-center rounded-lg bg-[#00236f] font-bold text-white">MX</div><div><div className="text-sm font-bold text-[#191c1e]">Med AI NexSure</div><div className="text-[10px] font-semibold uppercase tracking-wider text-[#444651]">Enterprise Admin</div></div></div></div><nav className="flex-1 py-4">{items.map(([icon, label]) => <a key={label} href={label === "User Management" ? "/admin/users" : "#"} className={`flex items-center gap-3 px-6 py-3 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-[#2563EB] ${label === "Patients" ? "border-l-4 border-[#00236f] bg-[#1e3a8a] font-bold text-[#90a8ff]" : "text-[#444651] hover:bg-[#e6e8ea]"}`}><SidebarIcon name={icon} /><span className="text-xs font-semibold uppercase tracking-[0.05em]">{label}</span></a>)}</nav><div className="border-t border-[#c5c5d3] p-4"><button className="flex w-full items-center justify-between rounded p-2 text-sm font-medium hover:bg-[#e6e8ea] focus:outline-none focus:ring-2 focus:ring-[#2563EB]">Switch Org<ArrowLeftRight className="h-4 w-4" /></button><a className="mt-4 flex items-center gap-3 rounded px-2 py-2 text-sm text-[#444651] hover:text-[#00236f]" href="#"><HelpCircle className="h-4 w-4" /> Help Center</a><a className="flex items-center gap-3 rounded px-2 py-2 text-sm text-[#ba1a1a] hover:bg-[#ffdad6]/20" href="#"><LogOut className="h-4 w-4" /> Logout</a></div></aside>;
+  return <aside className="fixed left-0 top-0 z-40 hidden h-full w-64 flex-col border-r border-sidebar-border bg-sidebar pt-14 md:flex"><div className="border-b border-sidebar-border p-4"><div className="flex items-center gap-3"><div className="grid h-10 w-10 place-items-center rounded-lg bg-sidebar-primary font-bold text-sidebar-primary-foreground">MX</div><div><div className="text-sm font-bold text-sidebar-foreground">Med AI NexSure</div><div className="text-[10px] font-semibold uppercase tracking-wider text-nav-foreground">Enterprise Admin</div></div></div></div><nav className="flex-1 py-4">{items.map(([icon, label]) => {
+    const active = label === "User Management";
+    return <a key={label} href={active ? "/admin/users" : "#"} className={`flex items-center gap-3 px-6 py-3 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-ring-strong ${active ? "border-l-4 border-accent bg-nav-active font-bold text-nav-active-foreground" : "text-nav-foreground hover:bg-nav-hover hover:text-nav-active-foreground"}`}><span className={active ? "text-nav-active-icon" : "text-nav-foreground"}><SidebarIcon name={icon} /></span><span className="text-xs font-semibold uppercase tracking-[0.05em]">{label}</span></a>;
+  })}</nav><div className="border-t border-sidebar-border p-4"><button className="flex w-full items-center justify-between rounded p-2 text-sm font-medium text-nav-foreground hover:bg-nav-hover hover:text-nav-active-foreground focus:outline-none focus:ring-2 focus:ring-ring-strong">Switch Org<ArrowLeftRight className="h-4 w-4" /></button><a className="mt-4 flex items-center gap-3 rounded px-2 py-2 text-sm text-nav-foreground hover:bg-nav-hover hover:text-nav-active-foreground" href="#"><HelpCircle className="h-4 w-4" /> Help Center</a><a className="flex items-center gap-3 rounded px-2 py-2 text-sm text-danger hover:bg-[var(--nx-danger-bg)]" href="#"><LogOut className="h-4 w-4" /> Logout</a></div></aside>;
 }
 
 function SidebarIcon({ name }: { name: string }) {

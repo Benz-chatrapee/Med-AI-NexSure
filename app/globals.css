@@ -1,13 +1,135 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #0f172a;
+  --nexsure-primary: #1E3A8A;
+  --nexsure-deep-blue: #0F2A5F;
+  --nexsure-ai-blue: #2563EB;
+  --nexsure-background: #F8FAFC;
+  --nexsure-surface: #FFFFFF;
+  --nexsure-soft-background: #EFF6FF;
+  --nexsure-border: #E2E8F0;
+  --nexsure-accent: #38BDF8;
+  --nexsure-text: #0F172A;
+  --nexsure-secondary-text: #64748B;
+  --nexsure-success: #059669;
+  --nexsure-warning: #D97706;
+  --nexsure-danger: #DC2626;
+  --nexsure-blue-border: #BFDBFE;
+  --nexsure-nav-text: #334155;
+
+  --background: var(--nexsure-background);
+  --foreground: var(--nexsure-text);
+  --card: var(--nexsure-surface);
+  --card-foreground: var(--nexsure-text);
+  --popover: var(--nexsure-surface);
+  --popover-foreground: var(--nexsure-text);
+  --primary: var(--nexsure-primary);
+  --primary-foreground: var(--nexsure-surface);
+  --secondary: var(--nexsure-soft-background);
+  --secondary-foreground: var(--nexsure-primary);
+  --muted: var(--nexsure-soft-background);
+  --muted-foreground: var(--nexsure-secondary-text);
+  --accent: var(--nexsure-accent);
+  --accent-foreground: var(--nexsure-deep-blue);
+  --destructive: var(--nexsure-danger);
+  --destructive-foreground: var(--nexsure-surface);
+  --border: var(--nexsure-border);
+  --input: var(--nexsure-border);
+  --ring: var(--nexsure-ai-blue);
+  --ring-strong: var(--nexsure-accent);
+  --success: var(--nexsure-success);
+  --success-foreground: var(--nexsure-surface);
+  --warning: var(--nexsure-warning);
+  --warning-foreground: var(--nexsure-surface);
+  --danger: var(--nexsure-danger);
+  --danger-foreground: var(--nexsure-surface);
+  --ai: var(--nexsure-ai-blue);
+  --ai-foreground: var(--nexsure-surface);
+  --deep-blue: var(--nexsure-deep-blue);
+  --soft-background: var(--nexsure-soft-background);
+  --sidebar: var(--nexsure-deep-blue);
+  --sidebar-foreground: var(--nexsure-surface);
+  --sidebar-primary: var(--nexsure-primary);
+  --sidebar-primary-foreground: var(--nexsure-surface);
+  --sidebar-accent: var(--nexsure-soft-background);
+  --sidebar-accent-foreground: var(--nexsure-primary);
+  --sidebar-border: color-mix(in srgb, var(--nexsure-surface) 12%, transparent);
+  --sidebar-ring: var(--nexsure-accent);
+  --nav-background: var(--nexsure-deep-blue);
+  --nav-foreground: color-mix(in srgb, var(--nexsure-surface) 82%, transparent);
+  --nav-hover: color-mix(in srgb, var(--nexsure-surface) 10%, transparent);
+  --nav-active: var(--nexsure-primary);
+  --nav-active-foreground: var(--nexsure-surface);
+  --nav-active-icon: var(--nexsure-surface);
+
+  --nx-primary: var(--nexsure-primary);
+  --nx-deep: var(--nexsure-deep-blue);
+  --nx-ai: var(--nexsure-ai-blue);
+  --nx-accent: var(--nexsure-accent);
+  --nx-bg: var(--nexsure-background);
+  --nx-surface: var(--nexsure-surface);
+  --nx-surface-low: var(--nexsure-soft-background);
+  --nx-info-bg: var(--nexsure-soft-background);
+  --nx-border: var(--nexsure-border);
+  --nx-control: var(--nexsure-border);
+  --nx-focus: var(--nexsure-accent);
+  --nx-text: var(--nexsure-text);
+  --nx-secondary: var(--nexsure-secondary-text);
+  --nx-muted: var(--nexsure-secondary-text);
+  --nx-success: var(--nexsure-success);
+  --nx-success-bg: #ECFDF5;
+  --nx-warning: var(--nexsure-warning);
+  --nx-warning-bg: #FFFBEB;
+  --nx-danger: var(--nexsure-danger);
+  --nx-danger-bg: #FEF2F2;
+  --nx-ai-bg: #DBEAFE;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-strong: var(--ring-strong);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-ai: var(--ai);
+  --color-ai-foreground: var(--ai-foreground);
+  --color-deep-blue: var(--deep-blue);
+  --color-soft-background: var(--soft-background);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-nav-background: var(--nav-background);
+  --color-nav-foreground: var(--nav-foreground);
+  --color-nav-hover: var(--nav-hover);
+  --color-nav-active: var(--nav-active);
+  --color-nav-active-foreground: var(--nav-active-foreground);
+  --color-nav-active-icon: var(--nav-active-icon);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -19,39 +141,21 @@ body {
 }
 
 .doctor-dashboard-theme {
-  --doctor-primary: #1E3A8A;
-  --doctor-ai-blue: #2563EB;
-  --doctor-accent-sky: #38BDF8;
-  --doctor-bg: #F8FAFC;
-  --doctor-card: #FFFFFF;
-  --doctor-border: #E2E8F0;
-  --doctor-text: #0F172A;
-  --doctor-muted: #64748B;
-  --doctor-success: #059669;
-  --doctor-warning: #D97706;
-  --doctor-danger: #DC2626;
-  --doctor-info: #2563EB;
-  --doctor-soft-blue: #EFF6FF;
-  --doctor-blue-border: #BFDBFE;
-  --doctor-shadow: 0 8px 24px rgba(15, 42, 95, .07);
-}
-
-.doctor-dashboard-theme {
-  --doctor-primary: #1E3A8A;
-  --doctor-ai-blue: #2563EB;
-  --doctor-accent-sky: #38BDF8;
-  --doctor-bg: #F8FAFC;
-  --doctor-card: #FFFFFF;
-  --doctor-border: #E2E8F0;
-  --doctor-text: #0F172A;
-  --doctor-muted: #64748B;
-  --doctor-success: #059669;
-  --doctor-warning: #D97706;
-  --doctor-danger: #DC2626;
-  --doctor-info: #2563EB;
-  --doctor-soft-blue: #EFF6FF;
-  --doctor-blue-border: #BFDBFE;
-  --doctor-shadow: 0 8px 24px rgba(15, 42, 95, .07);
+  --doctor-primary: var(--nexsure-primary);
+  --doctor-ai-blue: var(--nexsure-ai-blue);
+  --doctor-accent-sky: var(--nexsure-accent);
+  --doctor-bg: var(--nexsure-background);
+  --doctor-card: var(--nexsure-surface);
+  --doctor-border: var(--nexsure-border);
+  --doctor-text: var(--nexsure-text);
+  --doctor-muted: var(--nexsure-secondary-text);
+  --doctor-success: var(--nexsure-success);
+  --doctor-warning: var(--nexsure-warning);
+  --doctor-danger: var(--nexsure-danger);
+  --doctor-info: var(--nexsure-ai-blue);
+  --doctor-soft-blue: var(--nexsure-soft-background);
+  --doctor-blue-border: var(--nexsure-blue-border);
+  --doctor-shadow: 0 8px 24px color-mix(in srgb, var(--nexsure-deep-blue) 7%, transparent);
 }
 
 @keyframes pageFade {
@@ -143,9 +247,9 @@ body {
 
 .blueprint-bg {
   background-image:
-    linear-gradient(rgba(191, 219, 254, .055) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(191, 219, 254, .055) 1px, transparent 1px),
-    radial-gradient(circle at 20% 26%, rgba(56, 189, 248, .10), transparent 28%);
+    linear-gradient(color-mix(in srgb, var(--nexsure-blue-border) 5.5%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--nexsure-blue-border) 5.5%, transparent) 1px, transparent 1px),
+    radial-gradient(circle at 20% 26%, color-mix(in srgb, var(--nexsure-accent) 10%, transparent), transparent 28%);
   background-size: 64px 64px, 64px 64px, 100% 100%;
   animation: blueprintDrift 64s linear infinite;
 }
@@ -172,7 +276,7 @@ body {
   height: 520px;
   left: 55%;
   top: 5%;
-  background: rgba(56, 189, 248, .20);
+  background: color-mix(in srgb, var(--nexsure-accent) 20%, transparent);
 }
 
 .aurora-b {
@@ -180,7 +284,7 @@ body {
   height: 560px;
   left: 18%;
   top: 42%;
-  background: rgba(37, 99, 235, .18);
+  background: color-mix(in srgb, var(--nexsure-ai-blue) 18%, transparent);
   animation-delay: 4s;
   animation-duration: 30s;
 }
@@ -190,7 +294,7 @@ body {
   height: 420px;
   right: 6%;
   bottom: 8%;
-  background: rgba(147, 197, 253, .12);
+  background: color-mix(in srgb, var(--nexsure-blue-border) 42%, transparent);
   animation-delay: 8s;
   animation-duration: 34s;
 }
@@ -200,10 +304,10 @@ body {
   align-items: center;
   gap: .45rem;
   border-radius: 999px;
-  border: 1px solid rgba(191, 219, 254, .16);
-  background: rgba(255, 255, 255, .075);
+  border: 1px solid color-mix(in srgb, var(--nexsure-blue-border) 16%, transparent);
+  background: color-mix(in srgb, var(--nexsure-surface) 7.5%, transparent);
   padding: .5rem .7rem;
-  color: #DBEAFE;
+  color: var(--nexsure-soft-background);
   backdrop-filter: blur(14px);
 }
 
@@ -211,15 +315,15 @@ body {
   width: .45rem;
   height: .45rem;
   border-radius: 999px;
-  background: #34D399;
-  box-shadow: 0 0 14px rgba(52, 211, 153, .8);
+  background: var(--nexsure-success);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--nexsure-success) 80%, transparent);
 }
 
 .metric-panel {
-  border: 1px solid rgba(191, 219, 254, .16);
-  background: rgba(255, 255, 255, .07);
+  border: 1px solid color-mix(in srgb, var(--nexsure-blue-border) 16%, transparent);
+  background: color-mix(in srgb, var(--nexsure-surface) 7%, transparent);
   backdrop-filter: blur(14px);
-  box-shadow: 0 18px 45px rgba(2, 6, 23, .16);
+  box-shadow: 0 18px 45px color-mix(in srgb, var(--nexsure-text) 16%, transparent);
 }
 
 .metric-line {
@@ -241,7 +345,7 @@ body {
 .const-label {
   font: 700 10px Inter, system-ui, sans-serif;
   letter-spacing: .09em;
-  fill: #DBEAFE;
+  fill: var(--nexsure-soft-background);
   opacity: .72;
 }
 
@@ -275,7 +379,7 @@ body {
 
 .ekg-glow {
   fill: none;
-  stroke: #38BDF8;
+  stroke: var(--nexsure-accent);
   stroke-width: 10;
   opacity: .065;
   filter: blur(10px);
@@ -285,14 +389,14 @@ body {
 
 .ekg-main {
   fill: none;
-  stroke: #7DD3FC;
+  stroke: color-mix(in srgb, var(--nexsure-accent) 72%, white);
   stroke-width: 2.75;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-dasharray: 1800;
   stroke-dashoffset: 1800;
   animation: ekgCenterFlow 8s linear infinite;
-  filter: drop-shadow(0 0 8px rgba(56, 189, 248, .34));
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--nexsure-accent) 34%, transparent));
 }
 
 .ekg-layer::after {
@@ -303,8 +407,8 @@ body {
   width: 10px;
   height: 10px;
   border-radius: 999px;
-  background: #38BDF8;
-  box-shadow: 0 0 14px rgba(56, 189, 248, .55);
+  background: var(--nexsure-accent);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--nexsure-accent) 55%, transparent);
   transform: translate(-50%, -50%);
   animation: ekgCorePulse 3s ease-in-out infinite;
 }
@@ -328,7 +432,7 @@ body {
   width: 820px;
   height: 820px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(56, 189, 248, .22), rgba(37, 99, 235, .12) 42%, transparent 72%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--nexsure-accent) 22%, transparent), color-mix(in srgb, var(--nexsure-ai-blue) 12%, transparent) 42%, transparent 72%);
   opacity: .24;
   filter: blur(48px);
   transform: translate(-50%, -50%);
@@ -339,7 +443,7 @@ body {
 .drbenz img {
   display: block;
   animation: drBreathe 8s ease-in-out infinite;
-  filter: drop-shadow(0 30px 30px rgba(2, 6, 23, .28)) contrast(1.01) saturate(1.02);
+  filter: drop-shadow(0 30px 30px color-mix(in srgb, var(--nexsure-text) 28%, transparent)) contrast(1.01) saturate(1.02);
   backface-visibility: hidden;
   transform-style: preserve-3d;
   will-change: transform;
@@ -352,7 +456,7 @@ body {
   width: 420px;
   height: 48px;
   border-radius: 50%;
-  background: radial-gradient(ellipse, rgba(0, 0, 0, .28), transparent 72%);
+  background: radial-gradient(ellipse, color-mix(in srgb, var(--nexsure-text) 28%, transparent), transparent 72%);
   opacity: .22;
   filter: blur(22px);
   animation: shadowBreath 7.4s ease-in-out infinite;
@@ -364,7 +468,7 @@ body {
   left: 14px;
   top: 50%;
   transform: translateY(-50%);
-  color: #64748B;
+  color: var(--muted-foreground);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: .04em;
@@ -375,8 +479,8 @@ body {
   height: 48px;
   width: 100%;
   border-radius: 16px;
-  border: 1px solid #CBD5E1;
-  background: #fff;
+  border: 1px solid var(--input);
+  background: var(--card);
   padding: 0 44px;
   font-size: 14px;
   outline: none;
@@ -384,8 +488,8 @@ body {
 }
 
 .form-input:focus {
-  border-color: #2563EB;
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, .11);
+  border-color: var(--ring);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--ring) 11%, transparent);
 }
 
 @media (min-width: 1600px) {

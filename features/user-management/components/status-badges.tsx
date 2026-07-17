@@ -5,11 +5,11 @@ import type { AiAccessLevel, AiAccessStatus, ClinicUserStatus } from "../types/u
 type Tone = "success" | "warning" | "danger" | "info" | "neutral";
 
 const toneClasses: Record<Tone, string> = {
-  success: "border-emerald-200 bg-emerald-50 text-emerald-800",
-  warning: "border-amber-200 bg-amber-50 text-amber-800",
-  danger: "border-red-200 bg-red-50 text-red-800",
-  info: "border-blue-200 bg-blue-50 text-blue-800",
-  neutral: "border-slate-200 bg-slate-50 text-slate-700",
+  success: "border-[color:color-mix(in_srgb,var(--success)_24%,white)] bg-[var(--nx-success-bg)] text-success",
+  warning: "border-[color:color-mix(in_srgb,var(--warning)_24%,white)] bg-[var(--nx-warning-bg)] text-warning",
+  danger: "border-[color:color-mix(in_srgb,var(--danger)_24%,white)] bg-[var(--nx-danger-bg)] text-danger",
+  info: "border-[var(--nexsure-blue-border)] bg-soft-background text-primary",
+  neutral: "border-border bg-background text-nav-foreground",
 };
 
 export function StatusBadge({ status }: { status: ClinicUserStatus }) {
@@ -37,7 +37,7 @@ export function AiAccessBadge({ status, level }: { status: AiAccessStatus; level
         <BrainCircuit size={13} aria-hidden="true" />
         {aiAccessStatusLabels[status]}
       </span>
-      <span className="text-xs font-semibold text-slate-500">{aiAccessLevelLabels[level]}</span>
+      <span className="text-xs font-semibold text-muted-foreground">{aiAccessLevelLabels[level]}</span>
     </div>
   );
 }
