@@ -798,11 +798,8 @@ function Worklist({ rows, filters, updateFilter, openCase, clearChart }: { rows:
   const [page, setPage] = useState(1);
   const pageSize = 4;
   const totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
-  const visibleRows = rows.slice((page - 1) * pageSize, page * pageSize);
-
-  useEffect(() => {
-    setPage(1);
-  }, [filters, rows.length]);
+  const safePage = Math.min(page, totalPages);
+  const visibleRows = rows.slice((safePage - 1) * pageSize, safePage * pageSize);
 
   return (
     <section className={`${cardClass} overflow-hidden p-0`}>
@@ -870,11 +867,11 @@ function Worklist({ rows, filters, updateFilter, openCase, clearChart }: { rows:
         {!rows.length ? <div className="p-8 text-center text-sm text-slate-500">No claim cases found for the selected filters.<br />ไม่พบเคสตามเงื่อนไขที่เลือก กรุณาปรับตัวกรองและลองอีกครั้ง</div> : null}
       </div>
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 p-3 text-xs text-slate-500">
-        <span>Showing {rows.length ? (page - 1) * pageSize + 1 : 0}-{Math.min(page * pageSize, rows.length)} of {rows.length} claims</span>
+        <span>Showing {rows.length ? (safePage - 1) * pageSize + 1 : 0}-{Math.min(safePage * pageSize, rows.length)} of {rows.length} claims</span>
         <div className="flex items-center gap-2">
-          <button className={smallButtonSecondary} disabled={page === 1} onClick={() => setPage((current) => Math.max(1, current - 1))}>Previous</button>
-          <strong className="text-slate-700">Page {page} / {totalPages}</strong>
-          <button className={smallButtonSecondary} disabled={page === totalPages} onClick={() => setPage((current) => Math.min(totalPages, current + 1))}>Next</button>
+          <button className={smallButtonSecondary} disabled={safePage === 1} onClick={() => setPage((current) => Math.max(1, current - 1))}>Previous</button>
+          <strong className="text-slate-700">Page {safePage} / {totalPages}</strong>
+          <button className={smallButtonSecondary} disabled={safePage === totalPages} onClick={() => setPage((current) => Math.min(totalPages, current + 1))}>Next</button>
         </div>
       </div>
     </section>
