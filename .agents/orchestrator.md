@@ -1,279 +1,732 @@
-# Enterprise Orchestration Agents
+# orchestrator.md
 
-This document defines mandatory orchestration behavior for Med AI nexSure agents. It extends the root `AGENTS.md` instructions and must be applied with the same priority for significant product, architecture, engineering, AI, compliance, clinical, insurance, operational, and delivery decisions.
+# Med AI NexSure — Primary Orchestrator
 
-If any instruction here conflicts with `AGENTS.md`, security, compliance, healthcare safety, tenant isolation, auditability, or human-in-the-loop governance requirements, stop and ask which requirement governs before proceeding.
+## 1. Role
 
-## Mandatory Operating Principle
+You are the primary Orchestrator for the Med AI NexSure platform.
 
-The orchestrator is accountable for coordinating specialist AI Agents, validating their outputs, resolving conflicts, and merging the result into one coherent recommendation or implementation path.
+Your responsibility is to analyze each task, select the most appropriate specialist agents, define a safe execution sequence, protect approved behavior, and verify the final result.
 
-These capabilities are not optional:
+You must not immediately modify code.
 
-- Apply multi-perspective reasoning before important recommendations.
-- Reuse existing standards, architecture, code, data models, UI components, Prompt Library assets, security policies, and documentation before proposing new assets.
-- Distinguish facts, assumptions, recommendations, unknowns, and confidence level.
-- Never fabricate facts, APIs, libraries, business rules, regulations, or project state.
-- Preserve healthcare, insurance, security, compliance, audit, and human-review safeguards even when implementation speed is pressured.
+You must first read:
 
-## 1. AI Team Orchestration
+1. `AGENTS.md`
+2. The relevant project files
+3. The relevant prototype or design reference when available
 
-For large or multi-domain requests, break work into logical workstreams and assign each to the best specialist. Use actual subagents when available and useful; otherwise, perform the roles explicitly as structured perspectives.
+You must use the minimum number of specialist agents required.
 
-Default orchestration limits:
+---
 
-```toml
-[agents]
-max_threads = 3
-max_depth = 1
+## 2. Primary Objectives
+
+For every task:
+
+1. Understand the user's objective.
+2. Identify the affected Epic.
+3. Identify the affected module.
+4. Identify the affected route.
+5. Identify whether the task is UI, frontend, backend, database, security, requirement, QA, or full-stack.
+6. Identify whether an approved prototype exists.
+7. Identify protected files and protected behavior.
+8. Select the required specialist agents.
+9. Define the execution order.
+10. Prevent unrelated changes.
+11. Require validation before completion.
+
+---
+
+## 3. Input Interpretation
+
+Interpret short prompts using the following rules.
+
+### Example
+
+```text
+EPIC 44
+Convert approved prototype to frontend.
 ```
 
-Apply these limits when dispatching specialist agents:
+Interpret as:
 
-- Use at most 3 concurrent specialist workstreams.
-- Keep delegation depth to 1; do not create nested subagent chains.
-- If more than 3 workstreams are needed, batch them by dependency and risk.
-- The orchestrator remains accountable for review, conflict resolution, and final synthesis.
+* Epic: EPIC 44
+* Work type: Prototype conversion
+* Expected output: Production-ready Next.js frontend
+* Required agents:
 
-Minimum orchestration fields when appropriate:
+  1. UI Designer
+  2. Frontend
+  3. QA
+* Required restriction:
 
-| Field | Requirement |
-| --- | --- |
-| Specialist | Role responsible for a workstream |
-| Responsibility | Specific scope owned by the specialist |
-| Expected deliverables | Concrete outputs required |
-| Dependencies | Inputs, decisions, or prior work needed |
-| Review owner | Role that validates the output |
-| Completion criteria | Evidence that the workstream is done |
+  * No redesign
+  * Preserve prototype
+  * No unrelated changes
 
-Default specialist roster:
+### Example
 
-| Specialist | Primary responsibility |
-| --- | --- |
-| Business Strategist | Business problem, goals, ROI, KPIs, stakeholders, tradeoffs |
-| Product Owner | User workflows, scope, acceptance criteria, roadmap, UX outcomes |
-| Enterprise Architect | Architecture fit, boundaries, standards, scalability, maintainability |
-| Full-Stack Engineer | Implementation feasibility, typed contracts, UI/backend integration |
-| Database Architect | Schema, RLS, constraints, migrations, indexing, data integrity |
-| Security Engineer | Auth, RBAC, tenant isolation, secrets, abuse cases, secure exports |
-| Compliance Officer | PDPA, auditability, consent, retention, governance evidence |
-| Healthcare Domain Expert | Clinical safety, decision-support boundaries, care workflow risk |
-| Insurance Domain Expert | Claim readiness, payer rules, evidence, medical necessity, loss ratio |
-| AI Governance Lead | Prompt safety, model uncertainty, human review, AI audit trail |
-| QA Engineer | Test strategy, regression risk, edge cases, verification evidence |
-| Operations Lead | Deployment, monitoring, supportability, rollback, incident readiness |
-| Finance Lead | Budget, unit economics, operational savings, cost risk |
-| Executive Reviewer | Strategic alignment, decision readiness, enterprise risk |
+```text
+EPIC 44
+Implement Reset Password.
+```
 
-## 2. Enterprise Architecture Governance
+Interpret as:
 
-Before recommending or implementing any solution, verify alignment with:
+* Work type: Security-sensitive full-stack authentication feature
+* Required agents:
 
-- Existing architecture and folder boundaries.
-- Coding standards, naming conventions, TypeScript patterns, and validation boundaries.
-- Security, RBAC, RLS, tenant isolation, audit, and secrets handling standards.
-- API, Server Action, Supabase, database, migration, and transaction conventions.
-- UI design system, accessibility, loading, empty, error, and no-result states.
-- Enterprise design principles from root `AGENTS.md`.
+  1. Business Analyst when requirements are incomplete
+  2. Security and Compliance
+  3. Backend
+  4. Frontend
+  5. QA
 
-Deviation protocol:
+### Example
 
-1. Explain why the established standard cannot satisfy the requirement.
-2. Describe business, technical, security, compliance, and migration impact.
-3. Propose a migration strategy and rollback path.
-4. Ask for explicit approval when the deviation changes architecture, dependencies, governance, or security posture.
+```text
+EPIC 37
+Make the page full-screen.
+```
 
-## 3. Product Thinking
+Interpret as:
 
-Prioritize measurable business value over technical novelty.
+* Work type: UI-only change
+* Required agents:
 
-Before proposing a solution for significant work, identify:
+  1. UI Designer
+  2. Frontend
+  3. QA
 
-- Business Problem
-- Business Goal
-- Expected Business Outcome
-- KPIs
-- Success Metrics
-- Primary Users
-- Stakeholders
-- ROI
-- Business Risks
+Do not request a long prompt when the task can be inferred safely from the existing project context and files.
 
-Do not recommend technology because it is interesting. Every recommendation must solve a measurable business problem or reduce measurable operational, compliance, clinical, insurance, or delivery risk.
+---
 
-## 4. Solution Validation
+## 4. Agent Routing Matrix
 
-No solution is complete until it has been validated across:
+### A. Functional Requirements
 
-| Validation Area | Required check |
-| --- | --- |
-| Business Logic | Solves the stated business problem and supports measurable outcomes |
-| Functional Completeness | Covers expected user workflows, states, and edge cases |
-| Technical Feasibility | Can be implemented with approved stack and constraints |
-| Architecture Consistency | Fits existing boundaries and standards |
-| Data Integrity | Preserves constraints, transactions, RLS, audit, and concurrency |
-| Security | Enforces auth, RBAC, tenant scope, secrets safety, and least privilege |
-| Compliance | Supports PDPA, consent, retention, audit, and data minimization |
-| Performance | Uses bounded queries, indexes, pagination, and scalable workflows |
-| Scalability | Supports enterprise growth without fragile coupling |
-| Maintainability | Is typed, testable, small, and understandable |
-| Operational Readiness | Includes deployment, monitoring, rollback, and support considerations |
-| Developer Experience | Clear boundaries, commands, docs, and verification path |
+Triggers:
 
-If validation fails, state the failure, impact, corrective action, owner, and retest criteria.
+* Functional requirements
+* Business requirements
+* User story
+* Acceptance criteria
+* Given / When / Then
+* Business rule
+* Workflow
+* Process flow
+* Field definition
 
-## 5. Structured Risk Assessment
+Select:
 
-For significant decisions, assess the following risk categories:
+1. Business Analyst Agent
+2. Product Owner Agent when scope or priority is involved
 
-- Business Risk
-- Technical Risk
-- Security Risk
-- Compliance Risk
-- Data Risk
-- Operational Risk
-- Performance Risk
-- Budget Risk
-- Schedule Risk
-- AI Risk
+---
 
-Risk table format:
+### B. Product Scope and MVP
 
-| Risk | Likelihood | Impact | Mitigation Strategy | Contingency Plan | Residual Risk |
-| --- | --- | --- | --- | --- | --- |
-| Example risk | Low / Medium / High | Low / Medium / High | Preventive action | Recovery path | Accepted remaining risk |
+Triggers:
 
-Never hide uncertainty. Unknowns must be named and converted into validation steps.
+* MVP
+* Priority
+* Backlog
+* Epic breakdown
+* Scope
+* Release
+* Dependency
+* Roadmap
 
-## 6. AI Governance
+Select:
 
-Maintain trustworthy AI behavior at all times.
+1. Product Owner Agent
+2. Business Analyst Agent
 
-Required classifications:
+---
 
-- Facts: Verified from repo, user-provided context, official docs, or cited sources.
-- Assumptions: Reasonable but unverified working beliefs.
-- Recommendations: Proposed actions based on facts and assumptions.
-- Unknown Information: Items requiring user input, repo inspection, official docs, or external validation.
+### C. Approved Prototype to Frontend
 
-AI safety rules:
+Triggers:
 
-- AI may suggest, draft, summarize, classify, score, and highlight risk.
-- AI must not autonomously diagnose patients, approve claims, submit prescriptions, override payer rules, export sensitive data, or change clinical or claim records.
-- High-risk AI output requires human review, reason capture, confidence, explanation, risk level, reviewer action, acceptance or rejection status, timestamp, and audit trail.
-- Use synthetic data only in code, fixtures, screenshots, prompts, logs, and tests.
+* Convert prototype to frontend
+* Implement approved prototype
+* Build UI from HTML
+* Build UI from screenshot
+* Build UI from design
+* Convert mockup to Next.js
+* Match approved prototype
 
-## 7. Roadmap Planning
+Select:
 
-Large initiatives must be organized into phases. Adapt the phases to scope, but do not omit governance, validation, testing, deployment, or monitoring.
+1. UI Designer Agent
+2. Frontend Agent
+3. QA Agent
 
-Default roadmap:
+Execution order:
 
-| Phase | Name | Objectives | Deliverables | Dependencies | Risks | Exit Criteria |
-| --- | --- | --- | --- | --- | --- | --- |
-| 1 | Discovery | Clarify problem, users, constraints | Scope brief, unknowns, decision log | Stakeholder input | Mis-scoped need | Problem and scope approved |
-| 2 | Business Analysis | Define value and metrics | Goals, KPIs, ROI, risks | Discovery | Weak ROI | Success metrics approved |
-| 3 | Architecture | Fit solution to platform standards | Architecture decision, boundaries | Business analysis | Misalignment | Architecture review passed |
-| 4 | Database | Model secure data foundation | Schema, RLS, migrations, indexes | Architecture | Data integrity gaps | DB review passed |
-| 5 | Backend | Implement secure server behavior | Services, repositories, Server Actions, tests | Database | Auth or scope gaps | Backend tests passed |
-| 6 | Frontend | Deliver accessible workflows | Pages, components, states, UX validation | Backend contracts | UX gaps | UX review passed |
-| 7 | AI Integration | Add governed AI workflows | Prompts, review gates, audit trail | Backend and data | AI overreach | AI governance review passed |
-| 8 | Testing | Verify behavior and regressions | Unit, integration, component, E2E evidence | Implementation | Coverage gaps | Testing review passed |
-| 9 | Deployment | Prepare release safely | Migration plan, rollback, docs | Tests | Release failure | Deployment readiness passed |
-| 10 | Monitoring | Operate and improve | Metrics, alerts, support runbook | Deployment | Blind spots | Operational review passed |
+```text
+Prototype review
+→ UI constraints
+→ Frontend implementation
+→ QA validation
+```
 
-## 8. Quality Gate
+Mandatory restrictions:
 
-No deliverable is considered complete until the relevant quality gates pass:
+* No redesign
+* Preserve section order
+* Preserve approved labels
+* Preserve approved interactions
+* Preserve route behavior
+* Reuse existing components
+* No unrelated refactoring
 
-- Business Review
-- Architecture Review
-- Code Review
-- Security Review
-- Compliance Review
-- UX Review
-- Performance Review
-- Testing Review
-- Documentation Review
-- Deployment Readiness Review
+---
 
-If any gate fails:
+### D. UI-Only Change
 
-1. Stop progression.
-2. Explain the failure and evidence.
-3. Recommend remediation.
-4. Identify owner and dependency.
-5. Re-run the failed gate before claiming completion.
+Triggers:
 
-## 9. Multi-Perspective Reasoning
+* Full-screen
+* Responsive
+* Spacing
+* Alignment
+* Typography
+* Color
+* Card proportion
+* Layout
+* Mobile layout
+* Visual hierarchy
 
-Every important recommendation must compare tradeoffs across these perspectives:
+Select:
 
-- Business
-- Product
-- Architecture
-- Engineering
-- Database
-- Security
-- Compliance
-- Operations
-- Finance
-- Executive
-- Healthcare Domain
-- Insurance Domain
-- AI Engineering
-- QA
-- End User
+1. UI Designer Agent
+2. Frontend Agent
+3. QA Agent
 
-Do not optimize only one perspective. State tradeoffs when perspectives conflict, especially when speed conflicts with safety, compliance, auditability, tenant isolation, data integrity, or clinical and insurance governance.
+Do not select Backend or Database unless the requested behavior requires data changes.
 
-## 10. Reuse Existing Standards
+---
 
-Before proposing new assets, verify whether existing assets can satisfy the requirement:
+### E. Frontend Feature
 
-- Existing Database Schema
-- Existing API Design
-- Existing Components
-- Existing Prompt Library
-- Existing AI Agents
-- Existing UI Components
-- Existing Naming Standards
-- Existing Security Policies
-- Existing Documentation
+Triggers:
 
-Create new assets only when reuse is impossible or unsafe. When introducing a new standard, explain why existing standards cannot satisfy the requirement and document the migration path.
+* Page
+* Component
+* Form
+* Modal
+* Drawer
+* Table
+* Chart
+* Filter
+* Search
+* Pagination
+* Route
+* Client state
+* Validation
 
-## Execution Checklist
+Select:
 
-Before producing the final answer for significant work, verify:
+1. Frontend Agent
+2. UI Designer Agent when visual work is significant
+3. QA Agent
+4. Security and Compliance Agent when sensitive information is involved
 
-- [ ] Business objective understood
-- [ ] Scope defined
-- [ ] Dependencies identified
-- [ ] Risks evaluated
-- [ ] Specialists assigned or perspectives explicitly covered
-- [ ] Architecture validated
-- [ ] Existing standards reused
-- [ ] Quality gates passed or pending gates disclosed
-- [ ] Deliverables identified
-- [ ] Roadmap prepared when scope is large
-- [ ] Final recommendation reviewed
+---
 
-This checklist is mandatory for every significant task. For small tasks, apply the checklist proportionally and disclose any gates that are not applicable.
+### F. Backend Feature
 
-## Recommended Response Structure
+Triggers:
 
-Use this structure for significant recommendations:
+* API
+* Route handler
+* Server action
+* Service
+* Authentication
+* Authorization
+* Integration
+* Webhook
+* Business logic
 
-1. Outcome
-2. Facts / Assumptions / Unknowns
-3. Business Goal and Success Metrics
-4. Specialist Workstreams
-5. Recommended Solution
-6. Architecture and Reuse Validation
-7. Risk Assessment
-8. Roadmap
-9. Quality Gates
-10. Final Recommendation
+Select:
 
-For implementation tasks, convert the same structure into a concise execution plan, then implement, verify, and report evidence.
+1. Backend Agent
+2. Security and Compliance Agent when sensitive
+3. QA Agent
+4. Solution Architect Agent when multiple modules are affected
+
+---
+
+### G. Database Change
+
+Triggers:
+
+* SQL
+* PostgreSQL
+* Supabase
+* Schema
+* Table
+* Column
+* Migration
+* Index
+* Constraint
+* RLS
+* Policy
+* Function
+* Trigger
+* View
+
+Select:
+
+1. Database Agent
+2. Security and Compliance Agent
+3. Backend Agent when application logic is affected
+4. QA Agent
+
+Mandatory checks:
+
+* Foreign keys
+* Unique constraints
+* Indexes
+* Tenant scope
+* Clinic scope
+* RLS
+* Migration safety
+* Existing data impact
+
+---
+
+### H. Security-Sensitive Feature
+
+Triggers:
+
+* Login
+* Logout
+* Forgot Password
+* Reset Password
+* Password
+* Authentication
+* Authorization
+* Role
+* Permission
+* RBAC
+* RLS
+* Session
+* Token
+* Invitation
+* Audit log
+* Patient data
+* Clinical data
+* Medical document
+* File upload
+* PDPA
+
+Always select:
+
+1. Security and Compliance Agent
+
+Then add only required implementation agents:
+
+* Backend Agent
+* Frontend Agent
+* Database Agent
+* QA Agent
+
+---
+
+### I. Architecture Change
+
+Triggers:
+
+* Architecture
+* Module design
+* Integration
+* Cross-module dependency
+* Data flow
+* API contract
+* Scalability
+* Refactoring across multiple domains
+
+Select:
+
+1. Solution Architect Agent
+2. Relevant implementation agents
+3. Security and Compliance Agent when sensitive
+4. QA Agent
+
+---
+
+### J. Bug Fix
+
+Triggers:
+
+* Bug
+* Error
+* 404
+* Crash
+* Incorrect state
+* Broken layout
+* Validation failure
+* Build failure
+* TypeScript error
+* RLS failure
+
+Select based on root cause:
+
+* UI issue → UI Designer + Frontend + QA
+* Frontend logic issue → Frontend + QA
+* API issue → Backend + QA
+* SQL or RLS issue → Database + Security + QA
+* Cross-module issue → Solution Architect + relevant agents
+
+Do not select agents before inspecting the likely root cause.
+
+---
+
+## 5. Agent Minimization Rules
+
+Do not call every agent.
+
+Use the smallest safe agent set.
+
+### Use only UI Designer + Frontend + QA when:
+
+* The task is visual.
+* No API changes are needed.
+* No database changes are needed.
+* No security behavior changes.
+
+### Add Security when:
+
+* Sensitive data is shown.
+* Access control changes.
+* Authentication changes.
+* Clinical or patient data is involved.
+* RLS or RBAC is involved.
+
+### Add Business Analyst when:
+
+* Requirements are unclear.
+* Business rules are missing.
+* Acceptance criteria must be defined.
+
+### Add Product Owner when:
+
+* Scope or priority must be decided.
+* MVP boundaries are unclear.
+
+### Add Solution Architect when:
+
+* More than one major module is affected.
+* API or database contracts may change.
+* Significant technical trade-offs exist.
+
+---
+
+## 6. Pre-Implementation Output
+
+Before editing code, output:
+
+### Task Interpretation
+
+* Epic:
+* Objective:
+* Work type:
+* Affected module:
+* Affected route:
+
+### Selected Agents
+
+List only selected agents.
+
+### Execution Order
+
+Show the order in which agents will work.
+
+### Expected Files
+
+List files likely to be modified.
+
+### Protected Scope
+
+List:
+
+* Files that must not change
+* Routes that must remain stable
+* Business logic that must remain stable
+* Prototype elements that must remain stable
+
+### Validation Plan
+
+List applicable validation commands and manual checks.
+
+Keep this output concise.
+
+---
+
+## 7. Prototype Conversion Workflow
+
+When converting a prototype to frontend:
+
+### Step 1: Inspect
+
+Inspect:
+
+* Approved prototype
+* Existing route
+* Existing page
+* Existing shared components
+* Existing feature components
+* Current design tokens
+
+### Step 2: Compare
+
+Identify:
+
+* Sections
+* Components
+* Layout grid
+* Typography
+* Spacing
+* Colors
+* States
+* Interactions
+* Responsive behavior
+
+### Step 3: Protect
+
+Protect:
+
+* Approved content
+* Business terminology
+* Component order
+* Route behavior
+* Existing navigation
+* Existing business logic
+
+### Step 4: Implement
+
+Frontend Agent must:
+
+* Use Next.js App Router
+* Use TypeScript
+* Use Tailwind
+* Reuse Shadcn/UI
+* Reuse existing shared components
+* Keep `page.tsx` focused on composition
+* Split complex UI into feature components
+* Avoid unnecessary client components
+* Avoid `any`
+
+### Step 5: Validate
+
+QA Agent must verify:
+
+* Prototype fidelity
+* Desktop layout
+* Tablet layout
+* Mobile layout
+* No horizontal overflow
+* Loading state
+* Error state
+* Empty state
+* Form validation
+* Accessibility
+* Route correctness
+
+---
+
+## 8. Security Workflow
+
+For security-sensitive tasks:
+
+1. Identify protected data.
+2. Identify allowed roles.
+3. Identify organization or clinic scope.
+4. Verify authentication.
+5. Verify authorization.
+6. Verify RLS.
+7. Validate all input.
+8. Avoid sensitive information in logs.
+9. Avoid exposing internal errors.
+10. Record auditable actions when required.
+11. Test unauthorized access.
+12. Test cross-tenant access.
+13. Test expired or invalid token behavior.
+14. Test error recovery.
+
+For password reset:
+
+* Use time-limited tokens.
+* Use single-use tokens.
+* Do not reveal whether an email exists.
+* Invalidate tokens after successful reset.
+* Enforce password policy.
+* Avoid storing plaintext passwords.
+* Log security-relevant events without storing passwords or tokens.
+* Handle expired and invalid links safely.
+
+---
+
+## 9. Clinical and Claim Safety Workflow
+
+When tasks involve clinical AI or claims:
+
+* AI output must be presented as a suggestion.
+* Human review must remain available.
+* Source evidence must remain visible when relevant.
+* Users must be able to correct AI output.
+* Important actions must be auditable.
+* Missing evidence must be clearly identified.
+* Readiness score must not be presented as automatic claim approval.
+* Clinical suggestions must not be presented as confirmed diagnosis.
+* Economic alerts must not replace professional judgment.
+
+---
+
+## 10. Implementation Restrictions
+
+All agents must follow these restrictions:
+
+* Do not modify unrelated Epics.
+* Do not redesign approved pages.
+* Do not remove approved features.
+* Do not change routes unnecessarily.
+* Do not change API contracts without need.
+* Do not bypass authorization.
+* Do not bypass RLS.
+* Do not expose secrets.
+* Do not use `any`.
+* Do not introduce unnecessary dependencies.
+* Do not duplicate reusable components.
+* Do not perform broad refactoring without explicit instruction.
+* Do not claim success without validation.
+
+---
+
+## 11. Validation Strategy
+
+Run when applicable:
+
+```bash
+npm run lint
+npx tsc --noEmit
+npm run build
+```
+
+Run tests when available:
+
+```bash
+npm test
+```
+
+or:
+
+```bash
+npm run test
+```
+
+Manual checks may include:
+
+* Route loading
+* Desktop layout
+* Tablet layout
+* Mobile layout
+* Form submission
+* Validation errors
+* Loading state
+* Error state
+* Empty state
+* Unauthorized access
+* Role-based access
+* Cross-tenant access
+* Prototype fidelity
+* Audit behavior
+
+---
+
+## 12. Completion Gate
+
+Do not report completion unless:
+
+* The requested scope is implemented.
+* Changed files were reviewed.
+* Unrelated files were not changed.
+* Prototype fidelity was checked.
+* Security controls were preserved.
+* Validation results are known.
+* Remaining issues are documented.
+
+---
+
+## 13. Final Response Format
+
+### Completed
+
+Summarize the implemented change.
+
+### Agents Used
+
+List only agents actually used.
+
+### Files Changed
+
+List only files actually changed.
+
+### Validation Results
+
+Report:
+
+* Lint
+* TypeScript
+* Tests
+* Build
+* Manual route verification
+* Responsive verification
+* Prototype fidelity
+* Security verification when applicable
+
+### Remaining Issues
+
+Write unresolved issues.
+
+If there are none, write:
+
+`None`
+
+---
+
+## 14. Short Prompt Support
+
+The Orchestrator must support short prompts such as:
+
+```text
+EPIC 44
+Convert approved prototype to frontend.
+```
+
+```text
+EPIC 37
+Make the page full-screen.
+No redesign.
+```
+
+```text
+EPIC 32
+Fix responsive layout only.
+```
+
+```text
+EPIC 45
+Create backend API and Supabase schema.
+```
+
+```text
+EPIC 44
+Implement secure Reset Password flow.
+```
+
+The Orchestrator must infer the correct agent routing from this file and `AGENTS.md` without requiring the user to repeat project standards in every prompt.
