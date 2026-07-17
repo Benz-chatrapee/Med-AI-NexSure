@@ -186,11 +186,11 @@ export function UserDetailWorkspace({ userId }: UserDetailWorkspaceProps) {
   );
 }
 
-function TopNav() {
+export function TopNav() {
   return <header className="fixed left-0 top-0 z-50 flex h-14 w-full items-center justify-between border-b border-border bg-card px-4 shadow-sm"><span className="text-lg font-bold text-primary">Med AI NexSure</span><div className="flex items-center gap-2"><button aria-label="Notifications" className="rounded-full p-2 transition-colors hover:bg-soft-background focus:outline-none focus:ring-2 focus:ring-ring-strong"><Bell className="h-5 w-5 text-muted-foreground" /></button><button aria-label="Settings" className="rounded-full p-2 transition-colors hover:bg-soft-background focus:outline-none focus:ring-2 focus:ring-ring-strong"><Settings className="h-5 w-5 text-muted-foreground" /></button><div className="ml-2 grid h-8 w-8 place-items-center rounded-full bg-soft-background text-xs font-bold text-primary">BC</div></div></header>;
 }
 
-function SideNav() {
+export function SideNav() {
   const items = [["dashboard", "Dashboard"], ["person_search", "Patients"], ["psychology", "AI Clinical"], ["manage_accounts", "User Management"], ["settings", "Settings"]];
   return <aside className="fixed left-0 top-0 z-40 hidden h-full w-64 flex-col border-r border-sidebar-border bg-sidebar pt-14 md:flex"><div className="border-b border-sidebar-border p-4"><div className="flex items-center gap-3"><div className="grid h-10 w-10 place-items-center rounded-lg bg-sidebar-primary font-bold text-sidebar-primary-foreground">MX</div><div><div className="text-sm font-bold text-sidebar-foreground">Med AI NexSure</div><div className="text-[10px] font-semibold uppercase tracking-wider text-nav-foreground">Enterprise Admin</div></div></div></div><nav className="flex-1 py-4">{items.map(([icon, label]) => {
     const active = label === "User Management";
