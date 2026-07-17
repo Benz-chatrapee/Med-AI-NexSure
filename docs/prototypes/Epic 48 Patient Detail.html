@@ -1,0 +1,536 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Med AI NexSure | Patient 360° Intelligence Workspace</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary-fixed-variant": "#264191",
+                      "surface-container-low": "#eff4ff",
+                      "secondary-container": "#a9c0fe",
+                      "surface-tint": "#4059aa",
+                      "surface-container-lowest": "#ffffff",
+                      "outline-variant": "#c5c5d3",
+                      "on-primary-container": "#90a8ff",
+                      "tertiary-fixed-dim": "#b4c5ff",
+                      "error": "#ba1a1a",
+                      "on-secondary-container": "#364d83",
+                      "surface-container-high": "#dce9ff",
+                      "surface-variant": "#d3e4fe",
+                      "on-tertiary": "#ffffff",
+                      "on-background": "#0b1c30",
+                      "primary-fixed-dim": "#b6c4ff",
+                      "on-tertiary-container": "#8da9ff",
+                      "background": "#f8f9ff",
+                      "on-tertiary-fixed": "#00174b",
+                      "primary-container": "#1e3a8a",
+                      "on-error-container": "#93000a",
+                      "surface-bright": "#f8f9ff",
+                      "primary-fixed": "#dce1ff",
+                      "on-error": "#ffffff",
+                      "on-surface-variant": "#444651",
+                      "surface": "#f8f9ff",
+                      "surface-dim": "#cbdbf5",
+                      "error-container": "#ffdad6",
+                      "on-primary-fixed": "#00164e",
+                      "inverse-on-surface": "#eaf1ff",
+                      "on-surface": "#0b1c30",
+                      "tertiary": "#00246b",
+                      "secondary": "#465d94",
+                      "primary": "#00236f",
+                      "inverse-surface": "#213145",
+                      "outline": "#757682",
+                      "inverse-primary": "#b6c4ff",
+                      "tertiary-container": "#00389a",
+                      "on-tertiary-fixed-variant": "#003ea8",
+                      "on-primary": "#ffffff",
+                      "tertiary-fixed": "#dbe1ff",
+                      "secondary-fixed": "#dae2ff",
+                      "on-secondary-fixed-variant": "#2e457b",
+                      "surface-container-highest": "#d3e4fe",
+                      "secondary-fixed-dim": "#b1c5ff",
+                      "surface-container": "#e5eeff",
+                      "on-secondary": "#ffffff",
+                      "on-secondary-fixed": "#001946"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "16px",
+                      "base": "4px",
+                      "md": "16px",
+                      "sidebar-width": "260px",
+                      "sm": "12px",
+                      "xl": "32px",
+                      "lg": "24px",
+                      "xs": "8px",
+                      "container-margin": "24px"
+              },
+              "fontFamily": {
+                      "data-table": ["IBM Plex Sans"],
+                      "label-sm": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "display-lg-mobile": ["Inter"],
+                      "title-sm": ["Inter"],
+                      "display-lg": ["Inter"],
+                      "body-md": ["Inter"],
+                      "data-label": ["IBM Plex Sans"]
+              },
+              "fontSize": {
+                      "data-table": ["13px", {"lineHeight": "1.4", "fontWeight": "400"}],
+                      "label-sm": ["12px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                      "headline-md": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                      "display-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                      "title-sm": ["16px", {"lineHeight": "1.5", "fontWeight": "600"}],
+                      "display-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-md": ["14px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "data-label": ["11px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .glass-ai {
+            background: rgba(239, 246, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(191, 219, 254, 0.5);
+        }
+        .sidebar-gradient {
+            background: linear-gradient(180deg, #00246b 0%, #00174b 100%);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-surface font-body-md text-on-surface antialiased overflow-x-hidden">
+<!-- Clinical Alert Banner (Shared Component TopAppBar Mapping) -->
+<header class="flex items-center justify-center w-full py-1 px-4 z-[60] bg-error">
+<div class="flex items-center gap-2 text-on-error font-label-sm text-label-sm font-bold">
+<span class="material-symbols-outlined text-[18px]">warning</span>
+<span class="">Critical Alert: Penicillin Allergy - Anaphylaxis</span>
+<span class="mx-2 opacity-60">|</span>
+<span class="text-[11px] font-medium">Verified by Dr. Anan Chaiyasit</span>
+<button class="ml-4 underline hover:opacity-80 transition-opacity">View Clinical Safety Detail</button>
+</div>
+</header>
+<!-- Side Navigation (Shared Component SideNavBar Mapping) -->
+<aside class="flex flex-col h-full w-[260px] fixed left-0 top-0 z-50 py-lg sidebar-gradient shadow-xl">
+<div class="px-6 mb-8">
+<h1 class="text-headline-md font-headline-md font-black text-on-tertiary tracking-tighter">Med AI NexSure</h1>
+<p class="text-[10px] text-tertiary-fixed-dim uppercase tracking-widest mt-1">Clinical Operations</p>
+</div>
+<nav class="flex-1 px-2 space-y-1 overflow-y-auto no-scrollbar">
+<!-- Labels and Icons strictly from JSON -->
+<a class="flex items-center gap-3 text-on-tertiary-fixed-variant px-4 py-3 opacity-80 hover:bg-on-tertiary-fixed-variant/20 transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-sm text-label-sm">Dashboard</span>
+</a>
+<!-- ACTIVE: Patients -->
+<a class="flex items-center gap-3 bg-on-primary-fixed-variant text-white font-semibold rounded-lg mx-2 px-4 py-3 scale-95 active:scale-90 transition-all" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm">Patients</span>
+</a>
+<a class="flex items-center gap-3 text-on-tertiary-fixed-variant px-4 py-3 opacity-80 hover:bg-on-tertiary-fixed-variant/20 transition-all" href="#">
+<span class="material-symbols-outlined">event_note</span>
+<span class="font-label-sm text-label-sm">Visits</span>
+</a>
+<a class="flex items-center gap-3 text-on-tertiary-fixed-variant px-4 py-3 opacity-80 hover:bg-on-tertiary-fixed-variant/20 transition-all" href="#">
+<span class="material-symbols-outlined">psychology</span>
+<span class="font-label-sm text-label-sm">AI Clinical Engine</span>
+</a>
+<a class="flex items-center gap-3 text-on-tertiary-fixed-variant px-4 py-3 opacity-80 hover:bg-on-tertiary-fixed-variant/20 transition-all" href="#">
+<span class="material-symbols-outlined">medical_services</span>
+<span class="font-label-sm text-label-sm">Prescriptions</span>
+</a>
+<a class="flex items-center gap-3 text-on-tertiary-fixed-variant px-4 py-3 opacity-80 hover:bg-on-tertiary-fixed-variant/20 transition-all" href="#">
+<span class="material-symbols-outlined">fact_check</span>
+<span class="font-label-sm text-label-sm">Claim Readiness</span>
+</a>
+<a class="flex items-center gap-3 text-on-tertiary-fixed-variant px-4 py-3 opacity-80 hover:bg-on-tertiary-fixed-variant/20 transition-all" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-label-sm text-label-sm">Evidence Packages</span>
+</a>
+<a class="flex items-center gap-3 text-on-tertiary-fixed-variant px-4 py-3 opacity-80 hover:bg-on-tertiary-fixed-variant/20 transition-all" href="#">
+<span class="material-symbols-outlined">gavel</span>
+<span class="font-label-sm text-label-sm">Audit</span>
+</a>
+<a class="flex items-center gap-3 text-on-tertiary-fixed-variant px-4 py-3 opacity-80 hover:bg-on-tertiary-fixed-variant/20 transition-all" href="#">
+<span class="material-symbols-outlined">verified_user</span>
+<span class="font-label-sm text-label-sm">Compliance</span>
+</a>
+<a class="flex items-center gap-3 text-on-tertiary-fixed-variant px-4 py-3 opacity-80 hover:bg-on-tertiary-fixed-variant/20 transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-sm text-label-sm">Settings</span>
+</a>
+</nav>
+<div class="mt-auto px-2 pb-4">
+<a class="flex items-center gap-3 text-on-tertiary-fixed-variant px-4 py-3 opacity-80 hover:bg-on-tertiary-fixed-variant/20 transition-all" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-sm text-label-sm">Help Center</span>
+</a>
+<div class="px-4 py-4 mt-4 border-t border-on-tertiary/10">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full border-2 border-primary-fixed" data-alt="A professional close-up headshot of a female clinical administrator in a modern hospital setting, dressed in business casual attire. High-end photography, soft corporate lighting, blurred medical background with blue and white tones to match the enterprise UI." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAoWHlE_zFCdMOUnNf3EdPHl-67uPXc8NbnaHAASAcQjSZIpZvHfTBvTV38XEzmnJNzmeRr6WUfqzFogoHVsybZxQDQ_Ui0IW7mtNCz5mZum9FWyy2RTpND6q9Fiu-CU_W9XxcmXUKpdf-dtHoM3FlQ-3le7qJVEQorTsjzXrmjzYqc0pZBx0SaXptQ4ttp3I6TvE_XBSn8OT5TI15it5pcNiFd3oVQAFOVUQwGZGJgFrSp2mrMTxPRb-P8vdeHL95r3OINzWFnPOc">
+<div>
+<p class="text-label-sm font-label-sm text-on-tertiary">Clinical Admin</p>
+<p class="text-[10px] text-tertiary-fixed-dim">Enterprise Health</p>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Workspace -->
+<main class="ml-[260px] min-h-screen">
+<!-- Top Navigation (Shared Component TopNavBar Mapping) -->
+<div class="sticky top-0 z-40 flex justify-between items-center w-full px-lg py-sm bg-surface shadow-sm border-b border-outline-variant">
+<div class="flex items-center gap-6 flex-1">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full text-body-md focus:ring-2 focus:ring-primary" placeholder="Global search: Patients, Visits, Claims..." type="text">
+</div>
+<nav class="flex gap-6 items-center">
+<span class="text-body-md font-body-md text-on-surface-variant hover:text-primary cursor-pointer transition-colors">Overview</span>
+<span class="text-body-md font-body-md text-on-surface-variant hover:text-primary cursor-pointer transition-colors">Patient History</span>
+<span class="text-body-md font-body-md text-on-surface-variant hover:text-primary cursor-pointer transition-colors">AI Insights</span>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-surface-container-low transition-colors text-primary relative">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container-low transition-colors text-primary">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container-low transition-colors text-primary">
+<span class="material-symbols-outlined">corporate_fare</span>
+</button>
+</div>
+</div>
+<!-- Breadcrumb & Page Header -->
+<div class="px-lg py-sm">
+<nav class="flex items-center gap-2 text-[12px] text-outline mb-4">
+<span class="">Patients</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="">PT-2026-004872</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-semibold">Patient Detail</span>
+</nav>
+<!-- Patient Header Card -->
+<div class="bg-white rounded-xl shadow-sm border border-outline-variant p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+<div class="flex gap-6 items-center">
+<div class="w-20 h-20 rounded-2xl overflow-hidden shadow-inner">
+<img class="w-full h-full object-cover" data-alt="A portrait of a middle-aged Thai woman with a gentle and professional appearance, clean studio lighting with a soft blue tint, high-resolution clinical profile aesthetic. The lighting is bright and modern, emphasizing trust and patient care." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAE4CSO5oM-bebsJA6n6jF-aQNR3Qda93k3tnjjaPdFczgsPYta1x-DqxP1zXKiydI-kVDns2xF0SYTcsVmLcFTzBa39WYvtAXmKuyy69rzdbLKtkSDNJ0H0BCqaITWLBr7WQ2S9DRvkW5EqSepp_ylSApDzogwBr9ldqWjOgS3Zqu6ZfvXHEwKhRKdF3B7wlLiEXy_jpnPOS6IrI2A34iRPPZRKjkyj9RrYH2devvP4Rb1Jp5_mv-uh2JDuTB2ZnIjK9Gwccj-39E">
+</div>
+<div>
+<div class="flex items-center gap-3 mb-1">
+<h2 class="text-display-lg font-display-lg text-primary">Ms. Naree Srisuk</h2>
+<span class="px-2 py-0.5 rounded bg-surface-container-highest text-primary font-bold text-[11px]">PT-2026-004872</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-highest text-on-surface-variant text-[11px]">HN-009241</span>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant text-body-md">
+<span class="">42y • Female • O+</span>
+<span class="">|</span>
+<span class="">DOB: 14 Feb 1984</span>
+</div>
+<div class="flex gap-2 mt-3">
+<span class="flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-[11px] font-bold rounded-full">
+<span class="w-1.5 h-1.5 bg-green-600 rounded-full"></span> Active Patient
+                            </span>
+<span class="flex items-center gap-1 px-2 py-1 bg-error-container text-on-error-container text-[11px] font-bold rounded-full">
+<span class="material-symbols-outlined text-[14px]">priority_high</span> High Attention
+                            </span>
+<span class="flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 text-[11px] font-bold rounded-full">
+<span class="material-symbols-outlined text-[14px]">check_circle</span> Insurance Verified
+                            </span>
+</div>
+</div>
+</div>
+<button class="bg-primary hover:bg-primary-container text-white px-6 py-3 rounded-lg font-title-sm text-title-sm flex items-center gap-2 shadow-lg shadow-primary/20 transition-all active:scale-95">
+<span class="material-symbols-outlined">add</span>
+                    Create New Visit
+                </button>
+</div>
+</div>
+<!-- KPI Row -->
+<div class="px-lg pb-lg grid grid-cols-2 md:grid-cols-6 gap-4">
+<div class="bg-white p-4 rounded-xl border border-outline-variant hover:shadow-md transition-shadow cursor-pointer">
+<p class="text-data-label font-data-label text-outline uppercase">Visits</p>
+<div class="flex items-baseline gap-2 mt-2">
+<p class="text-display-lg font-display-lg text-on-surface">18</p>
+<span class="text-green-600 text-[12px] font-bold">+2 New</span>
+</div>
+</div>
+<div class="bg-white p-4 rounded-xl border border-outline-variant">
+<p class="text-data-label font-data-label text-outline uppercase">Conditions</p>
+<p class="text-display-lg font-display-lg text-on-surface mt-2">4</p>
+</div>
+<div class="bg-white p-4 rounded-xl border border-outline-variant">
+<p class="text-data-label font-data-label text-outline uppercase">Claims</p>
+<p class="text-display-lg font-display-lg text-on-surface mt-2">2</p>
+</div>
+<div class="bg-white p-4 rounded-xl border border-outline-variant ring-2 ring-primary/20">
+<p class="text-data-label font-data-label text-primary font-bold uppercase">Readiness</p>
+<div class="flex items-baseline gap-2 mt-2">
+<p class="text-display-lg font-display-lg text-primary">78%</p>
+<span class="material-symbols-outlined text-error text-[18px]">error</span>
+</div>
+<p class="text-[10px] text-error font-medium mt-1">Needs Review</p>
+</div>
+<div class="bg-white p-4 rounded-xl border border-outline-variant">
+<p class="text-data-label font-data-label text-outline uppercase">Meds</p>
+<p class="text-display-lg font-display-lg text-on-surface mt-2">5</p>
+</div>
+<div class="bg-white p-4 rounded-xl border border-outline-variant">
+<p class="text-data-label font-data-label text-outline uppercase">Docs</p>
+<p class="text-display-lg font-display-lg text-on-surface mt-2">24</p>
+</div>
+</div>
+<!-- Main Content Area: Workspace Structure -->
+<div class="px-lg pb-xl flex gap-6">
+<!-- Left Sticky Panel: Patient Snapshot -->
+<aside class="w-80 flex-shrink-0 space-y-6">
+<div class="bg-white rounded-xl border border-outline-variant overflow-hidden">
+<div class="bg-surface-container p-4 border-b border-outline-variant flex items-center justify-between">
+<h3 class="text-title-sm font-title-sm text-primary">Patient Snapshot</h3>
+<span class="material-symbols-outlined text-outline">contact_emergency</span>
+</div>
+<div class="p-4 space-y-4">
+<div>
+<p class="text-data-label font-data-label text-outline uppercase">Contact Information</p>
+<p class="text-body-md mt-1">+66 8* *** 5542</p>
+<p class="text-[11px] text-secondary mt-0.5">n****.s@email.com</p>
+</div>
+<div class="pt-4 border-t border-outline-variant/30">
+<p class="text-data-label font-data-label text-outline uppercase">Insurance Coverage</p>
+<div class="flex items-center justify-between mt-1">
+<p class="text-body-md font-semibold">Thai Life Insurance</p>
+<span class="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded">Active</span>
+</div>
+<p class="text-[11px] text-on-surface-variant">Tier 1: Global Platinum</p>
+</div>
+<div class="pt-4 border-t border-outline-variant/30">
+<div class="flex items-center justify-between">
+<p class="text-data-label font-data-label text-outline uppercase">PDPA Consent</p>
+<span class="w-2 h-2 bg-green-500 rounded-full"></span>
+</div>
+<p class="text-body-md mt-1">Active / Verified</p>
+</div>
+<div class="pt-4 border-t border-outline-variant/30">
+<p class="text-data-label font-data-label text-outline uppercase mb-2">Risk Indicators</p>
+<div class="space-y-2">
+<div class="flex justify-between items-center text-[12px]">
+<span class="text-on-surface-variant">Clinical Risk</span>
+<span class="font-bold text-error">High</span>
+</div>
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-error w-[85%] h-full"></div>
+</div>
+<div class="flex justify-between items-center text-[12px] pt-1">
+<span class="text-on-surface-variant">Claim Risk</span>
+<span class="font-bold text-secondary">Medium</span>
+</div>
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-secondary w-[45%] h-full"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="p-4 bg-surface-container-low">
+<p class="text-[11px] italic text-on-surface-variant leading-tight">
+                            "เอกสาร PDPA ครบถ้วน ตรวจสอบสิทธิประกันเรียบร้อยแล้ว"
+                        </p>
+</div>
+</div>
+</aside>
+<!-- Main Work Area (Tabs & Content) -->
+<div class="flex-1 space-y-6">
+<!-- Tab Headers -->
+<div class="flex border-b border-outline-variant">
+<button class="px-6 py-4 text-on-surface-variant hover:text-primary font-medium">Overview</button>
+<button class="px-6 py-4 text-primary font-bold border-b-2 border-primary">Clinical</button>
+<button class="px-6 py-4 text-on-surface-variant hover:text-primary font-medium">Diagnostics</button>
+<button class="px-6 py-4 text-on-surface-variant hover:text-primary font-medium">Claim File</button>
+<button class="px-6 py-4 text-on-surface-variant hover:text-primary font-medium">Timeline</button>
+</div>
+<!-- Grid: Overview Content -->
+<div class="space-y-6">
+<!-- Clinical Summary & Vitals -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<div class="lg:col-span-8 space-y-6">
+<div class="bg-white rounded-xl border border-outline-variant p-6">
+<div class="flex items-center justify-between mb-4"><h3 class="text-title-sm font-title-sm text-primary">Clinical Summary</h3><button class="p-1 rounded hover:bg-surface-container-low text-primary transition-colors flex items-center gap-1 text-[12px] font-medium"><span class="material-symbols-outlined text-[18px]">edit</span>Edit</button></div>
+<p class="text-body-md text-on-surface-variant leading-relaxed p-3 rounded-lg border border-outline-variant/30 bg-surface-container-lowest hover:border-primary/50 cursor-text transition-all">
+          Patient is a 42-year-old female with a history of Type 2 Diabetes and Hypertension, currently managing Stage 3 CKD. Recent trends show rising HbA1c levels requiring medication adjustment. Strict avoidance of Penicillin is mandatory.
+        </p>
+</div>
+<!-- Allergy Registry -->
+<div class="bg-white rounded-xl border border-outline-variant overflow-hidden">
+<div class="px-4 py-3 border-b border-outline-variant bg-error-container/10">
+<h4 class="text-title-sm font-title-sm text-error flex items-center gap-2">
+<span class="material-symbols-outlined">warning</span> Allergy Registry
+          </h4>
+</div>
+<table class="w-full text-left font-data-table text-data-table">
+<thead class="bg-surface-container-low text-outline">
+<tr>
+<th class="px-4 py-2 uppercase font-data-label text-[10px]">Allergen</th>
+<th class="px-4 py-2 uppercase font-data-label text-[10px]">Reaction</th>
+<th class="px-4 py-2 uppercase font-data-label text-[10px]">Severity</th>
+<th class="px-4 py-2 uppercase font-data-label text-[10px]">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<tr>
+<td class="px-4 py-3 font-bold text-error">Penicillin</td>
+<td class="px-4 py-3">Anaphylaxis</td>
+<td class="px-4 py-3"><span class="px-2 py-0.5 rounded bg-error text-white text-[10px] font-bold">SEVERE</span></td>
+<td class="px-4 py-3 text-green-600 font-medium">Verified</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Latest Vital Signs Grid -->
+<div class="lg:col-span-4 grid grid-cols-2 gap-3">
+<div class="bg-white p-3 rounded-xl border border-outline-variant">
+<p class="text-[10px] text-outline font-bold uppercase">Blood Pressure</p>
+<p class="text-title-sm font-bold">138/88</p>
+<p class="text-[10px] text-error">High</p>
+</div>
+<div class="bg-white p-3 rounded-xl border border-outline-variant">
+<p class="text-[10px] text-outline font-bold uppercase">Heart Rate</p>
+<p class="text-title-sm font-bold">72 bpm</p>
+<p class="text-[10px] text-green-600">Normal</p>
+</div>
+<div class="bg-white p-3 rounded-xl border border-outline-variant">
+<p class="text-[10px] text-outline font-bold uppercase">Resp. Rate</p>
+<p class="text-title-sm font-bold">16 /min</p>
+<p class="text-[10px] text-green-600">Stable</p>
+</div>
+<div class="bg-white p-3 rounded-xl border border-outline-variant">
+<p class="text-[10px] text-outline font-bold uppercase">Temp</p>
+<p class="text-title-sm font-bold">36.6 °C</p>
+<p class="text-[10px] text-green-600">Normal</p>
+</div>
+<div class="bg-white p-3 rounded-xl border border-outline-variant">
+<p class="text-[10px] text-outline font-bold uppercase">SpO2</p>
+<p class="text-title-sm font-bold">98%</p>
+<p class="text-[10px] text-green-600">Optimal</p>
+</div>
+<div class="bg-white p-3 rounded-xl border border-outline-variant">
+<p class="text-[10px] text-outline font-bold uppercase">BMI</p>
+<p class="text-title-sm font-bold">24.2</p>
+<p class="text-[10px] text-on-surface-variant">Normal</p>
+</div>
+</div>
+</div>
+<!-- Medication History -->
+<div class="bg-white rounded-xl border border-outline-variant overflow-hidden">
+<div class="px-4 py-3 border-b border-outline-variant">
+<h4 class="text-title-sm font-title-sm">Medication History</h4>
+</div>
+<table class="w-full text-left font-data-table text-data-table">
+<thead class="bg-surface-container-low text-outline">
+<tr>
+<th class="px-4 py-2 uppercase font-data-label text-[10px]">Medication</th>
+<th class="px-4 py-2 uppercase font-data-label text-[10px]">Dosage/Freq</th>
+<th class="px-4 py-2 uppercase font-data-label text-[10px]">Period</th>
+<th class="px-4 py-2 uppercase font-data-label text-[10px]">Prescriber</th>
+<th class="px-4 py-2 uppercase font-data-label text-[10px]">Safety</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<tr>
+<td class="px-4 py-3 font-semibold">Metformin</td>
+<td class="px-4 py-3">500mg BID</td>
+<td class="px-4 py-3">Jan 2021 - Present</td>
+<td class="px-4 py-3">Dr. Anan C.</td>
+<td class="px-4 py-3"><span class="text-green-600 font-bold text-[11px] flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">check_circle</span> Safe</span></td>
+</tr>
+<tr>
+<td class="px-4 py-3 font-semibold">Amlodipine</td>
+<td class="px-4 py-3">5mg QD</td>
+<td class="px-4 py-3">Jun 2023 - Present</td>
+<td class="px-4 py-3">Dr. Anan C.</td>
+<td class="px-4 py-3"><span class="text-green-600 font-bold text-[11px] flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">check_circle</span> Safe</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Diagnosis History -->
+<div class="bg-white rounded-xl border border-outline-variant overflow-hidden">
+<div class="px-4 py-3 border-b border-outline-variant">
+<h4 class="text-title-sm font-title-sm">Diagnosis History</h4>
+</div>
+<table class="w-full text-left font-data-table text-data-table">
+<thead class="bg-surface-container-low text-outline">
+<tr>
+<th class="px-4 py-2 uppercase font-data-label text-[10px]">Diagnosis</th>
+<th class="px-4 py-2 uppercase font-data-label text-[10px]">ICD-10</th>
+<th class="px-4 py-2 uppercase font-data-label text-[10px]">Date</th>
+<th class="px-4 py-2 uppercase font-data-label text-[10px]">Provider</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<tr>
+<td class="px-4 py-3 font-semibold">Type 2 Diabetes Mellitus</td>
+<td class="px-4 py-3">E11.9</td>
+<td class="px-4 py-3">12 Jan 2021</td>
+<td class="px-4 py-3">Dr. Somchai P.</td>
+</tr>
+<tr>
+<td class="px-4 py-3 font-semibold">Essential Hypertension</td>
+<td class="px-4 py-3">I10</td>
+<td class="px-4 py-3">05 Jun 2023</td>
+<td class="px-4 py-3">Dr. Anan C.</td>
+</tr>
+<tr>
+<td class="px-4 py-3 font-semibold">CKD Stage 3</td>
+<td class="px-4 py-3">N18.30</td>
+<td class="px-4 py-3">18 Mar 2025</td>
+<td class="px-4 py-3">Dr. Anan C.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Contextual FAB (Hidden on detail page as per rules, but shown here for UI richness if allowed - per rules FAB is suppressed on detail screens, keeping it hidden) -->
+<script>
+        // Micro-interactions and effects
+        document.querySelectorAll('.hover\\:shadow-md').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-2px)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Simple search interaction placeholder
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('ring-2', 'ring-primary/20');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('ring-2', 'ring-primary/20');
+        });
+    </script>
+
+
+</body></html>
