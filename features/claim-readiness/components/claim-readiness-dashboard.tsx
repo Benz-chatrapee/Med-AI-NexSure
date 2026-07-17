@@ -7,18 +7,24 @@ import {
   CartesianGrid,
   Cell,
   ComposedChart,
+  Legend,
   Line,
   LineChart,
   Pie,
   PieChart,
+  ReferenceLine,
   ResponsiveContainer,
+  Scatter,
+  ScatterChart,
   Tooltip,
   XAxis,
   YAxis,
+  ZAxis,
 } from "recharts";
 
 type ReadinessStatus = "Ready" | "Needs Review" | "Not Ready";
 type RiskLevel = "Low" | "Medium" | "High";
+type MatrixRiskLevel = "Low" | "Moderate" | "High" | "Critical";
 type SlaStatus = "Within SLA" | "Near SLA" | "Over SLA";
 type CostStatus = "Normal" | "Cost Alert";
 type QueueStatus = "Waiting" | "In Consultation" | "Pending Evidence" | "Completed";
@@ -46,6 +52,14 @@ type ClaimCase = {
   department: "General Medicine" | "Orthopedics";
   claimType: "Direct Billing" | "Reimbursement";
   updated: number;
+  value: number;
+  valueAtRisk: number;
+  aiConfidence: number;
+  expectedCost: number;
+  actualCost: number;
+  ownerRole: string;
+  lastUpdated: string;
+  payerRule: "Aligned" | "Needs Review" | "Exception";
 };
 
 type Filters = {
@@ -67,6 +81,8 @@ type ChartFilter =
   | { kind: "riskStatus"; risk: RiskLevel; status: ReadinessStatus }
   | { kind: "queue"; value: QueueStatus }
   | { kind: "missing"; value: string }
+  | { kind: "matrix"; likelihood: number; impact: number }
+  | { kind: "costOutlier"; value: string }
   | null;
 
 const initialCases: ClaimCase[] = [
@@ -93,6 +109,14 @@ const initialCases: ClaimCase[] = [
     department: "General Medicine",
     claimType: "Direct Billing",
     updated: 3,
+    value: 48000,
+    valueAtRisk: 18000,
+    aiConfidence: 92,
+    expectedCost: 22000,
+    actualCost: 24800,
+    ownerRole: "Clinical Coder",
+    lastUpdated: "Today 10:42",
+    payerRule: "Needs Review",
   },
   {
     id: "VIS-10102",
@@ -117,6 +141,14 @@ const initialCases: ClaimCase[] = [
     department: "General Medicine",
     claimType: "Reimbursement",
     updated: 1,
+    value: 26500,
+    valueAtRisk: 1200,
+    aiConfidence: 95,
+    expectedCost: 18000,
+    actualCost: 17600,
+    ownerRole: "Claim Reviewer",
+    lastUpdated: "Today 10:31",
+    payerRule: "Aligned",
   },
   {
     id: "VIS-10118",
@@ -141,6 +173,14 @@ const initialCases: ClaimCase[] = [
     department: "Orthopedics",
     claimType: "Direct Billing",
     updated: 5,
+    value: 128000,
+    valueAtRisk: 86000,
+    aiConfidence: 88,
+    expectedCost: 62000,
+    actualCost: 94000,
+    ownerRole: "Clinical Reviewer",
+    lastUpdated: "Today 09:58",
+    payerRule: "Exception",
   },
   {
     id: "VIS-10123",
@@ -165,6 +205,14 @@ const initialCases: ClaimCase[] = [
     department: "General Medicine",
     claimType: "Reimbursement",
     updated: 2,
+    value: 34000,
+    valueAtRisk: 11200,
+    aiConfidence: 81,
+    expectedCost: 25000,
+    actualCost: 26200,
+    ownerRole: "Nurse Reviewer",
+    lastUpdated: "Today 10:17",
+    payerRule: "Aligned",
   },
   {
     id: "VIS-10131",
@@ -189,6 +237,14 @@ const initialCases: ClaimCase[] = [
     department: "Orthopedics",
     claimType: "Direct Billing",
     updated: 4,
+    value: 96000,
+    valueAtRisk: 67000,
+    aiConfidence: 90,
+    expectedCost: 54000,
+    actualCost: 78000,
+    ownerRole: "Payer Liaison",
+    lastUpdated: "Today 09:36",
+    payerRule: "Exception",
   },
 ];
 
@@ -223,25 +279,33 @@ const readinessData = [
 ] as const;
 
 const paretoData = [
-  { issue: "ICD Missing", count: 18, cumulative: 30.5 },
-  { issue: "SOAP Incomplete", count: 14, cumulative: 54.2 },
-  { issue: "Medical Certificate Missing", count: 11, cumulative: 72.9 },
-  { issue: "Attachment Missing", count: 9, cumulative: 88.1 },
-  { issue: "Cost Justification Missing", count: 7, cumulative: 100 },
+  { issue: "SOAP Incomplete", count: 18, percentage: 24, cumulative: 24, value: 420000 },
+  { issue: "Medical Certificate Missing", count: 14, percentage: 19, cumulative: 43, value: 318000 },
+  { issue: "ICD Missing", count: 12, percentage: 16, cumulative: 59, value: 287000 },
+  { issue: "Diagnosis and Procedure Mismatch", count: 10, percentage: 13, cumulative: 72, value: 244000 },
+  { issue: "Investigation Result Missing", count: 8, percentage: 11, cumulative: 83, value: 168000 },
+  { issue: "Physician Signature Missing", count: 7, percentage: 9, cumulative: 92, value: 122000 },
+  { issue: "Payer Document Missing", count: 6, percentage: 8, cumulative: 100, value: 98000 },
 ];
 
-const costData = [
-  { range: "฿0-999", visits: 16, color: "#94a3b8" },
-  { range: "฿1,000-1,999", visits: 33, color: "#60a5fa" },
-  { range: "฿2,000-3,199", visits: 49, color: "#2563eb" },
-  { range: "฿3,200-4,999", visits: 19, color: "#d97706" },
-  { range: "฿5,000+", visits: 11, color: "#dc2626" },
+const readinessFactors = [
+  { factor: "SOAP Completeness", current: 78, target: 90, affected: 18, status: "Needs Review" as const },
+  { factor: "Diagnosis and ICD", current: 74, target: 88, affected: 12, status: "Needs Review" as const },
+  { factor: "Prescription or Procedure", current: 86, target: 90, affected: 6, status: "Ready" as const },
+  { factor: "Evidence Completeness", current: 69, target: 88, affected: 24, status: "Needs Review" as const },
+  { factor: "Insurance Rule Alignment", current: 82, target: 90, affected: 11, status: "Needs Review" as const },
+  { factor: "Economic Justification", current: 58, target: 85, affected: 9, status: "Not Ready" as const },
 ];
 
-const heatmapRows: { risk: RiskLevel; values: Record<ReadinessStatus, number> }[] = [
-  { risk: "Low", values: { Ready: 41, "Needs Review": 12, "Not Ready": 2 } },
-  { risk: "Medium", values: { Ready: 8, "Needs Review": 31, "Not Ready": 10 } },
-  { risk: "High", values: { Ready: 1, "Needs Review": 13, "Not Ready": 18 } },
+const riskMatrixItems = [
+  { category: "Missing clinical evidence", likelihood: 4, impact: 4, level: "High" as MatrixRiskLevel, count: 18, value: 420000, owner: "Clinical Reviewer", payer: "ABC Insurance" },
+  { category: "Coding mismatch", likelihood: 4, impact: 3, level: "High" as MatrixRiskLevel, count: 12, value: 287000, owner: "Clinical Coder", payer: "ABC Insurance" },
+  { category: "Coverage uncertainty", likelihood: 3, impact: 4, level: "High" as MatrixRiskLevel, count: 9, value: 244000, owner: "Payer Liaison", payer: "XYZ Health" },
+  { category: "Benefit limit exceeded", likelihood: 3, impact: 5, level: "Critical" as MatrixRiskLevel, count: 5, value: 360000, owner: "Claim Reviewer", payer: "ABC Insurance" },
+  { category: "Cost outlier", likelihood: 4, impact: 5, level: "Critical" as MatrixRiskLevel, count: 7, value: 510000, owner: "Economic Review", payer: "ABC Insurance" },
+  { category: "Duplicate claim risk", likelihood: 2, impact: 3, level: "Moderate" as MatrixRiskLevel, count: 4, value: 76000, owner: "Audit Team", payer: "XYZ Health" },
+  { category: "PDPA or consent gap", likelihood: 2, impact: 5, level: "High" as MatrixRiskLevel, count: 3, value: 118000, owner: "Compliance", payer: "ABC Insurance" },
+  { category: "Possible fraud indicator", likelihood: 1, impact: 5, level: "High" as MatrixRiskLevel, count: 2, value: 210000, owner: "Fraud Review", payer: "XYZ Health" },
 ];
 
 const queueData = [
@@ -288,6 +352,10 @@ export function ClaimReadinessDashboard() {
           (chartFilter.kind === "status" && item.status === chartFilter.value) ||
           (chartFilter.kind === "queue" && item.queue === chartFilter.value) ||
           (chartFilter.kind === "missing" && item.missing.includes(chartFilter.value)) ||
+          (chartFilter.kind === "costOutlier" && item.actualCost > item.expectedCost && item.id === chartFilter.value) ||
+          (chartFilter.kind === "matrix" &&
+            riskPriority[item.risk] >= Math.max(1, Math.ceil(chartFilter.impact / 2)) &&
+            item.valueAtRisk >= chartFilter.likelihood * 12000) ||
           (chartFilter.kind === "riskStatus" &&
             item.risk === chartFilter.risk &&
             item.status === chartFilter.status);
@@ -309,7 +377,7 @@ export function ClaimReadinessDashboard() {
       .sort((a, b) => {
         if (filters.sort === "score") return b.score - a.score;
         if (filters.sort === "updated") return b.updated - a.updated;
-        return riskPriority[b.risk] - riskPriority[a.risk] || slaPriority[b.sla] - slaPriority[a.sla];
+        return b.valueAtRisk - a.valueAtRisk || riskPriority[b.risk] - riskPriority[a.risk] || slaPriority[b.sla] - slaPriority[a.sla] || b.updated - a.updated;
       });
   }, [cases, chartFilter, filters]);
 
@@ -411,16 +479,16 @@ export function ClaimReadinessDashboard() {
         }} />
 
         <section className="mb-4 grid gap-4 min-[1500px]:grid-cols-6 md:grid-cols-3">
-          <Kpi tone="success" label="Claim Readiness" icon="CR" value="92%" meta="Ready for Submission" trend="+5% vs Last Week" progress={92} />
-          <Kpi label="Total Eligible Visits" icon="TV" value={rows.length} meta="จำนวน Visit ที่เข้าเกณฑ์" trend="12% vs Previous Period" progress={80} />
-          <Kpi tone="warning" label="Needs Review" icon="NR" value="56" meta="เคสที่ต้องตรวจสอบเพิ่มเติม" trend="43.8% of Current Cases" progress={44} />
-          <Kpi tone="danger" label="High Risk Cases" icon="HR" value="14" meta="Human Review Required" trend="5 Cases Over SLA" progress={35} />
-          <Kpi label="Average Readiness Score" icon="AS" value="78" meta="Rule Engine Confidence 87%" trend="+4 Points Today" progress={78} />
-          <Kpi label="Evidence Package Ready" icon="EP" value="49" meta="38.3% of eligible visits" trend="No auto submission" progress={38} />
+          <Kpi label="Total Claim Candidates" icon="TC" value="128" meta="Target: 120 reviewed/day" trend="+12% vs previous period" progress={100} />
+          <Kpi label="Average Readiness Score" icon="AS" value="78" meta="Target score: 85" trend="+4 points today" progress={78} />
+          <Kpi tone="success" label="Claim Ready Rate" icon="RR" value="32.8%" meta="SLA target: 45%" trend="+5% vs last week" progress={33} />
+          <Kpi tone="warning" label="Claims Pending Review" icon="PR" value="56" meta="เคสที่ต้องตรวจสอบโดยมนุษย์" trend="43.8% of candidates" progress={44} />
+          <Kpi tone="danger" label="Value at Risk" icon="VR" value="฿183K" meta="High-risk unresolved value" trend="฿67K over SLA" progress={68} />
+          <Kpi label="First-pass Approval Rate" icon="FA" value="71%" meta="Target: 82%" trend="-3% vs previous period" progress={71} />
         </section>
 
         <section className="mb-4 grid gap-4 xl:grid-cols-[minmax(0,1.55fr)_minmax(320px,.85fr)]">
-          <ChartCard title="Readiness Trend" description="Actual vs target readiness score">
+          <ChartCard title="Claim Readiness Trend" description="Actual vs target readiness score">
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={trendData}>
                 <CartesianGrid stroke="#e2e8f0" vertical={false} />
@@ -506,39 +574,96 @@ export function ClaimReadinessDashboard() {
             <div className={insightClass}>ICD and SOAP gaps contribute more than half of all readiness blockers.</div>
           </ChartCard>
 
-          <ChartCard title="Risk vs Readiness Heatmap" description="Prioritize high-risk cases that are not ready">
-            <div className="grid grid-cols-[120px_repeat(3,1fr)] gap-2 max-sm:grid-cols-[90px_repeat(3,1fr)]">
-              <HeatLabel />
-              {(["Ready", "Needs Review", "Not Ready"] as ReadinessStatus[]).map((status) => (
-                <HeatLabel key={status}>{status}</HeatLabel>
+          <ChartCard title="Readiness Factor Breakdown" description="Weighted readiness factors with target gap and affected cases">
+            <ResponsiveContainer width="100%" height={310}>
+              <BarChart data={readinessFactors} layout="vertical" margin={{ left: 72, right: 16 }}>
+                <CartesianGrid stroke="#e2e8f0" horizontal={false} />
+                <XAxis type="number" domain={[0, 100]} tickFormatter={(value) => `${value}%`} />
+                <YAxis dataKey="factor" type="category" width={160} tick={{ fontSize: 11 }} />
+                <Tooltip content={({ active, payload }) => {
+                  const item = payload?.[0]?.payload as typeof readinessFactors[number] | undefined;
+                  if (!active || !item) return null;
+                  return <div className="rounded-[10px] border border-slate-200 bg-white p-3 text-xs shadow-lg"><strong>{item.factor}</strong><br />Current: {item.current}%<br />Target: {item.target}%<br />Gap: {Math.max(0, item.target - item.current)} points<br />Affected cases: {item.affected}</div>;
+                }} />
+                <Legend />
+                <Bar dataKey="current" name="Current Score" fill="#2563eb" radius={[0, 7, 7, 0]} />
+                <Bar dataKey="target" name="Target Score" fill="#94a3b8" radius={[0, 7, 7, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+            <div className="mt-3 grid gap-2 text-xs">
+              {readinessFactors.map((item) => (
+                <button key={item.factor} className="grid grid-cols-[1fr_auto_auto] items-center gap-3 rounded-[10px] border border-slate-200 px-3 py-2 text-left hover:bg-blue-50" onClick={() => {
+                  setChartFilter({ kind: "missing", value: item.factor.includes("SOAP") ? "SOAP Incomplete" : item.factor.includes("ICD") ? "ICD Missing" : item.factor.includes("Evidence") ? "Medical Certificate Missing" : "Cost Justification Missing" });
+                  showToast(`Filtered by ${item.factor}`);
+                }}>
+                  <span className="font-bold">{item.factor}</span>
+                  <span>{item.affected} affected</span>
+                  <Badge tone={statusTone(item.status)}>{item.status}</Badge>
+                </button>
               ))}
-              {heatmapRows.map((row) => (
-                <>
-                  <HeatLabel key={`${row.risk}-label`}>{row.risk} Risk</HeatLabel>
-                  {(["Ready", "Needs Review", "Not Ready"] as ReadinessStatus[]).map((status) => (
-                    <button
-                      key={`${row.risk}-${status}`}
-                      className={`min-h-[72px] rounded-[10px] border border-slate-200 text-center transition hover:-translate-y-0.5 hover:shadow-lg ${heatTone(row.risk, status)}`}
-                      onClick={() => {
-                        setChartFilter({ kind: "riskStatus", risk: row.risk, status });
-                        showToast(`Filtered by ${row.risk} Risk + ${status}`);
-                      }}
-                    >
-                      <strong className="block text-[22px]">{row.values[status]}</strong>
-                      <span className="text-[10px] text-slate-500">cases</span>
-                    </button>
-                  ))}
-                </>
-              ))}
-            </div>
-            <div className="mt-3 rounded-[10px] border border-red-200 bg-red-50 px-3 py-3 text-xs leading-5 text-red-800">
-              18 High-Risk cases are currently Not Ready and require priority review.
             </div>
           </ChartCard>
         </section>
 
         <section className="mb-4 grid gap-4 xl:grid-cols-2">
-          <ChartCard title="Queue Snapshot" description="ภาพรวมสถานะงานและเคสที่ยังรอดำเนินการ">
+          <ChartCard title="Risk and Compliance Matrix" description="Likelihood x Impact with owner and value-at-risk context">
+            <div className="overflow-x-auto">
+              <div className="grid min-w-[620px] grid-cols-[92px_repeat(5,1fr)] gap-2">
+                <HeatLabel>Impact</HeatLabel>
+                {[1, 2, 3, 4, 5].map((likelihood) => <HeatLabel key={likelihood}>L{likelihood}</HeatLabel>)}
+                {[5, 4, 3, 2, 1].map((impact) => (
+                  <div key={`impact-row-${impact}`} className="contents">
+                    <HeatLabel key={`impact-${impact}`}>I{impact}</HeatLabel>
+                    {[1, 2, 3, 4, 5].map((likelihood) => {
+                      const items = riskMatrixItems.filter((item) => item.impact === impact && item.likelihood === likelihood);
+                      const strongest = items[0];
+                      return (
+                        <button key={`${impact}-${likelihood}`} className={`min-h-[86px] rounded-[10px] border border-slate-200 p-2 text-left text-[10px] transition hover:-translate-y-0.5 hover:shadow-lg ${matrixTone(strongest?.level)}`} aria-label={`Likelihood ${likelihood}, impact ${impact}, ${items.length} risk categories`} onClick={() => {
+                          setChartFilter({ kind: "matrix", likelihood, impact });
+                          showToast(`Filtered by L${likelihood} / I${impact}`);
+                        }}>
+                          <strong className="block text-sm">{items.length ? `${items.length} risks` : "0"}</strong>
+                          {strongest ? <span className="block leading-4">{strongest.level}<br />{strongest.count} claims<br />{formatMoney(strongest.value)}</span> : <span className="block text-slate-500">No active risk</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="mt-3 grid gap-2 text-xs">
+              {riskMatrixItems.slice(0, 4).map((item) => <div key={item.category} className="rounded-[10px] border border-slate-200 p-3"><strong>{item.category}</strong><span className="block text-slate-500">{item.level} · {item.count} claims · {formatMoney(item.value)} · Owner: {item.owner} · Top payer: {item.payer}</span></div>)}
+            </div>
+          </ChartCard>
+
+          <ChartCard title="Actual vs Expected Cost" description="Bubble size reflects value at risk; reference line marks expected cost parity">
+            <ResponsiveContainer width="100%" height={360}>
+              <ScatterChart margin={{ top: 18, right: 20, bottom: 16, left: 8 }}>
+                <CartesianGrid stroke="#e2e8f0" />
+                <XAxis dataKey="expectedCost" name="Expected Cost" type="number" tickFormatter={(value) => `฿${Number(value) / 1000}K`} />
+                <YAxis dataKey="actualCost" name="Actual Cost" type="number" tickFormatter={(value) => `฿${Number(value) / 1000}K`} />
+                <ZAxis dataKey="valueAtRisk" range={[80, 460]} />
+                <Tooltip cursor={{ strokeDasharray: "3 3" }} content={({ active, payload }) => {
+                  const item = payload?.[0]?.payload as ClaimCase | undefined;
+                  if (!active || !item) return null;
+                  return <div className="rounded-[10px] border border-slate-200 bg-white p-3 text-xs shadow-lg"><strong>{item.id}</strong><br />Patient: {item.patient}<br />Expected: {formatMoney(item.expectedCost)}<br />Actual: {formatMoney(item.actualCost)}<br />Variance: {formatMoney(item.actualCost - item.expectedCost)}<br />Payer: {item.payer}<br />Readiness: {item.score}</div>;
+                }} />
+                <ReferenceLine segment={[{ x: 0, y: 0 }, { x: 100000, y: 100000 }]} stroke="#64748b" strokeDasharray="5 5" label="Actual = Expected" />
+                <Scatter name="Claim Cost Variance" data={cases} fill="#2563eb" onClick={(entry) => {
+                  const item = getChartPayload<ClaimCase>(entry);
+                  if (!item) return;
+                  setChartFilter({ kind: "costOutlier", value: item.id });
+                  setSelectedCaseId(item.id);
+                  showToast(`Opened ${item.id}`);
+                }} />
+              </ScatterChart>
+            </ResponsiveContainer>
+            <div className={insightClass}>จุดเหนือเส้นอ้างอิงคือค่าใช้จ่ายจริงสูงกว่าคาด ต้องตรวจสอบความเหมาะสมก่อนส่ง Claim</div>
+          </ChartCard>
+        </section>
+
+        <section className="mb-4 grid gap-4 xl:grid-cols-[.9fr_1.1fr]">
+          <ChartCard title="Operational Queue Snapshot" description="ภาพรวมสถานะงานและเคสที่ยังรอดำเนินการ">
             <div className="grid gap-3">
               {queueData.map((item) => (
                 <button
@@ -562,24 +687,24 @@ export function ClaimReadinessDashboard() {
             </div>
           </ChartCard>
 
-          <ChartCard title="Economic Intelligence" description="วิเคราะห์ค่าใช้จ่ายและ Outlier ก่อนส่งเคลม">
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={costData}>
-                <CartesianGrid stroke="#e2e8f0" vertical={false} />
-                <XAxis dataKey="range" tick={{ fontSize: 11 }} />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="visits" radius={[6, 6, 0, 0]}>
-                  {costData.map((entry) => (
-                    <Cell key={entry.range} fill={entry.color} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-            <div className="mt-3 grid gap-2 border-t border-slate-200 pt-3 text-xs text-slate-500">
-              <Summary label="Average Visit Cost" value="฿2,840" />
-              <Summary label="Expected Range" value="฿900-3,200" />
-              <Summary label="Cost Alert Cases" value="11" danger />
+          <ChartCard title="Intelligence Summary" description="Top 3 actionable priorities; decision support only">
+            <div className="grid gap-3">
+              {[
+                ["Missing SOAP details", "12 affected cases", "฿420,000 estimated value at risk", "Request clinical documentation review", "92%", "Clinical Reviewer"],
+                ["Cost outlier requires justification", "7 affected cases", "฿510,000 estimated value at risk", "Validate economic rationale and payer exception", "88%", "Economic Review"],
+                ["Payer-specific document missing", "6 affected cases", "฿98,000 estimated value at risk", "Request payer checklist evidence", "84%", "Payer Liaison"],
+              ].map(([issue, casesText, value, action, confidence, role]) => (
+                <div key={issue} className="rounded-[10px] border border-slate-200 p-3 text-xs leading-5">
+                  <strong className="text-sm">{issue}</strong>
+                  <span className="block text-slate-500">{casesText} · {value}</span>
+                  <span className="mt-2 block"><strong>Recommended action:</strong> {action}</span>
+                  <span className="block text-slate-500">AI confidence: {confidence} · Human review required · Responsible role: {role}</span>
+                </div>
+              ))}
+              <button className={buttonPrimary} onClick={() => {
+                setChartFilter({ kind: "missing", value: "SOAP Incomplete" });
+                showToast("Filtered affected claims");
+              }}>Review Affected Claims</button>
             </div>
           </ChartCard>
         </section>
@@ -675,7 +800,7 @@ function Worklist({ rows, filters, updateFilter, openCase, clearChart }: { rows:
       <div className="border-b border-slate-200 p-[18px]">
         <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
           <div>
-            <h3 className="m-0 text-lg font-bold">Claim Readiness Worklist</h3>
+            <h3 className="m-0 text-lg font-bold">Claims Requiring Attention</h3>
             <p className="mt-1 text-xs text-slate-500">รายการเคสสำหรับตรวจสอบ แก้ไข และส่งต่อ Evidence Package</p>
           </div>
           <div className="flex gap-2">
@@ -687,16 +812,16 @@ function Worklist({ rows, filters, updateFilter, openCase, clearChart }: { rows:
           <input className="h-10 min-w-[260px] flex-1 rounded-[10px] border border-slate-200 px-3 text-sm" value={filters.search} onChange={(event) => updateFilter("search", event.target.value)} placeholder="Search HN, Patient, Visit ID" />
           <SelectValue value={filters.status} onChange={(value) => updateFilter("status", value)} options={["All Readiness Status", "Ready", "Needs Review", "Not Ready"]} />
           <SelectValue value={filters.risk} onChange={(value) => updateFilter("risk", value)} options={["All Risk Levels", "Low", "Medium", "High"]} />
-          <SelectValue value={filters.missing} onChange={(value) => updateFilter("missing", value)} options={["All Missing Evidence", "ICD Missing", "SOAP Incomplete", "Medical Certificate Missing"]} />
+          <SelectValue value={filters.missing} onChange={(value) => updateFilter("missing", value)} options={["All Missing Evidence", "ICD Missing", "SOAP Incomplete", "Medical Certificate Missing", "Cost Justification Missing"]} />
           <SelectValue value={filters.sort} onChange={(value) => updateFilter("sort", value)} options={["Sort by Priority", "Sort by Score", "Sort by Last Updated"]} values={["priority", "score", "updated"]} />
           <button className={buttonSecondary} onClick={clearChart}>Clear Chart Filter</button>
         </div>
       </div>
       <div className="max-h-[520px] overflow-auto">
-        <table className="w-full min-w-[1450px] border-separate border-spacing-0 text-left text-xs">
+        <table className="w-full min-w-[1900px] border-separate border-spacing-0 text-left text-xs">
           <thead>
             <tr className="bg-slate-50 text-[11px] text-slate-600">
-              {["", "HN / Patient", "Visit", "Score", "Status", "Risk", "Primary Blocker", "Missing", "Cost Variance", "AI Recommendation", "SLA / Aging", "Owner", "Next Action"].map((head) => (
+              {["", "Claim ID", "Patient", "Payer", "Readiness Score", "Risk Level", "Primary Blocker", "Aging", "SLA Status", "Estimated Claim Value", "Value at Risk", "Owner", "AI Confidence", "Next Best Action", "Last Updated", "Actions"].map((head) => (
                 <th key={head} className="sticky top-0 z-10 border-b border-slate-200 bg-slate-50 px-2.5 py-3">{head || <input type="checkbox" aria-label="Select all" />}</th>
               ))}
             </tr>
@@ -708,20 +833,24 @@ function Worklist({ rows, filters, updateFilter, openCase, clearChart }: { rows:
                 openCase(item.id);
               }}>
                 <td className={tdClass}><input type="checkbox" aria-label={`Select ${item.id}`} /></td>
-                <td className={tdClass}><strong>{item.hn}</strong><div className={mutedClass}>{item.patient} · {item.visitType}</div></td>
-                <td className={tdClass}>{item.date}<div className={mutedClass}>{item.queue}</div></td>
+                <td className={tdClass}><strong className="text-blue-800">{item.id}</strong><div className={mutedClass}>{item.date} · {item.visitType}</div></td>
+                <td className={tdClass}><strong>{item.patient}</strong><div className={mutedClass}>{item.hn} · {item.clinic}</div></td>
+                <td className={tdClass}>{item.payer}<div className={mutedClass}>{item.payerRule}</div></td>
                 <td className={tdClass}><ScoreMini score={item.score} /></td>
-                <td className={tdClass}><Badge tone={statusTone(item.status)}>{item.status}</Badge></td>
                 <td className={tdClass}><Badge tone={riskTone(item.risk)}>{item.risk}</Badge></td>
                 <td className={tdClass}>{item.blocker === "None" ? <Badge tone="green">No blocker</Badge> : <strong>{item.blocker}</strong>}</td>
-                <td className={tdClass}>{item.missing.length ? <>{item.missing.length} missing<div className={mutedClass}>Primary: {item.missing[0]}</div></> : <Badge tone="green">Complete</Badge>}</td>
-                <td className={tdClass}><Badge tone={item.cost === "Normal" ? "green" : "red"}>{item.cost}</Badge></td>
-                <td className={tdClass}>{item.recommendation}</td>
-                <td className={tdClass}><Badge tone={slaTone(item.sla)}>{item.sla}</Badge><div className={mutedClass}>{item.aging}</div></td>
-                <td className={tdClass}>{item.owner}</td>
+                <td className={tdClass}>{item.aging}<div className={mutedClass}>{item.queue}</div></td>
+                <td className={tdClass}><Badge tone={slaTone(item.sla)}>{item.sla}</Badge></td>
+                <td className={tdClass}>{formatMoney(item.value)}</td>
+                <td className={tdClass}><strong className={item.valueAtRisk > 50000 ? "text-red-600" : "text-slate-950"}>{formatMoney(item.valueAtRisk)}</strong><div className={mutedClass}>{item.cost}</div></td>
+                <td className={tdClass}>{item.owner}<div className={mutedClass}>{item.ownerRole}</div></td>
+                <td className={tdClass}>{item.aiConfidence}%<div className={mutedClass}>{item.ai === "Yes" ? "AI Assisted" : "Manual Review"}</div></td>
+                <td className={tdClass}>{item.recommendation}<div className={mutedClass}>Human review required</div></td>
+                <td className={tdClass}>{item.lastUpdated}</td>
                 <td className={tdClass}>
                   <div className="flex flex-wrap gap-1.5">
-                    <button className={smallButtonSecondary} onClick={() => openCase(item.id)}>Review</button>
+                    <button className={smallButtonSecondary} onClick={() => openCase(item.id)}>View Detail</button>
+                    <button className={smallButtonSecondary}>Assign Owner</button>
                     <button className={smallButtonPrimary} disabled={item.status !== "Ready"} title={item.status !== "Ready" ? "Resolve blocking issues first" : "Generate Evidence Package"}>Generate</button>
                   </div>
                 </td>
@@ -928,8 +1057,19 @@ function scoreColor(score: number) {
   return score >= 85 ? "#059669" : score >= 60 ? "#d97706" : "#dc2626";
 }
 
-function heatTone(risk: RiskLevel, status: ReadinessStatus) {
-  if (risk === "High" && status !== "Ready") return "bg-red-50";
-  if (risk === "Low" && status === "Ready") return "bg-emerald-50";
-  return "bg-amber-50";
+function matrixTone(level?: MatrixRiskLevel) {
+  if (level === "Critical") return "bg-red-50 text-red-800";
+  if (level === "High") return "bg-amber-50 text-amber-800";
+  if (level === "Moderate") return "bg-blue-50 text-blue-900";
+  return "bg-slate-50 text-slate-500";
+}
+
+function formatMoney(value: number) {
+  return new Intl.NumberFormat("th-TH", { currency: "THB", maximumFractionDigits: 0, style: "currency" }).format(value);
+}
+
+function getChartPayload<TPayload>(entry: unknown): TPayload | null {
+  if (!entry || typeof entry !== "object") return null;
+  const maybePayload = (entry as { payload?: unknown }).payload;
+  return maybePayload && typeof maybePayload === "object" ? (maybePayload as TPayload) : null;
 }

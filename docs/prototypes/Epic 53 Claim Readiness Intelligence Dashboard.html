@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Claim Readiness Intelligence | Med AI NexSure</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed": "#dae2ff",
+                    "on-primary-fixed-variant": "#264191",
+                    "tertiary-container": "#00389a",
+                    "primary-fixed": "#dce1ff",
+                    "on-error-container": "#93000a",
+                    "surface-bright": "#faf8ff",
+                    "surface-dim": "#d2d9f4",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-fixed": "#00174b",
+                    "outline-variant": "#c5c5d3",
+                    "surface-tint": "#4059aa",
+                    "inverse-on-surface": "#eef0ff",
+                    "on-primary": "#ffffff",
+                    "on-secondary-container": "#364d83",
+                    "primary": "#00236f",
+                    "surface-variant": "#dae2fd",
+                    "secondary-fixed-dim": "#b1c5ff",
+                    "on-tertiary-container": "#8da9ff",
+                    "surface-container": "#eaedff",
+                    "on-tertiary-fixed-variant": "#003ea8",
+                    "surface-container-highest": "#dae2fd",
+                    "on-error": "#ffffff",
+                    "background": "#faf8ff",
+                    "on-primary-container": "#90a8ff",
+                    "on-background": "#131b2e",
+                    "surface-container-high": "#e2e7ff",
+                    "secondary-container": "#a9c0fe",
+                    "inverse-surface": "#283044",
+                    "on-tertiary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-fixed-variant": "#2e457b",
+                    "on-secondary": "#ffffff",
+                    "primary-fixed-dim": "#b6c4ff",
+                    "outline": "#757682",
+                    "inverse-primary": "#b6c4ff",
+                    "on-surface": "#131b2e",
+                    "tertiary-fixed": "#dbe1ff",
+                    "primary-container": "#1e3a8a",
+                    "tertiary-fixed-dim": "#b4c5ff",
+                    "on-secondary-fixed": "#001946",
+                    "on-surface-variant": "#444651",
+                    "surface": "#faf8ff",
+                    "on-primary-fixed": "#00164e",
+                    "surface-container-low": "#f2f3ff",
+                    "secondary": "#465d94",
+                    "tertiary": "#00246b"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gap-sm": "8px",
+                    "table-cell-x": "16px",
+                    "page-padding": "32px",
+                    "gap-lg": "24px",
+                    "table-cell-y": "12px",
+                    "gap-md": "16px",
+                    "card-padding": "24px",
+                    "base": "8px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Inter"],
+                    "headline-sm": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "label-md": ["Inter"]
+            },
+            "fontSize": {
+                    "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-sm": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "500"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .fill-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+        body {
+            background-color: #F8FAFC;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            border: 1px solid #E2E8F0;
+        }
+        .radar-grid {
+            stroke: #E2E8F0;
+            stroke-dasharray: 4;
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-surface">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-[280px] bg-primary flex flex-col py-page-padding z-50">
+<div class="px-page-padding mb-10">
+<h1 class="font-headline-lg text-headline-lg font-bold text-on-primary">ClaimIntel</h1>
+<p class="font-label-md text-label-md text-on-primary/60 uppercase tracking-widest mt-1">Enterprise Health</p>
+</div>
+<nav class="flex-1 flex flex-col">
+<a class="flex items-center gap-md px-page-padding py-table-cell-y text-on-primary/70 hover:bg-secondary-fixed/5 hover:text-on-primary transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-page-padding py-table-cell-y text-on-primary/70 hover:bg-secondary-fixed/5 hover:text-on-primary transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="font-label-md text-label-md">Visit Management</span>
+</a>
+<!-- Active Tab: Claims -->
+<a class="flex items-center gap-md px-page-padding py-table-cell-y bg-secondary-fixed/10 text-secondary-fixed border-l-4 border-on-tertiary-container transition-all duration-200" href="#">
+<span class="material-symbols-outlined fill-icon" data-icon="description" style="font-variation-settings: 'FILL' 1;">description</span>
+<span class="font-label-md text-label-md">Claims</span>
+</a>
+<a class="flex items-center gap-md px-page-padding py-table-cell-y text-on-primary/70 hover:bg-secondary-fixed/5 hover:text-on-primary transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="gavel">gavel</span>
+<span class="font-label-md text-label-md">Compliance</span>
+</a>
+<a class="flex items-center gap-md px-page-padding py-table-cell-y text-on-primary/70 hover:bg-secondary-fixed/5 hover:text-on-primary transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="lan">lan</span>
+<span class="font-label-md text-label-md">Network</span>
+</a>
+<a class="flex items-center gap-md px-page-padding py-table-cell-y text-on-primary/70 hover:bg-secondary-fixed/5 hover:text-on-primary transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-md text-label-md">Reporting</span>
+</a>
+</nav>
+<div class="mt-auto px-page-padding space-y-2">
+<a class="flex items-center gap-md py-2 text-on-primary/60 hover:text-on-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+<a class="flex items-center gap-md py-2 text-on-primary/60 hover:text-on-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+</div>
+</aside>
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 w-[calc(100%-280px)] h-16 bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center px-page-padding z-40">
+<div class="flex items-center gap-lg flex-1">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/50" data-icon="search">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-full pl-10 pr-4 py-2 text-body-md focus:ring-2 focus:ring-primary-container" placeholder="Search Claims, Patients, or ICD Codes..." type="text"/>
+</div>
+<h2 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Claim Readiness Intelligence</h2>
+</div>
+<div class="flex items-center gap-md">
+<button class="flex items-center gap-sm px-4 py-2 rounded-full border border-outline-variant hover:bg-surface-container transition-colors">
+<span class="font-label-md text-label-md">Clinic Switcher</span>
+<span class="material-symbols-outlined text-body-md" data-icon="keyboard_arrow_down">keyboard_arrow_down</span>
+</button>
+<button class="p-2 hover:bg-surface-container rounded-full transition-colors relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="p-2 hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a female healthcare administrator in her late 40s, with a soft blur background of a modern clinical office. She has a confident, reassuring expression, wearing a navy blue blazer over a white medical blouse. The lighting is soft and high-key, maintaining the enterprise medical theme with clean and crisp details." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8vuiTcpIqbVNK7fJs2MX4OL3mwxD_MemcyYs1NE0bAfYFwbr3O9Q9B_L2mZPRgCk-tn2Wld1y4yc8YouEKSZ8GsaJbGMZVTnVdastezd75d3GddragAMOwBVGNT7g5xpP49_CD-zN5d1MKF7UrgMYMrjCHF5nVxlpKPTBAcnp4ytEnJV_tQal8r4TWJdPR8qL7q9P8tujL3WSBaVQ4hTGYZoypAzmyKAmmd8Hrq8ar7vvlWPIK7zjUlEBj8v96vWxFfgJ1SDriXI8"/>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="ml-[280px] pt-16 min-h-screen">
+<div class="p-page-padding max-w-[1600px] mx-auto">
+<!-- Page Header -->
+<div class="mb-gap-lg">
+<h3 class="font-headline-lg text-headline-lg text-primary mb-1">Claim Readiness Intelligence</h3>
+<p class="font-body-lg text-on-surface-variant/80">Analysis of insurance readiness, clinical evidence mapping, and payer alignment.</p>
+</div>
+<!-- KPI Row -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gap-md mb-gap-lg">
+<!-- KPI Card 1 -->
+<div class="bg-surface-container-lowest p-card-padding rounded-xl border border-outline-variant shadow-sm hover:border-primary-container transition-colors group">
+<div class="flex justify-between items-start mb-4">
+<span class="p-2 bg-primary/5 text-primary rounded-lg">
+<span class="material-symbols-outlined" data-icon="speed">speed</span>
+</span>
+<span class="text-success-600 flex items-center gap-1 font-label-md text-emerald-600">
+<span class="material-symbols-outlined text-sm" data-icon="trending_up">trending_up</span> +2.4%
+                        </span>
+</div>
+<p class="font-label-md text-on-surface-variant uppercase tracking-wider mb-1">Avg. Readiness Score</p>
+<h4 class="font-display-lg text-display-lg text-on-surface">84.2%</h4>
+</div>
+<!-- KPI Card 2 -->
+<div class="bg-surface-container-lowest p-card-padding rounded-xl border border-outline-variant shadow-sm hover:border-primary-container transition-colors group">
+<div class="flex justify-between items-start mb-4">
+<span class="p-2 bg-primary/5 text-primary rounded-lg">
+<span class="material-symbols-outlined" data-icon="pending_actions">pending_actions</span>
+</span>
+<span class="text-on-surface-variant font-label-md">In Review</span>
+</div>
+<p class="font-label-md text-on-surface-variant uppercase tracking-wider mb-1">Claims Pending Review</p>
+<h4 class="font-display-lg text-display-lg text-on-surface">142</h4>
+</div>
+<!-- KPI Card 3 -->
+<div class="bg-surface-container-lowest p-card-padding rounded-xl border border-outline-variant shadow-sm hover:border-primary-container transition-colors group">
+<div class="flex justify-between items-start mb-4">
+<span class="p-2 bg-primary/5 text-primary rounded-lg">
+<span class="material-symbols-outlined" data-icon="task_alt">task_alt</span>
+</span>
+<span class="text-emerald-600 flex items-center gap-1 font-label-md">
+<span class="material-symbols-outlined text-sm" data-icon="check_circle">check_circle</span> Stable
+                        </span>
+</div>
+<p class="font-label-md text-on-surface-variant uppercase tracking-wider mb-1">Evidence Completion Rate</p>
+<h4 class="font-display-lg text-display-lg text-on-surface">91%</h4>
+</div>
+<!-- KPI Card 4 -->
+<div class="bg-surface-container-lowest p-card-padding rounded-xl border border-outline-variant shadow-sm hover:border-primary-container transition-colors group">
+<div class="flex justify-between items-start mb-4">
+<span class="p-2 bg-primary/5 text-primary rounded-lg">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+</span>
+<span class="text-on-surface-variant font-label-md">Current Period</span>
+</div>
+<p class="font-label-md text-on-surface-variant uppercase tracking-wider mb-1">Projected Claim Value</p>
+<h4 class="font-display-lg text-display-lg text-on-surface">฿4.2M</h4>
+</div>
+</div>
+<!-- Analysis & AI Insights Bento Section -->
+<div class="grid grid-cols-12 gap-gap-lg mb-gap-lg">
+<!-- Readiness Factor Breakdown -->
+<div class="col-span-12 lg:col-span-7 bg-surface-container-lowest p-card-padding rounded-xl border border-outline-variant shadow-sm">
+<div class="flex justify-between items-center mb-gap-lg">
+<h5 class="font-headline-md text-headline-md text-on-surface">Readiness Factor Breakdown</h5>
+<button class="p-2 hover:bg-surface-container rounded-lg">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+<div class="flex flex-col md:flex-row items-center gap-12 py-4">
+<!-- Simulated Radar Chart -->
+<div class="relative w-64 h-64 flex-shrink-0">
+<svg class="w-full h-full overflow-visible" viewbox="0 0 100 100">
+<!-- Polygons -->
+<circle class="radar-grid fill-none" cx="50" cy="50" r="45" stroke-width="0.5"></circle>
+<circle class="radar-grid fill-none" cx="50" cy="50" r="30" stroke-width="0.5"></circle>
+<circle class="radar-grid fill-none" cx="50" cy="50" r="15" stroke-width="0.5"></circle>
+<path class="radar-grid fill-none" d="M 50 5 L 95 50 L 50 95 L 5 50 Z" stroke-width="0.5"></path>
+<!-- Data Polygon -->
+<path d="M 50 15 L 85 50 L 50 85 L 20 50 Z" fill="rgba(30, 58, 138, 0.2)" stroke="#1E3A8A" stroke-width="2"></path>
+<!-- Points -->
+<circle cx="50" cy="15" fill="#1E3A8A" r="2"></circle>
+<circle cx="85" cy="50" fill="#1E3A8A" r="2"></circle>
+<circle cx="50" cy="85" fill="#1E3A8A" r="2"></circle>
+<circle cx="20" cy="50" fill="#1E3A8A" r="2"></circle>
+</svg>
+<div class="absolute -top-6 left-1/2 -translate-x-1/2 font-label-sm text-center uppercase">Clinical<br/>Completeness</div>
+<div class="absolute top-1/2 -right-16 -translate-y-1/2 font-label-sm text-center uppercase">Payer Rule<br/>Alignment</div>
+<div class="absolute -bottom-6 left-1/2 -translate-x-1/2 font-label-sm text-center uppercase">Evidence<br/>Strength</div>
+<div class="absolute top-1/2 -left-14 -translate-y-1/2 font-label-sm text-center uppercase">Coding<br/>Accuracy</div>
+</div>
+<div class="flex-1 space-y-4 w-full">
+<div class="p-3 bg-surface-container-low rounded-lg border border-outline-variant/30">
+<div class="flex justify-between mb-1">
+<span class="font-label-md text-on-surface">Clinical Completeness</span>
+<span class="font-label-md text-primary">88%</span>
+</div>
+<div class="w-full bg-outline-variant/30 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[88%]"></div>
+</div>
+</div>
+<div class="p-3 bg-surface-container-low rounded-lg border border-outline-variant/30">
+<div class="flex justify-between mb-1">
+<span class="font-label-md text-on-surface">Payer Rule Alignment</span>
+<span class="font-label-md text-primary">76%</span>
+</div>
+<div class="w-full bg-outline-variant/30 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[76%]"></div>
+</div>
+</div>
+<div class="p-3 bg-surface-container-low rounded-lg border border-outline-variant/30">
+<div class="flex justify-between mb-1">
+<span class="font-label-md text-on-surface">Evidence Strength</span>
+<span class="font-label-md text-primary">94%</span>
+</div>
+<div class="w-full bg-outline-variant/30 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[94%]"></div>
+</div>
+</div>
+<div class="p-3 bg-surface-container-low rounded-lg border border-outline-variant/30">
+<div class="flex justify-between mb-1">
+<span class="font-label-md text-on-surface">Coding Accuracy</span>
+<span class="font-label-md text-primary">82%</span>
+</div>
+<div class="w-full bg-outline-variant/30 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[82%]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Intelligence Summary -->
+<div class="col-span-12 lg:col-span-5 bg-primary p-card-padding rounded-xl border border-outline-variant shadow-lg text-on-primary flex flex-col relative overflow-hidden">
+<!-- Subtle AI Glow -->
+<div class="absolute -top-24 -right-24 w-64 h-64 bg-[#38BDF8] opacity-10 blur-[80px] rounded-full"></div>
+<div class="flex items-center gap-2 mb-gap-lg relative z-10">
+<span class="material-symbols-outlined text-[#38BDF8]" data-icon="auto_awesome">auto_awesome</span>
+<h5 class="font-headline-md text-headline-md">Intelligence Summary</h5>
+</div>
+<div class="space-y-md relative z-10">
+<p class="font-body-md text-on-primary/80 mb-4">Our AI has identified 3 critical factors affecting your claim readiness for the current quarter.</p>
+<div class="space-y-3">
+<h6 class="font-label-md text-on-primary/60 uppercase tracking-widest">Top Readiness Blockers</h6>
+<div class="bg-on-primary/5 border border-on-primary/10 p-3 rounded-lg flex gap-3 items-start group hover:bg-on-primary/10 transition-colors">
+<span class="material-symbols-outlined text-error mt-0.5" data-icon="warning">warning</span>
+<div>
+<p class="font-label-md font-bold mb-0.5">Missing SOAP details for Oncology</p>
+<p class="font-body-sm text-on-primary/70">Required for BlueCross pre-auth flow in 12 pending cases.</p>
+</div>
+</div>
+<div class="bg-on-primary/5 border border-on-primary/10 p-3 rounded-lg flex gap-3 items-start group hover:bg-on-primary/10 transition-colors">
+<span class="material-symbols-outlined text-warning-400 text-[#FBBF24] mt-0.5" data-icon="info">info</span>
+<div>
+<p class="font-label-md font-bold mb-0.5">ICD-10 Mismatch for VIS-902</p>
+<p class="font-body-sm text-on-primary/70">Automated mapping failed due to updated payer specific rules.</p>
+</div>
+</div>
+<div class="bg-on-primary/5 border border-on-primary/10 p-3 rounded-lg flex gap-3 items-start group hover:bg-on-primary/10 transition-colors">
+<span class="material-symbols-outlined text-[#38BDF8] mt-0.5" data-icon="lightbulb">lightbulb</span>
+<div>
+<p class="font-label-md font-bold mb-0.5">Recommended Rule Update</p>
+<p class="font-body-sm text-on-primary/70">Payer 'Aetna' updated outpatient dialysis requirements (Doc-302).</p>
+</div>
+</div>
+</div>
+<button class="w-full mt-auto py-3 bg-[#38BDF8] text-primary font-label-md rounded-lg flex items-center justify-center gap-2 hover:bg-[#38BDF8]/90 transition-colors">
+                            Fix Top Issues Now
+                            <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Claims List Table Section -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden mb-gap-lg">
+<div class="px-card-padding py-4 border-b border-outline-variant flex flex-col md:flex-row md:items-center justify-between gap-4">
+<h5 class="font-headline-md text-headline-md text-on-surface">Claims Requiring Attention</h5>
+<div class="flex items-center gap-sm">
+<div class="flex border border-outline-variant rounded-lg overflow-hidden">
+<button class="px-3 py-1.5 bg-surface-container font-label-md text-on-surface">All</button>
+<button class="px-3 py-1.5 hover:bg-surface-container font-label-md text-on-surface-variant transition-colors">High Risk</button>
+<button class="px-3 py-1.5 hover:bg-surface-container font-label-md text-on-surface-variant transition-colors">Low Score</button>
+</div>
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-container-low border border-outline-variant rounded-lg hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-body-md" data-icon="filter_list">filter_list</span>
+<span class="font-label-md">Filter</span>
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low">
+<tr>
+<th class="px-table-cell-x py-table-cell-y font-label-md text-on-surface-variant uppercase tracking-wider">Claim ID</th>
+<th class="px-table-cell-x py-table-cell-y font-label-md text-on-surface-variant uppercase tracking-wider">Patient</th>
+<th class="px-table-cell-x py-table-cell-y font-label-md text-on-surface-variant uppercase tracking-wider">Readiness</th>
+<th class="px-table-cell-x py-table-cell-y font-label-md text-on-surface-variant uppercase tracking-wider">Risk Level</th>
+<th class="px-table-cell-x py-table-cell-y font-label-md text-on-surface-variant uppercase tracking-wider">Primary Blocker</th>
+<th class="px-table-cell-x py-table-cell-y font-label-md text-on-surface-variant uppercase tracking-wider">Est. Value</th>
+<th class="px-table-cell-x py-table-cell-y font-label-md text-on-surface-variant uppercase tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<!-- Row 1 -->
+<tr class="hover:bg-primary/5 transition-colors group">
+<td class="px-table-cell-x py-4">
+<span class="font-label-md font-bold text-primary">#CLM-72410</span>
+</td>
+<td class="px-table-cell-x py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-container/20 flex items-center justify-center text-secondary font-label-md">SJ</div>
+<div>
+<p class="font-label-md text-on-surface">Sarah Johnson</p>
+<p class="font-body-sm text-on-surface-variant">DOB: 12/04/1982</p>
+</div>
+</div>
+</td>
+<td class="px-table-cell-x py-4">
+<div class="flex items-center gap-2">
+<div class="w-12 h-1.5 bg-outline-variant/30 rounded-full overflow-hidden">
+<div class="bg-error h-full w-[42%]"></div>
+</div>
+<span class="font-label-md text-error">42%</span>
+</div>
+</td>
+<td class="px-table-cell-x py-4">
+<span class="px-2 py-1 bg-error-container text-on-error-container rounded font-label-sm uppercase">High</span>
+</td>
+<td class="px-table-cell-x py-4">
+<span class="font-body-md text-on-surface">Missing Evidence</span>
+</td>
+<td class="px-table-cell-x py-4">
+<span class="font-label-md font-semibold">฿142,500</span>
+</td>
+<td class="px-table-cell-x py-4 text-right">
+<button class="p-2 text-primary hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+<button class="p-2 text-primary hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-primary/5 transition-colors group">
+<td class="px-table-cell-x py-4">
+<span class="font-label-md font-bold text-primary">#CLM-72412</span>
+</td>
+<td class="px-table-cell-x py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-container/20 flex items-center justify-center text-secondary font-label-md">MT</div>
+<div>
+<p class="font-label-md text-on-surface">Mark Thompson</p>
+<p class="font-body-sm text-on-surface-variant">DOB: 05/09/1975</p>
+</div>
+</div>
+</td>
+<td class="px-table-cell-x py-4">
+<div class="flex items-center gap-2">
+<div class="w-12 h-1.5 bg-outline-variant/30 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[68%]"></div>
+</div>
+<span class="font-label-md text-on-surface">68%</span>
+</div>
+</td>
+<td class="px-table-cell-x py-4">
+<span class="px-2 py-1 bg-surface-container text-on-surface-variant rounded font-label-sm uppercase">Med</span>
+</td>
+<td class="px-table-cell-x py-4">
+<span class="font-body-md text-on-surface">Payer Rule Conflict</span>
+</td>
+<td class="px-table-cell-x py-4">
+<span class="font-label-md font-semibold">฿89,200</span>
+</td>
+<td class="px-table-cell-x py-4 text-right">
+<button class="p-2 text-primary hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+<button class="p-2 text-primary hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-primary/5 transition-colors group">
+<td class="px-table-cell-x py-4">
+<span class="font-label-md font-bold text-primary">#CLM-72418</span>
+</td>
+<td class="px-table-cell-x py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-container/20 flex items-center justify-center text-secondary font-label-md">AL</div>
+<div>
+<p class="font-label-md text-on-surface">Anna Lee</p>
+<p class="font-body-sm text-on-surface-variant">DOB: 22/11/1990</p>
+</div>
+</div>
+</td>
+<td class="px-table-cell-x py-4">
+<div class="flex items-center gap-2">
+<div class="w-12 h-1.5 bg-outline-variant/30 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[81%]"></div>
+</div>
+<span class="font-label-md text-on-surface">81%</span>
+</div>
+</td>
+<td class="px-table-cell-x py-4">
+<span class="px-2 py-1 bg-surface-container text-on-surface-variant rounded font-label-sm uppercase">Low</span>
+</td>
+<td class="px-table-cell-x py-4">
+<span class="font-body-md text-on-surface">Coding Verification</span>
+</td>
+<td class="px-table-cell-x py-4">
+<span class="font-label-md font-semibold">฿214,000</span>
+</td>
+<td class="px-table-cell-x py-4 text-right">
+<button class="p-2 text-primary hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+<button class="p-2 text-primary hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-card-padding py-4 bg-surface-container-low border-t border-outline-variant flex items-center justify-between">
+<p class="font-body-sm text-on-surface-variant">Showing 3 of 142 claims pending review</p>
+<div class="flex items-center gap-2">
+<button class="p-1 rounded hover:bg-surface-container transition-colors disabled:opacity-30" disabled="">
+<span class="material-symbols-outlined" data-icon="chevron_left">chevron_left</span>
+</button>
+<span class="font-label-md px-2">Page 1 of 48</span>
+<button class="p-1 rounded hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- FAB for AI Assistance (only on Dashboard as requested) -->
+<button class="fixed bottom-gap-lg right-gap-lg w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-200 group z-50">
+<span class="material-symbols-outlined group-hover:rotate-12 transition-transform" data-icon="auto_fix_high">auto_fix_high</span>
+<div class="absolute right-16 px-4 py-2 bg-inverse-surface text-inverse-on-surface rounded-lg font-label-md opacity-0 group-hover:opacity-100 whitespace-nowrap pointer-events-none transition-opacity">
+            AI Assistant Ready
+        </div>
+</button>
+<script>
+        // Micro-interactions and effects
+        document.querySelectorAll('a, button').forEach(el => {
+            el.addEventListener('click', (e) => {
+                // Prevent navigation for demo
+                if (el.getAttribute('href') === '#') e.preventDefault();
+                
+                // Add a subtle ripple-like effect
+                const ripple = document.createElement('div');
+                ripple.className = 'absolute bg-white/20 rounded-full scale-0 animate-ping pointer-events-none';
+                ripple.style.width = '20px';
+                ripple.style.height = '20px';
+                el.classList.add('relative', 'overflow-hidden');
+                el.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+
+        // Simulating loading data state on charts
+        window.addEventListener('load', () => {
+            const chartBars = document.querySelectorAll('.w-full.bg-outline-variant\/30 .bg-primary');
+            chartBars.forEach(bar => {
+                const finalWidth = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.transition = 'width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                    bar.style.width = finalWidth;
+                }, 300);
+            });
+        });
+    </script>
+</body></html>
