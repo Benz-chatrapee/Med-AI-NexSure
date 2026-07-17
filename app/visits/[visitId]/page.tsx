@@ -1,12 +1,20 @@
 import type { Metadata } from "next";
-import { VisitTimelinePage } from "@/features/visit-timeline/components/visit-timeline-page";
+import { VisitDetailPage } from "@/features/visit-detail/components/visit-detail-page";
+import { getVisitDetailMock } from "@/features/visit-detail/data/visit-detail.mock";
 
 export const metadata: Metadata = {
   title: "Visit Detail | Med AI NexSure",
-  description: "Visit detail timeline for clinical and claim workflow review.",
+  description:
+    "Clinical visit detail workspace with AI decision support and claim readiness intelligence.",
 };
 
-export default async function VisitDetailPage({ params }: { params: Promise<{ visitId: string }> }) {
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ visitId: string }>;
+}) {
   const { visitId } = await params;
-  return <VisitTimelinePage visitId={visitId} />;
+  const visit = getVisitDetailMock(visitId);
+
+  return <VisitDetailPage visit={visit} />;
 }

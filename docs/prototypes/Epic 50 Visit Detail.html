@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Med AI NexSure | Visit Detail</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .ai-shimmer {
+            background: linear-gradient(90deg, rgba(239, 246, 255, 0) 0%, rgba(239, 246, 255, 1) 50%, rgba(239, 246, 255, 0) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite linear;
+        }
+        @keyframes shimmer {
+            from { background-position: 200% 0; }
+            to { background-position: -200% 0; }
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ba1a1a",
+                        "on-tertiary-container": "#8da9ff",
+                        "surface-dim": "#cbdbf5",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "primary-container": "#1e3a8a",
+                        "on-secondary-fixed-variant": "#2e457b",
+                        "primary-fixed-dim": "#b6c4ff",
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#b6c4ff",
+                        "on-tertiary-fixed": "#00174b",
+                        "background": "#f8f9ff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "tertiary-container": "#00389a",
+                        "surface-container-low": "#eff4ff",
+                        "on-tertiary-fixed-variant": "#003ea8",
+                        "on-surface": "#0b1c30",
+                        "on-primary-fixed": "#00164e",
+                        "inverse-surface": "#213145",
+                        "secondary-container": "#a9c0fe",
+                        "secondary-fixed": "#dae2ff",
+                        "outline-variant": "#c5c5d3",
+                        "surface-bright": "#f8f9ff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-variant": "#d3e4fe",
+                        "tertiary-fixed-dim": "#b4c5ff",
+                        "on-primary-container": "#90a8ff",
+                        "on-primary-fixed-variant": "#264191",
+                        "on-secondary-container": "#364d83",
+                        "on-tertiary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed-dim": "#b1c5ff",
+                        "on-secondary-fixed": "#001946",
+                        "outline": "#757682",
+                        "on-background": "#0b1c30",
+                        "surface-container-highest": "#d3e4fe",
+                        "surface-container-high": "#dce9ff",
+                        "surface": "#f8f9ff",
+                        "primary": "#00236f",
+                        "on-surface-variant": "#444651",
+                        "primary-fixed": "#dce1ff",
+                        "tertiary-fixed": "#dbe1ff",
+                        "secondary": "#465d94",
+                        "surface-container": "#e5eeff",
+                        "tertiary": "#00246b",
+                        "surface-tint": "#4059aa"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-page": "2rem",
+                        "stack-compact": "0.5rem",
+                        "sidebar-width": "260px",
+                        "gutter": "1rem",
+                        "container-max": "1440px",
+                        "stack-default": "1rem"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["Inter"],
+                        "section-title": ["Inter"],
+                        "table-header": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "page-title": ["Inter"],
+                        "mono-data": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "section-title": ["18px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "table-header": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "page-title": ["26px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "mono-data": ["13px", {"lineHeight": "18px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-x-hidden">
+<!-- SideNavBar -->
+<aside class="fixed h-full w-sidebar-width left-0 top-0 bg-primary flex flex-col py-6 border-r border-outline-variant z-50">
+<div class="px-6 mb-8">
+<h1 class="font-page-title text-page-title font-bold text-white leading-tight">Med AI NexSure</h1>
+<p class="font-label-caps text-label-caps text-on-primary-container opacity-80 uppercase tracking-widest mt-1">Clinical Intelligence</p>
+</div>
+<nav class="flex-1 space-y-1 px-3">
+<a class="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 text-on-primary/60 font-medium hover:bg-primary-container/10 hover:text-white rounded-lg group" href="#">
+<span class="material-symbols-outlined opacity-70 group-hover:opacity-100">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 text-on-primary/60 font-medium hover:bg-primary-container/10 hover:text-white rounded-lg group" href="#">
+<span class="material-symbols-outlined opacity-70 group-hover:opacity-100">person</span>
+<span class="font-label-caps text-label-caps">Patients</span>
+</a>
+<!-- Active Tab -->
+<a class="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 text-white font-bold border-l-2 border-on-primary-fixed-variant bg-primary-container/20 rounded-r-lg group" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">event</span>
+<span class="font-label-caps text-label-caps">Visits</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 text-on-primary/60 font-medium hover:bg-primary-container/10 hover:text-white rounded-lg group" href="#">
+<span class="material-symbols-outlined opacity-70 group-hover:opacity-100">psychology</span>
+<span class="font-label-caps text-label-caps">AI Clinical Engine</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 text-on-primary/60 font-medium hover:bg-primary-container/10 hover:text-white rounded-lg group" href="#">
+<span class="material-symbols-outlined opacity-70 group-hover:opacity-100">fact_check</span>
+<span class="font-label-caps text-label-caps">Claim Readiness</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 text-on-primary/60 font-medium hover:bg-primary-container/10 hover:text-white rounded-lg group" href="#">
+<span class="material-symbols-outlined opacity-70 group-hover:opacity-100">clinical_notes</span>
+<span class="font-label-caps text-label-caps">Evidence Package</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 text-on-primary/60 font-medium hover:bg-primary-container/10 hover:text-white rounded-lg group" href="#">
+<span class="material-symbols-outlined opacity-70 group-hover:opacity-100">analytics</span>
+<span class="font-label-caps text-label-caps">Insurance Intelligence</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 text-on-primary/60 font-medium hover:bg-primary-container/10 hover:text-white rounded-lg group" href="#">
+<span class="material-symbols-outlined opacity-70 group-hover:opacity-100">payments</span>
+<span class="font-label-caps text-label-caps">Economic Intelligence</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 transition-all duration-200 text-on-primary/60 font-medium hover:bg-primary-container/10 hover:text-white rounded-lg group" href="#">
+<span class="material-symbols-outlined opacity-70 group-hover:opacity-100">policy</span>
+<span class="font-label-caps text-label-caps">Audit &amp; Compliance</span>
+</a>
+</nav>
+<div class="px-6 pt-6 mt-auto border-t border-white/10">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a female physician in her late 40s, wearing a white lab coat with a stethoscope around her neck. She has a warm, confident expression. The background is a clean, modern medical facility with soft blue tones and professional lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwx-rVjZbXDTPgWuUvDVR1Zkv0zGc6ZuEz6TZwAilJCI50RBsXL9ntq06TS-yGYDvftkMAh9_lZEDHJySjhzpqbqAPpGMkW3dcPTYifgHiDWiWlwo3wkdwzx1EgTH0VKdR34uyoHLIDPpTiT0i8_u30ZTWC5ODBJbvp8oygM8dTGxtCiN4HC8ktjZdoxbHtG5jMiRtU9wSMbWLOAwB_FI7-BMBSg5gHr2v1a0IffN5F7pa08JvDhGTnQPwsezG6L1hLqqWGGPXFSM"/>
+</div>
+<div>
+<p class="text-white font-label-caps text-[11px] leading-tight">Dr. Sarah Jenkins</p>
+<p class="text-white/50 text-[10px]">Chief Medical Officer</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-sidebar-width min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="sticky top-0 z-40 flex justify-between items-center h-16 px-margin-page border-b border-outline-variant bg-surface-bright transition-colors duration-150">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 text-on-surface-variant font-medium font-body-md">
+<span class="hover:text-primary cursor-pointer transition-colors">Visits</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="text-primary font-bold">Visit Detail</span>
+</div>
+<div class="h-6 w-[1px] bg-outline-variant mx-2"></div>
+<div class="relative group">
+<input class="bg-surface-container-low border-none rounded-full px-4 py-1.5 text-body-sm w-64 focus:ring-1 focus:ring-primary transition-all" placeholder="Search medical records..." type="text"/>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded-lg border border-outline-variant cursor-pointer hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-primary text-lg">local_hospital</span>
+<span class="font-label-caps text-label-caps text-primary">St. Jude Medical Center</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low text-on-surface-variant transition-all">
+<span class="material-symbols-outlined">smart_toy</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low text-on-surface-variant relative transition-all">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+</div>
+</header>
+<!-- StickyVisitHeader -->
+<div class="sticky top-16 z-30 w-full flex items-center justify-between px-margin-page py-3 border-b border-outline-variant bg-surface-container-lowest shadow-sm">
+<div class="flex items-center gap-6">
+<div>
+<h2 class="font-section-title text-section-title text-primary">Emily Thorne</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">HN-2024-0815 <span class="mx-1">•</span> <span class="bg-primary/10 text-primary px-2 py-0.5 rounded text-[11px] font-bold">In Consultation</span></p>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant"></div>
+<div class="flex gap-6">
+<div>
+<p class="font-label-caps text-[10px] text-on-surface-variant uppercase tracking-tighter">Claim Readiness</p>
+<div class="flex items-center gap-2">
+<span class="font-mono-data text-body-md font-bold text-primary">78 / 100</span>
+<div class="w-16 h-1.5 bg-outline-variant rounded-full overflow-hidden">
+<div class="bg-primary h-full" style="width: 78%"></div>
+</div>
+</div>
+</div>
+<div>
+<p class="font-label-caps text-[10px] text-on-surface-variant uppercase tracking-tighter">Clinical Risk</p>
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-[#f59e0b]"></span>
+<span class="font-label-caps text-label-caps text-[#b45309]">Moderate</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 border border-outline-variant rounded-lg hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined text-lg">history</span>
+<span class="font-label-caps text-label-caps">History</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:brightness-110 transition-all shadow-sm">
+<span class="material-symbols-outlined text-lg">edit_note</span>
+<span class="font-label-caps text-label-caps">New Note</span>
+</button>
+</div>
+</div>
+<!-- 3 Column Layout Canvas -->
+<div class="p-margin-page grid grid-cols-12 gap-gutter flex-1 pb-24">
+<!-- Left Column: Patient Context -->
+<div class="col-span-3 space-y-gutter">
+<div class="bg-white border border-outline-variant rounded-xl p-5 shadow-sm overflow-hidden relative">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary"></div>
+<div class="flex items-center gap-4 mb-5">
+<div class="w-14 h-14 rounded-xl bg-surface-container-high flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A clean, minimalist studio portrait of a woman in her early 30s with light hair, looking directly at the camera with a neutral, calm expression. The image has high-key lighting, soft shadows, and a sophisticated enterprise software aesthetic with a cool blue undertone." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBV7R9BRfnmu3weE2r5yrN4c4p_1ur-CvD4uylblejhCcu6ys6pa_la4WtlJYDuFaXdCg01phkFdNhITR305lFHT7kxEqSV6YHTviqM11eC5GJmimR0nr3tp3mkwD1_uYx9eKIJCZNUfLCY8y1P22Ji5XGm0ISsK2mXlJDZDiDaEOQ86s1KDoJp1nOJc_LWzMWg46Y9Bn28NfSPKIRs7DmDVof42XunjIXZcUzGd2PPCzoNZgxdW_QNisF5e_3V9IcBanoaNMI-4zc"/>
+</div>
+<div>
+<h3 class="font-section-title text-section-title leading-tight">Emily Thorne</h3>
+<p class="text-body-sm text-on-surface-variant">32 Years • Female</p>
+</div>
+</div>
+<div class="space-y-4">
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-1">Critical Allergy <span class="text-body-sm text-error ml-1 font-normal">(อาการแพ้รุนแรง)</span></p>
+<div class="flex items-center gap-2 bg-error/5 border border-error/20 p-2 rounded-lg">
+<span class="material-symbols-outlined text-error text-lg">warning</span>
+<span class="text-error font-bold text-body-md uppercase">Penicillin</span>
+</div>
+</div>
+<div class="grid grid-cols-1 gap-2">
+<div class="p-3 bg-surface-container-lowest border border-outline-variant rounded-lg">
+<p class="font-label-caps text-[10px] text-on-surface-variant uppercase mb-1">Insurance Policy</p>
+<div class="flex justify-between items-center">
+<span class="font-medium text-body-md">Allianz Elite</span>
+<span class="text-[11px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full border border-green-200">Likely Covered</span>
+</div>
+</div>
+<div class="p-3 bg-surface-container-lowest border border-outline-variant rounded-lg">
+<p class="font-label-caps text-[10px] text-on-surface-variant uppercase mb-1">PDPA Consent</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-green-600 text-lg" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-medium text-body-md">Active Consent <span class="text-[11px] text-on-surface-variant ml-1 font-normal">(ยินยอมใช้งานข้อมูล)</span></span>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-outline-variant">
+<h4 class="font-label-caps text-label-caps text-primary mb-3">Quick Vitals History</h4>
+<div class="space-y-2">
+<div class="flex justify-between text-body-sm">
+<span class="text-on-surface-variant">Last Visit (05/12)</span>
+<span class="font-mono-data">BP 118/76</span>
+</div>
+<div class="flex justify-between text-body-sm">
+<span class="text-on-surface-variant">Avg. Resting HR</span>
+<span class="font-mono-data">68 bpm</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-4 tracking-widest">Medical Documents</h3>
+<div class="space-y-3">
+<div class="flex items-center justify-between p-2 rounded-lg hover:bg-surface-container transition-colors cursor-pointer">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">lab_profile</span>
+<div class="leading-none">
+<p class="text-body-sm font-medium">Blood Test Results</p>
+<p class="text-[11px] text-on-surface-variant">Uploaded 2h ago</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-sm">open_in_new</span>
+</div>
+<div class="flex items-center justify-between p-2 rounded-lg bg-surface-container-high/50 border-l-2 border-primary">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">description</span>
+<div class="leading-none">
+<p class="text-body-sm font-medium">Initial Consent Form</p>
+<p class="text-[11px] text-green-600 font-bold">Verified</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-sm">verified</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Center Column: Clinical Workspace -->
+<div class="col-span-6 space-y-gutter">
+<!-- Safety Banner -->
+<div class="bg-white border-2 border-error border-solid rounded-xl p-4 flex items-center gap-4 bg-[#FEF2F2] shadow-sm">
+<div class="w-12 h-12 rounded-full bg-error flex items-center justify-center text-white shrink-0">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-error text-body-md uppercase tracking-wide">Severe Allergy Alert: Penicillin</h4>
+<p class="text-body-sm text-error">Patient has reported anaphylactic shock history. Do not prescribe any Beta-lactam antibiotics. <span class="font-bold">(ห้ามใช้ยากลุ่มเพนิซิลลินโดยเด็ดขาด)</span></p>
+</div>
+<button class="px-3 py-1 bg-white border border-error/30 text-error text-[11px] font-bold rounded-lg hover:bg-error hover:text-white transition-all uppercase">Acknowledge</button>
+</div>
+<!-- Vitals Grid -->
+<div class="grid grid-cols-4 gap-4">
+<div class="bg-white border border-outline-variant p-3 rounded-xl shadow-sm">
+<p class="font-label-caps text-[10px] text-on-surface-variant uppercase mb-1">Blood Pressure</p>
+<div class="flex items-baseline gap-1">
+<span class="font-mono-data text-lg font-bold text-primary">120/80</span>
+<span class="text-[10px] text-on-surface-variant">mmHg</span>
+</div>
+<div class="mt-1 flex items-center text-[10px] text-green-600 font-bold">
+<span class="material-symbols-outlined text-xs">check</span> Normal
+                        </div>
+</div>
+<div class="bg-white border border-outline-variant p-3 rounded-xl shadow-sm">
+<p class="font-label-caps text-[10px] text-on-surface-variant uppercase mb-1">Heart Rate</p>
+<div class="flex items-baseline gap-1">
+<span class="font-mono-data text-lg font-bold text-primary">72</span>
+<span class="text-[10px] text-on-surface-variant">bpm</span>
+</div>
+<div class="mt-1 flex items-center text-[10px] text-green-600 font-bold">
+<span class="material-symbols-outlined text-xs">trending_flat</span> Stable
+                        </div>
+</div>
+<div class="bg-white border border-outline-variant p-3 rounded-xl shadow-sm">
+<p class="font-label-caps text-[10px] text-on-surface-variant uppercase mb-1">Temperature</p>
+<div class="flex items-baseline gap-1">
+<span class="font-mono-data text-lg font-bold text-primary">37.2</span>
+<span class="text-[10px] text-on-surface-variant">°C</span>
+</div>
+<div class="mt-1 flex items-center text-[10px] text-[#b45309] font-bold">
+<span class="material-symbols-outlined text-xs">trending_up</span> Slightly Elevated
+                        </div>
+</div>
+<div class="bg-white border border-outline-variant p-3 rounded-xl shadow-sm">
+<p class="font-label-caps text-[10px] text-on-surface-variant uppercase mb-1">SpO2</p>
+<div class="flex items-baseline gap-1">
+<span class="font-mono-data text-lg font-bold text-primary">98</span>
+<span class="text-[10px] text-on-surface-variant">%</span>
+</div>
+<div class="mt-1 flex items-center text-[10px] text-green-600 font-bold">
+<span class="material-symbols-outlined text-xs">check</span> Optimal
+                        </div>
+</div>
+</div>
+<!-- SOAP Workspace -->
+<div class="bg-white border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+<div class="bg-surface-container px-4 py-2 border-b border-outline-variant flex justify-between items-center">
+<h3 class="font-label-caps text-label-caps text-primary uppercase">Clinical Documentation (SOAP)</h3>
+<div class="flex gap-2">
+<button class="p-1 hover:bg-white rounded transition-all text-on-surface-variant">
+<span class="material-symbols-outlined text-lg">mic</span>
+</button>
+<button class="p-1 hover:bg-white rounded transition-all text-on-surface-variant">
+<span class="material-symbols-outlined text-lg">history_edu</span>
+</button>
+</div>
+</div>
+<div class="p-0 divide-y divide-outline-variant/50">
+<div class="p-4 grid grid-cols-[40px_1fr] gap-4">
+<div class="font-bold text-primary text-xl flex justify-center items-start pt-1">S</div>
+<div class="space-y-1">
+<p class="font-label-caps text-[10px] text-on-surface-variant">Subjective <span class="font-normal italic">(อาการที่ผู้ป่วยแจ้ง)</span></p>
+<textarea class="w-full border-none p-0 focus:ring-0 text-body-md text-on-surface placeholder-on-surface-variant/40 resize-none" placeholder="Enter patient complaints, pain levels, and history of present illness..." rows="2">Patient reports persistent epigastric pain for 3 days, described as "burning," exacerbated after spicy meals. No nausea or vomiting reported.</textarea>
+</div>
+</div>
+<div class="p-4 grid grid-cols-[40px_1fr] gap-4">
+<div class="font-bold text-primary text-xl flex justify-center items-start pt-1">O</div>
+<div class="space-y-1">
+<p class="font-label-caps text-[10px] text-on-surface-variant">Objective <span class="font-normal italic">(สิ่งที่ตรวจพบ)</span></p>
+<textarea class="w-full border-none p-0 focus:ring-0 text-body-md text-on-surface placeholder-on-surface-variant/40 resize-none" placeholder="Enter clinical findings, physical exam results..." rows="2">Mild tenderness on palpation of the epigastrium. Bowel sounds are normal. No rebound tenderness or guarding. BMI is 24.5.</textarea>
+</div>
+</div>
+<div class="p-4 grid grid-cols-[40px_1fr] gap-4">
+<div class="font-bold text-primary text-xl flex justify-center items-start pt-1">A</div>
+<div class="space-y-1">
+<p class="font-label-caps text-[10px] text-on-surface-variant">Assessment <span class="font-normal italic">(การวินิจฉัยเบื้องต้น)</span></p>
+<div class="flex flex-wrap gap-2 mb-2">
+<span class="bg-primary/5 text-primary text-[11px] font-bold px-3 py-1 rounded-full border border-primary/20 flex items-center gap-1">
+                                        K29.7 Gastritis, unspecified <span class="material-symbols-outlined text-sm">close</span>
+</span>
+<button class="text-primary text-[11px] font-bold hover:underline">+ Add Diagnosis</button>
+</div>
+<textarea class="w-full border-none p-0 focus:ring-0 text-body-md text-on-surface placeholder-on-surface-variant/40 resize-none" placeholder="Clinical reasoning..." rows="1">Based on the location and nature of pain, acute gastritis is highly likely.</textarea>
+</div>
+</div>
+<div class="p-4 grid grid-cols-[40px_1fr] gap-4">
+<div class="font-bold text-primary text-xl flex justify-center items-start pt-1">P</div>
+<div class="space-y-1">
+<p class="font-label-caps text-[10px] text-on-surface-variant">Plan <span class="font-normal italic">(แผนการรักษา)</span></p>
+<textarea class="w-full border-none p-0 focus:ring-0 text-body-md text-on-surface placeholder-on-surface-variant/40 resize-none" placeholder="Enter medications, follow-ups, and advice..." rows="2">Prescribe Antacids and PPIs. Advise dietary modifications (avoid spicy food). Schedule follow-up in 1 week if symptoms persist.</textarea>
+</div>
+</div>
+</div>
+</div>
+<!-- AI Clinical Summary Panel -->
+<div class="bg-[#EFF6FF] border border-primary/20 rounded-xl p-5 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-3 ai-shimmer opacity-30 pointer-events-none"></div>
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-[#1D4ED8]" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<h4 class="font-label-caps text-label-caps text-[#1D4ED8] uppercase tracking-wider">AI Clinical Synthesis</h4>
+<div class="ml-auto flex items-center gap-1">
+<span class="text-[10px] text-on-surface-variant">Confidence</span>
+<span class="text-[11px] font-bold text-green-600">94%</span>
+</div>
+</div>
+<p class="text-body-md text-primary/80 leading-relaxed italic">
+                        "Patient presents with classic symptoms of **Epigastric Distress (K29.7)**. The clinical history and vitals suggest a non-acute presentation. **Recommendation:** Proceed with H2-Blocker therapy. **Allergy Check:** Confirmed negative for Penicillin-derivative interaction."
+                    </p>
+<div class="mt-4 flex gap-3">
+<button class="bg-[#1D4ED8] text-white text-[11px] font-bold px-4 py-1.5 rounded-lg hover:brightness-110 transition-all">Accept Summary</button>
+<button class="bg-white border border-primary/20 text-primary text-[11px] font-bold px-4 py-1.5 rounded-lg hover:bg-surface transition-all">Regenerate</button>
+</div>
+</div>
+<!-- Prescription & Diagnosis Tables -->
+<div class="bg-white border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+<div class="px-4 py-3 border-b border-outline-variant flex justify-between items-center">
+<h3 class="font-label-caps text-label-caps text-on-surface uppercase">Current Prescription</h3>
+<span class="text-[11px] text-on-surface-variant font-medium">3 Items Total</span>
+</div>
+<table class="w-full text-left">
+<thead class="bg-surface-container-low text-table-header font-table-header uppercase text-on-surface-variant border-b border-outline-variant">
+<tr>
+<th class="px-4 py-2">Medication</th>
+<th class="px-4 py-2">Dosage</th>
+<th class="px-4 py-2">Freq</th>
+<th class="px-4 py-2">Safety Status</th>
+<th class="px-4 py-2">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/50 text-body-sm">
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-4 py-3 font-medium">Omeprazole 20mg</td>
+<td class="px-4 py-3">1 Cap</td>
+<td class="px-4 py-3">O.M. (AC)</td>
+<td class="px-4 py-3">
+<div class="flex items-center gap-1.5 text-green-600 font-bold text-[11px]">
+<span class="w-1.5 h-1.5 rounded-full bg-green-600"></span> Safe
+                                    </div>
+</td>
+<td class="px-4 py-3">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-error">delete</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-4 py-3 font-medium">Almagate 1.5g/15ml</td>
+<td class="px-4 py-3">1 Sachet</td>
+<td class="px-4 py-3">T.I.D. (PC)</td>
+<td class="px-4 py-3">
+<div class="flex items-center gap-1.5 text-green-600 font-bold text-[11px]">
+<span class="w-1.5 h-1.5 rounded-full bg-green-600"></span> Safe
+                                    </div>
+</td>
+<td class="px-4 py-3">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-error">delete</span>
+</td>
+</tr>
+<tr class="bg-error-container/20">
+<td class="px-4 py-3 font-medium text-error">Amoxicillin 500mg</td>
+<td class="px-4 py-3">1 Cap</td>
+<td class="px-4 py-3">B.I.D. (PC)</td>
+<td class="px-4 py-3">
+<div class="flex items-center gap-1.5 text-error font-bold text-[11px]">
+<span class="material-symbols-outlined text-xs">report</span> CRITICAL WARNING
+                                    </div>
+</td>
+<td class="px-4 py-3">
+<span class="material-symbols-outlined text-error cursor-pointer">block</span>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="p-3 bg-surface-container-lowest flex justify-center">
+<button class="text-primary font-bold text-body-sm hover:underline flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">add</span> Search Pharmacoepia
+                        </button>
+</div>
+</div>
+</div>
+<!-- Right Column: Intelligence Panel -->
+<div class="col-span-3 space-y-gutter">
+<!-- Claim Readiness Score Card -->
+<div class="bg-white border border-outline-variant rounded-xl p-5 shadow-sm">
+<h3 class="font-label-caps text-label-caps text-on-surface uppercase mb-4 tracking-widest flex items-center justify-between">
+                        Claim Readiness
+                        <span class="material-symbols-outlined text-primary">analytics</span>
+</h3>
+<div class="flex flex-col items-center mb-6">
+<div class="relative w-32 h-32 flex items-center justify-center">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-surface-container" cx="64" cy="64" fill="transparent" r="58" stroke="currentColor" stroke-width="10"></circle>
+<circle class="text-primary" cx="64" cy="64" fill="transparent" r="58" stroke="currentColor" stroke-dasharray="364.4" stroke-dashoffset="80.1" stroke-width="10"></circle>
+</svg>
+<div class="absolute flex flex-col items-center">
+<span class="text-3xl font-bold text-primary leading-none">78</span>
+<span class="text-[10px] text-on-surface-variant uppercase font-bold">Percent</span>
+</div>
+</div>
+</div>
+<div class="space-y-3">
+<div class="flex items-center justify-between">
+<span class="text-body-sm text-on-surface-variant">SOAP Completeness</span>
+<span class="material-symbols-outlined text-green-600 text-lg" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-body-sm text-on-surface-variant">ICD-10 / Treatment Alignment</span>
+<span class="material-symbols-outlined text-green-600 text-lg" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-body-sm text-on-surface-variant">Missing Evidence Docs</span>
+<span class="material-symbols-outlined text-[#f59e0b] text-lg" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+</div>
+</div>
+<!-- Missing Evidence Checklist -->
+<div class="bg-white border border-outline-variant rounded-xl p-5 shadow-sm">
+<h3 class="font-label-caps text-label-caps text-on-surface uppercase mb-4 tracking-widest">Priority Tasks</h3>
+<div class="space-y-3">
+<div class="flex items-start gap-3 p-2 bg-error/5 border border-error/10 rounded-lg group cursor-pointer hover:bg-error/10 transition-all">
+<input class="mt-1 rounded border-outline focus:ring-primary text-primary" type="checkbox"/>
+<div>
+<p class="text-body-sm font-bold text-error">Medical Certificate Missing</p>
+<p class="text-[11px] text-error/80 leading-tight">Required for Allianz workplace claim.</p>
+</div>
+</div>
+<div class="flex items-start gap-3 p-2 bg-surface-container rounded-lg">
+<input class="mt-1 rounded border-outline focus:ring-primary text-primary" type="checkbox"/>
+<div>
+<p class="text-body-sm font-medium text-on-surface">Lab Order Confirmation</p>
+<p class="text-[11px] text-on-surface-variant leading-tight">Pending doctor signature.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Insurance Intelligence -->
+<div class="bg-primary/5 border border-primary/10 rounded-xl p-5">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-primary text-lg">shield_with_heart</span>
+<h3 class="font-label-caps text-label-caps text-primary uppercase">Insurance Intel</h3>
+</div>
+<div class="space-y-4">
+<div>
+<p class="text-[11px] font-bold text-primary/60 uppercase">Payer Rules: Allianz</p>
+<ul class="mt-2 space-y-1">
+<li class="text-[11px] text-on-surface-variant flex items-start gap-2">
+<span class="w-1 h-1 bg-primary rounded-full mt-1.5 shrink-0"></span>
+                                    Requires ICD-10 at the 4th digit for outpatient coverage.
+                                </li>
+<li class="text-[11px] text-on-surface-variant flex items-start gap-2">
+<span class="w-1 h-1 bg-primary rounded-full mt-1.5 shrink-0"></span>
+                                    Gastritis meds capped at 1,500 THB per visit.
+                                </li>
+</ul>
+</div>
+<div class="bg-white/60 p-2 rounded-lg border border-primary/10">
+<p class="text-[11px] font-bold text-on-surface uppercase mb-1">Economic Intelligence</p>
+<div class="flex justify-between items-center">
+<span class="text-body-sm text-on-surface-variant">Cost Variance</span>
+<span class="text-body-sm font-bold text-green-600">-12% vs Bench</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Activity Timeline -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-5">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-4 tracking-widest">Audit Trail</h3>
+<div class="space-y-4 relative before:content-[''] before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-[1px] before:bg-outline-variant">
+<div class="relative pl-7">
+<div class="absolute left-0 top-1.5 w-5 h-5 bg-white border-2 border-primary rounded-full flex items-center justify-center z-10">
+<div class="w-2 h-2 bg-primary rounded-full"></div>
+</div>
+<p class="text-body-sm font-bold">Consultation Started</p>
+<p class="text-[10px] text-on-surface-variant">10:45 AM • Dr. Sarah Jenkins</p>
+</div>
+<div class="relative pl-7">
+<div class="absolute left-0 top-1.5 w-5 h-5 bg-white border-2 border-outline rounded-full flex items-center justify-center z-10">
+<div class="w-2 h-2 bg-outline rounded-full"></div>
+</div>
+<p class="text-body-sm text-on-surface">SOAP Entry Modified</p>
+<p class="text-[10px] text-on-surface-variant">10:52 AM • AI-Auto Draft</p>
+</div>
+<div class="relative pl-7">
+<div class="absolute left-0 top-1.5 w-5 h-5 bg-white border-2 border-error rounded-full flex items-center justify-center z-10">
+<div class="w-2 h-2 bg-error rounded-full"></div>
+</div>
+<p class="text-body-sm text-error font-bold">Allergy Alert Triggered</p>
+<p class="text-[10px] text-on-surface-variant">11:01 AM • System Intelligence</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- StickyWorkflowActionBar -->
+<footer class="fixed bottom-0 right-0 h-20 border-t border-outline-variant bg-white/95 backdrop-blur-sm shadow-lg flex justify-end items-center gap-4 py-4 px-margin-page w-[calc(100%-260px)] z-50 transition-transform hover:scale-98">
+<div class="mr-auto flex items-center gap-4">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-lg">save</span>
+<span class="font-label-caps text-label-caps uppercase">Auto-saved at 11:04 AM</span>
+</div>
+</div>
+<button class="bg-secondary-container text-on-secondary-container rounded-lg px-6 py-2.5 font-label-caps text-label-caps font-bold hover:brightness-95 hover:shadow-md transition-all uppercase flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">print</span>
+                Print Prescription
+            </button>
+<button class="bg-primary text-on-primary rounded-lg px-8 py-2.5 font-label-caps text-label-caps font-bold hover:brightness-110 hover:shadow-lg transition-all uppercase flex items-center gap-2 shadow-sm">
+                Complete Visit
+                <span class="material-symbols-outlined text-lg">check_circle</span>
+</button>
+</footer>
+</main>
+<script>
+        // Simple micro-interaction for SOAP field highlighting
+        document.querySelectorAll('textarea').forEach(el => {
+            el.addEventListener('focus', () => {
+                el.parentElement.parentElement.classList.add('bg-primary/5');
+                el.parentElement.parentElement.classList.add('transition-colors');
+            });
+            el.addEventListener('blur', () => {
+                el.parentElement.parentElement.classList.remove('bg-primary/5');
+            });
+        });
+
+        // Simulating AI interaction feedback
+        const aiPanel = document.querySelector('.bg-\\[\\#EFF6FF\\]');
+        aiPanel.addEventListener('click', () => {
+            aiPanel.classList.add('ring-2', 'ring-primary/20');
+            setTimeout(() => {
+                aiPanel.classList.remove('ring-2', 'ring-primary/20');
+            }, 1000);
+        });
+    </script>
+</body></html>
