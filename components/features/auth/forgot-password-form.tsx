@@ -35,41 +35,64 @@ export function ForgotPasswordForm() {
   const isSuccess = submitState === "success";
 
   return (
-    <section className="flex w-full items-center justify-center bg-[#faf8ff] p-4 lg:w-[55%]">
-      <div className="flex w-full max-w-[460px] flex-col gap-8">
-        <div className="flex flex-col items-center text-center">
-          <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-[#EFF6FF]">
-            <span className="text-3xl text-[#00236f]" aria-hidden="true">
-              ✉
+    <section className="relative grid min-h-screen place-items-center overflow-hidden bg-[linear-gradient(145deg,#F8FAFC_0%,#FFFFFF_48%,#EFF6FF_100%)] px-5 py-10 sm:px-7 lg:px-8 xl:px-10">
+      <div className="absolute right-[-180px] top-[-140px] h-[420px] w-[420px] rounded-full bg-blue-600/10 blur-3xl" />
+      <div className="absolute bottom-[-180px] left-[-160px] h-[420px] w-[420px] rounded-full bg-sky-400/10 blur-3xl" />
+
+      <div className="relative mx-auto mb-8 flex items-center gap-3 lg:hidden">
+        <div className="grid h-11 w-11 place-items-center rounded-2xl bg-[#0F2A5F] font-bold text-white shadow-lg shadow-blue-950/20">
+          NX
+        </div>
+        <div>
+          <div className="font-bold text-[#0F172A]">Med AI NexSure</div>
+          <div className="text-xs text-[#64748B]">Enterprise Workspace</div>
+        </div>
+      </div>
+
+      <div className="card-up relative mx-auto w-full max-w-[410px]">
+        <div className="mb-5 rounded-[24px] border border-blue-100 bg-white/90 p-4 shadow-sm backdrop-blur">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[.16em] text-[#2563EB]">
+                Account Recovery
+              </p>
+              <h2 className="mt-1 text-xl font-bold tracking-tight text-[#0F172A]">
+                Secure Password Reset
+              </h2>
+            </div>
+            <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-bold text-emerald-700">
+              Protected
             </span>
           </div>
-          <h1 className="mb-1 text-[32px] font-bold leading-10 tracking-[-0.02em] text-[#131b2e]">
-            Forgot your password?
-          </h1>
-          <p className="text-base leading-6 text-[#64748B]">
-            Enter your work email to receive a recovery link.
-            <br />
-            <span className="text-[13px] leading-[18px] text-[#94A3B8]">
-              กรุณากรอกอีเมลของหน่วยงานเพื่อรับลิงก์กู้คืนรหัสผ่าน
-            </span>
-          </p>
         </div>
 
-        <form
-          className="flex flex-col gap-6"
-          onSubmit={(event) => {
-            void handleSubmit(onSubmit)(event);
-          }}
-          noValidate
-        >
-          <div className="flex flex-col gap-1">
-            <label
-              className="text-xs font-semibold uppercase leading-4 tracking-[0.05em] text-[#444651]"
-              htmlFor="work-email"
-            >
-              Work Email / อีเมลสำหรับงาน
-            </label>
-            <div className="relative transition-transform focus-within:scale-[1.01]">
+        <div className="rounded-[28px] border border-[#E2E8F0] bg-white p-7 shadow-[0_30px_90px_rgba(15,42,95,.18)] sm:p-8">
+          <div className="mb-8 flex items-center gap-4">
+            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-[#0F2A5F] text-sm font-bold text-white shadow-lg shadow-blue-950/20">
+              Mail
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight text-[#0F172A]">Forgot your password?</h1>
+              <p className="mt-2 text-sm leading-6 text-[#64748B]">
+                Enter your work email to receive a recovery link.
+                <span className="block text-[13px] leading-[18px] text-[#64748B]">
+                  กรุณากรอกอีเมลของหน่วยงานเพื่อรับลิงก์กู้คืนรหัสผ่าน
+                </span>
+              </p>
+            </div>
+          </div>
+
+          <form
+            className="space-y-5"
+            onSubmit={(event) => {
+              void handleSubmit(onSubmit)(event);
+            }}
+            noValidate
+          >
+            <label className="block" htmlFor="work-email">
+              <span className="mb-2 block text-xs font-bold text-slate-700">
+                Work Email / อีเมลสำหรับงาน
+              </span>
               <Input
                 id="work-email"
                 type="email"
@@ -78,85 +101,81 @@ export function ForgotPasswordForm() {
                 disabled={isSubmitting}
                 aria-invalid={errors.email ? "true" : "false"}
                 aria-describedby={errors.email ? "work-email-error" : undefined}
-                className="h-12 w-full rounded-lg border border-[#E2E8F0] bg-white px-4 py-3 text-base leading-6 text-[#131b2e] outline-none transition-all placeholder:text-[#94A3B8] focus:border-[#00236f] focus:ring-2 focus:ring-[#00236f]/10 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-500"
+                className="form-input"
                 {...register("email")}
               />
-            </div>
-            {errors.email ? (
-              <p className="text-[13px] leading-[18px] text-[#ba1a1a]" id="work-email-error">
-                {errors.email.message}
-              </p>
-            ) : null}
-          </div>
+              {errors.email ? (
+                <p className="mt-2 text-[13px] leading-[18px] text-[#ba1a1a]" id="work-email-error">
+                  {errors.email.message}
+                </p>
+              ) : null}
+            </label>
 
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className={`flex h-14 w-full items-center justify-center rounded-lg px-4 py-4 text-xl font-semibold leading-7 text-white shadow-sm transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed ${
-              isSuccess ? "bg-[#059669]" : "bg-[#00236f] hover:bg-[#1e3a8a]"
-            }`}
-          >
-            {isSubmitting ? (
-              <span className="flex items-center justify-center gap-4">
-                <span
-                  className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white"
-                  aria-hidden="true"
-                />
-                Sending Link...
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className={`h-13 flex w-full items-center justify-center rounded-2xl px-4 py-4 text-sm font-bold text-white shadow-lg shadow-blue-900/20 transition hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-blue-600/20 disabled:cursor-not-allowed disabled:hover:translate-y-0 ${
+                isSuccess
+                  ? "bg-[#059669] hover:bg-[#059669]"
+                  : "bg-[#1E3A8A] hover:bg-[#2563EB] hover:shadow-[0_22px_60px_rgba(37,99,235,.20)]"
+              }`}
+            >
+              {isSubmitting ? (
+                <span className="flex items-center justify-center gap-3">
+                  <span
+                    className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"
+                    aria-hidden="true"
+                  />
+                  Sending Link...
+                </span>
+              ) : null}
+              {isSuccess ? "Link Sent Successfully" : null}
+              {submitState === "idle" ? "Send reset link" : null}
+            </Button>
+          </form>
+
+          {isSuccess ? (
+            <div
+              className="mt-5 rounded-2xl border border-blue-100 bg-[#EFF6FF] p-4 text-sm leading-6 text-[#0F172A]"
+              role="status"
+            >
+              If an account exists for that email, a recovery link has been sent.
+              <span className="block text-[13px] leading-[18px] text-[#64748B]">
+                ระบบจะแจ้งผลแบบทั่วไปเพื่อป้องกันการเปิดเผยข้อมูลบัญชี
               </span>
-            ) : null}
-            {isSuccess ? "Link Sent Successfully" : null}
-            {submitState === "idle" ? "Send reset link" : null}
-          </Button>
-        </form>
+            </div>
+          ) : null}
 
-        {isSuccess ? (
-          <div
-            className="rounded-xl border border-[#BFDBFE] bg-white px-4 py-3 text-sm leading-6 text-[#131b2e]"
-            role="status"
-          >
-            If an account exists for that email, a recovery link has been sent.
-            <span className="block text-[13px] leading-[18px] text-[#64748B]">
-              ระบบจะแจ้งผลแบบทั่วไปเพื่อป้องกันการเปิดเผยข้อมูลบัญชี
+          <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-xs leading-6 text-slate-600">
+            <strong className="text-slate-800">Security Notice.</strong>
+            <br />
+            Reset links expire automatically after 30 minutes. The response is generic and does not reveal whether the email exists.
+            <span className="block text-[#64748B]">
+              เพื่อความปลอดภัย ระบบจะไม่เปิดเผยว่ามีบัญชีนี้อยู่หรือไม่ในขั้นตอนการส่งลิงก์
             </span>
           </div>
-        ) : null}
 
-        <div className="flex flex-col items-center gap-3">
-          <Link
-            className="flex items-center gap-1 rounded text-sm font-semibold leading-5 text-[#00236f] hover:underline focus:outline-none focus:ring-2 focus:ring-[#00236f]/30"
-            href="/"
-          >
-            <span aria-hidden="true">←</span>
-            Back to Sign In
-          </Link>
-          <button
-            className="border-none bg-transparent text-sm leading-5 text-[#94A3B8] transition-colors hover:text-[#131b2e] focus:outline-none focus:ring-2 focus:ring-[#00236f]/30"
-            type="button"
-          >
-            Contact System Administrator
-          </button>
-        </div>
-
-        <div className="flex gap-4 rounded-xl border border-[#BFDBFE] bg-[#EFF6FF] p-6">
-          <span className="shrink-0 text-[#00236f]" aria-hidden="true">
-            ⛨
-          </span>
-          <div className="flex flex-col gap-1">
-            <p className="text-sm font-medium leading-tight text-[#131b2e]">
-              Reset links expire automatically after 30 minutes for your protection.
-            </p>
-            <p className="text-[13px] leading-[18px] text-[#64748B]">
-              เพื่อความปลอดภัย ระบบจะไม่เปิดเผยว่ามีบัญชีนี้อยู่หรือไม่ในขั้นตอนการส่งลิงก์
-            </p>
+          <div className="mt-5 flex flex-col items-center gap-3">
+            <Link
+              className="rounded text-sm font-bold text-[#1E3A8A] hover:text-[#2563EB] focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+              href="/"
+            >
+              Back to Sign In
+            </Link>
+            <button
+              className="border-none bg-transparent text-xs font-bold text-[#64748B] transition hover:text-[#2563EB] focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+              type="button"
+            >
+              Contact System Administrator
+            </button>
           </div>
         </div>
 
-        <div className="mt-8 text-center">
-          <p className="text-xs font-semibold uppercase leading-4 tracking-normal text-[#94A3B8]">
-            © 2024 NexSure AI Systems • Support ID: 882-MED-SYS
-          </p>
-        </div>
+        <footer className="mt-6 text-center text-[11px] leading-5 text-slate-500">
+          <div>Version 1.0.0 - Production Environment</div>
+          <div>© 2026 Med AI NexSure - Secure - Compliant - Explainable AI</div>
+          <div>Support ID: 882-MED-SYS</div>
+        </footer>
       </div>
     </section>
   );
