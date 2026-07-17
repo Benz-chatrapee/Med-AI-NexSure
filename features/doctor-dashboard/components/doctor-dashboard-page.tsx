@@ -18,10 +18,13 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
+  ComposedChart,
+  Legend,
   Line,
   LineChart,
   Pie,
   PieChart,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -89,6 +92,25 @@ function chartPayload<T>(item: unknown): T | null {
   return (item as { payload?: T }).payload ?? null;
 }
 
+const dayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
+const hourLabels = ["08", "10", "12", "14", "16", "18"] as const;
+const likelihoodLabels = ["Rare", "Unlikely", "Possible", "Likely", "Almost Certain"] as const;
+const impactLabels = ["Minimal", "Minor", "Moderate", "Major", "Severe"] as const;
+
+function sumValues(values: number[]) {
+  return values.reduce((total, value) => total + value, 0);
+}
+
+function formatBaht(value: number) {
+  return `฿${value.toLocaleString("en-US")}`;
+}
+
+function riskScoreTone(score: number): StatusTone {
+  if (score >= 18) return "danger";
+  if (score >= 10) return "warning";
+  return score >= 5 ? "info" : "success";
+}
+
 export function DoctorDashboardPage({ initialData }: { initialData: DoctorDashboardData }) {
   const [data, setData] = useState(initialData);
   const [selectedDetail, setSelectedDetail] = useState<VisitReadinessDetail>(initialData.selectedVisit);
@@ -119,6 +141,54 @@ export function DoctorDashboardPage({ initialData }: { initialData: DoctorDashbo
     }));
     return [...prefix, ...data.readinessTrend];
   }, [data.readinessTrend, trendRange]);
+
+  const visitVolumeHeatmap = useMemo(() => {
+    const base = data.workflow.reduce((total, item) => total + item.count, 0);
+    return dayLabels.flatMap((day, dayIndex) =>
+      hourLabels.map((hour, hourIndex) => {
+        const dayWeight = [0.9, 1.05, 1.18, 1.1, 0.96, 0.62, 0.48][dayIndex] ?? 1;
+        const hourWeight = [0.72, 1.18, 1.05, 0.88, 0.98, 0.56][hourIndex] ?? 1;
+        return {
+          day,
+          hour,
+          count: Math.max(1, Math.round((base / 16) * dayWeight * hourWeight)),
+        };
+      }),
+    );
+  }, [data.workflow]);
+
+  const visitCostTrend = useMemo(() => data.timeToReadiness.map((item, index) => ({
+    date: item.date,
+    actual: 2840 + Math.round((item.minutes - item.targetMinutes) * 5.5) + index * 18,
+    benchmark: 2820 + index * 10,
+  })), [data.timeToReadiness]);
+
+  const costVarianceBridge = useMemo(() => [
+    { label: "Benchmark", value: 2820, start: 0, end: 2820, tone: "base" },
+    { label: "Labs", value: 280, start: 2820, end: 3100, tone: "increase" },
+    { label: "Medication", value: 180, start: 3100, end: 3280, tone: "increase" },
+    { label: "Imaging", value: 120, start: 3280, end: 3400, tone: "increase" },
+    { label: "Discount", value: -90, start: 3310, end: 3400, tone: "decrease" },
+    { label: "Actual", value: 3310, start: 0, end: 3310, tone: "base" },
+  ], []);
+
+  const economicAlerts = useMemo(() => [
+    { label: "Cost justification missing", count: data.visits.filter((visit) => visit.primaryGap === "Cost Justification").length + 3, impact: 182000 },
+    { label: "High-cost imaging review", count: data.visits.filter((visit) => visit.primaryGap === "Imaging Report").length + 2, impact: 146000 },
+    { label: "Medication above benchmark", count: 4, impact: 121000 },
+    { label: "Payer exception exposure", count: data.visits.filter((visit) => visit.riskLevel === "High").length + 1, impact: 88000 },
+  ], [data.visits]);
+
+  const riskMatrix = useMemo(() => impactLabels.flatMap((impact, impactIndex) =>
+    likelihoodLabels.map((likelihood, likelihoodIndex) => {
+      const score = (impactIndex + 1) * (likelihoodIndex + 1);
+      const cases = data.visits.filter((visit, visitIndex) => {
+        const riskWeight = visit.riskLevel === "Critical" ? 5 : visit.riskLevel === "High" ? 4 : visit.riskLevel === "Medium" ? 3 : 2;
+        return Math.abs(riskWeight - (impactIndex + 1)) <= 1 && (visitIndex + likelihoodIndex + impactIndex) % 3 === 0;
+      }).length;
+      return { impact, likelihood, score, cases, tone: riskScoreTone(score) };
+    }),
+  ), [data.visits]);
 
   function showToast(message: string) {
     setToast(message);
@@ -226,123 +296,31 @@ export function DoctorDashboardPage({ initialData }: { initialData: DoctorDashbo
         </section>
 
         <section className="grid min-w-0 gap-4 xl:grid-cols-12">
-          <ChartCard title="Today's Visit Workflow" subtitle="Click a bar to filter the Worklist." className="xl:col-span-7">
-            <div className="h-[340px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data.workflow} layout="vertical" margin={{ left: 40, right: 16 }}>
-                  <CartesianGrid stroke={chartColors.border} horizontal={false} />
-                  <XAxis type="number" />
-                  <YAxis dataKey="status" type="category" width={150} tick={{ fontSize: 12 }} />
-                  <Tooltip />
-                  <Bar dataKey="count" radius={[0, 8, 8, 0]} onClick={(item) => {
-                    const payload = chartPayload<{ status: VisitStatus }>(item);
-                    if (payload) updateFilters({ visitStatus: payload.status });
-                  }}>
-                    {data.workflow.map((item, index) => (
-                      <Cell key={item.status} fill={[chartColors.blue, chartColors.sky, chartColors.navy, chartColors.warning, chartColors.success, chartColors.muted][index]} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            <button type="button" onClick={() => clearFilter("visitStatus")} className="mt-2 text-sm font-black text-[var(--doctor-ai-blue)]">Reset workflow filter</button>
-            <p className="sr-only">{data.workflow.map((item) => `${item.status}: ${item.count}`).join(", ")}</p>
-          </ChartCard>
-
-          <ChartCard title="Claim Readiness Status" subtitle="Total evaluated Visits by readiness state." className="xl:col-span-5">
-            <div className="grid gap-3 md:grid-cols-[1fr_220px] xl:grid-cols-1 2xl:grid-cols-[1fr_220px]">
-              <div className="relative h-[260px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie data={data.readinessMix} dataKey="count" nameKey="status" innerRadius={72} outerRadius={110} onClick={(item) => {
-                      const payload = chartPayload<{ status: ReadinessStatus }>(item);
-                      if (payload) updateFilters({ readinessStatus: payload.status });
-                    }}>
-                      {data.readinessMix.map((item) => (
-                        <Cell key={item.status} fill={item.status === "Ready for Human Review" ? chartColors.success : item.status === "Needs Review" ? chartColors.warning : chartColors.danger} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="pointer-events-none absolute inset-0 grid place-items-center text-center">
-                  <div><strong className="block text-3xl text-[var(--doctor-primary)]">18</strong><span className="text-xs font-bold text-[var(--doctor-muted)]">Evaluated Visits</span></div>
-                </div>
-              </div>
-              <div className="space-y-2">
-                {data.readinessMix.map((item) => (
-                  <button key={item.status} onClick={() => updateFilters({ readinessStatus: item.status })} className="flex w-full justify-between rounded-lg border border-[var(--doctor-border)] bg-[var(--doctor-card)] p-2 text-left text-sm">
-                    <span>{item.status}</span><strong>{item.count} · {Math.round((item.count / 18) * 100)}%</strong>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </ChartCard>
+          <VisitVolumeHeatmap data={visitVolumeHeatmap} onReset={() => clearFilter("visitStatus")} />
+          <ClaimReadinessDonut data={data.readinessMix} onSelect={(status) => updateFilters({ readinessStatus: status })} />
         </section>
 
         <section className="grid min-w-0 gap-4 xl:grid-cols-12">
-          <ChartCard title="Claim Readiness Trend" subtitle="Actual readiness rate vs target and previous period." className="xl:col-span-7">
-            <div className="mb-3 flex gap-2">
-              {[7, 14].map((range) => (
-                <button key={range} type="button" aria-pressed={trendRange === range} onClick={() => setTrendRange(range as 7 | 14)} className={`rounded-lg border px-3 py-2 text-sm font-black ${trendRange === range ? "border-[var(--doctor-blue-border)] bg-[var(--doctor-soft-blue)] text-[var(--doctor-primary)]" : "border-[var(--doctor-border)] bg-[var(--doctor-card)] text-[var(--doctor-muted)]"}`}>
-                  {range} Days
-                </button>
-              ))}
-            </div>
-            <div className="h-[320px]">
-              <ResponsiveContainer>
-                <LineChart data={trendData}>
-                  <CartesianGrid stroke={chartColors.border} />
-                  <XAxis dataKey="date" />
-                  <YAxis domain={[0, 100]} tickFormatter={(value) => `${value}%`} />
-                  <Tooltip formatter={(value) => `${value}%`} />
-                  <Line dataKey="actual" name="Actual Readiness Rate" stroke={chartColors.blue} strokeWidth={3} />
-                  <Line dataKey="target" name="Target Readiness Rate" stroke={chartColors.success} strokeDasharray="6 5" />
-                  <Line dataKey="previous" name="Previous Period" stroke={chartColors.muted} strokeDasharray="3 4" />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </ChartCard>
-
-          <ChartCard id="time-to-readiness" title="Average Time to Readiness" subtitle="Current average: 2h 18m · Target: < 3h · Trend: Improving" className="xl:col-span-5">
-            <div className="h-[320px]">
-              <ResponsiveContainer>
-                <BarChart data={data.timeToReadiness}>
-                  <CartesianGrid stroke={chartColors.border} />
-                  <XAxis dataKey="date" />
-                  <YAxis tickFormatter={(value) => `${Math.round(Number(value) / 60)}h`} />
-                  <Tooltip formatter={(value) => formatDuration(Number(value))} />
-                  <Bar dataKey="minutes" name="Average time" radius={[8, 8, 0, 0]}>
-                    {data.timeToReadiness.map((item) => (
-                      <Cell key={item.date} fill={item.minutes <= item.targetMinutes ? chartColors.success : chartColors.warning} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </ChartCard>
+          <ReadinessTrendChart trendData={trendData} trendRange={trendRange} setTrendRange={setTrendRange} />
+          <MissingEvidencePareto data={data.missingEvidence} onSelect={(gapType) => updateFilters({ gapType })} />
         </section>
 
         <section className="grid min-w-0 gap-4 xl:grid-cols-12">
-          <ChartCard title="Top Missing Evidence" subtitle="SOAP rationale and imaging evidence account for 54% of current readiness gaps." className="xl:col-span-7">
-            <p className="mb-3 rounded-lg border border-[var(--doctor-blue-border)] bg-[var(--doctor-soft-blue)] p-3 text-sm text-[var(--doctor-primary)]">ปัญหา 2 ประเภทแรกเป็นสาเหตุหลักของงานค้างในวันนี้</p>
-            <div className="h-[320px]">
-              <ResponsiveContainer>
-                <BarChart data={data.missingEvidence} layout="vertical" margin={{ left: 80, right: 16 }}>
-                  <CartesianGrid stroke={chartColors.border} horizontal={false} />
-                  <XAxis type="number" />
-                  <YAxis dataKey="gapType" type="category" width={150} tick={{ fontSize: 12 }} />
-                  <Tooltip />
-                  <Bar dataKey="count" fill={chartColors.blue} radius={[0, 8, 8, 0]} onClick={(item) => {
-                    const payload = chartPayload<{ gapType: string }>(item);
-                    if (payload) updateFilters({ gapType: payload.gapType });
-                  }} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </ChartCard>
-          <Heatmap data={data} onSelectVisit={(visit) => void selectVisit(visit)} />
+          <RiskMatrixHeatmap matrix={riskMatrix} />
+          <VisitCostTrend data={visitCostTrend} />
         </section>
+
+        <section className="grid min-w-0 gap-4 xl:grid-cols-12">
+          <CostVarianceWaterfall data={costVarianceBridge} />
+          <EconomicAlertsBar data={economicAlerts} />
+        </section>
+
+        <CaseQueueCompact
+          visits={visibleVisits}
+          selectedVisitId={selectedVisit.id}
+          total={filteredVisits.length}
+          onSelectVisit={(visit) => void selectVisit(visit)}
+        />
 
         <Worklist
           filters={filters}
@@ -455,6 +433,261 @@ function FilterBar({ filters, updateFilters }: { filters: DoctorDashboardFilters
   );
 }
 
+function ChartMeta({ insight, units, lastUpdated }: { insight: string; units: string; lastUpdated: string }) {
+  return (
+    <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-[var(--doctor-border)] pt-3 text-xs text-[var(--doctor-muted)]">
+      <span><strong className="text-[var(--doctor-text)]">Insight:</strong> {insight}</span>
+      <span>{units} · Last updated {lastUpdated}</span>
+    </div>
+  );
+}
+
+function VisitVolumeHeatmap({ data, onReset }: { data: Array<{ day: string; hour: string; count: number }>; onReset: () => void }) {
+  const max = Math.max(...data.map((item) => item.count), 1);
+  return (
+    <ChartCard title="Visit Volume" subtitle="Day x hour demand heatmap based on current workflow volume." className="xl:col-span-7">
+      <div className="overflow-x-auto">
+        <div className="grid min-w-[620px] grid-cols-[70px_repeat(6,minmax(72px,1fr))] gap-2 text-center text-xs">
+          <div />
+          {hourLabels.map((hour) => <div key={hour} className="font-black text-[var(--doctor-muted)]">{hour}:00</div>)}
+          {dayLabels.map((day) => (
+            <div key={day} className="contents">
+              <div className="grid place-items-center rounded-lg bg-[var(--doctor-bg)] px-2 font-black text-[var(--doctor-muted)]">{day}</div>
+              {hourLabels.map((hour) => {
+                const cell = data.find((item) => item.day === day && item.hour === hour);
+                const count = cell?.count ?? 0;
+                const intensity = Math.max(0.16, count / max);
+                return (
+                  <button key={`${day}-${hour}`} type="button" onClick={onReset} aria-label={`${day} ${hour}:00 visit volume ${count} visits`} className="min-h-14 rounded-lg border border-white/80 px-2 py-2 font-black text-[var(--doctor-primary)] transition hover:ring-2 hover:ring-[var(--doctor-ai-blue)]" style={{ background: `color-mix(in srgb, var(--doctor-ai-blue) ${Math.round(intensity * 72)}%, white)` }}>
+                    {count}<span className="block text-[10px] font-bold opacity-75">visits</span>
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="mt-3 flex items-center gap-2 text-xs text-[var(--doctor-muted)]"><span>Low</span><span className="h-2 w-16 rounded-full bg-[color-mix(in_srgb,var(--doctor-ai-blue)_22%,white)]" /><span className="h-2 w-16 rounded-full bg-[color-mix(in_srgb,var(--doctor-ai-blue)_52%,white)]" /><span>Peak</span></div>
+      <ChartMeta insight="Late morning demand is the likely staffing pressure window. ควรติดตามช่วง 10:00-12:00 เป็นพิเศษ" units="Visits" lastUpdated="10:24" />
+    </ChartCard>
+  );
+}
+
+function ClaimReadinessDonut({ data, onSelect }: { data: Array<{ status: ReadinessStatus; count: number }>; onSelect: (status: ReadinessStatus) => void }) {
+  const total = sumValues(data.map((item) => item.count));
+  const ready = data.find((item) => item.status === "Ready for Human Review")?.count ?? 0;
+  return (
+    <ChartCard title="Claim Readiness" subtitle="Ready / Needs Review / Not Ready distribution with human review status." className="xl:col-span-5">
+      <div className="grid gap-3 md:grid-cols-[1fr_220px] xl:grid-cols-1 2xl:grid-cols-[1fr_220px]">
+        <div className="relative h-[260px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie data={data} dataKey="count" nameKey="status" innerRadius={72} outerRadius={108} paddingAngle={2} onClick={(item) => {
+                const payload = chartPayload<{ status: ReadinessStatus }>(item);
+                if (payload) onSelect(payload.status);
+              }}>
+                {data.map((item) => (
+                  <Cell key={item.status} fill={item.status === "Ready for Human Review" ? chartColors.success : item.status === "Needs Review" ? chartColors.warning : chartColors.danger} />
+                ))}
+              </Pie>
+              <Tooltip formatter={(value, name) => [`${value} visits`, name]} />
+            </PieChart>
+          </ResponsiveContainer>
+          <div className="pointer-events-none absolute inset-0 grid place-items-center text-center">
+            <div><strong className="block text-3xl text-[var(--doctor-primary)]">{Math.round((ready / total) * 100)}%</strong><span className="text-xs font-bold text-[var(--doctor-muted)]">Ready</span></div>
+          </div>
+        </div>
+        <div className="space-y-2">
+          {data.map((item) => (
+            <button key={item.status} onClick={() => onSelect(item.status)} className="flex w-full justify-between rounded-lg border border-[var(--doctor-border)] bg-[var(--doctor-card)] p-2 text-left text-sm hover:bg-[var(--doctor-bg)]">
+              <span>{item.status}</span><strong>{item.count} · {Math.round((item.count / total) * 100)}%</strong>
+            </button>
+          ))}
+        </div>
+      </div>
+      <ChartMeta insight="Needs Review and Not Ready cases remain blocked from autonomous claim submission." units="Visits / %" lastUpdated="10:24" />
+    </ChartCard>
+  );
+}
+
+function ReadinessTrendChart({ trendData, trendRange, setTrendRange }: { trendData: DoctorDashboardData["readinessTrend"]; trendRange: 7 | 14; setTrendRange: (range: 7 | 14) => void }) {
+  return (
+    <ChartCard title="Readiness Trend" subtitle="Actual readiness vs target line chart with previous-period context." className="xl:col-span-7">
+      <div className="mb-3 flex gap-2">
+        {[7, 14].map((range) => (
+          <button key={range} type="button" aria-pressed={trendRange === range} onClick={() => setTrendRange(range as 7 | 14)} className={`rounded-lg border px-3 py-2 text-sm font-black ${trendRange === range ? "border-[var(--doctor-blue-border)] bg-[var(--doctor-soft-blue)] text-[var(--doctor-primary)]" : "border-[var(--doctor-border)] bg-[var(--doctor-card)] text-[var(--doctor-muted)]"}`}>
+            {range} Days
+          </button>
+        ))}
+      </div>
+      <div className="h-[320px]">
+        <ResponsiveContainer>
+          <LineChart data={trendData}>
+            <CartesianGrid stroke={chartColors.border} />
+            <XAxis dataKey="date" />
+            <YAxis domain={[0, 100]} tickFormatter={(value) => `${value}%`} />
+            <Tooltip formatter={(value) => `${value}%`} />
+            <Legend />
+            <ReferenceLine y={85} stroke={chartColors.warning} strokeDasharray="5 5" label="Target" />
+            <Line dataKey="actual" name="Actual" stroke={chartColors.blue} strokeWidth={3} dot={{ r: 3 }} />
+            <Line dataKey="target" name="Target" stroke={chartColors.success} strokeDasharray="6 5" dot={false} />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+      <ChartMeta insight="Actual readiness is improving but still below the 85% target threshold." units="%" lastUpdated="10:24" />
+    </ChartCard>
+  );
+}
+
+function MissingEvidencePareto({ data, onSelect }: { data: DoctorDashboardData["missingEvidence"]; onSelect: (gapType: string) => void }) {
+  return (
+    <ChartCard title="Missing Evidence" subtitle="Pareto chart ranking evidence gaps by case count and cumulative contribution." className="xl:col-span-5">
+      <p className="mb-3 rounded-lg border border-[color:color-mix(in_srgb,var(--doctor-warning)_28%,white)] bg-[color:color-mix(in_srgb,var(--doctor-warning)_10%,white)] p-3 text-sm text-[var(--doctor-warning)]">Top two gaps drive 54% of current readiness blockers. ควรเร่ง SOAP และ Imaging ก่อน</p>
+      <div className="h-[320px]">
+        <ResponsiveContainer>
+          <ComposedChart data={data} layout="vertical" margin={{ left: 62, right: 24 }}>
+            <CartesianGrid stroke={chartColors.border} horizontal={false} />
+            <XAxis type="number" xAxisId="count" />
+            <XAxis type="number" xAxisId="percent" orientation="top" domain={[0, 100]} tickFormatter={(value) => `${value}%`} />
+            <YAxis dataKey="gapType" type="category" width={126} tick={{ fontSize: 11 }} />
+            <Tooltip formatter={(value, name) => [name === "Cumulative %" ? `${value}%` : `${value} cases`, name]} />
+            <Legend />
+            <Bar xAxisId="count" dataKey="count" name="Cases" fill={chartColors.blue} radius={[0, 7, 7, 0]} onClick={(item) => {
+              const payload = chartPayload<{ gapType: string }>(item);
+              if (payload) onSelect(payload.gapType);
+            }} />
+            <Line xAxisId="percent" dataKey="cumulativePercent" name="Cumulative %" stroke={chartColors.warning} strokeWidth={2.5} />
+            <ReferenceLine xAxisId="percent" x={80} stroke={chartColors.danger} strokeDasharray="4 4" />
+          </ComposedChart>
+        </ResponsiveContainer>
+      </div>
+      <ChartMeta insight="80/20 reference clarifies which gaps should enter the next review sprint." units="Cases / cumulative %" lastUpdated="10:24" />
+    </ChartCard>
+  );
+}
+
+function RiskMatrixHeatmap({ matrix }: { matrix: Array<{ impact: string; likelihood: string; score: number; cases: number; tone: StatusTone }> }) {
+  return (
+    <ChartCard title="Claim Risk" subtitle="5x5 likelihood x impact heatmap for review prioritization." className="xl:col-span-5">
+      <div className="overflow-x-auto">
+        <div className="grid min-w-[640px] grid-cols-[100px_repeat(5,minmax(86px,1fr))] gap-2 text-center text-xs">
+          <div />
+          {likelihoodLabels.map((label) => <div key={label} className="font-black text-[var(--doctor-muted)]">{label}</div>)}
+          {[...impactLabels].reverse().map((impact) => (
+            <div key={impact} className="contents">
+              <div className="grid place-items-center rounded-lg bg-[var(--doctor-bg)] px-2 font-black text-[var(--doctor-muted)]">{impact}</div>
+              {likelihoodLabels.map((likelihood) => {
+                const cell = matrix.find((item) => item.impact === impact && item.likelihood === likelihood);
+                const score = cell?.score ?? 0;
+                const cases = cell?.cases ?? 0;
+                return <button key={`${impact}-${likelihood}`} className={`min-h-14 rounded-lg border px-2 py-2 font-black ${statusColors[cell?.tone ?? "info"]}`} aria-label={`${likelihood} likelihood and ${impact} impact: risk score ${score}, ${cases} cases`} type="button">{score}<span className="block text-[10px] font-bold">{cases} cases</span></button>;
+              })}
+            </div>
+          ))}
+        </div>
+      </div>
+      <ChartMeta insight="Major and Severe impact cells are visually separated for mandatory human review." units="Risk score / cases" lastUpdated="10:24" />
+    </ChartCard>
+  );
+}
+
+function VisitCostTrend({ data }: { data: Array<{ date: string; actual: number; benchmark: number }> }) {
+  return (
+    <ChartCard title="Visit Cost" subtitle="Actual average visit cost compared with benchmark." className="xl:col-span-7">
+      <div className="h-[320px]">
+        <ResponsiveContainer>
+          <LineChart data={data}>
+            <CartesianGrid stroke={chartColors.border} />
+            <XAxis dataKey="date" />
+            <YAxis tickFormatter={(value) => `฿${value}`} />
+            <Tooltip formatter={(value) => formatBaht(Number(value))} />
+            <Legend />
+            <Line dataKey="actual" name="Actual Cost" stroke={chartColors.blue} strokeWidth={3} />
+            <Line dataKey="benchmark" name="Benchmark" stroke={chartColors.success} strokeDasharray="6 5" dot={false} />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+      <ChartMeta insight="Actual cost remains above benchmark on higher-readiness delay days." units="THB / visit" lastUpdated="10:24" />
+    </ChartCard>
+  );
+}
+
+function CostVarianceWaterfall({ data }: { data: Array<{ label: string; value: number; start: number; end: number; tone: string }> }) {
+  return (
+    <ChartCard title="Cost Variance" subtitle="Waterfall bridge from benchmark to actual average visit cost." className="xl:col-span-7">
+      <div className="h-[320px]">
+        <ResponsiveContainer>
+          <BarChart data={data}>
+            <CartesianGrid stroke={chartColors.border} />
+            <XAxis dataKey="label" />
+            <YAxis tickFormatter={(value) => `฿${value}`} />
+            <Tooltip formatter={(value) => Array.isArray(value) ? `${formatBaht(Number(value[0]))} to ${formatBaht(Number(value[1]))}` : formatBaht(Number(value))} />
+            <Bar dataKey={(item: { start: number; end: number }) => [item.start, item.end]} name="Variance bridge" radius={[7, 7, 0, 0]}>
+              {data.map((item) => <Cell key={item.label} fill={item.tone === "increase" ? chartColors.warning : item.tone === "decrease" ? chartColors.success : chartColors.navy} />)}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+      <ChartMeta insight="Labs and medication explain the largest positive variance; discounts partially offset cost." units="THB / visit" lastUpdated="10:24" />
+    </ChartCard>
+  );
+}
+
+function EconomicAlertsBar({ data }: { data: Array<{ label: string; count: number; impact: number }> }) {
+  return (
+    <ChartCard title="Economic Alerts" subtitle="Ranked alerts by case volume and estimated financial exposure." className="xl:col-span-5">
+      <div className="h-[320px]">
+        <ResponsiveContainer>
+          <BarChart data={data} layout="vertical" margin={{ left: 96, right: 20 }}>
+            <CartesianGrid stroke={chartColors.border} horizontal={false} />
+            <XAxis type="number" />
+            <YAxis dataKey="label" type="category" width={140} tick={{ fontSize: 11 }} />
+            <Tooltip formatter={(value, name) => [name === "Exposure" ? formatBaht(Number(value)) : `${value} cases`, name]} />
+            <Legend />
+            <Bar dataKey="count" name="Cases" fill={chartColors.blue} radius={[0, 7, 7, 0]} />
+            <Bar dataKey="impact" name="Exposure" fill={chartColors.warning} radius={[0, 7, 7, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+      <ChartMeta insight="Cost justification and imaging reviews should be handled first due to exposure." units="Cases / THB" lastUpdated="10:24" />
+    </ChartCard>
+  );
+}
+
+function CaseQueueCompact({ visits, selectedVisitId, total, onSelectVisit }: { visits: DoctorWorklistVisit[]; selectedVisitId: string; total: number; onSelectVisit: (visit: DoctorWorklistVisit) => void }) {
+  return (
+    <section className="rounded-lg border border-[var(--doctor-border)] bg-[var(--doctor-card)] shadow-[var(--doctor-shadow)]">
+      <div className="flex flex-col gap-1 border-b border-[var(--doctor-border)] p-4 md:flex-row md:items-end md:justify-between">
+        <div><h2 className="text-lg font-black text-[var(--doctor-text)]">Case Queue</h2><p className="text-sm text-[var(--doctor-muted)]">Compact operational table for review-required cases. แสดงเคสที่ต้องติดตามก่อน</p></div>
+        <span className="text-xs font-bold text-[var(--doctor-muted)]">Showing {visits.length} of {total} · Last updated 10:24</span>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[980px] text-left text-sm">
+          <caption className="sr-only">Compact case queue with priority, readiness, risk, SLA and next action</caption>
+          <thead className="bg-[var(--doctor-bg)] text-xs uppercase tracking-wide text-[var(--doctor-muted)]">
+            <tr>{["Priority", "Visit", "Patient", "Readiness", "Risk", "Pending", "Gap", "Next Action", "Action"].map((header) => <th key={header} className="px-3 py-2">{header}</th>)}</tr>
+          </thead>
+          <tbody>
+            {visits.slice(0, 6).map((visit) => (
+              <tr key={visit.id} className={visit.id === selectedVisitId ? "bg-[var(--doctor-soft-blue)]" : "hover:bg-[var(--doctor-bg)]"}>
+                <td className="px-3 py-2"><Badge tone={visit.priority === "Critical" ? "danger" : visit.priority === "High" ? "warning" : "info"}>{visit.priority}</Badge></td>
+                <td className="px-3 py-2 font-black text-[var(--doctor-primary)]">{visit.id}</td>
+                <td className="px-3 py-2">{visit.patientName}<div className="text-xs text-[var(--doctor-muted)]">{visit.hn}</div></td>
+                <td className="px-3 py-2"><Badge tone={getReadinessTone(visit.readinessStatus)}>{visit.readinessScore} · {visit.readinessStatus}</Badge></td>
+                <td className="px-3 py-2"><Badge tone={riskTone(visit.riskLevel)}>{visit.riskLevel}</Badge></td>
+                <td className="px-3 py-2">{formatDuration(visit.pendingMinutes)}</td>
+                <td className="px-3 py-2">{visit.primaryGap ?? "None"}</td>
+                <td className="px-3 py-2">{visit.nextAction}</td>
+                <td className="px-3 py-2"><Button onClick={() => onSelectVisit(visit)} className="rounded-lg border border-[var(--doctor-blue-border)] bg-[var(--doctor-card)] px-3 py-2 font-black text-[var(--doctor-primary)]">Review</Button></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
 function KpiCard({ kpi, onClick }: { kpi: DoctorKpi; onClick: () => void }) {
   return (
     <button type="button" onClick={onClick} className="flex min-h-72 flex-col rounded-lg border border-[var(--doctor-border)] bg-[var(--doctor-card)] p-4 text-left shadow-[var(--doctor-shadow)] outline-none transition hover:-translate-y-0.5 hover:shadow-md focus:ring-4 focus:ring-[color:color-mix(in_srgb,var(--doctor-ai-blue)_20%,white)]">
@@ -542,16 +775,6 @@ function Worklist(props: {
 
 function Select({ label, value, options, onChange }: { label: string; value: string; options: readonly string[]; onChange: (value: string) => void }) {
   return <label className="grid gap-1 text-xs font-black uppercase text-[var(--doctor-muted)]">{label}<select value={value} onChange={(event) => onChange(event.target.value)} className="min-h-10 rounded-lg border border-[var(--doctor-border)] bg-[var(--doctor-card)] px-3 text-sm normal-case text-[var(--doctor-text)]"><option value="">All</option>{options.map((option) => <option key={option}>{option}</option>)}</select></label>;
-}
-
-function Heatmap({ data, onSelectVisit }: { data: DoctorDashboardData; onSelectVisit: (visit: DoctorWorklistVisit) => void }) {
-  const columns = Object.keys(data.heatmap[0]?.risks ?? {});
-  return (
-    <section className="min-w-0 rounded-lg border border-[var(--doctor-border)] bg-[var(--doctor-card)] p-4 shadow-[var(--doctor-shadow)] xl:col-span-5">
-      <h2 className="text-lg font-black text-[var(--doctor-text)]">Clinical & Claim Risk Heatmap</h2><p className="mb-3 text-sm text-[var(--doctor-muted)]">Keyboard accessible table heatmap; each cell selects a Visit.</p>
-      <div className="overflow-x-auto"><table className="min-w-[760px] border-separate border-spacing-1 text-sm"><thead><tr><th className="text-left">Visit</th>{columns.map((column) => <th key={column}>{column}</th>)}</tr></thead><tbody>{data.heatmap.map((row) => { const visit = data.visits.find((item) => item.id === row.visitId); return <tr key={row.visitId}><td><button className="font-black text-[var(--doctor-primary)]" onClick={() => visit && onSelectVisit(visit)}>{row.patientName}</button></td>{columns.map((column) => <td key={column}><button onClick={() => visit && onSelectVisit(visit)} aria-label={`${row.visitId} ${column} risk ${row.risks[column]}`} className={`w-full rounded-lg border px-2 py-2 text-xs font-black ${statusColors[riskTone(row.risks[column])]}`}>{row.risks[column]}</button></td>)}</tr>; })}</tbody></table></div>
-    </section>
-  );
 }
 
 function ReadinessScorePanel({ detail, onReevaluate, isPending }: { detail: VisitReadinessDetail; onReevaluate: () => void; isPending: boolean }) {

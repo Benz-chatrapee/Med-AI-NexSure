@@ -1,0 +1,488 @@
+<!DOCTYPE html><html lang="en" class="light"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">try{
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#1a1b21",
+                        "tertiary": "#00246b",
+                        "on-secondary-fixed-variant": "#2e457b",
+                        "on-primary": "#ffffff",
+                        "secondary": "#465d94",
+                        "surface": "#faf8ff",
+                        "secondary-fixed": "#dae2ff",
+                        "surface-tint": "#4059aa",
+                        "on-surface-variant": "#444651",
+                        "surface-container-highest": "#e3e1e9",
+                        "tertiary-fixed": "#dbe1ff",
+                        "error-container": "#ffdad6",
+                        "tertiary-container": "#00389a",
+                        "outline": "#757682",
+                        "surface-dim": "#dad9e1",
+                        "background": "#faf8ff",
+                        "inverse-on-surface": "#f1f0f7",
+                        "surface-container-low": "#f4f3fa",
+                        "secondary-fixed-dim": "#b1c5ff",
+                        "on-tertiary-fixed-variant": "#003ea8",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-container": "#90a8ff",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed": "#dce1ff",
+                        "surface-container-high": "#e9e7ef",
+                        "inverse-surface": "#2f3036",
+                        "tertiary-fixed-dim": "#b4c5ff",
+                        "on-primary-fixed-variant": "#264191",
+                        "on-secondary-fixed": "#001946",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#faf8ff",
+                        "primary": "#00236f",
+                        "primary-fixed-dim": "#b6c4ff",
+                        "surface-variant": "#e3e1e9",
+                        "on-secondary-container": "#364d83",
+                        "on-tertiary-container": "#8da9ff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#00164e",
+                        "inverse-primary": "#b6c4ff",
+                        "on-tertiary-fixed": "#00174b",
+                        "primary-container": "#1e3a8a",
+                        "secondary-container": "#a9c0fe",
+                        "on-error": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "outline-variant": "#c5c5d3",
+                        "surface-container": "#eeedf4",
+                        "on-background": "#1a1b21"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "stack-lg": "24px",
+                        "margin-mobile": "16px",
+                        "gutter": "16px",
+                        "stack-md": "16px",
+                        "stack-xs": "4px",
+                        "stack-sm": "8px",
+                        "margin-desktop": "32px",
+                        "container-max": "1440px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "data-mono": ["IBM Plex Sans"],
+                        "label-caps": ["IBM Plex Sans"],
+                        "body-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "title-sm": ["Inter"]
+                    }
+                }
+            }
+        }
+    }catch(_e){}</script><meta charset="utf-8"></head><body class="bg-surface font-body-md text-on-surface antialiased overflow-hidden">
+<!-- SideNavBar Component -->
+<aside class="fixed left-0 top-0 h-full w-[240px] bg-primary dark:bg-primary-container border-r border-outline-variant flex flex-col py-stack-lg px-stack-md z-50">
+<div class="mb-8 px-2">
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary">Med AI NexSure</h1>
+<p class="text-on-primary/60 text-xs tracking-wider uppercase font-label-caps">Clinical AI Intelligence</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a href="#" class="flex items-center gap-3 px-3 py-2 text-on-primary/70 hover:text-on-primary font-label-caps text-label-caps duration-200 ease-in-out hover:bg-primary-container/50 transition-colors">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="">Dashboard</span>
+</a>
+<a href="#" class="flex items-center gap-3 px-3 py-2 bg-secondary-container text-on-secondary-container rounded-lg font-label-caps text-label-caps duration-200 ease-in-out transition-colors">
+<span class="material-symbols-outlined" data-icon="group" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="">Patient Management</span>
+</a>
+<a href="#" class="flex items-center gap-3 px-3 py-2 text-on-primary/70 hover:text-on-primary font-label-caps text-label-caps duration-200 ease-in-out hover:bg-primary-container/50 transition-colors">
+<span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+<span class="">AI Clinical Engine</span>
+</a>
+<a href="#" class="flex items-center gap-3 px-3 py-2 text-on-primary/70 hover:text-on-primary font-label-caps text-label-caps duration-200 ease-in-out hover:bg-primary-container/50 transition-colors">
+<span class="material-symbols-outlined" data-icon="assignment_turned_in">assignment_turned_in</span>
+<span class="">Claim Readiness</span>
+</a>
+</nav>
+<div class="mt-auto pt-4 border-t border-on-primary/10 space-y-1">
+<a href="#" class="flex items-center gap-3 px-3 py-2 text-on-primary/70 hover:text-on-primary font-label-caps text-label-caps duration-200 ease-in-out hover:bg-primary-container/50 transition-colors">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="">Settings</span>
+</a>
+<a href="#" class="flex items-center gap-3 px-3 py-2 text-on-primary/70 hover:text-on-primary font-label-caps text-label-caps duration-200 ease-in-out hover:bg-primary-container/50 transition-colors">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="">Support</span>
+</a>
+</div>
+</aside>
+<!-- Main Viewport -->
+<main class="ml-[240px] flex flex-col h-screen overflow-hidden">
+<!-- TopNavBar Component -->
+<header class="fixed top-0 right-0 w-[calc(100%-240px)] h-16 bg-surface dark:bg-surface-container border-b border-outline-variant flex justify-between items-center px-margin-desktop z-40">
+<div class="flex items-center gap-8">
+<div class="relative w-96 group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none group-focus-within:text-primary">search</span>
+<input type="text" placeholder="Search HN, Name, or ID..." class="w-full bg-surface-container-low border border-outline-variant rounded px-10 py-1.5 font-body-sm focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none">
+</div>
+<div class="flex items-center gap-6">
+<a href="#" class="text-primary border-b-2 border-primary pb-1 font-title-sm text-title-sm">Patients</a>
+<a href="#" class="text-on-surface-variant hover:text-primary font-title-sm text-title-sm duration-200 ease-in-out">AI Copilot</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 flex items-center justify-center hover:bg-surface-container-low rounded-full transition-colors relative">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-surface"></span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center hover:bg-surface-container-low rounded-full transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="translate">translate</span>
+</button>
+<div class="h-8 w-px bg-outline-variant"></div>
+<div class="flex items-center gap-3 pl-2">
+<div class="text-right">
+<p class="text-xs font-bold text-primary leading-tight">Dr. Sarah Korn</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-tighter">Senior Clinical Analyst</p>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a female doctor with a stethoscope, clean studio lighting, high-end medical professional profile picture, clinical aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBW5iHwDbRAA3lm-d3vaBX_l5E1Lek1iQmR1lw5xb8er7pSfuxQyWR1MF09BxsCJOfW3DwC_v_dSoD99kxLZFZifyrMbU2bYNAalEoWtM25XwC9VsAGVOp-54jHMky29KTnisPLpvHD69-80RiCpH_uEJ68pWSpSubqCiMSGRY3e5KwCSpF7nTaiCptJakFbojysJhK5Z1y1URqubi120VKsrROWc8_mG6kWlt2-jNGMdgv_leXhXeNW7hGdVKAYjfyTvVY2m1AoNk">
+</div>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="mt-16 flex-1 flex overflow-hidden">
+<!-- Main Content Area -->
+<div class="flex-1 overflow-y-auto bg-[#F8FAFC]">
+<div class="p-margin-desktop space-y-6">
+<!-- Page Header -->
+<div class="flex justify-between items-end">
+<div>
+<nav class="flex items-center gap-2 text-on-surface-variant mb-2">
+<span class="text-xs hover:text-primary cursor-pointer">Patient Management</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-xs font-bold text-primary">Patient List</span>
+</nav>
+<h2 class="text-[32px] font-bold text-primary leading-tight">Patient Management</h2>
+<p class="text-body-sm text-on-surface-variant max-w-2xl">Manage patient identity, clinical activity, and claim readiness. <span class="block text-[14px] font-normal opacity-70 mt-1">จัดการข้อมูลผู้ป่วย การเข้ารับบริการ และสถานะเคลม</span></p>
+</div>
+<div class="flex items-center gap-3"><button class="flex items-center gap-2 px-4 py-2 bg-white border border-outline-variant text-primary font-semibold text-[13px] hover:bg-surface-container-low transition-colors rounded"><span class="material-symbols-outlined text-[18px]">history</span>View Detail</button><button class="flex items-center gap-2 px-4 py-2 bg-white border border-outline-variant text-primary font-semibold text-[13px] hover:bg-surface-container-low transition-colors rounded"><span class="material-symbols-outlined text-[18px]">file_download</span>Export</button><button class="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary font-semibold text-[13px] hover:bg-primary-container transition-colors rounded"><span class="material-symbols-outlined text-[18px]">person_add</span>Add Patient</button></div>
+</div>
+<!-- KPI Grid -->
+<div class="grid grid-cols-6 gap-4"><div class="bg-white p-3 border border-outline-variant shadow-sm rounded-lg hover:border-primary transition-all group"><div class="flex justify-between items-start mb-1"><span class="material-symbols-outlined text-primary bg-primary-container/20 p-1 rounded text-[18px]">group</span><span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">+5.8%</span></div><p class="text-on-surface-variant font-semibold text-[13px] mb-0.5">Active Patients</p><p class="text-[28px] font-bold text-primary leading-none">18,542</p></div><div class="bg-white p-3 border border-outline-variant shadow-sm rounded-lg hover:border-primary transition-all group"><div class="flex justify-between items-start mb-1"><span class="material-symbols-outlined text-secondary bg-secondary-container/20 p-1 rounded text-[18px]">person_add</span><span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">+18%</span></div><p class="text-on-surface-variant font-semibold text-[13px] mb-0.5">New Patients Today</p><p class="text-[28px] font-bold text-primary leading-none">124</p></div><div class="bg-white p-3 border border-outline-variant shadow-sm rounded-lg hover:border-primary transition-all"><div class="flex justify-between items-start mb-1"><span class="material-symbols-outlined text-primary bg-primary-container/20 p-1 rounded text-[18px]">festival</span></div><p class="text-on-surface-variant font-semibold text-[13px] mb-0.5">Active Visits</p><p class="text-[28px] font-bold text-primary leading-none">842</p></div><div class="bg-blue-50/50 p-3 border border-primary/20 shadow-sm rounded-lg border-l-4 border-l-primary"><div class="flex justify-between items-start mb-1"><span class="material-symbols-outlined text-primary text-[18px]">check_circle</span></div><p class="text-on-surface-variant font-semibold text-[13px] mb-0.5">Claim Ready</p><p class="text-[28px] font-bold text-primary leading-none">92%</p></div><div class="bg-white p-3 border border-outline-variant shadow-sm rounded-lg hover:border-error transition-all"><div class="flex justify-between items-start mb-1"><span class="material-symbols-outlined text-error bg-error-container/20 p-1 rounded text-[18px]">warning</span></div><p class="text-on-surface-variant font-semibold text-[13px] mb-0.5">Missing Consent</p><p class="text-[28px] font-bold text-error leading-none">12</p></div><div class="bg-white p-3 border border-outline-variant shadow-sm rounded-lg hover:border-primary transition-all"><div class="flex justify-between items-start mb-1"><span class="material-symbols-outlined text-on-surface-variant bg-surface-container-highest p-1 rounded text-[18px]">content_copy</span></div><p class="text-on-surface-variant font-semibold text-[13px] mb-0.5">Duplicate Review</p><p class="text-[28px] font-bold text-primary leading-none">04</p></div></div>
+<!-- Filters Bar -->
+<div class="sticky top-0 z-30 bg-white border border-outline-variant rounded-lg p-3 shadow-sm flex flex-wrap items-center gap-4">
+<div class="flex-1 min-w-[200px] relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border-none rounded focus:ring-2 focus:ring-primary/20 text-body-sm font-data-mono" placeholder="Search by HN, patient name, phone, or Visit ID" type="text">
+</div>
+<select class="bg-white border border-outline-variant rounded px-3 py-2 text-body-sm focus:ring-primary focus:border-primary">
+<option>Status: All Activity</option>
+<option>Active Now</option>
+<option>Discharged</option>
+</select>
+<select class="bg-white border border-outline-variant rounded px-3 py-2 text-body-sm focus:ring-primary focus:border-primary">
+<option class="">Claim Readiness: All</option>
+<option class="">Ready for Submission</option>
+<option class="">Correction Required</option>
+</select>
+<select class="bg-white border border-outline-variant rounded px-3 py-2 text-body-sm focus:ring-primary focus:border-primary">
+<option>Insurance: All Payors</option>
+<option>AIA</option>
+<option>Allianz</option>
+<option>Government</option>
+</select>
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors text-body-sm px-2">
+<span class="material-symbols-outlined text-[20px]">filter_list</span>
+                            More Filters
+                        </button>
+</div>
+<!-- Data Table -->
+<div class="bg-white border border-outline-variant rounded-lg shadow-sm overflow-hidden">
+<table class="w-full high-density-table border-collapse text-left">
+<thead class="bg-surface-container-low border-b border-outline-variant"><tr><th class="p-2 font-semibold text-[13px] text-on-surface-variant tracking-wider uppercase w-12"><input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"></th><th class="p-2 font-semibold text-[13px] text-on-surface-variant tracking-wider uppercase">Patient</th><th class="p-2 font-semibold text-[13px] text-on-surface-variant tracking-wider uppercase">HN</th><th class="p-2 font-semibold text-[13px] text-on-surface-variant tracking-wider uppercase">Latest Visit</th><th class="p-2 font-semibold text-[13px] text-on-surface-variant tracking-wider uppercase">Visit Status</th><th class="p-2 font-semibold text-[13px] text-on-surface-variant tracking-wider uppercase">Clinical Alert</th><th class="p-2 font-semibold text-[13px] text-on-surface-variant tracking-wider uppercase">Claim Readiness</th><th class="p-2 font-semibold text-[13px] text-on-surface-variant tracking-wider uppercase">Insurance</th><th class="p-2 font-semibold text-[13px] text-on-surface-variant tracking-wider uppercase text-right">Actions</th></tr></thead>
+<tbody class="divide-y divide-outline-variant">
+<!-- Row 1 -->
+<tr class="hover:bg-blue-50/30 transition-colors cursor-pointer group bg-blue-50/20">
+<td class="p-3 text-center py-1.5"><input checked="" class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"></td>
+<td class="p-3 py-1.5">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-slate-200 overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A portrait of a senior Thai man, professional lighting, healthcare dashboard asset, dignified and realistic medical patient profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEM5sZLm0XAHrFmvLIS-jYRPSDE38Vua1TXleqjZSxx9xak1-Q2dAVfoNbPSYEvDlXmX6n7OS9z3KmHFr6Mpqy-bVkj1tQ9CKyjHbWhd02FYpQ6FaJJYTYI-Q-tLKXPmviVitAuISTl_-Zc4fyCVBD2Pawg6oiK3gpglZEC8Hi9T1YnJaq-ATK4-gzOBhNVq_wbXb3eYCv1LKDQI36UDrSiJfINxFJ1At_YMoxtc3g4LgDZaxbgFi8qR0FOoDRm1RHM78Xyox6epo">
+</div>
+<div>
+<p class="text-sm font-bold text-primary">Somchai Jaidee</p>
+<p class="text-[11px] text-on-surface-variant">Male, 54Y • Thai National ID: ****3421</p>
+</div>
+</div>
+</td>
+<td class="p-3 font-data-mono text-sm py-1.5">HN-2023-9941</td>
+<td class="p-3 py-1.5">
+<p class="text-sm font-medium">24 Oct 2023</p>
+<p class="text-[11px] text-on-surface-variant">VN: V-9284210 (OPD)</p>
+</td>
+<td class="p-3 py-1.5">
+<div class="flex flex-col gap-1">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 w-fit text-[11px] font-semibold">
+                                                STABLE
+                                            </span>
+
+</div>
+</td>
+<td class="p-3 py-1.5">
+<div class="flex items-center gap-2">
+<div class="h-1.5 w-16 bg-outline-variant rounded-full overflow-hidden">
+<div class="h-full bg-emerald-500 w-[92%]"></div>
+</div>
+<span class="text-xs font-bold text-emerald-700">92%</span>
+</div>
+<p class="text-[10px] text-on-surface-variant font-medium">READY TO SUBMIT</p>
+</td>
+<td class="p-3 py-1.5">
+<p class="text-sm font-medium">AIA Platinum</p>
+<p class="text-[11px] text-on-surface-variant">Policy: PREM-882</p>
+</td>
+<td class="p-3 text-right py-1.5">
+<button class="w-8 h-8 rounded hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[20px]">more_vert</span></button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-blue-50/30 transition-colors cursor-pointer group">
+<td class="p-3 text-center py-1.5"><input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"></td>
+<td class="p-3 py-1.5">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-slate-200 overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="Close up portrait of a young adult Thai woman, soft natural lighting, medical record profile, clean background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAEIwihOlvky5EBzHZGnq0ZZhle2czre3YS-xkZR0yTRdn86ZTI0XE16MAYvF_AehywOG-_4yTtotAiv3oiMd1IPFBmqAplGD6mlmE9QLTzdET1vQLem3kjUnkycs2Mk7TZzjfoKBNThQkY9nBfmEmyeE6PnZrfrWD_jlbVrmljvsq_Tz7wP_fqU_tfDDlmv-oJCfTpv5hnxBlYXi7i6sTZyJFjaO4kaaXoCIXP_620Xa3k6qylfqNWsZI3BzcQsR0iiPv0X82w5o">
+</div>
+<div class="">
+<p class="text-sm font-bold text-primary">Areeya Sukawat</p>
+<p class="text-[11px] text-on-surface-variant">Female, 28Y • Passport: AA984***</p>
+</div>
+</div>
+</td>
+<td class="p-3 font-data-mono text-sm py-1.5">HN-2023-1102</td>
+<td class="p-3 py-1.5">
+<p class="text-sm font-medium">24 Oct 2023</p>
+<p class="text-[11px] text-on-surface-variant">VN: V-9284305 (ER)</p>
+</td>
+<td class="p-3 py-1.5">
+<div class="flex flex-col gap-1">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 w-fit gap-1 text-[11px] font-semibold">
+<span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">error</span>
+                                                NEEDS REVIEW
+                                            </span>
+
+</div>
+</td>
+<td class="p-3 py-1.5">
+<div class="flex items-center gap-2">
+<div class="h-1.5 w-16 bg-outline-variant rounded-full overflow-hidden">
+<div class="h-full bg-amber-500 w-[64%]"></div>
+</div>
+<span class="text-xs font-bold text-amber-700">64%</span>
+</div>
+<p class="text-[10px] text-on-surface-variant font-medium uppercase">Missing Clinical Note</p>
+</td>
+<td class="p-3 py-1.5">
+<p class="text-sm font-medium">Bupa Global</p>
+<p class="text-[11px] text-on-surface-variant">Direct Billing</p>
+</td>
+<td class="p-3 text-right py-1.5">
+<button class="w-8 h-8 rounded hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[20px]">more_vert</span></button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-blue-50/30 transition-colors cursor-pointer group">
+<td class="p-3 text-center py-1.5"><input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"></td>
+<td class="p-3 py-1.5">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-slate-200 overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="Headshot of a middle-aged Thai woman, serene expression, healthcare patient portrait, crisp studio lighting, neutral grey background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtznGlb8vhuGIH6nZzoLrWPRceWekGRHOaeTYiPL6O60C1OfIXZDgz0tGg_VjLnD4gjdCfk1ELZyHaOr5pox9eRnu8fGVxy6Lz6sq8vB-RuIIn1xOLxqIZvtwmla44RWJh_p_5xly1bcIXELrYRgU-ke7QoxqGv0-xYI8WwgSSNc505Zc9et-P4QXpu6Tk6m8tU_NyMGQoztO199Rkqf3JRH7bQZuT7q1K1wBTPJ2ivn7U5Rrsq2R92_AoT0CVNw1mviBG0-OWF_c">
+</div>
+<div>
+<p class="text-sm font-bold text-primary">Sunee Chatchai</p>
+<p class="text-[11px] text-on-surface-variant">Female, 42Y • Thai National ID: ****1190</p>
+</div>
+</div>
+</td>
+<td class="p-3 font-data-mono text-sm py-1.5">HN-2022-4410</td>
+<td class="p-3 py-1.5">
+<p class="text-sm font-medium">23 Oct 2023</p>
+<p class="text-[11px] text-on-surface-variant">VN: V-9271102 (IPD)</p>
+</td>
+<td class="p-3 py-1.5">
+<div class="flex flex-col gap-1">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 w-fit text-[11px] font-semibold">
+                                                IN-PATIENT
+                                            </span>
+
+</div>
+</td>
+<td class="p-3 py-1.5">
+<div class="flex items-center gap-2">
+<div class="h-1.5 w-16 bg-outline-variant rounded-full overflow-hidden">
+<div class="h-full bg-emerald-500 w-[88%]"></div>
+</div>
+<span class="text-xs font-bold text-emerald-700">88%</span>
+</div>
+<p class="text-[10px] text-on-surface-variant font-medium">PENDING DISCHARGE</p>
+</td>
+<td class="p-3 py-1.5">
+<p class="text-sm font-medium">Social Security</p>
+<p class="text-[11px] text-on-surface-variant">Gov-Funded</p>
+</td>
+<td class="p-3 text-right py-1.5">
+<button class="w-8 h-8 rounded hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[20px]">more_vert</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="p-3 border-t border-outline-variant bg-surface-container-low flex justify-between items-center">
+<p class="text-xs text-on-surface-variant">Showing 1-15 of 18,542 Patients</p>
+<div class="flex items-center gap-1">
+<button class="p-1 rounded hover:bg-surface-container-highest transition-colors"><span class="material-symbols-outlined text-[20px]">first_page</span></button>
+<button class="p-1 rounded hover:bg-surface-container-highest transition-colors"><span class="material-symbols-outlined text-[20px]">chevron_left</span></button>
+<span class="px-3 text-xs font-bold">1</span>
+<button class="p-1 rounded hover:bg-surface-container-highest transition-colors"><span class="material-symbols-outlined text-[20px]">chevron_right</span></button>
+<button class="p-1 rounded hover:bg-surface-container-highest transition-colors"><span class="material-symbols-outlined text-[20px]">last_page</span></button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Preview Panel -->
+<aside class="w-[360px] bg-white border-l border-outline-variant flex flex-col shadow-2xl relative z-20">
+<!-- Panel Header -->
+<div class="p-6 border-b border-outline-variant bg-surface-container-low">
+<div class="flex justify-between items-start mb-4">
+<div class="w-16 h-16 rounded-lg bg-slate-200 overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="Portrait of Somchai Jaidee, senior Thai man, clear features for medical identification, clean aesthetic, high definition portrait." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKqVt8D7de9OF147u8uE1ckjN7d_k61FetPsdhKgKfMqz2LdKVhcad_GyCpolRMg_33tjS1Y6-0mmmDu3zeLgRSjMhS5-kPGeDQyHyyhpy3vlkd7GnH2f4AyNbUqcNHRYxsPKC2VouN0F4IzMDX6WeaDVoXDq8OoMu93LnnXLVqb9JCx8VKCaSgR-cz7y95Ie8PsLK0erTmZKEDIH13hjui449WjDYIzZU-o3INzPAhe7RXI2B-G-WG5fA-tPSJWmG1qoTXdTZ-88">
+</div>
+<button class="w-8 h-8 rounded hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-on-surface-variant">close</span></button>
+</div>
+<h3 class="text-title-sm font-bold text-primary">Somchai Jaidee</h3>
+<p class="text-xs text-on-surface-variant mb-4">HN: 2023-9941 • ID: 3-1002-33291-1</p>
+<div class="flex gap-2">
+<button class="flex-1 py-1.5 bg-primary text-on-primary text-[11px] font-bold rounded">OPEN CHART</button>
+<button class="w-10 h-8 border border-outline-variant rounded flex items-center justify-center hover:bg-surface-container-low"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+</div>
+</div>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto p-6 space-y-8">
+<!-- AI Clinical Summary -->
+<section class="space-y-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="psychology">psychology</span>
+<h4 class="font-bold text-xs uppercase tracking-wider text-primary">AI Clinical Summary</h4>
+</div>
+<div class="bg-blue-50 p-4 rounded border border-primary/10">
+<p class="text-xs leading-relaxed text-on-surface italic mb-2">
+                                "Patient shows stable progress post-hypertension management. Current labs indicate creatinine normalization (1.1 mg/dL)."
+                            <span class="block not-italic text-[11px] opacity-60 mt-1">ผู้ป่วยมีอาการคงที่หลังการรักษาความดันโลหิตสูง ผลแล็บล่าสุดปกติ</span></p>
+<div class="space-y-2">
+<div class="flex justify-between text-[11px]">
+<span class="text-on-surface-variant">Risk Profile</span>
+<span class="font-bold text-emerald-600">LOW RISK</span>
+</div>
+<div class="flex justify-between text-[11px]">
+<span class="text-on-surface-variant">Recommended Action</span>
+<span class="font-bold">Follow-up in 3M</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Claim Readiness Score -->
+<section class="space-y-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="assignment_turned_in">assignment_turned_in</span>
+<h4 class="font-bold text-xs uppercase tracking-wider text-primary">Claim Integrity Score</h4>
+</div>
+<div class="flex flex-col items-center text-center py-4">
+<div class="relative w-32 h-32 flex items-center justify-center">
+<svg class="w-full h-full transform -rotate-90">
+<circle cx="64" cy="64" fill="transparent" r="58" stroke="#f1f5f9" stroke-width="8"></circle>
+<circle cx="64" cy="64" fill="transparent" r="58" stroke="#2563eb" stroke-dasharray="364.4" stroke-dashoffset="29.1" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<div class="absolute flex flex-col">
+<span class="text-3xl font-bold text-primary">92</span>
+<span class="text-[10px] text-on-surface-variant uppercase">Excellent</span>
+</div>
+</div>
+<p class="text-[11px] text-on-surface-variant mt-3 px-4">Missing only signed consent for digital disclosure (Minor Ref: B-29).</p>
+</div>
+<div class="space-y-2">
+<div class="p-3 bg-emerald-50 border border-emerald-100 rounded flex gap-3">
+<span class="material-symbols-outlined text-emerald-600 text-[20px]">check_circle</span>
+<div class="text-[11px]">
+<p class="font-bold text-emerald-800">ICD-10 Mapping Complete</p>
+<p class="text-emerald-700/70">Verified against clinician notes.</p>
+</div>
+</div>
+<div class="p-3 bg-amber-50 border border-amber-100 rounded flex gap-3">
+<span class="material-symbols-outlined text-amber-600 text-[20px]">info</span>
+<div class="text-[11px]">
+<p class="font-bold text-amber-800">Pending Consent Form</p>
+<p class="text-amber-700/70">Requires patient signature. <span class="block font-medium">ยังไม่ได้รับความยินยอมที่ครบถ้วน</span></p>
+</div>
+</div>
+</div>
+</section>
+<!-- Assigned Care Team -->
+<section class="space-y-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="medical_services">medical_services</span>
+<h4 class="font-bold text-xs uppercase tracking-wider text-primary">Assigned Care Team</h4>
+</div>
+<div class="space-y-3">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A male doctor profile photo, professional and friendly, hospital setting background, 4k high resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpNHAHLHnqouh1WL4yE6F2e5NhufEzz5UIk6OedttCfwqoSbEfeeQx8N4sU6t6PRGwWj81r_o1Kj3pfBO1lk5MeKJBk5Qocb2wA1RNPTozBZVlspgzxa4R0p_7tfzbg3clVARDxfcEAg9dYl1SvUM3E5Am_pj1P6IA7zSM6htVxIYj1ukkF8sI8h9rzdl-0XQ4id7lVHe4JALsjg5ypoRaTzYZ66i6okmK4sIqIlItdSvmmn-us4YBGKKQrFTWLbHO5p1WTu6ZrPU">
+</div>
+<div class="text-[11px]">
+<p class="font-bold">Dr. Thanat V.</p>
+<p class="text-on-surface-variant italic">Lead Cardiologist</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional nurse portrait, female, wearing medical scrubs, looking confident, soft light medical environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNPelhiyWjXyacQZcEqjY72iyk_F60cIKZBrh-JXxB-hCe1TTZiZu27rboumuYPNncE9NavYIgiG9WUUHwAij-ecby1Ha--Zx5ngrpZzRZrR40UOW7QDPdpaMA9pcLhkav6REfi0n4ecZE9QaWcamdDCkB5jj89v-k6ueLvcnm8s1v9jLUWzmtvt7-S-oMnliJtb8Qpyu9eZyP5cB29AQR489mMHeAK-FhP0NAQ7NnxZKn8dt8A6jdREhfRwTA48SEQBOBHDXT1SM">
+</div>
+<div class="text-[11px]">
+<p class="font-bold">Nurse Preeti S.</p>
+<p class="text-on-surface-variant italic">Case Manager</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Footer Info -->
+<div class="p-6 border-t border-outline-variant">
+<div class="flex justify-between items-center text-[10px] text-on-surface-variant font-data-mono">
+<span class="">Last Updated: Today, 14:02</span>
+<span class="bg-surface-container-high px-2 py-0.5 rounded uppercase">Ver 2.4</span>
+</div>
+</div>
+</aside>
+</div>
+</main>
+<script>
+        // Micro-interactions for table rows
+        document.querySelectorAll('tbody tr').forEach(row => {
+            row.addEventListener('click', () => {
+                // Remove active class from all rows
+                document.querySelectorAll('tbody tr').forEach(r => r.classList.remove('bg-blue-50/20'));
+                // Add active class to clicked row
+                row.classList.add('bg-blue-50/20');
+            });
+        });
+
+        // Simple Search Filter Simulation
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('ring-2', 'ring-primary/20');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('ring-2', 'ring-primary/20');
+        });
+    </script>
+
+</body></html>

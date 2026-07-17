@@ -1,0 +1,80 @@
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Copy,
+  Hospital,
+  UserPlus,
+  UsersRound,
+} from "lucide-react";
+import type { CareTeamMember, PatientListKpi, PatientListRecord } from "../types/patient-list.types";
+
+export const patientListKpis: PatientListKpi[] = [
+  { label: "Active Patients", value: "18,542", trend: "+5.8%", icon: UsersRound, tone: "primary" },
+  { label: "New Patients Today", value: "124", trend: "+18%", icon: UserPlus, tone: "secondary" },
+  { label: "Active Visits", value: "842", icon: Hospital, tone: "primary" },
+  { label: "Claim Ready", value: "92%", icon: CheckCircle2, tone: "success" },
+  { label: "Missing Consent", value: "12", icon: AlertTriangle, tone: "danger" },
+  { label: "Duplicate Review", value: "04", icon: Copy, tone: "muted" },
+];
+
+export const patientListRecords: PatientListRecord[] = [
+  {
+    id: "patient-somchai",
+    name: "Somchai Jaidee",
+    demographics: "Male, 54Y",
+    maskedIdentity: "Thai National ID: ****3421",
+    hn: "HN-2023-9941",
+    visitDate: "24 Oct 2023",
+    visitCode: "V-9284210",
+    visitType: "OPD",
+    status: "STABLE",
+    claimScore: 92,
+    claimLabel: "READY TO SUBMIT",
+    claimTone: "ready",
+    insuranceName: "AIA Platinum",
+    insuranceDetail: "Policy: PREM-882",
+    initials: "SJ",
+    avatarTone: "bg-blue-100 text-blue-900",
+  },
+  {
+    id: "patient-areeya",
+    name: "Areeya Sukawat",
+    demographics: "Female, 28Y",
+    maskedIdentity: "Passport: AA984***",
+    hn: "HN-2023-1102",
+    visitDate: "24 Oct 2023",
+    visitCode: "V-9284305",
+    visitType: "ER",
+    status: "NEEDS REVIEW",
+    claimScore: 64,
+    claimLabel: "Missing Clinical Note",
+    claimTone: "warning",
+    insuranceName: "Bupa Global",
+    insuranceDetail: "Direct Billing",
+    initials: "AS",
+    avatarTone: "bg-sky-100 text-sky-900",
+  },
+  {
+    id: "patient-sunee",
+    name: "Sunee Chatchai",
+    demographics: "Female, 42Y",
+    maskedIdentity: "Thai National ID: ****1190",
+    hn: "HN-2022-4410",
+    visitDate: "23 Oct 2023",
+    visitCode: "V-9271102",
+    visitType: "IPD",
+    status: "IN-PATIENT",
+    claimScore: 88,
+    claimLabel: "PENDING DISCHARGE",
+    claimTone: "inpatient",
+    insuranceName: "Social Security",
+    insuranceDetail: "Gov-Funded",
+    initials: "SC",
+    avatarTone: "bg-indigo-100 text-indigo-900",
+  },
+];
+
+export const patientCareTeam: CareTeamMember[] = [
+  { name: "Dr. Thanat V.", role: "Lead Cardiologist", initials: "TV" },
+  { name: "Nurse Preeti S.", role: "Case Manager", initials: "PS" },
+];
