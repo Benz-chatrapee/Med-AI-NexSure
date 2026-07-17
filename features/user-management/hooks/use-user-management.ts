@@ -25,7 +25,7 @@ export const clinicUserKeys = {
 
 const defaultQuery: ClinicUsersQuery = {
   page: 1,
-  pageSize: 8,
+  pageSize: 12,
 };
 
 export function useUserManagement() {
@@ -137,7 +137,7 @@ export function useUserManagement() {
 function parseQuery(params: URLSearchParams): ClinicUsersQuery {
   return {
     search: params.get("search") || undefined,
-    role: parseOption(params.get("role"), ["clinic_admin", "clinic_manager", "doctor", "nurse", "pharmacist", "clinic_staff", "claim_reviewer", "compliance_officer", "executive"]),
+    role: parseOption(params.get("role"), ["system_admin", "organization_admin", "clinic_admin", "clinic_manager", "doctor", "nurse", "pharmacist", "clinic_staff", "claim_reviewer", "auditor_compliance", "compliance_officer", "executive"]),
     status: parseOption(params.get("status"), ["active", "invited", "locked", "suspended", "inactive"]),
     invitationStatus: parseOption(params.get("invitationStatus"), ["sent", "expired"]),
     departmentId: params.get("departmentId") || undefined,

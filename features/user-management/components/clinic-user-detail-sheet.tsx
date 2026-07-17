@@ -1,4 +1,5 @@
 import { Activity, Lock, ShieldCheck, X } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { aiAccessLevelLabels, dataAccessLevelLabels, maskProfessionalLicense, permissionDescriptions, permissionLabels, roleLabels } from "../constants/clinic-user-options";
@@ -16,6 +17,8 @@ export function ClinicUserDetailSheet({
   onRevokeSessions,
   onUnlock,
   onUpdateAi,
+  onEdit,
+  onViewAudit,
   aiPending,
 }: {
   user?: ClinicUser;
@@ -25,6 +28,8 @@ export function ClinicUserDetailSheet({
   onRevokeSessions: (userId: string) => void;
   onUnlock: (userId: string) => void;
   onUpdateAi: (userId: string, permissions: ClinicUserAiPermissions, reason: string) => void;
+  onEdit: (userId: string) => void;
+  onViewAudit: (userId: string) => void;
   aiPending: boolean;
 }) {
   const [tab, setTab] = useState<TabName>("Overview");
@@ -173,8 +178,11 @@ export function ClinicUserDetailSheet({
           ) : null}
         </div>
 
-        <div className="flex justify-end gap-2 border-t border-slate-200 p-4">
+        <div className="flex flex-wrap justify-end gap-2 border-t border-slate-200 p-4">
           <Button onClick={onClose} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-black text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">Close</Button>
+          {user ? <Link href={`/admin/users/${user.id}`} className="inline-flex items-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-black text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">Open Detail Page</Link> : null}
+          {user ? <Button onClick={() => onEdit(user.id)} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-black text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">Edit User</Button> : null}
+          {user ? <Button onClick={() => onViewAudit(user.id)} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-black text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">View Audit</Button> : null}
           <Button onClick={() => user && setTab("AI Permissions")} className="inline-flex items-center gap-2 rounded-xl border border-blue-800 bg-[#1E3A8A] px-3 py-2 text-sm font-black text-white focus:outline-none focus:ring-2 focus:ring-blue-500"><ShieldCheck size={15} />Manage Access</Button>
         </div>
       </aside>

@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { CreateUserForm } from "./create-user-form";
 import { StickyActions } from "./sticky-actions";
@@ -25,10 +25,31 @@ const defaultValues: CreateUserFormValues = {
   departmentId: "",
   locationId: "",
   additionalClinics: [],
-  accessScope: "own_clinic",
+  accessScope: "primary_clinic",
   primaryRole: "",
   additionalRoles: [],
+  permissionTemplate: "role_recommended",
+  customPermissions: [],
+  privilegedReason: "",
+  aiEnabled: false,
+  aiPermissionLevels: {
+    clinical_summary: "no_access",
+    icd_suggestion: "no_access",
+    differential_support: "no_access",
+    prescription_safety: "no_access",
+    claim_readiness: "no_access",
+    missing_evidence: "no_access",
+    insurance_rule_validation: "no_access",
+    economic_intelligence: "no_access",
+    evidence_package_generation: "no_access",
+  },
+  patientDataAccess: "assigned_cases",
+  clinicalRecordAccess: ["view"],
+  claimDataAccess: [],
+  auditLogAccess: "own_activity",
+  exportPermissions: ["no_export"],
   accountStatus: "invited",
+  authenticationMethod: "email_password",
   sessionTimeout: "30",
   language: "en",
   timezone: "Asia/Bangkok",
@@ -40,6 +61,32 @@ const defaultValues: CreateUserFormValues = {
   inviteLanguage: "en",
   inviteExpiry: "168",
   welcomeMessage: "",
+  loginRestriction: "standard",
+  ipRestriction: "",
+  temporaryAccess: false,
+  securityNotification: true,
+  lockOnRiskDetection: true,
+  scheduleActivation: false,
+  setTemporaryPassword: false,
+  notifyAdministrator: true,
+  acknowledgedAiSuggestion: false,
+  permissionMatrix: {
+    dashboard: ["view"],
+    patient: [],
+    visit: [],
+    soap: [],
+    ai_clinical: [],
+    diagnosis: [],
+    prescription: [],
+    certificate: [],
+    claim: [],
+    evidence: [],
+    insurance: [],
+    economic: [],
+    audit: [],
+    users: [],
+    settings: [],
+  },
 };
 
 type ToastState = { title: string; tone: "success" | "error" | "info" };
@@ -53,7 +100,26 @@ export function CreateUserWorkspace() {
     mode: "onChange",
   });
   const watchedValues = useWatch({ control: form.control });
-  const values = useMemo(() => ({ ...defaultValues, ...watchedValues }), [watchedValues]);
+  const values: CreateUserFormValues = useMemo(
+    () => ({
+      ...defaultValues,
+      ...watchedValues,
+      aiPermissionLevels: { ...defaultValues.aiPermissionLevels, ...watchedValues.aiPermissionLevels },
+      permissionMatrix: Object.fromEntries(Object.entries(defaultValues.permissionMatrix).map(([key, value]) => [key, watchedValues.permissionMatrix?.[key] ?? value])) as CreateUserFormValues["permissionMatrix"],
+    }),
+    [watchedValues],
+  );
+  const valid = form.formState.isValid;
+
+  useEffect(() => {
+    if (!form.formState.isDirty) return;
+    const warnBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warnBeforeUnload);
+    return () => window.removeEventListener("beforeunload", warnBeforeUnload);
+  }, [form.formState.isDirty]);
 
   async function submit(mode: "draft" | "create") {
     try {
@@ -65,47 +131,49 @@ export function CreateUserWorkspace() {
           await userManagementService.createUser(submittedValues);
         })();
       }
-      setToast({ title: mode === "draft" ? "Draft saved successfully" : "User created successfully", tone: "success" });
+      setToast({ title: mode === "draft" ? "Draft saved\nบันทึกฉบับร่างเรียบร้อยแล้ว" : values.sendInvitation ? "User created successfully\nส่งคำเชิญไปยังอีเมลผู้ใช้งานแล้ว" : "User created successfully\nสร้างบัญชีผู้ใช้งานเรียบร้อยแล้ว", tone: "success" });
       form.reset(form.getValues());
     } catch {
-      setToast({ title: "Unable to save user. Please review required fields and try again.", tone: "error" });
+      setToast({ title: "Unable to create user\nไม่สามารถสร้างผู้ใช้งานได้ กรุณาลองใหม่อีกครั้ง", tone: "error" });
     } finally {
       setSaving(null);
     }
   }
 
   return (
-    <main className="min-h-screen bg-[#F8FAFC] text-slate-950">
-      <div className="mx-auto max-w-[1760px] px-4 pb-32 pt-6 lg:px-7">
-        <div className="mb-3 text-sm text-slate-500">
-          User Management <span className="px-2">&gt;</span><strong className="text-blue-800">New User</strong>
+    <main
+      className="min-h-screen bg-[var(--nx-bg)] text-[var(--nx-text)] [--nx-accent:#38BDF8] [--nx-ai-bg:#DBEAFE] [--nx-ai:#2563EB] [--nx-bg:#F8FAFC] [--nx-border:#E2E8F0] [--nx-control:#CBD5E1] [--nx-danger-bg:#FEF2F2] [--nx-danger:#DC2626] [--nx-deep:#0F2A5F] [--nx-focus:#BFDBFE] [--nx-info-bg:#EFF6FF] [--nx-muted:#94A3B8] [--nx-primary:#1E3A8A] [--nx-secondary:#64748B] [--nx-success-bg:#ECFDF5] [--nx-success:#059669] [--nx-surface-low:#EFF6FF] [--nx-surface:#FFFFFF] [--nx-text:#0F172A] [--nx-warning-bg:#FFFBEB] [--nx-warning:#D97706]"
+    >
+      <div className="mx-auto max-w-[1440px] px-4 pb-28 pt-5 md:px-8">
+        <div className="mb-3 font-['Inter'] text-[13px] font-semibold leading-5 text-[var(--nx-secondary)]">
+          User Management <span className="px-2">&gt;</span><strong className="text-[var(--nx-primary)]">Add User</strong>
         </div>
-        <header className="mb-6 flex flex-col justify-between gap-4 xl:flex-row">
+        <header className="mb-5 flex flex-col justify-between gap-4 border-b border-[var(--nx-border)] pb-4 xl:flex-row">
           <div>
-            <h1 className="text-3xl font-black tracking-tight">Create New User</h1>
-            <p className="mt-2 text-slate-500">สร้างบัญชีผู้ใช้ใหม่ พร้อมกำหนด Role, Access Scope และ AI Permission ตามนโยบายองค์กร</p>
+            <h1 className="font-['Inter'] text-[32px] font-bold leading-[40px] text-[var(--nx-text)]">Add User</h1>
+            <p className="mt-1 max-w-4xl font-['Inter'] text-[15px] leading-6 text-[var(--nx-secondary)]">Create a secure account with role, scope, AI governance, and audit-ready permissions. เพิ่มผู้ใช้งานใหม่โดยยึดหลัก Least Privilege และ Human-in-the-Loop</p>
+            <p className="mt-2 rounded-full bg-[var(--nx-info-bg)] px-3 py-1 font-['Inter'] text-[13px] font-semibold leading-5 text-[var(--nx-primary)]">Administrative scope: Organization Admin / Bangkok Medical Network / users.create</p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-800">Role-based Access</span>
-            <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-800">Enterprise Intelligence</span>
-            <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-800">Audit Ready</span>
+          <div className="flex flex-wrap items-start gap-2">
+            <button type="button" onClick={() => history.back()} className="min-h-10 rounded-lg border border-[var(--nx-focus)] bg-[var(--nx-surface)] px-4 font-['Inter'] text-[14px] font-semibold leading-5 text-[var(--nx-primary)] hover:bg-[var(--nx-info-bg)] focus:outline-none focus:ring-2 focus:ring-[var(--nx-focus)]">Cancel</button>
+            <button type="button" disabled={Boolean(saving)} onClick={() => void submit("create")} className="min-h-10 rounded-lg bg-[var(--nx-primary)] px-4 font-['Inter'] text-[14px] font-semibold leading-5 text-white hover:bg-[var(--nx-deep)] focus:outline-none focus:ring-2 focus:ring-[var(--nx-focus)] disabled:opacity-50">{saving === "create" ? "Creating..." : "Create User"}</button>
           </div>
         </header>
-        <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_390px]">
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
           <CreateUserForm form={form} />
           <UserSummary values={values} />
         </div>
       </div>
-      <StickyActions dirty={form.formState.isDirty} saving={saving} sendInvitation={values.sendInvitation} onDraft={() => void submit("draft")} onCreate={() => void submit("create")} />
+      <StickyActions dirty={form.formState.isDirty} saving={saving} sendInvitation={values.sendInvitation} createDisabled={!valid || Boolean(saving)} onDraft={() => void submit("draft")} onCreate={() => void submit("create")} />
       {toast ? <Toast title={toast.title} tone={toast.tone} onClose={() => setToast(null)} /> : null}
     </main>
   );
 }
 
 function Toast({ title, tone, onClose }: ToastState & { onClose: () => void }) {
-  const classes = tone === "error" ? "border-red-200 bg-red-50 text-red-800" : tone === "success" ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-blue-200 bg-blue-50 text-blue-800";
+  const classes = tone === "error" ? "border-red-200 bg-[#FEF2F2] text-red-700" : tone === "success" ? "border-emerald-200 bg-[#ECFDF5] text-emerald-700" : "border-blue-200 bg-[#EFF6FF] text-[#1E3A8A]";
   return (
-    <div className={`fixed bottom-24 right-5 z-[80] max-w-md rounded-2xl border p-4 text-sm font-bold shadow-xl ${classes}`} role="status">
+    <div className={`fixed bottom-24 right-5 z-[80] max-w-md rounded-xl border p-4 text-sm font-semibold shadow-sm ${classes}`} role="status">
       <div className="flex items-start justify-between gap-4">
         <span>{title}</span>
         <button type="button" onClick={onClose} className="font-black focus:outline-none focus:ring-2 focus:ring-blue-500">Close</button>

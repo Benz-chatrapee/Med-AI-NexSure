@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react";
 
 export type ClinicUserStatus = "active" | "invited" | "locked" | "suspended" | "inactive";
 export type ClinicUserRole =
+  | "system_admin"
   | "organization_admin"
   | "clinic_admin"
   | "clinic_manager"
@@ -16,14 +17,36 @@ export type ClinicUserRole =
 export type CreateUserRole = Extract<
   ClinicUserRole,
   "organization_admin" | "clinic_admin" | "doctor" | "nurse" | "pharmacist" | "clinic_staff" | "claim_reviewer" | "auditor_compliance" | "executive"
+  | "system_admin"
 >;
-export type CreateUserAccessScope = "own_clinic" | "assigned_clinics" | "organization_wide";
+export type CreateUserAccessScope = "assigned_cases" | "primary_clinic" | "selected_clinics" | "organization_wide";
+export type PermissionTemplate = "role_recommended" | "least_privilege" | "claim_review" | "audit_review" | "custom_permissions";
+export type CustomPermissionId = "patient_management" | "claim_approval" | "audit_access" | "user_management" | "data_export" | "evidence_package";
+export type AiPermissionId =
+  | "clinical_summary"
+  | "icd_suggestion"
+  | "differential_support"
+  | "prescription_safety"
+  | "claim_readiness"
+  | "missing_evidence"
+  | "insurance_rule_validation"
+  | "economic_intelligence"
+  | "evidence_package_generation";
+export type AiPermissionLevel = "no_access" | "view" | "generate" | "review" | "confirm";
+export type PatientDataAccess = "no_access" | "assigned_cases" | "clinic_scope" | "selected_clinics" | "organization_scope";
+export type ClinicalRecordPermission = "view" | "create" | "update" | "review" | "approve";
+export type ClaimDataPermission = "view" | "review" | "approve" | "export";
+export type AuditLogAccess = "no_access" | "own_activity" | "clinic_scope" | "organization_scope";
+export type ExportPermission = "no_export" | "pdf" | "csv" | "evidence_package" | "audit_report";
+export type AccountStatus = "draft" | "invited" | "active" | "suspended";
+export type AuthenticationMethod = "email_password" | "passwordless" | "sso";
+export type PermissionAction = "view" | "create" | "edit" | "approve" | "export" | "admin";
+export type PermissionRiskLevel = "Low" | "Medium" | "High" | "Critical";
 export type AiAccessStatus = "enabled" | "restricted" | "disabled";
 export type AiAccessLevel = "disabled" | "view_only" | "clinical_assist" | "clinical_review" | "ai_administrator";
 export type DataAccessLevel = "assigned_department" | "assigned_clinic" | "cross_clinic_view_only";
 export type ClinicUsersSort = "name" | "recently_updated" | "last_login" | "status";
 export type AuditResult = "success" | "warning" | "blocked";
-export type PermissionTemplate = "role_recommended" | "custom_permissions" | "claim_review";
 
 export interface ClinicAccessScope {
   clinicId: string;
@@ -107,6 +130,19 @@ export interface ClinicUsersSummary {
   pendingInvitations: number;
   suspendedUsers: number;
   aiEnabledUsers: number;
+  disabledUsers: number;
+  lockedAccounts: number;
+  recentlyActiveUsers: number;
+  privilegedAccounts: number;
+  newUsersThisMonth: number;
+  inactiveOver30Days: number;
+  failedLoginAlerts: number;
+  passwordResetRequests: number;
+  suspiciousActivity: number;
+  mfaEnabledUsers: number;
+  dormantAccounts: number;
+  criticalSecurityAlerts: number;
+  neverLoggedIn: number;
 }
 
 export interface ClinicUsersResponse {
@@ -153,7 +189,18 @@ export interface CreateUserFormValues {
   accessScope: CreateUserAccessScope;
   primaryRole: CreateUserRole | "";
   additionalRoles: CreateUserRole[];
-  accountStatus: "draft" | "invited";
+  permissionTemplate: PermissionTemplate;
+  customPermissions: CustomPermissionId[];
+  privilegedReason: string;
+  aiEnabled: boolean;
+  aiPermissionLevels: Record<AiPermissionId, AiPermissionLevel>;
+  patientDataAccess: PatientDataAccess;
+  clinicalRecordAccess: ClinicalRecordPermission[];
+  claimDataAccess: ClaimDataPermission[];
+  auditLogAccess: AuditLogAccess;
+  exportPermissions: ExportPermission[];
+  accountStatus: AccountStatus;
+  authenticationMethod: AuthenticationMethod;
   sessionTimeout: string;
   language: "en" | "th";
   timezone: string;
@@ -165,6 +212,16 @@ export interface CreateUserFormValues {
   inviteLanguage: "en" | "th";
   inviteExpiry: string;
   welcomeMessage: string;
+  loginRestriction: string;
+  ipRestriction: string;
+  temporaryAccess: boolean;
+  securityNotification: boolean;
+  lockOnRiskDetection: boolean;
+  scheduleActivation: boolean;
+  setTemporaryPassword: boolean;
+  notifyAdministrator: boolean;
+  acknowledgedAiSuggestion: boolean;
+  permissionMatrix: Record<string, PermissionAction[]>;
 }
 
 export interface UpdateClinicUserInput {

@@ -44,7 +44,7 @@ export function ClinicUsersToolbar({
   }, [query.accessScope, query.aiAccessStatus, query.clinicId, query.departmentId, query.invitationStatus, query.role, query.search, query.sort, query.status]);
 
   return (
-    <div className="border-b border-slate-200 p-4">
+    <div className="sticky top-16 z-20 border-b border-slate-200 bg-white/95 p-4 backdrop-blur">
       <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
         <div className="grid flex-1 gap-2 md:grid-cols-2 xl:grid-cols-[minmax(260px,1.6fr)_repeat(4,minmax(132px,1fr))] 2xl:grid-cols-[minmax(280px,1.7fr)_repeat(7,minmax(132px,1fr))]">
           <label className="relative block md:col-span-2 xl:col-span-1">
@@ -88,8 +88,23 @@ export function ClinicUsersToolbar({
           ))}
         </div>
       ) : null}
+      <div className="mt-3 flex flex-wrap gap-2" aria-label="Quick filters">
+        <QuickFilter label="Recently Added" onClick={() => onChange({ sort: "recently_updated", page: 1 })} />
+        <QuickFilter label="Recently Active" onClick={() => onChange({ sort: "last_login", status: "active", page: 1 })} />
+        <QuickFilter label="Never Logged In" onClick={() => onChange({ status: "invited", page: 1 })} />
+        <QuickFilter label="Inactive Users" onClick={() => onChange({ status: "inactive", page: 1 })} />
+        <QuickFilter label="Privileged Users" onClick={() => onChange({ role: "clinic_admin", page: 1 })} />
+        <QuickFilter label="AI Enabled" onClick={() => onChange({ aiAccessStatus: "enabled", page: 1 })} />
+        <QuickFilter label="Locked Accounts" onClick={() => onChange({ status: "locked", page: 1 })} />
+        <QuickFilter label="Pending Invitation" onClick={() => onChange({ status: "invited", invitationStatus: "sent", page: 1 })} />
+        <QuickFilter label="Disabled Users" onClick={() => onChange({ status: "suspended", page: 1 })} />
+      </div>
     </div>
   );
+}
+
+function QuickFilter({ label, onClick }: { label: string; onClick: () => void }) {
+  return <button type="button" onClick={onClick} className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-black text-slate-700 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500">{label}</button>;
 }
 
 function FilterSelect<TValue extends string>({

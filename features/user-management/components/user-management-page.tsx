@@ -12,6 +12,7 @@ import { ClinicUsersKpis } from "./clinic-users-kpis";
 import { ClinicUsersTable } from "./clinic-users-table";
 import { ClinicUsersToolbar } from "./clinic-users-toolbar";
 import { InviteUserDialog } from "./invite-user-dialog";
+import { SecurityIntelligencePanel } from "./security-intelligence-panel";
 import type { UserAction } from "./clinic-user-actions";
 import { useUserManagement } from "../hooks/use-user-management";
 import type { ClinicUser, ClinicUserAiPermissions } from "../types/user-management.types";
@@ -57,6 +58,10 @@ function ClinicUsersWorkspace() {
       workspace.actionMutation.mutate({ userId: user.id, action: "resend" });
       return;
     }
+    if (action === "reset_password") {
+      workspace.setToast({ title: `Password reset requested for ${user.fullName} - บันทึกใน Audit Log แล้ว`, tone: "info" });
+      return;
+    }
     if (action === "unlock") {
       setConfirm({ user, action });
       return;
@@ -65,7 +70,7 @@ function ClinicUsersWorkspace() {
       setConfirm({ user, action });
       return;
     }
-    if (action === "reactivate") {
+    if (action === "reactivate" || action === "enable") {
       workspace.actionMutation.mutate({ userId: user.id, action: "reactivate" });
       return;
     }
@@ -93,7 +98,7 @@ function ClinicUsersWorkspace() {
   }
 
   function openUserDetail(userId: string) {
-    router.push(`/admin/users/${userId}`);
+    workspace.setSelectedUserId(userId);
   }
 
   function suspendSelected(reason: string) {
@@ -110,13 +115,14 @@ function ClinicUsersWorkspace() {
         <Sidebar />
         <div className="min-w-0">
           <ClinicUsersHeader onExport={() => workspace.exportMutation.mutate()} exportPending={workspace.exportMutation.isPending} />
-          <div className="px-4 py-6 sm:px-7">
+          <div className="px-3 py-4 sm:px-5 2xl:px-7">
             <ClinicUsersKpis summary={data?.summary} loading={workspace.usersQuery.isLoading} />
-            <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm" aria-labelledby="clinic-users-directory-title">
-              <div className="flex flex-col gap-2 p-4 sm:flex-row sm:items-start sm:justify-between">
+            <SecurityIntelligencePanel summary={data?.summary} />
+            <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm" aria-labelledby="clinic-users-directory-title">
+              <div className="flex flex-col gap-2 border-b border-slate-100 p-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
-                  <h2 id="clinic-users-directory-title" className="text-lg font-black text-[#0F2A5F]">User List</h2>
-                  <p className="text-sm leading-6 text-slate-500">Search, filter and manage users by status, role, clinic scope, access scope and AI permission.</p>
+                  <h2 id="clinic-users-directory-title" className="text-lg font-black text-[#0F2A5F]">Enterprise Identity & Access Directory</h2>
+                  <p className="text-sm leading-6 text-slate-500">Search, filter and manage users by role, organization, clinic scope, security posture, audit state and AI permission.</p>
                 </div>
                 {workspace.usersQuery.isFetching && !workspace.usersQuery.isLoading ? <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-black text-blue-800">Refreshing...</span> : null}
               </div>
@@ -151,6 +157,8 @@ function ClinicUsersWorkspace() {
         onRevokeSessions={(userId) => setConfirm({ user: selectedUser ?? placeholderUser(userId), action: "revoke_sessions" })}
         onUnlock={(userId) => setConfirm({ user: selectedUser ?? placeholderUser(userId), action: "unlock" })}
         onUpdateAi={(userId, permissions, reason) => updateAi(workspace, userId, permissions, reason)}
+        onEdit={(userId) => { workspace.setSelectedUserId(userId); workspace.setToast({ title: "Edit user opened in drawer context - mock action", tone: "info" }); }}
+        onViewAudit={(userId) => { workspace.setSelectedUserId(userId); workspace.setToast({ title: "Audit timeline available in drawer - mock action", tone: "info" }); }}
         aiPending={workspace.aiAccessMutation.isPending}
       />
 
@@ -176,7 +184,7 @@ function ClinicUsersWorkspace() {
         onCancel={() => setConfirm(null)}
         onConfirm={(reason) => {
           if (!confirm) return;
-          if (confirm.action === "suspend" || confirm.action === "cancel_invite") {
+          if (confirm.action === "suspend" || confirm.action === "cancel_invite" || confirm.action === "disable" || confirm.action === "lock") {
             workspace.suspendMutation.mutate({ userId: confirm.user.id, payload: { reason } });
           } else if (confirm.action === "unlock") {
             workspace.actionMutation.mutate({ userId: confirm.user.id, action: "unlock" });
@@ -242,7 +250,7 @@ function ConfirmationDialog({
 }) {
   const [reason, setReason] = useState("");
   if (!confirmation) return null;
-  const needsReason = confirmation.action === "suspend" || confirmation.action === "cancel_invite";
+  const needsReason = confirmation.action === "suspend" || confirmation.action === "cancel_invite" || confirmation.action === "disable" || confirmation.action === "lock";
   return (
     <div className="fixed inset-0 z-[70] grid place-items-center bg-slate-950/45 p-4">
       <section role="dialog" aria-modal="true" aria-labelledby="confirm-action-title" className="w-full max-w-lg rounded-2xl bg-white p-5 shadow-xl">

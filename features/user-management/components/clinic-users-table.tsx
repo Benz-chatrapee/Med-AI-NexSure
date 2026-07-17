@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { aiAccessLevelLabels, dataAccessLevelLabels, roleLabels } from "../constants/clinic-user-options";
 import type { ClinicUser, ClinicUsersQuery, ClinicUsersResponse } from "../types/user-management.types";
+import { getAuditStatus, getSecurityStatus, isPrivilegedUser } from "../utils/user-list-intelligence";
 import { ClinicUserActions, type UserAction } from "./clinic-user-actions";
 import { ClinicUserMobileCard } from "./clinic-user-mobile-card";
 import { ClinicUsersEmptyState } from "./clinic-users-empty-state";
@@ -49,8 +50,8 @@ export function ClinicUsersTable({
 
   return (
     <>
-      <div className="hidden max-h-[calc(100vh-19rem)] overflow-auto lg:block">
-        <table className="w-full min-w-[1420px] border-separate border-spacing-0 text-left text-sm" aria-label="User management directory">
+      <div className="hidden max-h-[calc(100vh-23rem)] overflow-auto lg:block 2xl:max-h-[calc(100vh-21rem)]">
+        <table className="w-full min-w-[1680px] border-separate border-spacing-0 text-left text-sm" aria-label="User management directory">
           <caption className="sr-only">Clinic users with role, clinic access, AI access, account status and actions</caption>
           <thead className="sticky top-0 z-20">
             <tr className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500 shadow-[0_1px_0_#E2E8F0]">
@@ -58,7 +59,7 @@ export function ClinicUsersTable({
                 <Checkbox checked={allSelected} onChange={(event) => onTogglePage(event.currentTarget.checked, pageUserIds)} aria-label="Select all users on current page" className="h-4 w-4 accent-blue-800" />
               </th>
               <th scope="col" className="sticky left-0 z-30 border-b border-slate-200 bg-slate-50 px-4 py-3 font-black">User</th>
-              {["Email", "Role", "Organization", "Clinic / Access Scope", "AI Permission", "Status", "Invitation Status", "Last Login", "Updated At", "Actions"].map((head) => (
+              {["Email", "Role", "Department", "Organization", "Clinic", "Access Scope", "AI Permission", "Status", "Security", "Audit", "Last Login", "Updated", "Actions"].map((head) => (
                 <th key={head} scope="col" className="border-b border-slate-200 px-4 py-3 font-black">{head}</th>
               ))}
             </tr>
@@ -69,43 +70,45 @@ export function ClinicUsersTable({
                 <td className="border-b border-slate-100 px-4 py-4">
                   <Checkbox checked={selectedIds.has(user.id)} onChange={(event) => onToggleUser(user.id, event.currentTarget.checked)} aria-label={`Select ${user.fullName}`} className="h-4 w-4 accent-blue-800" />
                 </td>
-                <td className="sticky left-0 z-10 border-b border-slate-100 bg-white px-4 py-4 group-hover:bg-blue-50">
+                <td className="sticky left-0 z-10 border-b border-slate-100 bg-white px-4 py-3 group-hover:bg-blue-50">
                   <div className="flex items-center gap-3">
-                    <button type="button" onClick={() => onOpenUser(user.id)} className="grid h-10 w-10 place-items-center rounded-xl bg-blue-50 text-sm font-black text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500">{user.initials}</button>
+                    <button type="button" onClick={() => onOpenUser(user.id)} className="grid h-9 w-9 place-items-center rounded-lg bg-blue-50 text-sm font-black text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500">{user.initials}</button>
                     <div>
                       <button type="button" onClick={() => onOpenUser(user.id)} className="font-black text-[#0F2A5F] underline-offset-2 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500">{user.fullName}</button>
-                      <div className="text-xs font-semibold text-slate-500">{user.employeeId}</div>
+                      <div className="text-xs font-semibold text-slate-500">{user.employeeId}{isPrivilegedUser(user) ? <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-black text-amber-900">Privileged</span> : null}</div>
                     </div>
                   </div>
                 </td>
-                <td className="border-b border-slate-100 px-4 py-4 text-slate-700">{user.email}</td>
-                <td className="border-b border-slate-100 px-4 py-4"><Badge tone="neutral">{roleLabels[user.primaryRole]}</Badge></td>
-                <td className="border-b border-slate-100 px-4 py-4">
-                  <strong className="text-xs text-slate-800">NexSure Health</strong>
-                  <div className="mt-1 text-xs font-semibold text-slate-500">{user.departmentName ?? "Unassigned"}</div>
+                <td className="border-b border-slate-100 px-4 py-3 text-slate-700">{user.email}</td>
+                <td className="border-b border-slate-100 px-4 py-3"><RoleBadge user={user} /></td>
+                <td className="border-b border-slate-100 px-4 py-3 text-xs font-bold text-slate-700">{user.departmentName ?? "Unassigned"}</td>
+                <td className="border-b border-slate-100 px-4 py-3">
+                  <strong className="text-xs text-slate-800">NexSure Healthcare</strong>
+                  <div className="mt-1 text-xs font-semibold text-slate-500">Bangkok region</div>
                 </td>
-                <td className="border-b border-slate-100 px-4 py-4">
+                <td className="border-b border-slate-100 px-4 py-3">
                   <div className="max-w-48">
                     <strong className="text-xs text-slate-800">{user.clinicScopes[0]?.clinicName}</strong>
                     <div className="mt-1 text-xs font-semibold text-slate-500">
                       {user.clinicScopes.length > 1 ? `+${user.clinicScopes.length - 1} additional clinic${user.clinicScopes.length > 2 ? "s" : ""}` : "Assigned clinic only"}
                     </div>
-                    <div className="text-xs text-slate-500">{dataAccessLevelLabels[user.clinicScopes[0]?.dataAccessLevel ?? "assigned_clinic"]}</div>
                   </div>
                 </td>
-                <td className="border-b border-slate-100 px-4 py-4"><AiAccessBadge status={user.aiAccessStatus} level={user.aiAccessLevel} /></td>
-                <td className="border-b border-slate-100 px-4 py-4"><StatusBadge status={user.status} /></td>
-                <td className="border-b border-slate-100 px-4 py-4"><InvitationBadge invited={user.status === "invited"} /></td>
-                <td className="border-b border-slate-100 px-4 py-4">
+                <td className="border-b border-slate-100 px-4 py-3"><AccessScope user={user} /></td>
+                <td className="border-b border-slate-100 px-4 py-3"><AiAccessBadge status={user.aiAccessStatus} level={user.aiAccessLevel} /></td>
+                <td className="border-b border-slate-100 px-4 py-3"><StatusBadge status={user.status} /></td>
+                <td className="border-b border-slate-100 px-4 py-3"><SecurityBadge user={user} /></td>
+                <td className="border-b border-slate-100 px-4 py-3"><AuditBadge user={user} /></td>
+                <td className="border-b border-slate-100 px-4 py-3">
                   <strong className="text-xs text-slate-800">{formatRelative(user.lastLoginAt ?? user.lastActiveAt)}</strong>
                   <div className="text-xs text-slate-500">{formatDate(user.lastLoginAt ?? user.lastActiveAt)}</div>
                   <span className="sr-only">AI access level {aiAccessLevelLabels[user.aiAccessLevel]}</span>
                 </td>
-                <td className="border-b border-slate-100 px-4 py-4">
+                <td className="border-b border-slate-100 px-4 py-3">
                   <strong className="text-xs text-slate-800">{formatRelative(user.updatedAt)}</strong>
                   <div className="text-xs text-slate-500">{formatDate(user.updatedAt)}</div>
                 </td>
-                <td className="border-b border-slate-100 px-4 py-4"><ClinicUserActions user={user} onAction={onAction} /></td>
+                <td className="border-b border-slate-100 px-4 py-3"><ClinicUserActions user={user} onAction={onAction} /></td>
               </tr>
             ))}
           </tbody>
@@ -148,8 +151,28 @@ function TableSkeleton() {
   );
 }
 
-function InvitationBadge({ invited }: { invited: boolean }) {
-  return invited ? <Badge tone="warning">Invitation Sent</Badge> : <Badge tone="neutral">Not Invited</Badge>;
+function RoleBadge({ user }: { user: ClinicUser }) {
+  const tone = user.primaryRole === "clinic_admin" || user.primaryRole === "organization_admin" || user.primaryRole === "system_admin" ? "warning" : user.primaryRole === "doctor" || user.primaryRole === "nurse" || user.primaryRole === "pharmacist" ? "info" : user.primaryRole === "claim_reviewer" || user.primaryRole === "auditor_compliance" || user.primaryRole === "compliance_officer" ? "danger" : "neutral";
+  return <div className="flex flex-col gap-1"><Badge tone={tone}>{roleLabels[user.primaryRole]}</Badge>{user.additionalRoles.length ? <span className="text-xs font-semibold text-slate-500">+{user.additionalRoles.length} role</span> : null}</div>;
+}
+
+function AccessScope({ user }: { user: ClinicUser }) {
+  const scope = user.clinicScopes[0]?.dataAccessLevel ?? "assigned_clinic";
+  const label = scope === "cross_clinic_view_only" ? "Organization / Read Only" : scope === "assigned_department" ? "Department / Read & Write" : "Clinic / Read & Write";
+  const tone = scope === "cross_clinic_view_only" ? "warning" : "info";
+  return <div className="space-y-1"><Badge tone={tone}>{label}</Badge><div className="text-xs font-semibold text-slate-500">{dataAccessLevelLabels[scope]}</div></div>;
+}
+
+function SecurityBadge({ user }: { user: ClinicUser }) {
+  const status = getSecurityStatus(user);
+  const tone = status === "Critical" ? "danger" : status === "Review" ? "warning" : status === "MFA Ready" ? "success" : "neutral";
+  return <div className="space-y-1"><Badge tone={tone}>{status}</Badge><div className="text-xs font-semibold text-slate-500">{user.security.failedAttempts} failed / {user.security.activeSessions} sessions</div></div>;
+}
+
+function AuditBadge({ user }: { user: ClinicUser }) {
+  const status = getAuditStatus(user);
+  const tone = status === "Current" ? "success" : status === "Review Due" ? "warning" : "danger";
+  return <div className="space-y-1"><Badge tone={tone}>{status}</Badge><div className="text-xs font-semibold text-slate-500">{user.auditTrail[0]?.event ?? "No audit events"}</div></div>;
 }
 
 function formatDate(value?: string) {

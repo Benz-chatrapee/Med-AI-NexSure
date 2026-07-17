@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import Link from "next/link";
 import { supportedRoles } from "./login-content";
 import { PasswordField } from "./password-field";
 
@@ -86,9 +87,9 @@ export function LoginForm() {
                 <Checkbox className="h-4 w-4 rounded border-slate-300 text-[#2563EB] focus:ring-[#2563EB]" />
                 Remember me
               </label>
-              <a href="#" className="rounded font-bold text-[#1E3A8A] hover:text-[#2563EB] focus:outline-none focus:ring-2 focus:ring-[#2563EB]">
+              <Link href="/forgot-password" className="rounded font-bold text-[#1E3A8A] hover:text-[#2563EB] focus:outline-none focus:ring-2 focus:ring-[#2563EB]">
                 Forgot Password?
-              </a>
+              </Link>
             </div>
             <Button className="h-13 w-full rounded-2xl bg-[#1E3A8A] px-4 py-4 text-sm font-bold text-white shadow-lg shadow-blue-900/20 transition hover:-translate-y-0.5 hover:bg-[#2563EB] hover:shadow-[0_22px_60px_rgba(37,99,235,.20)] focus:outline-none focus:ring-4 focus:ring-blue-600/20">
               Sign In

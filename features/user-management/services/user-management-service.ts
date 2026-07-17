@@ -15,6 +15,7 @@ import type {
   UpdateUserRolesInput,
 } from "../types/user-management.types";
 import { getAiAccessStatus } from "../constants/clinic-user-options";
+import { getUserListIntelligence } from "../utils/user-list-intelligence";
 
 let clinicUsers = [...clinicUsersMock];
 
@@ -140,8 +141,8 @@ export const userManagementService = {
           dataAccessLevel: accessScopeToDataAccess(payload.accessScope),
         },
       ],
-      aiAccessStatus: "restricted",
-      aiAccessLevel: "view_only",
+      aiAccessStatus: payload.aiEnabled ? "enabled" : "disabled",
+      aiAccessLevel: payload.aiEnabled ? "clinical_assist" : "disabled",
       aiPermissions: {
         viewAiSummary: true,
         generateSoapDraft: false,
@@ -255,12 +256,10 @@ function updateUser(userId: string, updater: (user: ClinicUser) => ClinicUser) {
 }
 
 function getSummary(users: ClinicUser[]): ClinicUsersSummary {
+  const intelligence = getUserListIntelligence(users);
   return {
-    totalUsers: users.length,
-    activeUsers: users.filter((user) => user.status === "active").length,
-    pendingInvitations: users.filter((user) => user.status === "invited").length,
+    ...intelligence,
     suspendedUsers: users.filter((user) => user.status === "suspended" || user.status === "locked" || user.status === "inactive").length,
-    aiEnabledUsers: users.filter((user) => user.aiAccessStatus === "enabled").length,
   };
 }
 
@@ -320,7 +319,7 @@ function clinicNameFor(clinicId: string) {
 
 function accessScopeToDataAccess(scope: CreateUserFormValues["accessScope"]) {
   if (scope === "organization_wide") return "cross_clinic_view_only";
-  if (scope === "assigned_clinics") return "assigned_clinic";
+  if (scope === "selected_clinics" || scope === "primary_clinic") return "assigned_clinic";
   return "assigned_clinic";
 }
 

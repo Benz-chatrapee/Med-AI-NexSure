@@ -18,14 +18,16 @@ export function getInitials(firstName: string, lastName: string) {
 export function calculateCompletion(values: CreateUserFormValues) {
   const needsLicense = values.primaryRole === "doctor" || values.primaryRole === "pharmacist";
   const checks = [
-    values.firstName.trim().length >= 2,
-    values.lastName.trim().length >= 2,
+    values.firstName.trim().length >= 1,
+    values.lastName.trim().length >= 1,
+    values.displayName.trim().length >= 1,
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email),
     Boolean(values.organizationId),
-    Boolean(values.clinicId),
+    values.accessScope === "assigned_cases" || Boolean(values.clinicId),
     Boolean(values.primaryRole),
     !needsLicense || Boolean(values.licenseNumber.trim()),
     Boolean(values.effectiveDate),
+    values.accountStatus !== "draft" || !values.sendInvitation,
   ];
   return Math.round((checks.filter(Boolean).length / checks.length) * 100);
 }

@@ -2,7 +2,11 @@ import {
   BrainCircuit,
   CheckCircle2,
   Clock3,
+  KeyRound,
+  LockKeyhole,
+  ShieldAlert,
   ShieldCheck,
+  TrendingUp,
   UserPlus,
   Users,
   UserX,
@@ -36,6 +40,8 @@ export const departmentOptions: SelectOption[] = [
 ];
 
 export const roleOptions: SelectOption<ClinicUserRole>[] = [
+  { value: "system_admin", label: "System Account" },
+  { value: "organization_admin", label: "Organization Admin" },
   { value: "clinic_admin", label: "Clinic Admin" },
   { value: "clinic_manager", label: "Clinic Manager" },
   { value: "doctor", label: "Doctor" },
@@ -43,6 +49,7 @@ export const roleOptions: SelectOption<ClinicUserRole>[] = [
   { value: "pharmacist", label: "Pharmacist" },
   { value: "clinic_staff", label: "Clinic Staff" },
   { value: "claim_reviewer", label: "Claim Reviewer" },
+  { value: "auditor_compliance", label: "Auditor / Compliance" },
   { value: "compliance_officer", label: "Compliance Officer" },
   { value: "executive", label: "Executive" },
 ];
@@ -107,13 +114,24 @@ export function getKpiDefinitions(summary: {
   pendingInvitations: number;
   suspendedUsers: number;
   aiEnabledUsers: number;
+  disabledUsers?: number;
+  lockedAccounts?: number;
+  recentlyActiveUsers?: number;
+  privilegedAccounts?: number;
+  newUsersThisMonth?: number;
+  inactiveOver30Days?: number;
 }): KpiCardDefinition[] {
   return [
     { label: "Total Users", value: summary.totalUsers, helper: "All clinic and organization accounts", semantic: "info", icon: Users },
     { label: "Active Users", value: summary.activeUsers, helper: "พร้อมใช้งานภายในสิทธิ์ที่กำหนด", semantic: "success", icon: CheckCircle2 },
+    { label: "Disabled Users", value: summary.disabledUsers ?? summary.suspendedUsers, helper: "Suspended or inactive accounts", semantic: "danger", icon: UserX },
     { label: "Pending Invitations", value: summary.pendingInvitations, helper: "รอผู้ใช้งานตอบรับคำเชิญ", semantic: "warning", icon: UserPlus },
-    { label: "Disabled / Locked Users", value: summary.suspendedUsers, helper: "ต้องมีเหตุผลและ audit trail", semantic: "danger", icon: UserX },
+    { label: "Locked Accounts", value: summary.lockedAccounts ?? 0, helper: "Security intervention required", semantic: "danger", icon: LockKeyhole },
+    { label: "Recently Active", value: summary.recentlyActiveUsers ?? summary.activeUsers, helper: "Active within the last 7 days", semantic: "success", icon: TrendingUp },
     { label: "AI-Enabled Users", value: summary.aiEnabledUsers, helper: "Decision support access only", semantic: "info", icon: BrainCircuit },
+    { label: "Privileged Accounts", value: summary.privilegedAccounts ?? 0, helper: "Admin, audit, broad-scope access", semantic: "warning", icon: ShieldAlert },
+    { label: "New This Month", value: summary.newUsersThisMonth ?? 0, helper: "Identity onboarding velocity", semantic: "info", icon: KeyRound },
+    { label: "Inactive >30 Days", value: summary.inactiveOver30Days ?? 0, helper: "ควรตรวจสอบสิทธิ์และความจำเป็น", semantic: "warning", icon: Clock3 },
   ];
 }
 

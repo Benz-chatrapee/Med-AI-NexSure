@@ -1,360 +1,225 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import {
-  Activity,
-  AlertTriangle,
-  BarChart3,
-  Bell,
-  BrainCircuit,
-  Check,
-  ChevronDown,
-  ClipboardCheck,
-  Download,
-  Edit3,
-  FileClock,
-  LayoutDashboard,
-  Search,
-  Settings,
-  ShieldCheck,
-  Stethoscope,
-  UserCog,
-  Users,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { roleLabels } from "../constants/clinic-user-options";
-import { clinicUsersMock } from "../data/clinic-users.mock";
-import type { ClinicUser } from "../types/user-management.types";
-import { Badge, StatusBadge } from "./status-badges";
-
-type DetailTab = "overview" | "access" | "cases" | "ai" | "security" | "audit";
-type DateRange = "Today" | "Last 7 Days" | "Last 30 Days" | "Custom";
+import { ArrowLeftRight, Bell, Camera, ChevronRight, Contact, HelpCircle, LogOut, Mail, PersonStanding, Phone, Save, Settings, Shield, Stethoscope, UserCog, UserRound } from "lucide-react";
+import { useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import { userDetailEditSchema, type UserDetailEditFormValues } from "../schemas/user-detail-schema";
 
 interface UserDetailWorkspaceProps {
   userId: string;
 }
 
-interface CaseRow {
-  visitId: string;
-  patient: string;
-  visitDate: string;
-  role: string;
-  visitStatus: string;
-  score: number;
-  claimStatus: "Ready" | "Needs Review" | "Not Ready";
-  evidenceGaps: number;
-  cost: string;
-}
+const departments = ["Oncology", "Cardiology", "Pediatrics", "General Medicine", "Administration"];
+const languages = ["English (US)", "Thai (TH)", "Mandarin", "Japanese"] as const;
+const clinics = ["Bangkok Central Medical", "Sukhumvit Specialist Center", "Thonburi Health Hub"] as const;
+const roleCards = [
+  ["Clinical Practitioner", "Full patient record access & diagnostics"],
+  ["AI Data Reviewer", "Permission to validate AI clinical models"],
+  ["System Admin", "Restricted to organization managers only"],
+] as const;
 
-const tabs: { id: DetailTab; label: string }[] = [
-  { id: "overview", label: "Overview" },
-  { id: "access", label: "Access & Roles" },
-  { id: "cases", label: "Assigned Cases" },
-  { id: "ai", label: "AI Governance & Usage" },
-  { id: "security", label: "Security" },
-  { id: "audit", label: "Activity & Audit Trail" },
-];
-
-const dateRanges: DateRange[] = ["Today", "Last 7 Days", "Last 30 Days", "Custom"];
-
-const navItems = [
-  { label: "Main Dashboard", href: "/dashboard", icon: LayoutDashboard, active: false },
-  { label: "Patient Management", href: "#", icon: Users, active: false },
-  { label: "Visit Management", href: "/visit-management", icon: Stethoscope, active: false },
-  { label: "AI Copilot", href: "/ai-clinical-engine", icon: BrainCircuit, active: false },
-  { label: "Claim Readiness", href: "/claim-readiness", icon: ClipboardCheck, active: false },
-  { label: "Evidence Package", href: "#", icon: Download, active: false },
-  { label: "User Administration", href: "/admin/users", icon: UserCog, active: true },
-  { label: "Roles & Permissions", href: "#", icon: ShieldCheck, active: false },
-  { label: "Audit & Compliance", href: "/audit-compliance", icon: FileClock, active: false },
-  { label: "Admin Settings", href: "#", icon: Settings, active: false },
-];
-
-const caseRows: CaseRow[] = [
-  { visitId: "VST-2026-07109", patient: "Araya S.", visitDate: "10 Jul 2026", role: "Doctor", visitStatus: "Completed", score: 94, claimStatus: "Ready", evidenceGaps: 0, cost: "Normal" },
-  { visitId: "VST-2026-07098", patient: "Somchai K.", visitDate: "10 Jul 2026", role: "Doctor", visitStatus: "Pending Evidence", score: 72, claimStatus: "Needs Review", evidenceGaps: 2, cost: "Alert" },
-  { visitId: "VST-2026-07072", patient: "Masked Patient", visitDate: "9 Jul 2026", role: "Clinical Reviewer", visitStatus: "In Consultation", score: 58, claimStatus: "Not Ready", evidenceGaps: 4, cost: "Normal" },
-  { visitId: "VST-2026-07061", patient: "Narin P.", visitDate: "9 Jul 2026", role: "Doctor", visitStatus: "Completed", score: 88, claimStatus: "Ready", evidenceGaps: 1, cost: "High" },
-];
+const defaultValues: UserDetailEditFormValues = {
+  firstName: "Ananya",
+  lastName: "Srisuk",
+  displayName: "Dr. Ananya Srisuk",
+  employeeId: "NEX-8821",
+  department: "Oncology",
+  email: "ananya.s@medai-nexsure.com",
+  phone: "+66 81 234 5678",
+  preferredLanguage: "Thai (TH)",
+  defaultClinic: "Bangkok Central Medical",
+  accountStatus: true,
+  assignedClinics: ["Bangkok Central Medical", "Sukhumvit Specialist Center"],
+  assignedRoles: ["Clinical Practitioner", "AI Data Reviewer"],
+};
 
 export function UserDetailWorkspace({ userId }: UserDetailWorkspaceProps) {
-  const [activeTab, setActiveTab] = useState<DetailTab>("overview");
-  const [dateRange, setDateRange] = useState<DateRange>("Last 30 Days");
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [modalAction, setModalAction] = useState<string | null>(null);
-  const [reason, setReason] = useState("");
   const [toast, setToast] = useState<string | null>(null);
-  const [caseSearch, setCaseSearch] = useState("");
-  const user = useMemo(() => clinicUsersMock.find((item) => item.id === userId) ?? clinicUsersMock[0], [userId]);
-  const primaryRoleLabel = roleLabels[user.primaryRole];
-  const licenseLabel = user.professionalLicense ? ` - Medical License ${user.professionalLicense}` : "";
+  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
+  const [isEditing, setIsEditing] = useState(true);
+  const form = useForm<UserDetailEditFormValues>({ resolver: zodResolver(userDetailEditSchema), defaultValues, mode: "onBlur" });
+  const { register, handleSubmit, setValue, control, formState: { errors, isDirty, isSubmitting } } = form;
+  const assignedClinics = useWatch({ control, name: "assignedClinics" });
+  const assignedRoles = useWatch({ control, name: "assignedRoles" });
+  const accountStatus = useWatch({ control, name: "accountStatus" });
+  const formName = useWatch({ control, name: "displayName" }) || "Dr. Ananya Srisuk";
 
-  const filteredCases = useMemo(() => {
-    const query = caseSearch.trim().toLowerCase();
-    if (!query) return caseRows;
-    return caseRows.filter((row) => Object.values(row).join(" ").toLowerCase().includes(query));
-  }, [caseSearch]);
-
-  function showToast(message: string) {
+  function flash(message: string) {
     setToast(message);
-    window.setTimeout(() => setToast(null), 2800);
+    window.setTimeout(() => setToast(null), 2600);
   }
 
-  function openAction(action: string) {
-    setReason("");
-    setModalAction(action);
-    setMenuOpen(false);
+  async function save(values: UserDetailEditFormValues) {
+    await new Promise((resolve) => window.setTimeout(resolve, 650));
+    form.reset(values);
+    setIsEditing(false);
+    flash("Saved changes / บันทึกข้อมูลผู้ใช้เรียบร้อยแล้ว");
   }
 
-  function confirmAction() {
-    if (reason.trim().length < 10) {
-      showToast("กรุณาระบุเหตุผลอย่างน้อย 10 ตัวอักษร");
+  function cancelEdit() {
+    if (isDirty) {
+      setShowUnsavedDialog(true);
       return;
     }
-    showToast(`${modalAction ?? "Action"} completed - ระบบบันทึก Audit Log แล้ว`);
-    setModalAction(null);
+    form.reset(defaultValues);
+    setIsEditing(false);
+  }
+
+  function removeClinic(clinic: string) {
+    setValue("assignedClinics", assignedClinics.filter((item) => item !== clinic), { shouldDirty: true, shouldValidate: true });
+  }
+
+  function toggleRole(role: string, checked: boolean) {
+    setValue("assignedRoles", checked ? [...assignedRoles, role] : assignedRoles.filter((item) => item !== role), { shouldDirty: true, shouldValidate: true });
   }
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#F8FAFC] text-slate-950">
-      <div className="grid min-h-screen grid-cols-1 min-[1040px]:grid-cols-[248px_minmax(0,1fr)]">
-        <Sidebar />
-        <div className="min-w-0 overflow-x-hidden">
-          <Topbar />
-          <div className="w-full min-w-0 px-4 pb-28 pt-6 sm:px-7">
-            <div className="mb-4 text-sm text-slate-500">Admin Settings / User Administration / <b className="text-[#1E3A8A]">User Detail</b></div>
-            <section className="relative overflow-visible rounded-3xl border border-blue-200 bg-white p-6 shadow-[0_12px_32px_rgba(15,42,95,.08)] before:absolute before:left-0 before:top-0 before:h-full before:w-1.5 before:bg-[#1E3A8A]">
-              <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-                <div className="flex gap-4">
-                  <div className="grid h-20 w-20 shrink-0 place-items-center rounded-[22px] border-4 border-white bg-[#1E3A8A] text-2xl font-black text-white shadow-lg">NP</div>
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h1 className="text-2xl font-black text-slate-950 sm:text-[27px]">{user.fullName}</h1>
-                      <Badge tone="info">{primaryRoleLabel}</Badge>
-                      <StatusBadge status={user.status} />
-                    </div>
-                    <p className="mt-2 text-sm text-slate-500">{user.email} - {user.employeeId}{licenseLabel}</p>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      <Chip>NexSure Health Network</Chip>
-                      <Chip>{user.clinicScopes[0]?.clinicName ?? "Assigned Clinic"}</Chip>
-                      <Chip>{user.departmentName ?? "Unassigned Department"}</Chip>
-                      <Chip>Route ID: {userId}</Chip>
-                    </div>
-                  </div>
+    <div className="min-h-screen bg-[#f7f9fb] pb-24 font-sans text-[#191c1e]">
+      <TopNav />
+      <SideNav />
+      <main className="mx-auto max-w-[1200px] px-4 pt-20 md:ml-64">
+        <nav className="mb-6 flex items-center gap-2 text-sm" aria-label="Breadcrumb">
+          <Link className="font-medium text-[#00236f]" href="/admin/users">User Management</Link>
+          <ChevronRight className="h-4 w-4 text-[#444651]" />
+          <span className="text-[#444651]">{formName}</span>
+          <ChevronRight className="h-4 w-4 text-[#444651]" />
+          <span className="font-bold text-[#191c1e]">{isEditing ? "Edit Profile" : "View Profile"}</span>
+        </nav>
+
+        <form onSubmit={handleSubmit(save)} className="flex flex-col items-start gap-8 lg:flex-row">
+          <aside className="flex w-full flex-col gap-6 lg:w-1/3">
+            <section className="flex flex-col items-center rounded-lg border border-[#c5c5d3] bg-white p-8 text-center">
+              <div className="group relative mx-auto mb-4 w-32">
+                <div className="h-32 w-32 overflow-hidden rounded-full border-4 border-[#1e3a8a] bg-[#dce1ff]">
+                  <div className="grid h-full w-full place-items-center text-4xl font-bold text-[#00236f]">AS</div>
                 </div>
-                <div className="flex flex-wrap justify-start gap-2 lg:justify-end">
-                  <PrimaryButton onClick={() => showToast("Opening Edit User form...")}><Edit3 size={16} /> Edit User</PrimaryButton>
-                  <div className="relative">
-                    <SecondaryButton onClick={() => setMenuOpen((current) => !current)}>More Actions <ChevronDown size={16} /></SecondaryButton>
-                    {menuOpen ? (
-                      <div className="absolute right-0 z-20 mt-2 w-56 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
-                        {["Reset Password", "Lock Account", "Disable User"].map((action) => <button key={action} type="button" onClick={() => openAction(action)} className="w-full rounded-xl px-3 py-2 text-left text-sm font-bold hover:bg-blue-50">{action}</button>)}
-                        <button type="button" onClick={() => { setMenuOpen(false); showToast("Invitation email sent successfully"); }} className="w-full rounded-xl px-3 py-2 text-left text-sm font-bold hover:bg-blue-50">Resend Invitation</button>
-                      </div>
-                    ) : null}
-                  </div>
-                </div>
+                <button type="button" onClick={() => flash("Avatar upload is unavailable in prototype mode")} className="absolute bottom-1 right-1 rounded-full bg-[#00236f] p-2 text-white shadow-lg transition hover:bg-[#1e3a8a] focus:outline-none focus:ring-2 focus:ring-[#2563EB]" aria-label="Change profile photo">
+                  <Camera className="h-4 w-4" />
+                </button>
+              </div>
+              <h1 className="text-2xl font-semibold leading-8 text-[#191c1e]">{formName}</h1>
+              <p className="mb-4 text-sm text-[#444651]">Senior Oncologist • ID: NEX-8821</p>
+              <div className="mb-4 h-px w-full bg-[#c5c5d3]" />
+              <div className="flex items-center justify-between text-left text-sm">
+                <span className="text-[#444651]">Account Status</span>
+                <label className="relative inline-flex cursor-pointer items-center">
+                  <input type="checkbox" className="peer sr-only" checked={accountStatus} onChange={(event) => setValue("accountStatus", event.target.checked, { shouldDirty: true })} disabled={!isEditing} />
+                  <span className="h-6 w-11 rounded-full bg-[#e0e3e5] after:absolute after:left-0.5 after:top-0.5 after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-[#00236f] peer-checked:after:translate-x-full peer-focus:outline peer-focus:outline-2 peer-focus:outline-offset-2 peer-focus:outline-[#2563EB]" />
+                  <span className="ml-3 font-medium text-[#191c1e]">{accountStatus ? "Active" : "Inactive"}</span>
+                </label>
               </div>
             </section>
 
-            <div className="my-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-              <div><h2 className="text-base font-black">User Performance Overview</h2><p className="mt-1 text-xs text-slate-500">สรุปภาระงาน คุณภาพเอกสาร และผลลัพธ์ของเคสที่ผู้ใช้งานรายนี้รับผิดชอบ</p></div>
-              <div className="flex rounded-xl border border-slate-200 bg-[#E9EFF8] p-1">
-                {dateRanges.map((range) => <button key={range} type="button" onClick={() => { setDateRange(range); showToast(`ปรับช่วงเวลาของ KPI เป็น ${range} เรียบร้อยแล้ว`); }} className={`rounded-lg px-3 py-1.5 text-xs font-black ${dateRange === range ? "bg-white text-[#1E3A8A] shadow-sm" : "text-slate-500"}`}>{range}</button>)}
-              </div>
-            </div>
+            <section className="space-y-4 rounded-lg border border-[#c5c5d3] bg-[#f2f4f6] p-6">
+              <h2 className="text-lg font-bold">System Metadata</h2>
+              <Meta label="USER ID" value={userId === "user-001" || userId === "USR-2026-00428" ? userId : "USR_ANANYA_8821_S7"} mono />
+              <Meta label="CREATED DATE" value="October 14, 2022 • 09:12 AM" />
+              <Meta label="LAST LOGIN" value="Today • 08:45 AM (Bangkok Time)" />
+            </section>
+          </aside>
 
-            <Kpis />
-            <Tabs activeTab={activeTab} onChange={setActiveTab} />
-            {activeTab === "overview" ? <OverviewTab user={user} primaryRoleLabel={primaryRoleLabel} onTab={setActiveTab} /> : null}
-            {activeTab === "access" ? <AccessTab onSave={() => showToast("บันทึก Access Changes และสร้าง Audit Log เรียบร้อยแล้ว")} /> : null}
-            {activeTab === "cases" ? <CasesTab rows={filteredCases} search={caseSearch} onSearch={setCaseSearch} /> : null}
-            {activeTab === "ai" ? <AiTab /> : null}
-            {activeTab === "security" ? <SecurityTab onAction={openAction} /> : null}
-            {activeTab === "audit" ? <AuditTab /> : null}
-          </div>
+          <section className="w-full space-y-6 lg:w-2/3">
+            <Panel icon={<UserRound className="h-5 w-5" />} title="Personal Information">
+              <Field label="First Name" error={errors.firstName?.message}><input readOnly={!isEditing} className={inputClass(errors.firstName?.message)} {...register("firstName")} /></Field>
+              <Field label="Last Name" error={errors.lastName?.message}><input readOnly={!isEditing} className={inputClass(errors.lastName?.message)} {...register("lastName")} /></Field>
+              <Field label="Display Name" error={errors.displayName?.message} wide><input readOnly={!isEditing} className={inputClass(errors.displayName?.message)} {...register("displayName")} /></Field>
+              <Field label="Employee ID" error={errors.employeeId?.message}><input readOnly={!isEditing} className={inputClass(errors.employeeId?.message)} {...register("employeeId")} /></Field>
+              <Field label="Department" error={errors.department?.message}>
+                <select disabled={!isEditing} className={inputClass(errors.department?.message)} {...register("department")}>{departments.map((item) => <option key={item}>{item}</option>)}</select>
+              </Field>
+            </Panel>
+
+            <Panel icon={<Contact className="h-5 w-5" />} title="Contact & Preferences">
+              <Field label="Email Address" error={errors.email?.message}><IconInput icon={<Mail className="h-4 w-4" />}><input readOnly={!isEditing} className={inputClass(errors.email?.message, "pl-10")} type="email" {...register("email")} /></IconInput></Field>
+              <Field label="Phone Number" error={errors.phone?.message}><IconInput icon={<Phone className="h-4 w-4" />} tone={errors.phone ? "danger" : "muted"}><input readOnly={!isEditing} className={inputClass(errors.phone?.message, "pl-10")} type="tel" {...register("phone")} /></IconInput></Field>
+              <Field label="Preferred Language" error={errors.preferredLanguage?.message}>
+                <select disabled={!isEditing} className={inputClass(errors.preferredLanguage?.message)} {...register("preferredLanguage")}>{languages.map((item) => <option key={item}>{item}</option>)}</select>
+              </Field>
+              <Field label="Default Clinic" error={errors.defaultClinic?.message}>
+                <select disabled={!isEditing} className={inputClass(errors.defaultClinic?.message)} {...register("defaultClinic")}>{clinics.map((item) => <option key={item}>{item}</option>)}</select>
+              </Field>
+            </Panel>
+
+            <Panel icon={<Shield className="h-5 w-5" />} title="Access Control" single>
+              <div>
+                <label className="mb-3 block text-xs font-semibold uppercase tracking-[0.05em] text-[#64748B]">Assigned Clinics (Multi-select)</label>
+                <div className="flex flex-wrap gap-2">
+                  {assignedClinics.map((clinic) => <span key={clinic} className="inline-flex items-center gap-2 rounded-full border border-[#00236f]/20 bg-[#1e3a8a] px-3 py-1 text-sm font-medium text-[#90a8ff]">{clinic}<button type="button" onClick={() => removeClinic(clinic)} className="rounded-full hover:text-[#00236f] focus:outline-none focus:ring-2 focus:ring-[#2563EB]" aria-label={`Remove ${clinic}`}>x</button></span>)}
+                  <button type="button" onClick={() => setValue("assignedClinics", [...assignedClinics, "Thonburi Health Hub"], { shouldDirty: true, shouldValidate: true })} className="inline-flex items-center gap-2 rounded-full border border-dashed border-[#c5c5d3] px-3 py-1 text-sm text-[#444651] transition hover:bg-[#f2f4f6] focus:outline-none focus:ring-2 focus:ring-[#2563EB]">+ Add Clinic</button>
+                </div>
+                {errors.assignedClinics?.message ? <p className="mt-1 text-[10px] font-semibold text-[#ba1a1a]">{errors.assignedClinics.message}</p> : null}
+              </div>
+              <div className="mt-6">
+                <label className="mb-3 block text-xs font-semibold uppercase tracking-[0.05em] text-[#444651]">Assigned Roles</label>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  {roleCards.map(([role, helper]) => {
+                    const disabled = role === "System Admin";
+                    return <label key={role} className={`flex cursor-pointer items-start gap-3 rounded-lg border border-[#c5c5d3] p-3 transition hover:bg-[#f2f4f6] ${disabled ? "opacity-50" : ""}`}>
+                      <input type="checkbox" checked={assignedRoles.includes(role)} disabled={disabled || !isEditing} onChange={(event) => toggleRole(role, event.target.checked)} className="mt-1 rounded border-[#c5c5d3] text-[#00236f] focus:ring-[#00236f]" />
+                      <span><span className="block text-sm font-bold">{role}</span><span className="text-[11px] text-[#444651]">{helper}</span></span>
+                    </label>;
+                  })}
+                </div>
+                {errors.assignedRoles?.message ? <p className="mt-1 text-[10px] font-semibold text-[#ba1a1a]">{errors.assignedRoles.message}</p> : null}
+              </div>
+            </Panel>
+          </section>
+        </form>
+      </main>
+
+      <div className={`fixed bottom-0 left-0 right-0 z-50 flex flex-col items-center justify-between gap-4 border-t border-[#c5c5d3] bg-white px-4 py-4 md:left-64 md:flex-row ${isDirty ? "shadow-[0_-8px_24px_rgba(0,0,0,0.05)]" : ""}`}>
+        <div className="flex items-center gap-3">
+          <div className="grid h-8 w-8 place-items-center rounded-full bg-[#1e3a8a]/30"><ArrowLeftRight className="h-4 w-4 text-[#00236f]" /></div>
+          <div><p className="text-sm font-bold text-[#191c1e]">{isDirty ? "Unsaved changes / การเปลี่ยนแปลงยังไม่ได้บันทึก" : "No unsaved changes / ไม่มีข้อมูลที่รอบันทึก"}</p><p className="text-[11px] text-[#444651]">Last autosaved 2m ago</p></div>
+        </div>
+        <div className="flex w-full items-center gap-3 md:w-auto">
+          <button type="button" onClick={cancelEdit} className="flex-1 rounded-lg border border-[#c5c5d3] px-6 py-2 text-sm font-bold text-[#444651] transition hover:bg-[#e6e8ea] active:scale-95 md:flex-none">Cancel</button>
+          <button type="button" onClick={handleSubmit(save)} disabled={!isDirty || isSubmitting} className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#00236f] px-8 py-2 text-sm font-bold text-white transition hover:shadow-lg active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 md:flex-none"><Save className="h-4 w-4" />{isSubmitting ? "Saving..." : "Save Changes"}</button>
         </div>
       </div>
-      {modalAction ? <SecurityModal action={modalAction} reason={reason} onReason={setReason} onCancel={() => setModalAction(null)} onConfirm={confirmAction} /> : null}
-      {toast ? <div className="fixed bottom-6 right-6 z-[80] rounded-xl border border-blue-200 bg-[#0F2A5F] px-4 py-3 text-sm font-bold text-white shadow-xl" role="status">{toast}</div> : null}
-    </main>
-  );
-}
 
-function Sidebar() {
-  return (
-    <aside className="hidden h-screen sticky top-0 overflow-y-auto bg-[#0F2A5F] px-4 py-6 text-white shadow-[10px_0_30px_rgba(15,42,95,.08)] min-[1040px]:block" aria-label="Main navigation">
-      <div className="flex items-center gap-3 pb-6">
-        <div className="grid h-10 w-10 place-items-center rounded-xl bg-white text-sm font-black text-[#0F2A5F] shadow-lg">N</div>
-        <div><div className="font-black">Med AI NexSure</div><p className="text-xs text-blue-100">Healthcare & Insurance Intelligence</p></div>
-      </div>
-      <NavGroup label="Workspace" items={navItems.slice(0, 6)} />
-      <NavGroup label="Administration" items={navItems.slice(6)} />
-    </aside>
-  );
-}
-
-function NavGroup({ label, items }: { label: string; items: typeof navItems }) {
-  return (
-    <>
-      <div className="mt-6 px-2 text-[11px] font-black uppercase tracking-[.12em] text-blue-300">{label}</div>
-      <nav className="mt-2 space-y-1" aria-label={label}>
-        {items.map((item) => {
-          const Icon = item.icon;
-          return item.href.startsWith("/") ? (
-            <Link key={item.label} href={item.href} className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold ${item.active ? "bg-[#173A78] text-white shadow-[inset_3px_0_0_#38BDF8]" : "text-blue-100 hover:bg-white/10"}`}>
-              <Icon size={17} aria-hidden="true" /><span>{item.label}</span>
-            </Link>
-          ) : (
-            <a key={item.label} href={item.href} className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold ${item.active ? "bg-[#173A78] text-white shadow-[inset_3px_0_0_#38BDF8]" : "text-blue-100 hover:bg-white/10"}`}>
-              <Icon size={17} aria-hidden="true" /><span>{item.label}</span>
-            </a>
-          );
-        })}
-      </nav>
-    </>
-  );
-}
-
-function Topbar() {
-  return (
-    <header className="sticky top-0 z-10 flex h-[70px] items-center justify-between border-b border-slate-200 bg-white/95 px-4 backdrop-blur sm:px-7">
-      <label className="flex w-[min(520px,45vw)] items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-slate-500 focus-within:border-blue-200 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-100">
-        <Search size={16} aria-hidden="true" />
-        <input className="w-full bg-transparent text-sm outline-none" placeholder="Search patients, visits, claims, users, or evidence..." />
-      </label>
-      <div className="flex items-center gap-2"><IconButton label="AI Copilot"><BrainCircuit size={17} /></IconButton><IconButton label="Notifications"><Bell size={17} /></IconButton><div className="grid h-10 w-10 place-items-center rounded-full bg-[#1E3A8A] text-sm font-black text-white shadow-md">BC</div></div>
-    </header>
-  );
-}
-
-function IconButton({ label, children }: { label: string; children: React.ReactNode }) {
-  return <button type="button" aria-label={label} className="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-blue-50 hover:text-[#1E3A8A]">{children}</button>;
-}
-
-function PrimaryButton({ children, onClick }: { children: React.ReactNode; onClick?: () => void }) {
-  return <Button onClick={onClick} className="rounded-xl border border-[#1E3A8A] bg-[#1E3A8A] px-4 py-2 font-black text-white shadow-sm hover:bg-blue-700">{children}</Button>;
-}
-
-function SecondaryButton({ children, onClick }: { children: React.ReactNode; onClick?: () => void }) {
-  return <Button onClick={onClick} className="rounded-xl border border-slate-300 bg-white px-4 py-2 font-black text-slate-800 shadow-sm hover:bg-blue-50">{children}</Button>;
-}
-
-function Chip({ children }: { children: React.ReactNode }) {
-  return <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-black text-slate-700">{children}</span>;
-}
-
-function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <section className={`rounded-2xl border border-slate-200 bg-white p-5 shadow-sm ${className}`}>{children}</section>;
-}
-
-function SectionHead({ title, helper, action }: { title: string; helper: string; action?: React.ReactNode }) {
-  return <div className="mb-4 flex items-start justify-between gap-3"><div><h3 className="text-[17px] font-black text-[#0F2A5F]">{title}</h3><p className="mt-1 text-xs leading-5 text-slate-500">{helper}</p></div>{action}</div>;
-}
-
-function Kpis() {
-  const items = [
-    ["Assigned Cases", "128", "8.4% vs previous period", ClipboardCheck],
-    ["Completed Cases", "104", "81.3% completion rate", Check],
-    ["Claim Ready Rate", "87.6%", "3.2 pts vs previous period", Activity],
-    ["AI Assisted Cases", "76", "59.4% of eligible cases", BrainCircuit],
-    ["Avg. Readiness Score", "82", "4 pts vs previous period", BarChart3],
-    ["Pending Actions", "14", "ต้องดำเนินการเพิ่มเติม", AlertTriangle],
-  ] as const;
-  return <section className="grid grid-cols-2 gap-3 lg:grid-cols-3 min-[1320px]:grid-cols-6">{items.map(([label, value, helper, Icon]) => <Card key={label} className="relative overflow-hidden before:absolute before:left-0 before:right-0 before:top-0 before:h-1 before:bg-[#1E3A8A]"><div className="flex items-center justify-between text-xs text-slate-500"><span>{label}</span><span className="grid h-9 w-9 place-items-center rounded-xl border border-blue-200 bg-blue-50 text-blue-700"><Icon size={16} /></span></div><strong className="mt-3 block text-[27px] font-black text-[#0F2A5F]">{value}</strong><p className={`mt-1 text-xs font-bold ${label === "Pending Actions" ? "text-amber-700" : "text-emerald-700"}`}>{helper}</p></Card>)}</section>;
-}
-
-function Tabs({ activeTab, onChange }: { activeTab: DetailTab; onChange: (tab: DetailTab) => void }) {
-  return <nav className="mt-6 flex overflow-x-auto rounded-t-2xl border border-slate-200 bg-white px-2" aria-label="User detail sections">{tabs.map((tab) => <button key={tab.id} type="button" onClick={() => onChange(tab.id)} className={`whitespace-nowrap border-b-4 px-4 py-3 text-sm font-black ${activeTab === tab.id ? "border-blue-600 bg-blue-50 text-[#1E3A8A]" : "border-transparent text-slate-500 hover:bg-blue-50"}`}>{tab.label}</button>)}</nav>;
-}
-
-function OverviewTab({ user, primaryRoleLabel, onTab }: { user: ClinicUser; primaryRoleLabel: string; onTab: (tab: DetailTab) => void }) {
-  return (
-    <div className="pt-4">
-      <div className="grid gap-4 xl:grid-cols-2">
-        <InfoCard title="User Profile" helper="ข้อมูลประจำตัว การติดต่อ และข้อมูลวิชาชีพของผู้ใช้งาน" action={<SecondaryButton>View Profile</SecondaryButton>} rows={[["Full Name", user.fullName], ["Display Name", user.fullName], ["Email Address", user.email], ["Phone Number", user.phone ?? "Not provided"], ["Job Title", user.jobTitle ?? primaryRoleLabel], ["Preferred Language", "English / Thai"], ["Time Zone", "Asia/Bangkok"], ["Last Updated", formatDateTime(user.updatedAt)]]} />
-        <AccessSummary user={user} primaryRoleLabel={primaryRoleLabel} onTab={onTab} />
-        <Card><SectionHead title="Case Activity Snapshot" helper="เลือกสถานะเพื่อกรอง Assigned Case List และตรวจสอบงานค้าง" /><div className="grid grid-cols-2 gap-2 sm:grid-cols-5">{[["128", "Assigned"], ["18", "In Progress"], ["9", "Pending Evidence"], ["7", "Needs Review"], ["104", "Completed"]].map(([value, label]) => <div key={label} className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-center"><strong className="block text-2xl font-black">{value}</strong><span className="text-xs text-slate-500">{label}</span></div>)}</div></Card>
-        <Card><SectionHead title="Claim Readiness Overview" helper="ประเมินจาก Readiness Assessment ล่าสุดของแต่ละเคส" action={<SecondaryButton onClick={() => onTab("cases")}>View Cases</SecondaryButton>} /><div className="grid gap-5 sm:grid-cols-[150px_1fr] sm:items-center"><div className="relative h-[138px] w-[138px] rounded-full bg-[conic-gradient(#059669_0_62%,#D97706_62%_86%,#DC2626_86%)] after:absolute after:inset-5 after:grid after:place-items-center after:rounded-full after:bg-white after:text-3xl after:font-black after:content-['82']" aria-label="Average readiness score 82" /><Legend /></div></Card>
-        <MetricsCard title="AI Clinical Insight" helper="ภาพรวมการใช้ AI Decision Support การยอมรับ และการปรับแก้คำแนะนำ" action={<SecondaryButton onClick={() => onTab("ai")}>Review AI Usage</SecondaryButton>} metrics={[["Suggestions", "214"], ["Accepted", "148"], ["Modified", "42"], ["Overrides", "6"]]} />
-        <InfoCard title="Economic Intelligence" helper="วิเคราะห์ต้นทุนและ Cost Signal ตามสิทธิ์การเข้าถึงของผู้ตรวจสอบ" action={<Chip>Cost Indicator Access</Chip>} rows={[["Average Visit Cost", "THB 2,860"], ["Expected Range", "THB 2,200-THB 3,100"], ["Cost Alert Cases", "8 cases"], ["Normal Cost Cases", "96 cases"]]} />
-      </div>
-      <BarsCard title="Missing Evidence Insights" helper="แสดงหลักฐานหรือข้อมูลที่ขาดบ่อย เพื่อช่วยยกระดับ Claim Readiness" action={<SecondaryButton onClick={() => onTab("cases")}>Filter Cases</SecondaryButton>} rows={[["SOAP Incomplete", 82, 18], ["ICD Missing", 63, 14], ["Attachment Missing", 48, 11], ["Claim Justification", 35, 8], ["Patient Consent", 22, 5]]} />
-      <TimelineCard title="Recent Operational Activity" helper="Latest actions across clinical, claim, and security modules" action={<SecondaryButton onClick={() => onTab("audit")}>View All Activity</SecondaryButton>} events={[["Completed claim readiness review", "Visit VST-2026-07109 - Result: Ready", "14 min ago"], ["Modified AI ICD suggestion", "Changed suggested ICD-10 before acceptance - Confidence 89%", "42 min ago"], ["Updated SOAP note", "Visit VST-2026-07098 - Version 4 saved", "1 hr ago"], ["Exported evidence package", "PDF package generated with audit summary", "Yesterday"]]} />
+      {showUnsavedDialog ? <UnsavedDialog onCancel={() => setShowUnsavedDialog(false)} onDiscard={() => { form.reset(defaultValues); setIsEditing(false); setShowUnsavedDialog(false); }} /> : null}
+      {toast ? <div role="status" className="fixed right-6 top-20 z-[60] rounded bg-[#2d3133] px-6 py-3 text-sm text-[#eff1f3] shadow-xl">{toast}</div> : null}
     </div>
   );
 }
 
-function AccessSummary({ user, primaryRoleLabel, onTab }: { user: ClinicUser; primaryRoleLabel: string; onTab: (tab: DetailTab) => void }) {
-  const additionalRoles = user.additionalRoles.map((role) => roleLabels[role]).join(", ") || "None";
-  return <Card><SectionHead title="Access & Role Overview" helper="สรุป Role, Effective Permission และขอบเขตข้อมูลที่สามารถเข้าถึง" action={<SecondaryButton onClick={() => onTab("access")}>Manage Access</SecondaryButton>} /><PermissionList rows={[["Primary Role", primaryRoleLabel], ["Additional Roles", additionalRoles], ["Patient Data Scope", user.clinicScopes[0]?.dataAccessLevel ?? "Assigned Clinic"], ["Claim Review", user.additionalRoles.includes("claim_reviewer") ? "Allowed" : "Limited"], ["AI Copilot", user.aiPermissions.acceptAiRecommendation ? "Generate & Accept" : user.aiPermissions.generateSoapDraft ? "Generate" : "View Only"], ["Audit Log Access", "Allowed"]]} /></Card>;
+function TopNav() {
+  return <header className="fixed left-0 top-0 z-50 flex h-14 w-full items-center justify-between border-b border-[#c5c5d3] bg-[#f7f9fb] px-4"><span className="text-lg font-bold text-[#00236f]">Med AI NexSure</span><div className="flex items-center gap-2"><button aria-label="Notifications" className="rounded-full p-2 transition-colors hover:bg-[#e6e8ea] focus:outline-none focus:ring-2 focus:ring-[#2563EB]"><Bell className="h-5 w-5 text-[#444651]" /></button><button aria-label="Settings" className="rounded-full p-2 transition-colors hover:bg-[#e6e8ea] focus:outline-none focus:ring-2 focus:ring-[#2563EB]"><Settings className="h-5 w-5 text-[#444651]" /></button><div className="ml-2 grid h-8 w-8 place-items-center rounded-full bg-[#e0e3e5] text-xs font-bold text-[#00236f]">BC</div></div></header>;
 }
 
-function formatDateTime(value: string) {
-  return new Intl.DateTimeFormat("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "Asia/Bangkok",
-  }).format(new Date(value));
+function SideNav() {
+  const items = [["dashboard", "Dashboard"], ["person_search", "Patients"], ["psychology", "AI Clinical"], ["manage_accounts", "User Management"], ["settings", "Settings"]];
+  return <aside className="fixed left-0 top-0 z-40 hidden h-full w-64 flex-col border-r border-[#c5c5d3] bg-[#f2f4f6] pt-14 md:flex"><div className="border-b border-[#c5c5d3] p-4"><div className="flex items-center gap-3"><div className="grid h-10 w-10 place-items-center rounded-lg bg-[#00236f] font-bold text-white">MX</div><div><div className="text-sm font-bold text-[#191c1e]">Med AI NexSure</div><div className="text-[10px] font-semibold uppercase tracking-wider text-[#444651]">Enterprise Admin</div></div></div></div><nav className="flex-1 py-4">{items.map(([icon, label]) => <a key={label} href={label === "User Management" ? "/admin/users" : "#"} className={`flex items-center gap-3 px-6 py-3 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-[#2563EB] ${label === "Patients" ? "border-l-4 border-[#00236f] bg-[#1e3a8a] font-bold text-[#90a8ff]" : "text-[#444651] hover:bg-[#e6e8ea]"}`}><SidebarIcon name={icon} /><span className="text-xs font-semibold uppercase tracking-[0.05em]">{label}</span></a>)}</nav><div className="border-t border-[#c5c5d3] p-4"><button className="flex w-full items-center justify-between rounded p-2 text-sm font-medium hover:bg-[#e6e8ea] focus:outline-none focus:ring-2 focus:ring-[#2563EB]">Switch Org<ArrowLeftRight className="h-4 w-4" /></button><a className="mt-4 flex items-center gap-3 rounded px-2 py-2 text-sm text-[#444651] hover:text-[#00236f]" href="#"><HelpCircle className="h-4 w-4" /> Help Center</a><a className="flex items-center gap-3 rounded px-2 py-2 text-sm text-[#ba1a1a] hover:bg-[#ffdad6]/20" href="#"><LogOut className="h-4 w-4" /> Logout</a></div></aside>;
 }
 
-function InfoCard({ title, helper, rows, action }: { title: string; helper: string; rows: [string, string][]; action?: React.ReactNode }) {
-  return <Card><SectionHead title={title} helper={helper} action={action} /><div className="grid gap-4 sm:grid-cols-2">{rows.map(([label, value]) => <div key={label}><div className="mb-1 text-[11px] font-black uppercase tracking-wide text-slate-500">{label}</div><div className="font-bold">{value}</div></div>)}</div></Card>;
+function SidebarIcon({ name }: { name: string }) {
+  const icons: Record<string, React.ReactNode> = { dashboard: <Settings className="h-5 w-5" />, person_search: <PersonStanding className="h-5 w-5" />, psychology: <Stethoscope className="h-5 w-5" />, manage_accounts: <UserCog className="h-5 w-5" />, settings: <Settings className="h-5 w-5" /> };
+  return icons[name];
 }
 
-function PermissionList({ rows }: { rows: [string, string][] }) {
-  return <div className="grid gap-2">{rows.map(([label, value]) => <div key={label} className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm"><span>{label}</span><b className={value === "Limited" ? "text-amber-700" : value === "Allowed" || value.includes("Accept") ? "text-emerald-700" : ""}>{value}</b></div>)}</div>;
+function Meta({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
+  return <div><p className="mb-1 text-xs font-semibold uppercase tracking-[0.05em] text-[#444651]">{label}</p><p className={`${mono ? "font-mono text-sm font-medium" : "text-sm"} text-[#191c1e]`}>{value}</p></div>;
 }
 
-function Legend() {
-  return <div className="grid gap-3 text-sm">{[["bg-emerald-600", "Ready", "79 - 62%"], ["bg-amber-600", "Needs Review", "31 - 24%"], ["bg-red-600", "Not Ready", "18 - 14%"]].map(([color, label, value]) => <div key={label} className="grid grid-cols-[12px_1fr_auto] items-center gap-2"><span className={`h-3 w-3 rounded ${color}`} /><span>{label}</span><b>{value}</b></div>)}</div>;
+function Panel({ title, icon, children, single = false }: { title: string; icon: React.ReactNode; children: React.ReactNode; single?: boolean }) {
+  return <section className="overflow-hidden rounded-lg border border-[#c5c5d3] bg-white"><div className="border-b border-[#c5c5d3] bg-white px-6 py-4"><h2 className="flex items-center gap-2 text-lg font-bold text-[#191c1e]"><span className="text-[#00236f]">{icon}</span>{title}</h2></div><div className={single ? "p-6" : "grid grid-cols-1 gap-x-6 gap-y-4 p-6 md:grid-cols-2"}>{children}</div></section>;
 }
 
-function MetricsCard({ title, helper, metrics, action }: { title: string; helper: string; metrics: [string, string][]; action?: React.ReactNode }) {
-  return <Card><SectionHead title={title} helper={helper} action={action} /><div className="grid grid-cols-2 gap-3 sm:grid-cols-4">{metrics.map(([label, value]) => <div key={label} className="rounded-xl border border-slate-200 bg-slate-50 p-4"><span className="text-xs text-slate-500">{label}</span><strong className="mt-2 block text-2xl font-black">{value}</strong></div>)}</div></Card>;
+function Field({ label, error, children, wide = false }: { label: string; error?: string; children: React.ReactNode; wide?: boolean }) {
+  return <label className={`flex flex-col gap-1 ${wide ? "md:col-span-2" : ""}`}><span className="text-xs font-semibold uppercase tracking-[0.05em] text-[#444651]">{label}</span>{children}{error ? <span className="text-[10px] font-semibold text-[#ba1a1a]">{error}</span> : null}</label>;
 }
 
-function BarsCard({ title, helper, rows, action }: { title: string; helper: string; rows: [string, number, number][]; action?: React.ReactNode }) {
-  return <Card className="mt-4"><SectionHead title={title} helper={helper} action={action} /><div className="grid gap-3">{rows.map(([label, width, value]) => <div key={label} className="grid grid-cols-[140px_1fr_32px] items-center gap-3 text-xs sm:grid-cols-[170px_1fr_34px]"><span>{label}</span><div className="h-2.5 overflow-hidden rounded-full bg-slate-200"><div className="h-full rounded-full bg-blue-600" style={{ width: `${width}%` }} /></div><b>{value}</b></div>)}</div></Card>;
+function IconInput({ icon, tone = "muted", children }: { icon: React.ReactNode; tone?: "muted" | "danger"; children: React.ReactNode }) {
+  return <div className="relative"><span className={`absolute left-3 top-2.5 ${tone === "danger" ? "text-[#ba1a1a]" : "text-[#444651]"}`}>{icon}</span>{children}</div>;
 }
 
-function TimelineCard({ title, helper, events, action }: { title: string; helper: string; events: [string, string, string][]; action?: React.ReactNode }) {
-  return <Card className="mt-4"><SectionHead title={title} helper={helper} action={action} /><div>{events.map(([titleText, detail, time]) => <div key={`${titleText}-${time}`} className="grid grid-cols-[40px_1fr_auto] gap-3 border-b border-slate-200 py-3 last:border-0"><div className="grid h-9 w-9 place-items-center rounded-xl border border-blue-200 bg-blue-50 text-blue-700"><Activity size={16} /></div><div><strong className="text-sm">{titleText}</strong><p className="mt-1 text-xs text-slate-500">{detail}</p></div><time className="text-xs text-slate-500">{time}</time></div>)}</div></Card>;
+function inputClass(error?: string, extra = "") {
+  return `w-full rounded border ${error ? "border-[#ba1a1a]" : "border-[#c5c5d3]"} p-2 text-base leading-6 text-[#191c1e] focus:border-transparent focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-[#2563EB] disabled:bg-[#f2f4f6] read-only:bg-[#f2f4f6] ${extra}`;
 }
 
-function AccessTab({ onSave }: { onSave: () => void }) {
-  return <div className="pt-4"><div className="grid gap-4 xl:grid-cols-2"><Card><SectionHead title="Role Assignment" helper="การเปลี่ยน Role ต้องระบุเหตุผล ตรวจสอบ Role Conflict และบันทึก Audit Log" /><label className="block text-[11px] font-black uppercase text-slate-500">Primary Role<select className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm"><option>Doctor</option><option>Claim Reviewer</option><option>Clinic Admin</option></select></label><div className="mt-4"><div className="text-[11px] font-black uppercase text-slate-500">Additional Roles</div><div className="mt-2 flex flex-wrap gap-2"><Chip>Clinical Reviewer x</Chip><Chip>AI Reviewer x</Chip><SecondaryButton>Add Role</SecondaryButton></div></div><label className="mt-4 block text-[11px] font-black uppercase text-slate-500">Change Reason<textarea className="mt-2 min-h-24 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm" placeholder="ระบุเหตุผลอย่างน้อย 10 ตัวอักษร" /></label><PrimaryButton onClick={onSave}>Save Access Changes</PrimaryButton></Card><Card><SectionHead title="Access Scope" helper="กำหนดขอบเขต Organization, Clinic, Department และ Patient Data ที่เข้าถึงได้" /><PermissionList rows={[["Organization", "NexSure Health Network"], ["Clinic Scope", "Sukhumvit Medical Center"], ["Department Scope", "Internal Medicine"], ["Patient Scope", "Department Patients"], ["Claim Approval Limit", "Review only"]]} /></Card></div><Card className="mt-4"><SectionHead title="Effective Permission Matrix" helper="Permission ที่ได้รับจาก Role ไม่สามารถลบโดยตรงจากหน้า User Detail" /><DataTable headers={["Permission Group", "View", "Create", "Update", "Approve", "Source"]} rows={[["Patient Management", "Allowed", "Limited", "Allowed", "-", "Inherited from Role"], ["Clinical Documentation", "Allowed", "Allowed", "Allowed", "-", "Inherited from Role"], ["Claim Readiness", "Allowed", "-", "Limited", "Not Allowed", "Direct + Role"], ["AI Clinical Engine", "Allowed", "Generate", "Accept", "Override", "Inherited from Role"], ["Audit & Compliance", "Limited", "-", "Not Allowed", "-", "Temporary"]]} /></Card></div>;
-}
-
-function CasesTab({ rows, search, onSearch }: { rows: CaseRow[]; search: string; onSearch: (value: string) => void }) {
-  return <div className="pt-4"><Card><SectionHead title="Assigned Case Portfolio" helper="รายการเคสที่ผู้ใช้งานรับผิดชอบ ตรวจสอบ หรือมีส่วนร่วมตาม Access Scope" action={<SecondaryButton>Export CSV</SecondaryButton>} /><div className="mb-4 flex flex-wrap gap-2"><input value={search} onChange={(event) => onSearch(event.target.value)} className="min-w-64 rounded-xl border border-slate-300 px-3 py-2 text-sm" placeholder="Search by Visit ID, patient name, or HN..." /><select className="rounded-xl border border-slate-300 px-3 py-2 text-sm"><option>All Statuses</option><option>Ready</option><option>Needs Review</option><option>Not Ready</option></select><select className="rounded-xl border border-slate-300 px-3 py-2 text-sm"><option>All Clinics</option><option>Sukhumvit Medical Center</option></select><select className="rounded-xl border border-slate-300 px-3 py-2 text-sm"><option>Last 30 Days</option><option>Last 7 Days</option></select></div><div className="overflow-auto rounded-2xl border border-slate-200"><table className="w-full min-w-[980px] border-collapse text-left text-xs"><thead className="bg-slate-50 text-[10px] uppercase tracking-wide text-slate-500"><tr>{["Visit ID", "Patient", "Visit Date", "Role", "Visit Status", "Score", "Claim Status", "Evidence Gaps", "Cost", "Action"].map((header) => <th key={header} className="border-b border-slate-200 px-4 py-3">{header}</th>)}</tr></thead><tbody>{rows.map((row) => <tr key={row.visitId} className="hover:bg-blue-50"><td className="border-b border-slate-200 px-4 py-3 font-black">{row.visitId}</td><td className="border-b border-slate-200 px-4 py-3">{row.patient}</td><td className="border-b border-slate-200 px-4 py-3">{row.visitDate}</td><td className="border-b border-slate-200 px-4 py-3">{row.role}</td><td className="border-b border-slate-200 px-4 py-3">{row.visitStatus}</td><td className="border-b border-slate-200 px-4 py-3 font-black">{row.score}</td><td className="border-b border-slate-200 px-4 py-3"><ClaimStatus status={row.claimStatus} /></td><td className="border-b border-slate-200 px-4 py-3">{row.evidenceGaps}</td><td className="border-b border-slate-200 px-4 py-3">{row.cost}</td><td className="border-b border-slate-200 px-4 py-3"><SecondaryButton>View Detail</SecondaryButton></td></tr>)}</tbody></table></div>{rows.length === 0 ? <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm font-bold text-amber-900">ไม่พบเคสที่ตรงกับเงื่อนไขการค้นหา</p> : null}</Card></div>;
-}
-
-function ClaimStatus({ status }: { status: CaseRow["claimStatus"] }) {
-  const classes: Record<CaseRow["claimStatus"], string> = { Ready: "bg-emerald-50 text-emerald-700 border-emerald-200", "Needs Review": "bg-amber-50 text-amber-700 border-amber-200", "Not Ready": "bg-red-50 text-red-700 border-red-200" };
-  return <span className={`rounded-full border px-2 py-1 text-[10px] font-black ${classes[status]}`}>{status}</span>;
-}
-
-function AiTab() {
-  return <div className="pt-4"><div className="mb-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-[#0F2A5F] shadow-[inset_4px_0_0_#2563EB]"><b>AI Governance Notice:</b> AI Clinical Insight is decision support only. การตัดสินใจทางคลินิกและการอนุมัติผลลัพธ์ยังคงอยู่ภายใต้ความรับผิดชอบของบุคลากรที่ได้รับมอบหมาย</div><MetricsCard title="AI Governance & Usage" helper="Human-reviewed AI usage outcomes for this user." metrics={[["AI Assisted Cases", "76"], ["Suggestions Generated", "214"], ["Acceptance Rate", "69.2%"], ["Average Confidence", "88.4%"], ["Modified", "42"], ["Rejected", "24"], ["Overrides", "6"], ["Safety Alerts", "3"]]} /><div className="grid gap-4 pt-4 xl:grid-cols-2"><BarsCard title="AI Recommendation Outcomes" helper="AI Suggested content requires user review before confirmation." rows={[["Accepted", 69, 148], ["Modified", 20, 42], ["Rejected", 11, 24]]} /><TimelineCard title="Recent AI Governance Activity" helper="รายการล่าสุดที่มีการตรวจสอบหรือแก้ไข AI output" events={[["ICD suggestion modified", "Reason recorded - Clinical context protected", "42 min ago"], ["Safety warning acknowledged", "Potential drug interaction reviewed", "Yesterday"], ["Recommendation overridden", "Reason: patient-specific contraindication", "2 days ago"]]} /></div></div>;
-}
-
-function SecurityTab({ onAction }: { onAction: (action: string) => void }) {
-  return <div className="grid gap-4 pt-4 xl:grid-cols-[1.15fr_.85fr]"><Card><SectionHead title="Account Security Posture" helper="สถานะ Authentication, MFA, Login Risk และ Active Sessions" action={<Badge tone="success">Secure</Badge>} /><div>{[["Authentication Provider", "Microsoft Entra ID"], ["MFA Status", "Enabled"], ["Last Login", "10 Jul 2026, 13:08"], ["Last Login IP", "203.0.xxx.42"], ["Failed Login Attempts", "1"], ["Password Last Changed", "28 Jun 2026"], ["Active Sessions", "2 sessions"], ["Account Lock Status", "Unlocked"]].map(([label, value]) => <div key={label} className="flex items-center justify-between border-b border-slate-200 py-3 last:border-0"><span>{label}</span><b>{value}</b></div>)}</div></Card><Card><SectionHead title="Privileged Security Actions" helper="ทุก Action ต้องระบุเหตุผล ยืนยันสิทธิ์ และบันทึกใน Audit Log" /><div className="grid gap-3">{[["Force Password Reset", "บังคับเปลี่ยนรหัสผ่านในการเข้าสู่ระบบครั้งถัดไป", "Run", false], ["Revoke All Sessions", "ยกเลิก Session ที่กำลังใช้งานในทุกอุปกรณ์", "Run", false], ["Reset MFA", "ต้องยืนยันตัวตนเพิ่มเติมก่อนดำเนินการ", "Run", false], ["Lock Account", "ระงับการเข้าสู่ระบบทันทีและยกเลิก Session", "Lock", true], ["Disable User", "มีงานค้าง 14 รายการที่ต้อง Reassign ก่อนปิดบัญชี", "Disable", true]].map(([title, helper, label, danger]) => <div key={String(title)} className={`flex items-center justify-between gap-3 rounded-xl border p-4 ${danger ? "border-red-200 bg-red-50/30" : "border-slate-200"}`}><div><b>{title}</b><p className="mt-1 text-xs text-slate-500">{helper}</p></div><Button onClick={() => onAction(String(title))} className={`rounded-xl border px-3 py-2 text-sm font-black ${danger ? "border-red-200 bg-white text-red-700" : "border-slate-300 bg-white text-slate-700"}`}>{label}</Button></div>)}</div></Card></div>;
-}
-
-function AuditTab() {
-  return <div className="pt-4"><div className="grid gap-4 xl:grid-cols-2"><TimelineCard title="Recent User Activity" helper="กิจกรรมล่าสุดพร้อมข้อมูล Device และ IP ที่ผ่านการ Mask ตามสิทธิ์" events={[["Logged in successfully", "Web - Chrome - 203.0.xxx.42", "13:08"], ["Updated SOAP note", "Visit VST-2026-07098 - Success", "12:34"], ["Accepted AI ICD suggestion", "Clinical Engine - Success", "11:58"]]} /><MetricsCard title="Account Audit Summary" helper="สรุปประวัติด้าน Security และ Access แบบ Append-only" metrics={[["Role Changes", "3"], ["Scope Changes", "2"], ["Security Events", "5"], ["Failed Actions", "1"]]} /></div><Card className="mt-4"><SectionHead title="Audit & Compliance Trail" helper="เก็บ Before/After Value, Actor, Reason และ Timestamp เพื่อรองรับการตรวจสอบ" action={<SecondaryButton>Export Audit Log</SecondaryButton>} /><DataTable headers={["Event", "Actor", "Before", "After", "Reason", "Date & Time", "Result"]} rows={[["Role Assigned", "Ben C. - Security Admin", "Doctor", "Doctor + Clinical Reviewer", "Support peer review workflow", "8 Jul 2026, 16:20", "Success"], ["Department Scope Changed", "Orn T. - Org Admin", "General Medicine", "Internal Medicine", "Department transfer", "2 Jul 2026, 10:11", "Success"], ["Failed Login", "Target User", "-", "-", "Invalid SSO assertion", "28 Jun 2026, 08:41", "Failed"]]} /></Card></div>;
-}
-
-function DataTable({ headers, rows }: { headers: string[]; rows: string[][] }) {
-  return <div className="overflow-auto rounded-2xl border border-slate-200"><table className="w-full min-w-[760px] border-collapse text-left text-xs"><thead className="bg-slate-50 text-[10px] uppercase tracking-wide text-slate-500"><tr>{headers.map((header) => <th key={header} className="border-b border-slate-200 px-4 py-3">{header}</th>)}</tr></thead><tbody>{rows.map((row) => <tr key={row.join("|")} className="hover:bg-blue-50">{row.map((cell, index) => <td key={`${cell}-${index}`} className="border-b border-slate-200 px-4 py-3">{cell}</td>)}</tr>)}</tbody></table></div>;
-}
-
-function SecurityModal({ action, reason, onReason, onCancel, onConfirm }: { action: string; reason: string; onReason: (value: string) => void; onCancel: () => void; onConfirm: () => void }) {
-  return <div className="fixed inset-0 z-[70] grid place-items-center bg-slate-950/50 p-4"><section role="dialog" aria-modal="true" aria-labelledby="security-action-title" className="w-full max-w-lg rounded-3xl border border-blue-200 bg-white p-6 shadow-2xl"><h2 id="security-action-title" className="text-xl font-black text-[#0F2A5F]">{action}</h2><p className="mt-2 text-sm leading-6 text-slate-500">การดำเนินการ {action} อาจส่งผลต่อสิทธิ์ Session หรือ Authentication โดยระบบจะบันทึกผู้ดำเนินการ เวลา และเหตุผลใน Audit Log</p><textarea value={reason} onChange={(event) => onReason(event.target.value)} className="mt-4 min-h-28 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm" placeholder="ระบุเหตุผลและผลกระทบทางธุรกิจ (อย่างน้อย 10 ตัวอักษร)" /><div className="mt-4 flex justify-end gap-2"><SecondaryButton onClick={onCancel}>Cancel</SecondaryButton><Button onClick={onConfirm} className="rounded-xl border border-red-200 bg-white px-4 py-2 font-black text-red-700">Confirm Action</Button></div></section></div>;
+function UnsavedDialog({ onCancel, onDiscard }: { onCancel: () => void; onDiscard: () => void }) {
+  return <div className="fixed inset-0 z-[70] grid place-items-center bg-[#191c1e]/50 p-4"><section role="dialog" aria-modal="true" aria-labelledby="unsaved-title" className="w-full max-w-md rounded-lg border border-[#c5c5d3] bg-white p-6 shadow-xl"><h2 id="unsaved-title" className="text-lg font-bold text-[#191c1e]">Unsaved Changes</h2><p className="mt-2 text-sm leading-6 text-[#444651]">คุณมีการเปลี่ยนแปลงที่ยังไม่ได้บันทึก ต้องการยกเลิกและทิ้งข้อมูลหรือไม่</p><div className="mt-5 flex justify-end gap-3"><button type="button" onClick={onCancel} className="rounded-lg border border-[#c5c5d3] px-4 py-2 text-sm font-bold text-[#444651] hover:bg-[#e6e8ea] focus:outline-none focus:ring-2 focus:ring-[#2563EB]">Continue Editing</button><button type="button" onClick={onDiscard} className="rounded-lg bg-[#ba1a1a] px-4 py-2 text-sm font-bold text-white hover:bg-[#ba1a1a]/90 focus:outline-none focus:ring-2 focus:ring-[#ba1a1a] focus:ring-offset-2">Discard Changes</button></div></section></div>;
 }

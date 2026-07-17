@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import type { ClinicUser } from "../types/user-management.types";
 
-export type UserAction = "view" | "edit" | "roles" | "clinic_access" | "ai_access" | "suspend" | "audit" | "resend" | "cancel_invite" | "unlock" | "revoke_sessions" | "reactivate";
+export type UserAction = "view" | "edit" | "roles" | "clinic_access" | "ai_access" | "reset_password" | "disable" | "enable" | "lock" | "suspend" | "audit" | "resend" | "cancel_invite" | "unlock" | "revoke_sessions" | "reactivate";
 
 export function ClinicUserActions({
   user,
@@ -55,6 +55,9 @@ function getActions(user: ClinicUser): { value: UserAction; label: string; dange
       { value: "roles", label: "Manage Roles" },
       { value: "clinic_access", label: "Manage Clinic Access" },
       { value: "ai_access", label: "Manage AI Access" },
+      { value: "reset_password", label: "Reset Password" },
+      { value: "lock", label: "Lock Account", danger: true },
+      { value: "disable", label: "Disable User", danger: true },
       { value: "suspend", label: "Suspend User", danger: true },
       { value: "audit", label: "View Audit Log" },
     ];
@@ -72,12 +75,14 @@ function getActions(user: ClinicUser): { value: UserAction; label: string; dange
     return [
       ...base,
       { value: "unlock", label: "Unlock Account" },
+      { value: "reset_password", label: "Reset Password" },
       { value: "revoke_sessions", label: "Revoke Sessions", danger: true },
       { value: "audit", label: "View Audit Log" },
     ];
   }
   return [
     ...base,
+    { value: "enable", label: "Enable User" },
     { value: "reactivate", label: "Reactivate User" },
     { value: "audit", label: "View Audit Log" },
   ];

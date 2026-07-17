@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Edit User Profile - Med AI NexSure</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#8da9ff",
+                        "on-tertiary-fixed": "#00174b",
+                        "inverse-primary": "#b6c4ff",
+                        "on-primary-fixed": "#00164e",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-error": "#ffffff",
+                        "secondary-container": "#a9c0fe",
+                        "primary-container": "#1e3a8a",
+                        "surface-container": "#eceef0",
+                        "on-background": "#191c1e",
+                        "outline-variant": "#c5c5d3",
+                        "primary-fixed": "#dce1ff",
+                        "tertiary-fixed-dim": "#b4c5ff",
+                        "inverse-surface": "#2d3133",
+                        "surface-container-high": "#e6e8ea",
+                        "surface-bright": "#f7f9fb",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#001946",
+                        "on-primary-fixed-variant": "#264191",
+                        "on-secondary-container": "#364d83",
+                        "surface-variant": "#e0e3e5",
+                        "primary-fixed-dim": "#b6c4ff",
+                        "primary": "#00236f",
+                        "outline": "#757682",
+                        "tertiary-container": "#00389a",
+                        "error-container": "#ffdad6",
+                        "inverse-on-surface": "#eff1f3",
+                        "background": "#f7f9fb",
+                        "surface-dim": "#d8dadc",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#90a8ff",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#003ea8",
+                        "secondary-fixed-dim": "#b1c5ff",
+                        "surface-container-low": "#f2f4f6",
+                        "on-secondary-fixed-variant": "#2e457b",
+                        "tertiary": "#00246b",
+                        "on-surface": "#191c1e",
+                        "surface": "#f7f9fb",
+                        "secondary": "#465d94",
+                        "on-primary": "#ffffff",
+                        "surface-tint": "#4059aa",
+                        "on-surface-variant": "#444651",
+                        "secondary-fixed": "#dae2ff",
+                        "tertiary-fixed": "#dbe1ff",
+                        "surface-container-highest": "#e0e3e5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-lg": "32px",
+                        "stack-md": "16px",
+                        "unit": "4px",
+                        "gutter": "16px",
+                        "container-padding": "24px",
+                        "stack-sm": "8px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "title-sm": ["Inter"],
+                        "data-mono": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "display-lg": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "display-lg-mobile": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .form-input-focus:focus {
+            outline: 2px solid #2563EB;
+            outline-offset: 2px;
+            border-color: transparent;
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 16px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen pb-24">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-gutter h-14 bg-surface dark:bg-inverse-surface border-b border-outline-variant dark:border-outline">
+<div class="flex items-center gap-4">
+<span class="text-title-sm font-title-sm font-bold text-primary dark:text-inverse-primary">Med AI NexSure</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-full hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">settings</span>
+</button>
+<div class="ml-2 h-8 w-8 rounded-full bg-surface-container-highest overflow-hidden">
+<img class="h-full w-full object-cover" data-alt="A professional headshot of a female hospital administrator in a clean, high-key corporate medical setting. She is wearing a dark navy blazer over a light blue clinical blouse. The background is a soft-focus modern hospital hallway with clean glass partitions and clinical white lighting, emphasizing a corporate healthcare environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuARtU_n1eQVfKl9R8r3wBJBmFosjBvLjaBKlDC33FwFp-64KcNHqqxlwXjDG6Xnhm_zR0hCQKrT7_JSVtwVpFXiEKSpHtYZKYmgePMIsN1eh3BJabDfx-AtwlMx-WvLX1GjXkyndsNBf0uDp0nE7WB_fWIpVPjNQgf0Bcj2SB0oY3wl3eXcTN__N1jJXdv-OFby0iUKKn0TBeZDsVzPu_usyonyYETgy56kz9becwFpYvO7-eP7p6dVD5upJ0UU2IFSZ0m-g0svSdtS"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-64 pt-14 flex flex-col z-40 bg-surface-container-low dark:bg-surface-container-lowest border-r border-outline-variant dark:border-outline hidden md:flex">
+<div class="p-4 border-b border-outline-variant">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 rounded-lg bg-primary flex items-center justify-center text-white font-bold">MX</div>
+<div>
+<div class="text-body-sm font-bold text-on-surface">Med AI NexSure</div>
+<div class="text-[10px] text-on-surface-variant uppercase tracking-wider font-semibold">Enterprise Admin</div>
+</div>
+</div>
+</div>
+<nav class="flex-1 py-4">
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all font-body-sm" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 bg-primary-container dark:bg-tertiary-container text-on-primary-container dark:text-on-tertiary-container font-bold border-l-4 border-primary font-body-sm" href="#">
+<span class="material-symbols-outlined">person_search</span>
+<span class="font-label-caps text-label-caps">Patients</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all font-body-sm" href="#">
+<span class="material-symbols-outlined">psychology</span>
+<span class="font-label-caps text-label-caps">AI Clinical</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all font-body-sm" href="#">
+<span class="material-symbols-outlined">manage_accounts</span>
+<span class="font-label-caps text-label-caps">User Management</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all font-body-sm" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</a>
+</nav>
+<div class="p-4 border-t border-outline-variant">
+<button class="w-full flex items-center justify-between p-2 rounded hover:bg-surface-container-high transition-all">
+<span class="text-body-sm font-medium">Switch Org</span>
+<span class="material-symbols-outlined text-sm">swap_horiz</span>
+</button>
+<div class="mt-4 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-2 py-2 text-on-surface-variant hover:text-primary text-body-sm" href="#">
+<span class="material-symbols-outlined text-sm">help</span> Help Center
+                </a>
+<a class="flex items-center gap-3 px-2 py-2 text-error hover:bg-error-container/20 text-body-sm rounded" href="#">
+<span class="material-symbols-outlined text-sm">logout</span> Logout
+                </a>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="md:ml-64 pt-20 px-gutter max-w-[1200px] mx-auto">
+<!-- Header / Breadcrumbs -->
+<nav class="flex items-center gap-2 mb-6">
+<a class="text-primary text-body-sm font-medium" href="#">User Management</a>
+<span class="material-symbols-outlined text-on-surface-variant text-sm">chevron_right</span>
+<span class="text-on-surface-variant text-body-sm">Dr. Ananya Srisuk</span>
+<span class="material-symbols-outlined text-on-surface-variant text-sm">chevron_right</span>
+<span class="text-on-surface font-bold text-body-sm">Edit Profile</span>
+</nav>
+<div class="flex flex-col lg:flex-row items-start gap-8">
+<!-- Profile Sidebar -->
+<div class="w-full lg:w-1/3 flex flex-col gap-6">
+<!-- Avatar Card -->
+<div class="bg-white border border-outline-variant rounded-lg p-8 flex flex-col items-center text-center">
+<div class="relative mb-4 group">
+<div class="w-32 h-32 rounded-full border-4 border-primary-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close up portrait of Dr. Ananya Srisuk, a Thai female doctor in her 40s. She has a warm, professional smile and is wearing a white lab coat with a stethoscope around her neck. The studio lighting is soft and neutral, typical of a high-end medical professional directory. The color palette is dominated by medical white and a clean light blue background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqv1sdjiZcaaMDUH5g0mHUTEgs0lZqI_AJ_FIn3Y82MofqiZoAyRUBjO9pUFAuUp9C9UqdjySnJSUy-RrmNEXPEHVCL-RmDNNHmVCEY-PwfzZpJogRYKHqHD01jYTW07GSs5VJZS-T2U7ZGzcKkDPohCeQl6olCz3jj8CPd7sUnYr4J1mrZGRioD5fvbPWt36Gzz5sBOsMEGCum0M4HnVsIbCeNBCwihVwZfi3AMTJUf5lMGkuCHeL89IvXqAGgmbjF7G0EJSlXGs1"/>
+</div>
+<button class="absolute bottom-1 right-1 bg-primary text-white p-2 rounded-full shadow-lg hover:bg-primary-container transition-all">
+<span class="material-symbols-outlined text-sm">photo_camera</span>
+</button>
+</div>
+<h1 class="font-headline-md text-headline-md text-on-surface">Dr. Ananya Srisuk</h1>
+<p class="text-body-sm text-on-surface-variant mb-4">Senior Oncologist • ID: NEX-8821</p>
+<div class="w-full h-px bg-outline-variant mb-4"></div>
+<div class="flex flex-col gap-2 w-full text-left">
+<div class="flex justify-between items-center text-body-sm">
+<span class="text-on-surface-variant">Account Status</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+<span class="ml-3 text-body-sm font-medium text-on-surface">Active</span>
+</label>
+</div>
+</div>
+</div>
+<!-- Read-only metadata -->
+<div class="bg-surface-container-low border border-outline-variant rounded-lg p-6 space-y-4">
+<h3 class="font-title-sm text-title-sm font-bold">System Metadata</h3>
+<div>
+<p class="text-label-caps font-label-caps text-on-surface-variant mb-1">USER ID</p>
+<p class="font-data-mono text-data-mono text-on-surface">USR_ANANYA_8821_S7</p>
+</div>
+<div>
+<p class="text-label-caps font-label-caps text-on-surface-variant mb-1">CREATED DATE</p>
+<p class="text-body-sm text-on-surface">October 14, 2022 • 09:12 AM</p>
+</div>
+<div>
+<p class="text-label-caps font-label-caps text-on-surface-variant mb-1">LAST LOGIN</p>
+<p class="text-body-sm text-on-surface">Today • 08:45 AM (Bangkok Time)</p>
+</div>
+</div>
+</div>
+<!-- Form Main Section -->
+<div class="w-full lg:w-2/3 space-y-6">
+<!-- Personal Information -->
+<div class="bg-white border border-outline-variant rounded-lg overflow-hidden">
+<div class="px-6 py-4 border-b border-outline-variant bg-surface-container-lowest">
+<h2 class="font-title-sm text-title-sm font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">person</span> Personal Information
+                        </h2>
+</div>
+<div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+<div class="flex flex-col gap-1">
+<label class="text-label-caps font-label-caps text-on-surface-variant">First Name</label>
+<input class="border border-outline-variant rounded p-2 text-body-md form-input-focus" type="text" value="Ananya"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="text-label-caps font-label-caps text-on-surface-variant">Last Name</label>
+<input class="border border-outline-variant rounded p-2 text-body-md form-input-focus" type="text" value="Srisuk"/>
+</div>
+<div class="flex flex-col gap-1 md:col-span-2">
+<label class="text-label-caps font-label-caps text-on-surface-variant">Display Name</label>
+<input class="border border-outline-variant rounded p-2 text-body-md form-input-focus" type="text" value="Dr. Ananya Srisuk"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="text-label-caps font-label-caps text-on-surface-variant">Employee ID</label>
+<input class="border border-outline-variant rounded p-2 text-body-md form-input-focus" type="text" value="NEX-8821"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="text-label-caps font-label-caps text-on-surface-variant">Department</label>
+<select class="border border-outline-variant rounded p-2 text-body-md form-input-focus">
+<option>Oncology</option>
+<option>Cardiology</option>
+<option>Pediatrics</option>
+<option>General Medicine</option>
+<option>Administration</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Contact & Preferences -->
+<div class="bg-white border border-outline-variant rounded-lg overflow-hidden">
+<div class="px-6 py-4 border-b border-outline-variant bg-surface-container-lowest">
+<h2 class="font-title-sm text-title-sm font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">contact_mail</span> Contact &amp; Preferences
+                        </h2>
+</div>
+<div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+<div class="flex flex-col gap-1">
+<label class="text-label-caps font-label-caps text-on-surface-variant">Email Address</label>
+<div class="relative">
+<input class="w-full border border-outline-variant rounded p-2 text-body-md form-input-focus pl-10" type="email" value="ananya.s@medai-nexsure.com"/>
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-sm">mail</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<label class="text-label-caps font-label-caps text-on-surface-variant">Phone Number</label>
+<div class="relative">
+<input class="w-full border border-outline-variant rounded p-2 text-body-md form-input-focus pl-10 border-error" type="tel" value="+66 81 234 5678"/>
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-error text-sm">phone</span>
+<p class="text-[10px] text-error font-semibold mt-1">Invalid phone format for selected region</p>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<label class="text-label-caps font-label-caps text-on-surface-variant">Preferred Language</label>
+<select class="border border-outline-variant rounded p-2 text-body-md form-input-focus">
+<option>English (US)</option>
+<option selected="">Thai (TH)</option>
+<option>Mandarin</option>
+<option>Japanese</option>
+</select>
+</div>
+<div class="flex flex-col gap-1">
+<label class="text-label-caps font-label-caps text-on-surface-variant">Default Clinic</label>
+<select class="border border-outline-variant rounded p-2 text-body-md form-input-focus">
+<option selected="">Bangkok Central Medical</option>
+<option>Sukhumvit Specialist Center</option>
+<option>Thonburi Health Hub</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Access Control -->
+<div class="bg-white border border-outline-variant rounded-lg overflow-hidden">
+<div class="px-6 py-4 border-b border-outline-variant bg-surface-container-lowest">
+<h2 class="font-title-sm text-title-sm font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">security</span> Access Control
+                        </h2>
+</div>
+<div class="p-6 space-y-6">
+<div>
+<label class="text-label-caps font-label-caps text-on-surface-variant block mb-3">Assigned Clinics (Multi-select)</label>
+<div class="flex flex-wrap gap-2">
+<div class="px-3 py-1 bg-primary-container text-on-primary-container rounded-full flex items-center gap-2 text-body-sm font-medium border border-primary/20">
+                                    Bangkok Central Medical <button class="hover:text-primary"><span class="material-symbols-outlined text-sm">close</span></button>
+</div>
+<div class="px-3 py-1 bg-primary-container text-on-primary-container rounded-full flex items-center gap-2 text-body-sm font-medium border border-primary/20">
+                                    Sukhumvit Specialist Center <button class="hover:text-primary"><span class="material-symbols-outlined text-sm">close</span></button>
+</div>
+<button class="px-3 py-1 border border-dashed border-outline-variant text-on-surface-variant rounded-full flex items-center gap-2 text-body-sm hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-sm">add</span> Add Clinic
+                                </button>
+</div>
+</div>
+<div>
+<label class="text-label-caps font-label-caps text-on-surface-variant block mb-3">Assigned Roles</label>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<label class="flex items-start gap-3 p-3 border border-outline-variant rounded-lg hover:bg-surface-container-low cursor-pointer transition-colors">
+<input checked="" class="mt-1 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+<div>
+<div class="text-body-sm font-bold">Clinical Practitioner</div>
+<div class="text-[11px] text-on-surface-variant">Full patient record access &amp; diagnostics</div>
+</div>
+</label>
+<label class="flex items-start gap-3 p-3 border border-outline-variant rounded-lg hover:bg-surface-container-low cursor-pointer transition-colors">
+<input checked="" class="mt-1 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+<div>
+<div class="text-body-sm font-bold">AI Data Reviewer</div>
+<div class="text-[11px] text-on-surface-variant">Permission to validate AI clinical models</div>
+</div>
+</label>
+<label class="flex items-start gap-3 p-3 border border-outline-variant rounded-lg hover:bg-surface-container-low cursor-pointer transition-colors opacity-50">
+<input class="mt-1 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+<div>
+<div class="text-body-sm font-bold">System Admin</div>
+<div class="text-[11px] text-on-surface-variant">Restricted to organization managers only</div>
+</div>
+</label>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Sticky Action Bar -->
+<div class="fixed bottom-0 left-0 md:left-64 right-0 bg-white border-t border-outline-variant px-gutter py-4 z-50 flex flex-col md:flex-row items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-primary-container/30 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary animate-pulse">sync</span>
+</div>
+<div>
+<p class="text-body-sm font-bold text-on-surface">Unsaved changes / การเปลี่ยนแปลงยังไม่ได้บันทึก</p>
+<p class="text-[11px] text-on-surface-variant">Last autosaved 2m ago</p>
+</div>
+</div>
+<div class="flex items-center gap-3 w-full md:w-auto">
+<button class="flex-1 md:flex-none px-6 py-2 border border-outline-variant text-on-surface-variant font-bold text-body-sm rounded-lg hover:bg-surface-container-high transition-all active:scale-95">
+                Cancel
+            </button>
+<button class="flex-1 md:flex-none px-8 py-2 bg-primary text-white font-bold text-body-sm rounded-lg hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">save</span>
+                Save Changes
+            </button>
+</div>
+</div>
+<!-- Notification Toast (Micro-interaction) -->
+<div class="fixed top-20 right-6 z-[60] transform translate-x-full transition-transform duration-300" id="save-toast">
+<div class="bg-inverse-surface text-inverse-on-surface px-6 py-3 rounded shadow-xl flex items-center gap-3">
+<span class="material-symbols-outlined text-primary-fixed">info</span>
+<span class="text-body-sm">Validating information...</span>
+</div>
+</div>
+<script>
+        // Simple micro-interaction for focus tracking
+        const inputs = document.querySelectorAll('input, select');
+        const toast = document.getElementById('save-toast');
+
+        inputs.forEach(input => {
+            input.addEventListener('change', () => {
+                // Show a brief validation toast simulation
+                toast.classList.remove('translate-x-full');
+                setTimeout(() => {
+                    toast.classList.add('translate-x-full');
+                }, 2000);
+            });
+        });
+
+        // Add sticky effect on scroll
+        window.addEventListener('scroll', () => {
+            const footer = document.querySelector('.bg-white.border-t');
+            if (window.scrollY > 50) {
+                footer.classList.add('shadow-[0_-8px_24px_rgba(0,0,0,0.05)]');
+            } else {
+                footer.classList.remove('shadow-[0_-8px_24px_rgba(0,0,0,0.05)]');
+            }
+        });
+    </script>
+</body></html>
