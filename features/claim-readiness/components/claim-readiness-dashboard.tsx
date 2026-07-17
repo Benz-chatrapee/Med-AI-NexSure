@@ -434,7 +434,7 @@ export function ClaimReadinessDashboard() {
   };
 
   return (
-    <div className="grid min-h-screen bg-[#f8fafc] text-slate-950 lg:grid-cols-[272px_minmax(0,1fr)]">
+    <div className="grid min-h-screen bg-[#F8FAFC] text-[#0F172A] lg:grid-cols-[272px_minmax(0,1fr)]">
       <Sidebar open={sidebarOpen} />
       <main className="min-w-0 px-4 py-4 sm:px-7 sm:py-6">
         <div className="mb-4 flex items-center justify-between lg:hidden">
@@ -449,11 +449,11 @@ export function ClaimReadinessDashboard() {
             <div className="text-[11px] font-extrabold uppercase tracking-[.1em] text-blue-600">
               Enterprise Claim Intelligence
             </div>
-            <h1 className="mt-1 text-[38px] font-extrabold tracking-[-.04em]">Claim Readiness</h1>
-            <p className="max-w-3xl text-sm leading-6 text-slate-500">
+            <h1 className="mt-1 text-[38px] font-extrabold text-[#0F2A5F] tracking-[-.04em]">Claim Readiness</h1>
+            <p className="max-w-3xl text-sm leading-6 text-[#64748B]">
               Monitor claim-ready cases, missing evidence, risk level, economic alerts, and AI recommendations in one audit-ready operational workspace.
             </p>
-            <p className="mt-1 text-xs text-slate-500">ตรวจสอบความพร้อมของข้อมูลก่อนสร้าง Evidence Package หรือส่งเคลมประกัน</p>
+            <p className="mt-1 text-xs text-[#64748B]">ตรวจสอบความพร้อมของข้อมูลก่อนสร้าง Evidence Package หรือส่งเคลมประกัน</p>
           </div>
           <div className="flex flex-wrap gap-2 xl:justify-end">
             <button
@@ -737,9 +737,9 @@ export function ClaimReadinessDashboard() {
 
 function Sidebar({ open }: { open: boolean }) {
   return (
-    <aside className={`fixed inset-y-0 left-0 z-30 h-screen w-[272px] overflow-auto bg-[#071733] px-[18px] py-6 text-blue-100 transition lg:sticky lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}>
+    <aside className={`fixed inset-y-0 left-0 z-30 h-screen w-[272px] overflow-auto bg-[#0F2A5F] px-[18px] py-6 text-blue-100 transition lg:sticky lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}>
       <div className="flex items-center gap-3 px-1 pb-6">
-        <div className="grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br from-blue-400 to-blue-700 font-extrabold text-white">AI</div>
+        <div className="grid h-11 w-11 place-items-center rounded-[10px] border border-sky-300/30 bg-[#1E3A8A] font-extrabold text-white">AI</div>
         <div>
           <h2 className="m-0 text-[17px] font-bold text-white">Med AI NexSure</h2>
           <p className="mt-1 text-[11px] text-blue-300">Enterprise Healthcare Intelligence</p>
@@ -757,12 +757,12 @@ function Sidebar({ open }: { open: boolean }) {
 function NavGroup({ label, items, start = 1, codePrefix }: { label: string; items: string[]; start?: number; codePrefix?: string }) {
   return (
     <div className="mt-2">
-      <div className="px-3 pb-1.5 pt-3 text-[10px] font-extrabold uppercase tracking-[.12em] text-slate-500">{label}</div>
+      <div className="px-3 pb-1.5 pt-3 text-[10px] font-extrabold uppercase tracking-[.12em] text-sky-300">{label}</div>
       {items.map((item, index) => (
         <a
           key={item}
           href="#"
-          className={`mb-1 flex items-center justify-between rounded-[10px] px-3 py-3 text-[13px] no-underline ${item === "Claim Readiness" ? "bg-blue-600/25 text-white" : "text-blue-200 hover:bg-blue-600/20 hover:text-white"}`}
+          className={`mb-1 flex items-center justify-between rounded-[8px] px-3 py-3 text-[13px] no-underline ${item === "Claim Readiness" ? "border border-sky-300/25 bg-[#1E3A8A] text-white" : "text-blue-100 hover:bg-white/10 hover:text-white"}`}
         >
           {item}
           <span>{codePrefix ? `⌘${codePrefix}` : `⌘${start + index}`}</span>
@@ -787,7 +787,7 @@ function FilterPanel({ filters, updateFilter, reset }: { filters: Filters; updat
         <Field label="AI Assisted"><SelectValue value={filters.ai} onChange={(value) => updateFilter("ai", value)} options={["All Cases", "AI Assisted", "Non-AI"]} values={["", "Yes", "No"]} /></Field>
       </div>
       <div className="mt-3 flex flex-wrap gap-2">
-        <span className="inline-flex rounded-full bg-blue-50 px-3 py-1.5 text-[11px] font-bold text-blue-900">Last 7 Days</span>
+        <span className="inline-flex rounded-full border border-blue-200 bg-[#EFF6FF] px-3 py-1.5 text-[11px] font-bold text-[#1E3A8A]">Last 7 Days</span>
         <button className={buttonGhost} onClick={reset}>Reset Filters</button>
       </div>
     </section>
@@ -826,15 +826,15 @@ function Worklist({ rows, filters, updateFilter, openCase, clearChart }: { rows:
       <div className="max-h-[520px] overflow-auto">
         <table className="w-full min-w-[1900px] border-separate border-spacing-0 text-left text-xs">
           <thead>
-            <tr className="bg-slate-50 text-[11px] text-slate-600">
+            <tr className="bg-[#EFF6FF] text-[11px] text-[#0F2A5F]">
               {["", "Claim ID", "Patient", "Payer", "Readiness Score", "Risk Level", "Primary Blocker", "Aging", "SLA Status", "Estimated Claim Value", "Value at Risk", "Owner", "AI Confidence", "Next Best Action", "Last Updated", "Actions"].map((head) => (
-                <th key={head} className="sticky top-0 z-10 border-b border-slate-200 bg-slate-50 px-2.5 py-3">{head || <input type="checkbox" aria-label="Select all" />}</th>
+                <th key={head} className="sticky top-0 z-10 border-b border-blue-200 bg-[#EFF6FF] px-2.5 py-3">{head || <input type="checkbox" aria-label="Select all" />}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {visibleRows.map((item) => (
-              <tr key={item.id} className="cursor-pointer align-top hover:bg-[#f8fbff]" onClick={(event) => {
+              <tr key={item.id} className="cursor-pointer align-top hover:bg-[#EFF6FF]" onClick={(event) => {
                 if ((event.target as HTMLElement).closest("button,input")) return;
                 openCase(item.id);
               }}>
@@ -968,11 +968,11 @@ function RecentActivity({ activities }: { activities: string[] }) {
 function Kpi({ label, icon, value, meta, trend, progress, tone = "default" }: { label: string; icon: string; value: string | number; meta: string; trend: string; progress: number; tone?: "default" | "success" | "warning" | "danger" }) {
   const toneColor = tone === "success" ? "#059669" : tone === "warning" ? "#d97706" : tone === "danger" ? "#dc2626" : "#2563eb";
   return (
-    <article className={`${cardClass} relative overflow-hidden p-[17px] before:absolute before:inset-y-0 before:left-0 before:w-1`} style={{ "--tw-gradient-from": toneColor } as React.CSSProperties}>
+    <article className={`${cardClass} relative overflow-hidden p-[17px] before:absolute before:inset-y-0 before:left-0 before:w-1`}>
       <div className="absolute inset-y-0 left-0 w-1" style={{ background: toneColor }} />
-      <div className="flex items-center justify-between gap-2"><div className="text-[13px] font-extrabold tracking-[-.01em]">{label}</div><div className="grid h-[30px] w-[30px] place-items-center rounded-[9px] bg-blue-50 text-[13px] font-extrabold text-blue-900">{icon}</div></div>
+      <div className="flex items-center justify-between gap-2"><div className="text-[13px] font-extrabold tracking-[-.01em] text-[#0F2A5F]">{label}</div><div className="grid h-[30px] w-[30px] place-items-center rounded-[8px] border border-[#BFDBFE] bg-[#EFF6FF] text-[13px] font-extrabold text-[#1E3A8A]">{icon}</div></div>
       <div className="mt-3.5 text-center text-[34px] font-extrabold tracking-[-.045em]">{value}</div>
-      <div className="mt-3.5 h-2.5 overflow-hidden rounded-full bg-slate-200"><span className="block h-full rounded-full" style={{ width: `${progress}%`, background: tone === "success" ? "linear-gradient(90deg,#10b981,#059669)" : tone === "warning" ? "linear-gradient(90deg,#f59e0b,#d97706)" : tone === "danger" ? "linear-gradient(90deg,#ef4444,#dc2626)" : "linear-gradient(90deg,#2563eb,#1e3a8a)" }} /></div>
+      <div className="mt-3.5 h-2.5 overflow-hidden rounded-full bg-slate-200"><span className="block h-full rounded-full" style={{ width: `${progress}%`, background: toneColor }} /></div>
       <div className={`mt-3.5 text-[11px] font-bold ${tone === "warning" ? "text-amber-600" : tone === "danger" ? "text-red-600" : "text-emerald-600"}`}>{trend}</div>
       <div className="mt-1 text-[11px] font-semibold text-slate-500">{meta}</div>
     </article>
@@ -996,7 +996,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function SelectValue({ value, onChange, options, values }: { value: string; onChange: (value: string) => void; options: string[]; values?: string[] }) {
   return (
-    <select className="h-10 min-w-[150px] rounded-[10px] border border-slate-200 bg-white px-3 text-sm text-slate-950" value={value} onChange={(event) => onChange(event.target.value)}>
+    <select className="h-10 min-w-[150px] rounded-[8px] border border-[#E2E8F0] bg-white px-3 text-sm text-[#0F172A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]" value={value} onChange={(event) => onChange(event.target.value)}>
       {options.map((option, index) => <option key={option} value={values?.[index] ?? (index === 0 ? "" : option)}>{option}</option>)}
     </select>
   );
@@ -1004,11 +1004,11 @@ function SelectValue({ value, onChange, options, values }: { value: string; onCh
 
 function Badge({ tone, children }: { tone: "green" | "amber" | "red" | "blue" | "gray"; children: React.ReactNode }) {
   const tones = {
-    green: "bg-emerald-50 text-emerald-700",
-    amber: "bg-amber-50 text-amber-700",
-    red: "bg-red-50 text-red-600",
-    blue: "bg-blue-50 text-blue-900",
-    gray: "bg-slate-100 text-slate-600",
+    green: "border border-emerald-200 bg-emerald-50 text-emerald-700",
+    amber: "border border-amber-200 bg-amber-50 text-amber-700",
+    red: "border border-red-200 bg-red-50 text-red-600",
+    blue: "border border-blue-200 bg-[#EFF6FF] text-[#1E3A8A]",
+    gray: "border border-slate-200 bg-slate-100 text-slate-600",
   };
   return <span className={`inline-flex whitespace-nowrap rounded-full px-2 py-1 text-[10px] font-bold ${tones[tone]}`}>{children}</span>;
 }
@@ -1042,18 +1042,18 @@ function getScoreComponents(item: ClaimCase) {
 
 const riskPriority: Record<RiskLevel, number> = { High: 3, Medium: 2, Low: 1 };
 const slaPriority: Record<SlaStatus, number> = { "Over SLA": 3, "Near SLA": 2, "Within SLA": 1 };
-const panelClass = "mb-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_12px_32px_rgba(15,23,42,.08)]";
-const cardClass = "rounded-2xl border border-slate-200 bg-white p-[18px] shadow-[0_12px_32px_rgba(15,23,42,.08)]";
-const buttonPrimary = "inline-flex min-h-10 items-center justify-center gap-2 rounded-[10px] border border-transparent bg-gradient-to-br from-blue-600 to-blue-900 px-3.5 py-2.5 text-[13px] font-bold text-white shadow-[0_8px_18px_rgba(37,99,235,.18)] disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-none disabled:bg-slate-100 disabled:text-slate-400 disabled:shadow-none";
-const buttonSecondary = "inline-flex min-h-10 items-center justify-center gap-2 rounded-[10px] border border-slate-200 bg-white px-3.5 py-2.5 text-[13px] font-bold text-slate-950 disabled:cursor-not-allowed disabled:text-slate-400";
-const buttonGhost = "inline-flex min-h-10 items-center justify-center rounded-[10px] border border-slate-200 bg-transparent px-3.5 py-2.5 text-[13px] font-bold text-slate-500";
-const buttonDanger = "inline-flex min-h-10 items-center justify-center rounded-[10px] border border-red-200 bg-white px-3.5 py-2.5 text-[13px] font-bold text-red-600";
+const panelClass = "mb-4 rounded-[8px] border border-[#E2E8F0] bg-white p-4 shadow-[0_8px_24px_rgba(15,42,95,.06)]";
+const cardClass = "rounded-[8px] border border-[#E2E8F0] bg-white p-[18px] shadow-[0_8px_24px_rgba(15,42,95,.06)]";
+const buttonPrimary = "inline-flex min-h-10 items-center justify-center gap-2 rounded-[8px] border border-[#1E3A8A] bg-[#1E3A8A] px-3.5 py-2.5 text-[13px] font-bold text-white shadow-[0_6px_16px_rgba(30,58,138,.16)] hover:bg-[#0F2A5F] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB] disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:shadow-none";
+const buttonSecondary = "inline-flex min-h-10 items-center justify-center gap-2 rounded-[8px] border border-[#BFDBFE] bg-white px-3.5 py-2.5 text-[13px] font-bold text-[#0F2A5F] hover:bg-[#EFF6FF] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB] disabled:cursor-not-allowed disabled:text-slate-400";
+const buttonGhost = "inline-flex min-h-10 items-center justify-center rounded-[8px] border border-[#E2E8F0] bg-transparent px-3.5 py-2.5 text-[13px] font-bold text-[#64748B] hover:border-[#BFDBFE] hover:bg-[#EFF6FF]";
+const buttonDanger = "inline-flex min-h-10 items-center justify-center rounded-[8px] border border-red-200 bg-white px-3.5 py-2.5 text-[13px] font-bold text-red-600 hover:bg-red-50";
 const smallButtonPrimary = `${buttonPrimary} min-h-8 px-2.5 py-1.5 text-[11px]`;
 const smallButtonSecondary = `${buttonSecondary} min-h-8 px-2.5 py-1.5 text-[11px]`;
 const mutedClass = "mt-1 text-[11px] text-slate-500";
 const tdClass = "border-b border-slate-100 px-2.5 py-3 align-top";
-const insightClass = "mt-3 rounded-[10px] border border-blue-200 bg-blue-50 px-3 py-3 text-xs leading-5 text-blue-950";
-const governanceClass = "rounded-[10px] border border-dashed border-slate-300 bg-slate-50 p-3 text-[11px] leading-5 text-slate-500";
+const insightClass = "mt-3 rounded-[8px] border border-[#BFDBFE] bg-[#EFF6FF] px-3 py-3 text-xs leading-5 text-[#0F2A5F]";
+const governanceClass = "rounded-[8px] border border-dashed border-[#BFDBFE] bg-[#F8FAFC] p-3 text-[11px] leading-5 text-[#64748B]";
 
 function statusTone(status: ReadinessStatus) {
   return status === "Ready" ? "green" : status === "Needs Review" ? "amber" : "red";
