@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Med AI NexSure | Enterprise Clinical Workspace</title>
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=IBM+Plex+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#eeedf4",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#003ea8",
+                        "tertiary-fixed": "#dbe1ff",
+                        "background": "#faf8ff",
+                        "tertiary-fixed-dim": "#b4c5ff",
+                        "secondary-fixed-dim": "#b1c5ff",
+                        "on-surface-variant": "#444651",
+                        "on-secondary-fixed": "#001946",
+                        "on-surface": "#1a1b21",
+                        "outline-variant": "#c5c5d3",
+                        "primary": "#00236f",
+                        "primary-container": "#1e3a8a",
+                        "secondary-fixed": "#dae2ff",
+                        "tertiary": "#00246b",
+                        "surface-tint": "#4059aa",
+                        "on-primary-fixed": "#00164e",
+                        "outline": "#757682",
+                        "surface-container-highest": "#e3e1e9",
+                        "on-background": "#1a1b21",
+                        "inverse-primary": "#b6c4ff",
+                        "on-secondary-container": "#364d83",
+                        "primary-fixed": "#dce1ff",
+                        "surface-container-high": "#e9e7ef",
+                        "inverse-on-surface": "#f1f0f7",
+                        "on-error-container": "#93000a",
+                        "surface-dim": "#dad9e1",
+                        "secondary-container": "#a9c0fe",
+                        "on-primary-container": "#90a8ff",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed-dim": "#b6c4ff",
+                        "on-primary-fixed-variant": "#264191",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "tertiary-container": "#00389a",
+                        "on-tertiary-container": "#8da9ff",
+                        "error-container": "#ffdad6",
+                        "surface-container-low": "#f4f3fa",
+                        "surface": "#faf8ff",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#2e457b",
+                        "surface-variant": "#e3e1e9",
+                        "surface-bright": "#faf8ff",
+                        "inverse-surface": "#2f3036",
+                        "secondary": "#465d94",
+                        "on-tertiary-fixed": "#00174b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "32px",
+                        "lg": "24px",
+                        "base": "4px",
+                        "gutter": "20px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "container-max": "1440px",
+                        "sm": "8px",
+                        "sidebar-width": "260px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["IBM Plex Sans"],
+                        "label-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["IBM Plex Sans"],
+                        "body-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "data-mono": ["IBM Plex Sans"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "500"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "450"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .sidebar-active { background: #1e3a8a; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
+        @keyframes subtle-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
+        .animate-ai { animation: subtle-pulse 3s infinite ease-in-out; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface flex h-screen overflow-hidden">
+<!-- Sidebar -->
+<aside class="fixed left-0 top-0 h-full w-[260px] bg-primary flex flex-col py-md shadow-lg z-50 overflow-y-auto">
+<div class="px-lg mb-xl">
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary tracking-tight">Med AI NexSure</h1>
+<p class="text-[10px] text-primary-fixed-dim uppercase tracking-widest mt-xs">Enterprise Clinical OS</p>
+</div>
+<nav class="flex-1 flex flex-col space-y-1">
+<div class="text-primary-fixed-dim/50 px-lg py-sm font-label-md text-label-md uppercase tracking-wider">Main Menu</div>
+<a class="text-primary-fixed-dim hover:text-on-primary px-lg py-2 flex items-center gap-md transition-colors cursor-pointer group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="text-primary-fixed-dim hover:text-on-primary px-lg py-2 flex items-center gap-md transition-colors cursor-pointer group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">person</span>
+<span class="font-label-md text-label-md">Patients</span>
+</a>
+<a class="text-primary-fixed-dim hover:text-on-primary px-lg py-2 flex items-center gap-md transition-colors cursor-pointer group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">calendar_today</span>
+<span class="font-label-md text-label-md">Visits</span>
+</a>
+<a class="bg-on-primary-fixed-variant text-on-primary px-lg py-2 flex items-center gap-md transition-colors cursor-pointer border-r-4 border-secondary-container" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">edit_note</span>
+<span class="font-label-md text-label-md">SOAP Notes</span>
+</a>
+<a class="text-primary-fixed-dim hover:text-on-primary px-lg py-2 flex items-center gap-md transition-colors cursor-pointer group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">psychology</span>
+<span class="font-label-md text-label-md">AI Clinical Engine</span>
+</a>
+<a class="text-primary-fixed-dim hover:text-on-primary px-lg py-2 flex items-center gap-md transition-colors cursor-pointer group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">medical_services</span>
+<span class="font-label-md text-label-md">Prescriptions</span>
+</a>
+<div class="mt-xl text-primary-fixed-dim/50 px-lg py-sm font-label-md text-label-md uppercase tracking-wider">Administration</div>
+<a class="text-primary-fixed-dim hover:text-on-primary px-lg py-2 flex items-center gap-md transition-colors cursor-pointer group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">fact_check</span>
+<span class="font-label-md text-label-md">Claim Readiness</span>
+</a>
+<a class="text-primary-fixed-dim hover:text-on-primary px-lg py-2 flex items-center gap-md transition-colors cursor-pointer group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">inventory_2</span>
+<span class="font-label-md text-label-md">Evidence Package</span>
+</a>
+</nav>
+<div class="px-md mt-auto">
+<div class="bg-on-primary-fixed-variant/40 p-md rounded-xl flex items-center gap-md">
+<img class="w-10 h-10 rounded-full border border-outline-variant bg-surface" data-alt="Professional headshot of a female doctor, Dr. Elena Smith, with a warm smile, wearing a white lab coat and stethoscope, set against a blurred hospital hallway background. Soft, natural lighting. High-end editorial clinical photography style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFgtOGgfsH_LHnOvQoU6BxQltlnutSByOZRyz6MrMigk_O9DW1bqFaWZul5_Ey-EEQY-zdFPTDDnBY8dKd4SfgJYmR9lU9BdHk94jM_L3OnQi_s7IGMBM0vvT8OqwLYt4HJ0RfG3Awbrs_92cE_UTZ8btLBcoYPDVwWVRMQRUZ0cIemU6PZxyQLhUEtU5LO4SV8wB-gsMtfZRx_h6YZX0S_lE0fukpfRYSYe8fkMTN6xJlg8D_yKxDMb951lyrZgP8FBxN5KAHYFJs"/>
+<div>
+<p class="text-on-primary font-label-md text-label-md">Dr. Elena Smith</p>
+<p class="text-primary-fixed-dim text-[10px]">Endocrinologist</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Workspace -->
+<main class="flex-1 ml-[260px] flex flex-col h-screen overflow-hidden">
+<!-- Top Nav -->
+<header class="h-16 flex items-center justify-between px-lg bg-surface-container-lowest border-b border-outline-variant sticky top-0 z-40">
+<div class="flex items-center gap-lg">
+<div class="flex items-center bg-surface-container-low rounded-lg px-md py-1.5 border border-outline-variant cursor-pointer hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-primary text-lg mr-sm">account_balance</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Metro General Hospital</span>
+<span class="material-symbols-outlined text-on-surface-variant ml-xl">expand_more</span>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="bg-secondary-container text-on-secondary-container px-md py-2 rounded-lg font-label-md text-label-md flex items-center gap-sm hover:shadow-md transition-all">
+<span class="material-symbols-outlined animate-ai">smart_toy</span>
+                    AI Copilot
+                </button>
+<button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:bg-surface-container rounded-full transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<!-- Patient Context & KPIs -->
+<section class="bg-surface border-b border-outline-variant px-lg py-md">
+<!-- Patient Bar -->
+<div class="flex items-center justify-between mb-md">
+<div class="flex items-center gap-lg">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-full bg-secondary-fixed text-primary flex items-center justify-center font-bold text-lg">SJ</div>
+<div>
+<h2 class="font-headline-md text-headline-md font-bold text-on-surface">Sunee Jaidee</h2>
+<p class="text-on-surface-variant text-body-sm font-label-md">HN-0001842 • Female • 62y • Oct 12, 1961</p>
+</div>
+</div>
+<div class="h-10 w-[1px] bg-outline-variant"></div>
+<div class="flex flex-col">
+<span class="text-label-md font-label-md text-on-surface-variant opacity-70">Current Visit</span>
+<span class="text-body-md font-medium text-primary">VIS-2026-005184</span>
+</div>
+<div class="h-10 w-[1px] bg-outline-variant"></div>
+<div class="flex flex-col">
+<span class="text-label-md font-label-md text-on-surface-variant opacity-70">Insurance</span>
+<span class="text-body-md font-medium">AIA Health Plus</span>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex items-center px-md py-1 rounded-full bg-success-container/10 border border-success/30 text-success text-[11px] font-bold uppercase tracking-wider">
+<span class="w-2 h-2 rounded-full bg-green-500 mr-sm"></span>
+                        In Consultation
+                    </div>
+<div class="flex items-center px-md py-1 rounded-full bg-error-container/10 border border-error/30 text-error text-[11px] font-bold uppercase tracking-wider">
+                        Needs Review
+                    </div>
+</div>
+</div>
+<!-- Safety Banner -->
+<div class="bg-error-container text-on-error-container px-lg py-sm rounded-lg flex items-center gap-md mb-md border border-error/20">
+<span class="material-symbols-outlined text-error">warning</span>
+<span class="font-label-md text-label-md font-bold uppercase tracking-tight">Clinical Safety Alert:</span>
+<span class="font-body-md text-body-md">Severe penicillin allergy (Anaphylaxis risk). Avoid Beta-lactam antibiotics.</span>
+</div>
+<!-- KPIs -->
+<div class="grid grid-cols-5 gap-md">
+<div class="bg-surface-container-low p-md rounded-xl border border-outline-variant">
+<p class="text-label-md font-label-md text-on-surface-variant mb-xs">SOAP Completeness</p>
+<div class="flex items-center justify-between">
+<span class="font-headline-md text-headline-md font-bold text-primary">82%</span>
+<div class="w-16 h-1.5 bg-outline-variant rounded-full overflow-hidden">
+<div class="w-[82%] h-full bg-primary"></div>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-low p-md rounded-xl border border-outline-variant">
+<p class="text-label-md font-label-md text-on-surface-variant mb-xs">AI Confidence</p>
+<div class="flex items-center justify-between">
+<span class="font-headline-md text-headline-md font-bold text-secondary">88%</span>
+<span class="material-symbols-outlined text-secondary animate-ai">check_circle</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-md rounded-xl border border-outline-variant">
+<p class="text-label-md font-label-md text-on-surface-variant mb-xs">Clinical Risk</p>
+<div class="flex items-center justify-between">
+<span class="font-headline-md text-headline-md font-bold text-warning-600">Moderate</span>
+<span class="material-symbols-outlined text-orange-500">priority_high</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-md rounded-xl border border-outline-variant">
+<p class="text-label-md font-label-md text-on-surface-variant mb-xs">Claim Readiness</p>
+<div class="flex items-center justify-between">
+<span class="font-headline-md text-headline-md font-bold text-error">Review</span>
+<span class="material-symbols-outlined text-error">pending_actions</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-md rounded-xl border border-outline-variant">
+<p class="text-label-md font-label-md text-on-surface-variant mb-xs">Documentation</p>
+<div class="flex items-center justify-between">
+<span class="font-headline-md text-headline-md font-bold text-on-surface-variant">Draft</span>
+<span class="material-symbols-outlined text-on-surface-variant">draw</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Three-Panel Body -->
+<div class="flex-1 flex overflow-hidden bg-surface-container-low">
+<!-- Left Panel: Patient Snapshot -->
+<section class="w-72 border-r border-outline-variant overflow-y-auto p-lg flex flex-col gap-lg bg-surface">
+<div>
+<h3 class="font-label-md text-label-md font-bold uppercase text-on-surface-variant tracking-wider mb-md flex items-center justify-between">
+                        Chronic Conditions
+                        <span class="material-symbols-outlined text-sm">add</span>
+</h3>
+<div class="space-y-sm">
+<div class="px-md py-sm bg-error-container/10 border border-error/20 rounded-lg">
+<p class="text-body-sm font-bold text-error">Diabetes Type 2</p>
+<p class="text-[11px] text-on-surface-variant">Last HbA1c: 7.8% (Sep 2025)</p>
+</div>
+<div class="px-md py-sm bg-warning-container/10 border border-orange-200 rounded-lg">
+<p class="text-body-sm font-bold text-orange-700">Hypertension</p>
+<p class="text-[11px] text-on-surface-variant">Stage 2, Medically managed</p>
+</div>
+</div>
+</div>
+<div>
+<h3 class="font-label-md text-label-md font-bold uppercase text-on-surface-variant tracking-wider mb-md">Current Medications</h3>
+<div class="space-y-xs">
+<div class="flex items-center gap-sm p-sm hover:bg-surface-variant rounded transition-colors cursor-pointer group">
+<span class="material-symbols-outlined text-primary text-sm">pill</span>
+<span class="text-body-sm flex-1">Metformin 500mg BID</span>
+</div>
+<div class="flex items-center gap-sm p-sm hover:bg-surface-variant rounded transition-colors cursor-pointer group">
+<span class="material-symbols-outlined text-primary text-sm">pill</span>
+<span class="text-body-sm flex-1">Lisinopril 10mg QD</span>
+</div>
+<div class="flex items-center gap-sm p-sm hover:bg-surface-variant rounded transition-colors cursor-pointer group">
+<span class="material-symbols-outlined text-primary text-sm">pill</span>
+<span class="text-body-sm flex-1">Aspirin 81mg QD</span>
+</div>
+</div>
+</div>
+<div>
+<h3 class="font-label-md text-label-md font-bold uppercase text-on-surface-variant tracking-wider mb-md">Visit History</h3>
+<div class="border-l-2 border-outline-variant ml-2 pl-4 space-y-md">
+<div class="relative">
+<div class="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-primary border-2 border-surface"></div>
+<p class="text-[11px] text-on-surface-variant">Dec 12, 2025</p>
+<p class="text-body-sm font-medium">Endo Follow-up</p>
+</div>
+<div class="relative">
+<div class="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-outline-variant border-2 border-surface"></div>
+<p class="text-[11px] text-on-surface-variant">Oct 05, 2025</p>
+<p class="text-body-sm font-medium">Urgent Care: Cough</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Center Panel: SOAP Editor -->
+<section class="flex-1 overflow-y-auto p-lg space-y-lg">
+<!-- Subjective -->
+<div class="bg-surface-container-lowest p-lg rounded-xl shadow-sm border border-outline-variant">
+<div class="flex items-center justify-between mb-md">
+<div class="flex items-center gap-md">
+<span class="w-8 h-8 rounded-lg bg-primary text-on-primary flex items-center justify-center font-bold">S</span>
+<h3 class="font-headline-md text-headline-md font-bold text-on-surface">Subjective</h3>
+</div>
+<div class="flex items-center gap-sm">
+<span class="bg-on-tertiary-fixed-variant/10 text-on-tertiary-fixed-variant text-[11px] font-bold px-md py-1 rounded-full flex items-center gap-xs">
+<span class="material-symbols-outlined text-sm">auto_awesome</span>
+                                Smart Labels Active
+                            </span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">more_vert</span>
+</div>
+</div>
+<div class="space-y-md">
+<div>
+<label class="font-label-md text-label-md text-on-surface-variant uppercase mb-sm block">Chief Complaint</label>
+<input class="w-full bg-surface-container-low border-outline-variant rounded-lg focus:ring-primary focus:border-primary" type="text" value="Recurrent headaches and dizzy spells for 2 weeks."/>
+</div>
+<div>
+<label class="font-label-md text-label-md text-on-surface-variant uppercase mb-sm block">History of Present Illness (HPI)</label>
+<textarea class="w-full bg-surface-container-low border-outline-variant rounded-lg focus:ring-primary focus:border-primary" rows="4">Patient reports gradual onset of occipital headaches, worse in the mornings. Associated with mild blurred vision and lightheadedness. Denies chest pain or shortness of breath. Adherence to medications is "mostly consistent" but missed Lisinopril for 3 days last week due to travel.</textarea>
+</div>
+</div>
+</div>
+<!-- Objective -->
+<div class="bg-surface-container-lowest p-lg rounded-xl shadow-sm border border-outline-variant">
+<div class="flex items-center justify-between mb-md">
+<div class="flex items-center gap-md">
+<span class="w-8 h-8 rounded-lg bg-primary text-on-primary flex items-center justify-center font-bold">O</span>
+<h3 class="font-headline-md text-headline-md font-bold text-on-surface">Objective</h3>
+</div>
+<button class="text-primary font-label-md text-label-md flex items-center gap-xs hover:underline">
+<span class="material-symbols-outlined text-sm">sync</span>
+                            Import Vitals
+                        </button>
+</div>
+<div class="grid grid-cols-4 gap-lg mb-lg">
+<div class="p-md bg-error-container/5 border border-error/20 rounded-xl">
+<p class="text-label-md text-on-surface-variant">Blood Pressure</p>
+<p class="text-headline-md font-bold text-error">158/94</p>
+<p class="text-[10px] text-error font-bold uppercase mt-xs">High (Stage 2)</p>
+</div>
+<div class="p-md bg-surface-container-low border border-outline-variant rounded-xl">
+<p class="text-label-md text-on-surface-variant">Heart Rate</p>
+<p class="text-headline-md font-bold text-on-surface">72 bpm</p>
+<p class="text-[10px] text-on-surface-variant font-bold uppercase mt-xs">Normal</p>
+</div>
+<div class="p-md bg-surface-container-low border border-outline-variant rounded-xl">
+<p class="text-label-md text-on-surface-variant">Temp</p>
+<p class="text-headline-md font-bold text-on-surface">36.7 °C</p>
+<p class="text-[10px] text-on-surface-variant font-bold uppercase mt-xs">Normal</p>
+</div>
+<div class="p-md bg-surface-container-low border border-outline-variant rounded-xl">
+<p class="text-label-md text-on-surface-variant">SpO2</p>
+<p class="text-headline-md font-bold text-on-surface">98%</p>
+<p class="text-[10px] text-on-surface-variant font-bold uppercase mt-xs">Normal</p>
+</div>
+</div>
+<div>
+<label class="font-label-md text-label-md text-on-surface-variant uppercase mb-sm block">Physical Examination</label>
+<textarea class="w-full bg-surface-container-low border-outline-variant rounded-lg focus:ring-primary focus:border-primary" rows="2">NAD. Chest clear. Cardiac: RRR, no murmurs. Neurological: CN II-XII intact. No peripheral edema.</textarea>
+</div>
+</div>
+<!-- Assessment -->
+<div class="bg-surface-container-lowest p-lg rounded-xl shadow-sm border border-outline-variant">
+<div class="flex items-center gap-md mb-md">
+<span class="w-8 h-8 rounded-lg bg-primary text-on-primary flex items-center justify-center font-bold">A</span>
+<h3 class="font-headline-md text-headline-md font-bold text-on-surface">Assessment</h3>
+</div>
+<table class="w-full border-collapse">
+<thead>
+<tr class="text-left border-b border-outline-variant">
+<th class="pb-sm font-label-md text-label-md text-on-surface-variant uppercase">Diagnosis</th>
+<th class="pb-sm font-label-md text-label-md text-on-surface-variant uppercase">Status</th>
+<th class="pb-sm font-label-md text-label-md text-on-surface-variant uppercase text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr>
+<td class="py-md">
+<p class="text-body-md font-medium">Essential Hypertension</p>
+<p class="text-body-sm text-on-surface-variant">ICD-10: I10</p>
+</td>
+<td class="py-md">
+<span class="px-md py-1 bg-surface-variant rounded-full text-[11px] font-medium text-on-surface-variant">Confirmed</span>
+</td>
+<td class="py-md text-right">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">edit</span>
+</td>
+</tr>
+<tr class="bg-secondary-container/10">
+<td class="py-md">
+<p class="text-body-md font-medium text-primary flex items-center gap-xs">
+<span class="material-symbols-outlined text-sm">auto_awesome</span>
+                                        Hypertensive Heart Disease
+                                    </p>
+<p class="text-body-sm text-on-surface-variant">ICD-10: I11.9</p>
+</td>
+<td class="py-md">
+<span class="px-md py-1 bg-primary/10 rounded-full text-[11px] font-bold text-primary">AI Suggested</span>
+</td>
+<td class="py-md text-right">
+<button class="text-primary font-bold text-[11px] uppercase border border-primary px-md py-1 rounded hover:bg-primary hover:text-on-primary transition-all">Accept</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Plan -->
+<div class="bg-surface-container-lowest p-lg rounded-xl shadow-sm border border-outline-variant">
+<div class="flex items-center gap-md mb-md">
+<span class="w-8 h-8 rounded-lg bg-primary text-on-primary flex items-center justify-center font-bold">P</span>
+<h3 class="font-headline-md text-headline-md font-bold text-on-surface">Plan</h3>
+</div>
+<div class="space-y-md">
+<div class="flex items-start gap-md">
+<span class="material-symbols-outlined text-primary mt-xs">medical_information</span>
+<div class="flex-1">
+<p class="text-body-md font-medium">Medication Adjustment</p>
+<p class="text-body-sm text-on-surface-variant">Increase Lisinopril to 20mg QD. Add Amlodipine 5mg QD if BP remains &gt;140/90 after 2 weeks.</p>
+</div>
+</div>
+<div class="flex items-start gap-md">
+<span class="material-symbols-outlined text-primary mt-xs">science</span>
+<div class="flex-1">
+<p class="text-body-md font-medium">Diagnostics</p>
+<p class="text-body-sm text-on-surface-variant">Order Electrolytes, BUN/Cr, and ECG (check for LVH).</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Panel: AI Clinical Engine -->
+<section class="w-96 bg-surface-container-low border-l border-outline-variant flex flex-col overflow-hidden">
+<!-- AI Tabs -->
+<div class="flex border-b border-outline-variant bg-surface-container">
+<button class="flex-1 py-md font-label-md text-label-md text-primary border-b-2 border-primary font-bold">Insights</button>
+<button class="flex-1 py-md font-label-md text-label-md text-on-surface-variant hover:bg-surface-variant transition-colors">Quality</button>
+<button class="flex-1 py-md font-label-md text-label-md text-on-surface-variant hover:bg-surface-variant transition-colors">Billing</button>
+</div>
+<div class="flex-1 overflow-y-auto p-lg space-y-lg">
+<!-- AI Insight Card -->
+<div class="bg-secondary-container/20 border-l-4 border-primary rounded-r-xl p-lg relative overflow-hidden">
+<span class="material-symbols-outlined absolute top-4 right-4 text-primary opacity-20 text-4xl">auto_awesome</span>
+<h4 class="font-headline-md text-headline-md font-bold text-primary mb-sm">Uncontrolled HTN</h4>
+<p class="text-body-md text-on-surface mb-md">Current readings suggest Stage 2 Hypertension despite Lisinopril 10mg QD. Risk of cardiovascular event increased by 14%.</p>
+<div class="flex items-center gap-lg mb-md">
+<div>
+<p class="text-[10px] text-on-surface-variant uppercase font-bold">Confidence</p>
+<p class="text-body-lg font-bold text-primary">94%</p>
+</div>
+<div>
+<p class="text-[10px] text-on-surface-variant uppercase font-bold">Priority</p>
+<p class="text-body-lg font-bold text-error">High</p>
+</div>
+</div>
+<div class="space-y-sm">
+<p class="text-label-md font-bold text-on-surface-variant uppercase mb-xs">Recommended Actions</p>
+<div class="flex items-center gap-md p-sm bg-surface-container-lowest/50 rounded-lg border border-primary/10">
+<span class="material-symbols-outlined text-sm text-primary">add_circle</span>
+<span class="text-body-sm">Upgrade to Lisinopril 20mg</span>
+</div>
+<div class="flex items-center gap-md p-sm bg-surface-container-lowest/50 rounded-lg border border-primary/10">
+<span class="material-symbols-outlined text-sm text-primary">analytics</span>
+<span class="text-body-sm">Request Renal Profile</span>
+</div>
+</div>
+</div>
+<!-- ICD-10 suggestions -->
+<div class="space-y-md">
+<h4 class="font-label-md text-label-md font-bold uppercase text-on-surface-variant tracking-wider">ICD-10 Optimization</h4>
+<div class="p-md bg-surface-container-lowest rounded-xl border border-outline-variant">
+<div class="flex items-center justify-between mb-sm">
+<span class="text-body-md font-bold">I10 vs I11.9</span>
+<span class="text-primary font-bold text-sm">+$124.00 Impact</span>
+</div>
+<p class="text-body-sm text-on-surface-variant">Based on documented ECG findings of LVH (suggested), I11.9 is more clinically accurate for this visit.</p>
+</div>
+</div>
+<!-- Evidence Links -->
+<div class="space-y-md">
+<h4 class="font-label-md text-label-md font-bold uppercase text-on-surface-variant tracking-wider">Clinical Evidence</h4>
+<div class="space-y-xs">
+<a class="block p-sm hover:bg-surface-variant rounded transition-colors text-primary text-body-sm flex items-center gap-sm" href="#">
+<span class="material-symbols-outlined text-sm">menu_book</span>
+                                ACC/AHA 2024 HTN Guidelines
+                            </a>
+<a class="block p-sm hover:bg-surface-variant rounded transition-colors text-primary text-body-sm flex items-center gap-sm" href="#">
+<span class="material-symbols-outlined text-sm">menu_book</span>
+                                NEJM: Management of Stage 2 HTN
+                            </a>
+</div>
+</div>
+</div>
+<div class="p-lg bg-surface-container border-t border-outline-variant">
+<p class="text-[11px] text-on-surface-variant italic">
+                        AI-generated insights support clinical decision-making and must be reviewed by an authorized healthcare professional.
+                    </p>
+</div>
+</section>
+</div>
+<!-- Footer / Action Bar -->
+<footer class="h-16 flex items-center justify-between px-lg bg-surface-container-highest border-t border-outline-variant sticky bottom-0 z-50">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-success animate-pulse">cloud_done</span>
+<span class="font-label-md text-label-md text-on-surface-variant">Auto-save enabled (2:41 PM). Clinical Intelligence Engine Active.</span>
+</div>
+<div class="flex items-center gap-lg">
+<button class="text-on-surface-variant font-label-md text-label-md px-md py-2 hover:bg-surface-variant rounded-lg transition-colors">Cancel</button>
+<button class="text-primary font-label-md text-label-md px-md py-2 border border-primary/20 rounded-lg hover:bg-primary/5 transition-colors">Save Draft</button>
+<div class="h-8 w-[1px] bg-outline-variant mx-sm"></div>
+<button class="bg-secondary-container text-on-secondary-container font-label-md text-label-md px-lg py-2 rounded-lg flex items-center gap-sm hover:shadow-lg active:scale-95 transition-all">
+<span class="material-symbols-outlined">psychology</span>
+                    Run AI Analysis
+                </button>
+<button class="bg-primary text-on-primary font-label-md text-label-md px-xl py-2 rounded-lg flex items-center gap-sm hover:shadow-lg active:scale-95 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                    Sign &amp; Complete
+                </button>
+</div>
+</footer>
+</main>
+<script>
+        // Micro-interactions for interactive elements
+        document.querySelectorAll('button, a').forEach(el => {
+            el.addEventListener('click', (e) => {
+                // Simple ripple/feedback effect could be added here
+                console.log('Action performed:', e.currentTarget.innerText || 'Icon Click');
+            });
+        });
+
+        // Simulating AI Analysis loader
+        const aiButton = document.querySelector('button.bg-secondary-container');
+        aiButton.addEventListener('click', () => {
+            const originalContent = aiButton.innerHTML;
+            aiButton.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span> Analyzing...';
+            aiButton.classList.add('opacity-80');
+            
+            setTimeout(() => {
+                aiButton.innerHTML = originalContent;
+                aiButton.classList.remove('opacity-80');
+                alert('Clinical Analysis Refreshed: No new safety alerts found.');
+            }, 1500);
+        });
+    </script>
+</body></html>
