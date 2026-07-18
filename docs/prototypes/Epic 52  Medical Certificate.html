@@ -1,0 +1,623 @@
+<!DOCTYPE html><html lang="en" class="light"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><meta charset="utf-8"><script id="tailwind-config">try{
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-background": "#191c1e",
+                        "on-surface-variant": "#444651",
+                        "on-tertiary-fixed": "#341100",
+                        "primary": "#00236f",
+                        "tertiary": "#4b1c00",
+                        "on-error": "#ffffff",
+                        "surface-container-highest": "#e0e3e5",
+                        "outline": "#757682",
+                        "on-primary-fixed": "#00164e",
+                        "on-secondary-container": "#364d83",
+                        "surface": "#f7f9fb",
+                        "on-tertiary-container": "#f39461",
+                        "inverse-surface": "#2d3133",
+                        "primary-fixed": "#dce1ff",
+                        "surface-container": "#eceef0",
+                        "secondary-container": "#a9c0fe",
+                        "tertiary-fixed-dim": "#ffb691",
+                        "on-primary-container": "#90a8ff",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed": "#dae2ff",
+                        "on-tertiary": "#ffffff",
+                        "surface-tint": "#4059aa",
+                        "on-primary-fixed-variant": "#264191",
+                        "on-secondary-fixed-variant": "#2e457b",
+                        "secondary-fixed-dim": "#b1c5ff",
+                        "error": "#ba1a1a",
+                        "secondary": "#465d94",
+                        "surface-bright": "#f7f9fb",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "surface-container-high": "#e6e8ea",
+                        "on-tertiary-fixed-variant": "#773205",
+                        "surface-variant": "#e0e3e5",
+                        "primary-container": "#1e3a8a",
+                        "outline-variant": "#c5c5d3",
+                        "inverse-primary": "#b6c4ff",
+                        "background": "#f7f9fb",
+                        "tertiary-container": "#6e2c00",
+                        "inverse-on-surface": "#eff1f3",
+                        "on-secondary-fixed": "#001946",
+                        "surface-container-low": "#f2f4f6",
+                        "on-primary": "#ffffff",
+                        "on-surface": "#191c1e",
+                        "surface-dim": "#d8dadc",
+                        "tertiary-fixed": "#ffdbcb",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#b6c4ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "unit": "4px",
+                        "sidebar-width": "280px",
+                        "card-gap": "20px",
+                        "container-padding": "24px"
+                    },
+                    "fontFamily": {
+                        "page-title": ["Inter"],
+                        "label-bold": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "page-title-mobile": ["Inter"],
+                        "section-title": ["Inter"],
+                        "body-base": ["Inter"]
+                    },
+                    "fontSize": {
+                        "page-title": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-bold": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                        "page-title-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "section-title": ["18px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-base": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    }catch(_e){}</script></head><body class="bg-surface text-on-surface overflow-hidden h-screen flex">
+<!-- Subtle Background Shader -->
+<!-- STITCH_SHADER_START:ANIMATION_1 class="fixed inset-0 w-full h-full pointer-events-none opacity-20" -->
+<div class="fixed inset-0 w-full h-full pointer-events-none opacity-20" style="display:block;">
+<canvas id="shader-canvas-ANIMATION_1" style="display:block;width:100%;height:100%"></canvas>
+<script>
+(function() {
+  const canvas = document.getElementById('shader-canvas-ANIMATION_1');
+
+  // Sync the WebGL drawing-buffer size with the CSS-driven layout size.
+  // This fires on initial layout and whenever the element is resized.
+  function syncSize() {
+    const w = canvas.clientWidth  || 1280;
+    const h = canvas.clientHeight || 720;
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width  = w;
+      canvas.height = h;
+    }
+  }
+  if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(syncSize).observe(canvas);
+  }
+  syncSize();
+
+  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+  if (!gl) return;
+  const vs = `attribute vec2 a_position;
+varying vec2 v_texCoord;
+void main() {
+  v_texCoord = a_position * 0.5 + 0.5;
+  gl_Position = vec4(a_position, 0.0, 1.0);
+}`;
+  const fs = `precision highp float;
+uniform float u_time;
+uniform vec2 u_resolution;
+varying vec2 v_texCoord;
+
+// Subtle flowing medical/data network background
+void main() {
+    vec2 uv = v_texCoord;
+    
+    // Create a very subtle gradient mesh effect
+    float t = u_time * 0.1;
+    
+    float noise = sin(uv.x * 10.0 + t) * cos(uv.y * 8.0 - t) * 0.5 + 0.5;
+    float noise2 = sin(uv.y * 12.0 - t * 1.5) * cos(uv.x * 6.0 + t) * 0.5 + 0.5;
+    
+    vec3 color1 = vec3(0.973, 0.98, 0.988); // #F8FAFC
+    vec3 color2 = vec3(0.937, 0.965, 0.996); // #EFF6FF (Soft Blue)
+    vec3 accent = vec3(0.145, 0.388, 0.922); // #2563EB (AI Blue)
+    
+    vec3 base = mix(color1, color2, noise * 0.3 + noise2 * 0.2);
+    vec3 finalColor = mix(base, accent, (noise * noise2) * 0.03);
+    
+    gl_FragColor = vec4(finalColor, 1.0);
+}`;
+  function cs(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    return s;
+  }
+  const prog = gl.createProgram();
+  gl.attachShader(prog, cs(gl.VERTEX_SHADER, vs));
+  gl.attachShader(prog, cs(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+  const pos = gl.getAttribLocation(prog, 'a_position');
+  gl.enableVertexAttribArray(pos);
+  gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+  const uTime = gl.getUniformLocation(prog, 'u_time');
+  const uRes = gl.getUniformLocation(prog, 'u_resolution');
+  const uMouse = gl.getUniformLocation(prog, 'u_mouse');
+
+  // u_mouse is in pixel coordinates matching u_resolution (ShaderToy convention).
+  // Shaders that need normalized coords should use: u_mouse / u_resolution.
+  let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
+  window.addEventListener('mousemove', (event) => {
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width && rect.height) {
+      const nx = (event.clientX - rect.left) / rect.width;
+      const ny = 1.0 - (event.clientY - rect.top) / rect.height;
+      mouse.x = nx * canvas.width;
+      mouse.y = ny * canvas.height;
+    }
+  });
+
+  function render(t) {
+    if (typeof ResizeObserver === 'undefined') syncSize();
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    if (uTime) gl.uniform1f(uTime, t * 0.001);
+    if (uRes) gl.uniform2f(uRes, canvas.width, canvas.height);
+    if (uMouse) gl.uniform2f(uMouse, mouse.x, mouse.y);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    requestAnimationFrame(render);
+  }
+  render(0);
+})();
+</script>
+</div>
+<!-- STITCH_SHADER_END:ANIMATION_1 -->
+<!-- SideNavBar (Shared Component) -->
+<aside class="w-sidebar-width h-full fixed left-0 top-0 bg-primary flex flex-col py-6 z-50">
+<div class="px-6 mb-8">
+<h1 class="text-page-title font-page-title text-on-primary">NexSure</h1>
+<p class="text-xs text-on-primary/60 font-bold uppercase tracking-widest">Clinical Intelligence</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-secondary-fixed/70 hover:text-on-primary hover:bg-primary-container/10 transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-bold text-label-bold">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary-fixed/70 hover:text-on-primary hover:bg-primary-container/10 transition-colors" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-bold text-label-bold">Patients</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary-fixed/70 hover:text-on-primary hover:bg-primary-container/10 transition-colors" href="#">
+<span class="material-symbols-outlined">event</span>
+<span class="font-label-bold text-label-bold">Visits</span>
+</a>
+<!-- Active Tab -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary font-bold bg-primary-container/20 sidebar-active" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-bold text-label-bold">Medical Certificate</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary-fixed/70 hover:text-on-primary hover:bg-primary-container/10 transition-colors" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-bold text-label-bold">Insurance Intelligence</span>
+</a>
+</nav>
+<div class="mt-auto px-2 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-secondary-fixed/70 hover:text-on-primary hover:bg-primary-container/10 transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-bold text-label-bold">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary-fixed/70 hover:text-on-primary hover:bg-primary-container/10 transition-colors" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-bold text-label-bold">Support</span>
+</a>
+<div class="mt-4 p-4 rounded-xl bg-primary-container/20 mx-2">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-primary font-bold">JS</div>
+<div>
+<p class="text-xs font-bold text-on-primary">Dr. J. Smith</p>
+<p class="text-[10px] text-on-primary/60">MD-45821</p>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-sidebar-width flex flex-col flex-1 h-screen relative overflow-hidden">
+<!-- TopNavBar (Shared Component) -->
+<header class="flex justify-between items-center w-full px-container-padding h-16 sticky top-0 z-40 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
+<div class="flex items-center gap-4">
+<nav class="flex items-center text-on-surface-variant font-body-base text-body-base gap-2">
+<span class="hover:text-primary cursor-pointer transition-colors">Visits</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="hover:text-primary cursor-pointer transition-colors">VN-2026-0718-001</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="text-primary font-bold">Medical Certificate</span>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center bg-surface-container-low px-3 py-1.5 rounded-full border border-outline-variant">
+<span class="material-symbols-outlined text-outline mr-2 text-xl">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-sm w-48" placeholder="Global Clinical Search..." type="text">
+</div>
+<div class="flex gap-2">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-full relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-surface"></span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container rounded-full">
+<span class="material-symbols-outlined">history</span>
+</button>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant mx-2"></div>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-bold text-label-bold flex items-center gap-2 shadow-sm hover:opacity-90 transition-all">
+<span class="material-symbols-outlined text-lg">auto_awesome</span>
+                    AI Copilot
+                </button>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto p-gutter pb-32">
+<!-- Page Header & KPI -->
+<div class="mb-gutter flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<div class="flex items-center gap-3 mb-1">
+<h2 class="font-page-title text-page-title text-primary">Medical Certificate<br><span class="text-sm font-normal opacity-70">จัดทำและตรวจสอบใบรับรองแพทย์</span></h2>
+<span class="px-3 py-1 bg-surface-container-highest text-on-surface-variant text-[10px] font-bold rounded-full uppercase tracking-tighter">Draft</span>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant font-body-base text-body-base">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg">person</span>
+<span class="font-bold text-on-surface">Sunee Chantarak (HN-2026-001245)</span>
+</div>
+<div class="w-1 h-1 bg-outline-variant rounded-full"></div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-error text-lg">warning</span>
+<span class="text-error font-bold">Allergy: Penicillin<br><span class="text-[10px] block">ประวัติการแพ้ยา: เพนิซิลลิน</span></span>
+</div>
+</div>
+</div>
+<div class="flex gap-3">
+<div class="bg-surface-container-low p-3 rounded-xl border border-outline-variant flex items-center gap-3 min-w-[120px]">
+<div class="bg-primary/10 p-2 rounded-lg"><span class="material-symbols-outlined text-primary">analytics</span></div>
+<div>
+<p class="text-[10px] font-bold text-outline uppercase">Rest Recommendation<br><span class="text-xs font-normal opacity-70">ข้อแนะนำการหยุดพักรักษาตัว</span></p>
+<p class="text-xl font-bold text-primary">Rest Recommendation<br><span class="text-xs font-normal opacity-70">ข้อแนะนำการหยุดพักรักษาตัว</span></p>
+</div>
+</div>
+<div class="bg-primary text-on-primary p-3 rounded-xl flex items-center gap-3 min-w-[120px]">
+<div class="bg-white/20 p-2 rounded-lg"><span class="material-symbols-outlined">verified</span></div>
+<div>
+<p class="text-[10px] font-bold text-on-primary/70 uppercase">Readiness</p>
+<p class="text-xl font-bold">91%</p>
+</div>
+</div>
+</div>
+</div>
+<!-- KPI Row -->
+<div class="grid grid-cols-2 md:grid-cols-5 gap-card-gap mb-gutter">
+<div class="bg-white p-4 rounded-2xl border border-outline-variant shadow-sm">
+<p class="text-label-bold font-label-bold text-outline uppercase mb-1">Certificates Today</p>
+<p class="text-2xl font-extrabold text-on-surface">24</p>
+</div>
+<div class="bg-white p-4 rounded-2xl border border-outline-variant shadow-sm">
+<p class="text-label-bold font-label-bold text-outline uppercase mb-1">Pending Review</p>
+<p class="text-2xl font-extrabold text-error">6</p>
+</div>
+<div class="bg-white p-4 rounded-2xl border border-outline-variant shadow-sm">
+<p class="text-label-bold font-label-bold text-outline uppercase mb-1">Issued Today</p>
+<p class="text-2xl font-extrabold text-on-surface">18</p>
+</div>
+<div class="bg-white p-4 rounded-2xl border border-outline-variant shadow-sm">
+<p class="text-label-bold font-label-bold text-outline uppercase mb-1">AI Utilization</p>
+<div class="flex items-center gap-2">
+<p class="text-2xl font-extrabold text-on-surface">83%</p>
+<span class="text-[10px] text-green-600 font-bold">↑ 12%</span>
+</div>
+</div>
+<div class="bg-white p-4 rounded-2xl border border-outline-variant shadow-sm">
+<p class="text-label-bold font-label-bold text-outline uppercase mb-1">Clinic Readiness</p>
+<p class="text-2xl font-extrabold text-secondary">91%</p>
+</div>
+</div>
+<!-- Three Panel Content -->
+<div class="grid grid-cols-12 gap-gutter items-start">
+<!-- Left Panel: Clinical Reference -->
+<div class="col-span-12 lg:col-span-3 space-y-gutter">
+<div class="bg-white rounded-2xl border border-outline-variant overflow-hidden">
+<div class="bg-surface-container px-4 py-3 border-b border-outline-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">folder_shared</span>
+<h3 class="font-section-title text-section-title text-primary">Clinical Reference<br><span class="text-xs font-normal opacity-70">ข้อมูลอ้างอิงทางคลินิก</span></h3>
+</div>
+<div class="p-4 space-y-4">
+<section>
+<label class="font-label-bold text-label-bold text-outline uppercase block mb-2">Certificate Purpose<br><span class="normal-case text-[10px]">วัตถุประสงค์การออกใบรับรอง</span></label>
+<div class="bg-surface-container-low p-3 rounded-xl border border-outline-variant">
+<p class="text-xs mb-1 font-bold">Rest Recommendation<br><span class="text-xs font-normal opacity-70">ข้อแนะนำการหยุดพักรักษาตัว</span></p>
+<p class="text-body-base text-on-surface mb-3">Sore throat, fever for 2 days, painful swallowing.</p>
+<p class="text-xs mb-1 font-bold">Rest Recommendation<br><span class="text-xs font-normal opacity-70">ข้อแนะนำการหยุดพักรักษาตัว</span></p>
+<p class="text-body-base text-on-surface">Temp: 38.5°C, Inflamed pharynx, swollen tonsils without exudate.</p>
+</div>
+</section>
+<section>
+<label class="font-label-bold text-label-bold text-outline uppercase block mb-2">Certificate Purpose<br><span class="normal-case text-[10px]">วัตถุประสงค์การออกใบรับรอง</span></label>
+<div class="flex items-center justify-between p-3 rounded-xl bg-primary-container/5 border border-primary-container/20">
+<div>
+<p class="text-primary font-bold">Acute Pharyngitis<br><span class="text-xs font-normal">โรคคออักเสบเฉียบพลัน</span></p>
+<p class="text-xs text-outline">J02.9</p>
+</div>
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</section>
+</div>
+</div>
+<div class="bg-white rounded-2xl border border-outline-variant p-4">
+<label class="font-label-bold text-label-bold text-outline uppercase block mb-3">SOAP Notes Snapshot</label>
+<div class="space-y-3 opacity-80">
+<div class="flex gap-3">
+<div class="text-primary font-bold w-4">S<span class="text-[8px] block leading-none">อาการนำ</span></div>
+<p class="text-xs">Patient reports severe throat pain and malaise...</p>
+</div>
+<div class="flex gap-3">
+<div class="text-primary font-bold w-4">O</div>
+<p class="text-xs">Pharyngeal erythema 3+, No cervical lymphadenopathy...</p>
+</div>
+<div class="flex gap-3">
+<div class="text-primary font-bold w-4">A</div>
+<p class="text-xs">Clinical presentation consistent with viral pharyngitis...</p>
+</div>
+<div class="flex gap-3">
+<div class="text-primary font-bold w-4">P</div>
+<p class="text-xs">Symptomatic treatment, rest, and 3-day sick leave...</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Center Panel: Form Builder -->
+<div class="col-span-12 lg:col-span-6 space-y-gutter">
+<div class="bg-white rounded-2xl border border-outline-variant shadow-lg overflow-hidden">
+<div class="bg-white p-6 border-b border-outline-variant flex justify-between items-center">
+<div>
+<h3 class="font-section-title text-section-title text-primary mb-1">Certificate Construction<br><span class="text-xs font-normal opacity-70">ร่างใบรับรองแพทย์โดย AI</span></h3>
+<div class="flex items-center gap-2 px-2 py-1 bg-secondary-container/20 rounded text-primary text-[10px] font-bold w-fit">
+<span class="material-symbols-outlined text-sm">auto_fix_high</span>
+                                    AI-ASSISTED DRAFT
+                                </div>
+</div>
+<div class="flex gap-2">
+<button class="px-3 py-1.5 text-xs font-bold border border-outline-variant rounded hover:bg-surface transition-colors">TH/EN</button>
+<button class="px-3 py-1.5 text-xs font-bold text-primary border border-primary rounded hover:bg-primary/5 transition-colors">Preview PDF</button>
+</div>
+</div>
+<div class="p-8 space-y-8">
+<!-- Purpose -->
+<section>
+<label class="font-label-bold text-label-bold text-outline uppercase block mb-4">Certificate Purpose<br><span class="normal-case text-[10px]">วัตถุประสงค์การออกใบรับรอง</span></label>
+<div class="grid grid-cols-3 gap-3">
+<button class="flex items-center justify-center gap-2 p-4 border-2 border-primary bg-primary/5 text-primary rounded-xl font-bold">
+<span class="material-symbols-outlined">sick</span>
+                                        Sick Leave
+                                    </button>
+<button class="flex items-center justify-center gap-2 p-4 border border-outline-variant text-on-surface-variant rounded-xl hover:bg-surface transition-colors">
+<span class="material-symbols-outlined">medical_information</span>
+                                        Health Check
+                                    </button>
+<button class="flex items-center justify-center gap-2 p-4 border border-outline-variant text-on-surface-variant rounded-xl hover:bg-surface transition-colors">
+<span class="material-symbols-outlined">assignment_turned_in</span>
+                                        Insurance
+                                    </button>
+</div>
+</section>
+<!-- Certification Statement -->
+<section>
+<div class="flex justify-between items-center mb-3">
+<label class="font-label-bold text-label-bold text-outline uppercase">Examination Statement<br><span class="normal-case text-[10px]">รายละเอียดการตรวจร่างกาย</span></label>
+<button class="text-[10px] text-primary flex items-center gap-1 font-bold">
+<span class="material-symbols-outlined text-xs">refresh</span> REGENERATE
+                                    </button>
+</div>
+<div class="relative group">
+<textarea class="w-full border-outline-variant rounded-xl p-4 text-body-base leading-relaxed focus:border-primary focus:ring-primary/20 bg-surface-container-lowest" rows="4">This is to certify that the patient attended a medical examination at our facility on 18 July 2026. Clinical findings suggest acute inflammation consistent with pharyngitis. (ขอรับรองว่าผู้ป่วยเข้ารับการตรวจรักษาจริงเมื่อวันที่ 18 กรกฎาคม 2569 มีอาการคออักเสบเฉียบพลัน)</textarea>
+<div class="absolute right-3 bottom-3 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary">edit</span>
+</div>
+</div>
+</section>
+<!-- Rest Recommendation -->
+<section class="p-6 bg-surface-container-low rounded-2xl border border-outline-variant">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-3">
+<div class="w-12 h-6 bg-primary rounded-full relative cursor-pointer">
+<div class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></div>
+</div>
+<div>
+<p class="font-bold text-on-surface">Rest Recommendation<br><span class="text-xs font-normal opacity-70">ข้อแนะนำการหยุดพักรักษาตัว</span></p>
+<p class="text-xs text-outline">Recommend time off work for recovery</p>
+</div>
+</div>
+<div class="flex items-center gap-2 bg-green-50 text-green-700 px-3 py-1.5 rounded-lg border border-green-200">
+<span class="material-symbols-outlined text-sm">tips_and_updates</span>
+<span class="text-[10px] font-bold">AI Suggests 3 Days (แนะนำให้พัก 3 วัน)</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-6">
+<div>
+<label class="text-[10px] font-bold text-outline block mb-1">START DATE</label>
+<input class="w-full border-outline-variant rounded-lg bg-white" type="date" value="2026-07-18">
+</div>
+<div>
+<label class="text-[10px] font-bold text-outline block mb-1">END DATE</label>
+<input class="w-full border-outline-variant rounded-lg bg-white" type="date" value="2026-07-20">
+</div>
+</div>
+<div class="mt-4 flex items-center justify-center py-2 bg-primary/5 rounded-lg border border-dashed border-primary/30">
+<p class="text-xs font-bold text-primary">Rest Recommendation<br><span class="text-xs font-normal opacity-70">ข้อแนะนำการหยุดพักรักษาตัว</span></p>
+</div>
+</section>
+<!-- Work Restrictions -->
+<section>
+<label class="font-label-bold text-label-bold text-outline uppercase block mb-3">Certificate Purpose<br><span class="normal-case text-[10px]">วัตถุประสงค์การออกใบรับรอง</span></label>
+<div class="flex flex-wrap gap-2">
+<div class="px-3 py-2 bg-white border-2 border-primary text-primary rounded-lg text-xs font-bold flex items-center gap-2">
+                                        Avoid heavy lifting <span class="material-symbols-outlined text-sm">close</span>
+</div>
+<div class="px-3 py-2 bg-white border-2 border-primary text-primary rounded-lg text-xs font-bold flex items-center gap-2">
+                                        Work from home <span class="material-symbols-outlined text-sm">close</span>
+</div>
+<button class="px-3 py-2 bg-surface border border-dashed border-outline-variant text-outline rounded-lg text-xs font-bold flex items-center gap-2 hover:border-primary hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm">add</span> Add Suggestion
+                                    </button>
+</div>
+</section>
+</div>
+</div>
+</div>
+<!-- Right-->
+<div class="col-span-12 lg:col-span-3 space-y-gutter">
+<div class="bg-primary text-on-primary rounded-2xl p-6 shadow-xl relative overflow-hidden">
+<div class="relative z-10">
+<h3 class="font-section-title text-section-title mb-6 flex items-center gap-2"><span class="material-symbols-outlined">psychology</span><div class="">Clinical Engine<br><span class="text-xs font-normal opacity-70">ระบบวิเคราะห์ข้อมูลทางคลินิก</span></div></h3>
+<div class="flex flex-col items-center mb-8">
+<div class="relative w-32 h-32 flex items-center justify-center">
+<!-- Circular Gauge via SVG -->
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-white/10" cx="64" cy="64" fill="transparent" r="58" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-on-primary-container" cx="64" cy="64" fill="transparent" r="58" stroke="currentColor" stroke-dasharray="364.4" stroke-dashoffset="47.3" stroke-width="10"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-3xl font-extrabold">87%</span>
+<span class="text-[10px] uppercase font-bold opacity-70">Confidence<br><span class="normal-case">ระดับความเชื่อมั่น</span></span>
+</div>
+</div>
+</div>
+<div class="space-y-4">
+<div class="p-3 bg-white/10 rounded-xl">
+<p class="text-[10px] font-bold text-on-primary/60 uppercase mb-2">Consistency Analysis</p>
+<div class="space-y-2">
+<div class="flex items-center justify-between">
+<span class="text-xs">ICD-10 Consistency</span>
+<span class="material-symbols-outlined text-green-400 text-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs">Rest Period Duration</span>
+<span class="material-symbols-outlined text-green-400 text-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs">Meds vs. Diagnosis</span>
+<span class="material-symbols-outlined text-green-400 text-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+</div>
+<div class="p-3 bg-white/10 rounded-xl">
+<p class="text-[10px] font-bold text-on-primary/60 uppercase mb-2">Issue Readiness<br><span class="normal-case">ความพร้อมในการออกเอกสาร</span></p>
+<div class="w-full bg-white/20 h-2 rounded-full overflow-hidden mb-2">
+<div class="bg-secondary-container h-full w-[92%] transition-all duration-1000"></div>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-xs font-bold">92% Ready</span>
+<span class="text-[10px] text-on-primary/70">1 task pending</span>
+</div>
+</div>
+</div>
+</div>
+<div class="absolute -right-12 -bottom-12 w-48 h-48 bg-white/5 rounded-full blur-3xl"></div>
+</div>
+<div class="bg-white rounded-2xl border border-outline-variant p-5">
+<h4 class="font-label-bold text-label-bold text-outline uppercase mb-4">Compliance Checklist<br><span class="normal-case text-[10px]">รายการตรวจสอบความถูกต้อง</span></h4>
+<ul class="space-y-3">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-green-600" style="font-variation-settings: 'FILL' 1;">check_box</span>
+<div>
+<p class="text-xs font-bold text-on-surface">Patient Identity Verified</p>
+<p class="text-[10px] text-outline">Face matching 99%</p>
+</div>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-green-600" style="font-variation-settings: 'FILL' 1;">check_box</span>
+<div>
+<p class="text-xs font-bold text-on-surface">Physician Profile Active</p>
+<p class="text-[10px] text-outline">MD-45821 Verified</p>
+</div>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-outline">check_box_outline_blank</span>
+<div>
+<p class="text-xs font-bold text-on-surface">Digital Signature Pending</p>
+<p class="text-[10px] text-outline">Requires biometric confirmation</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<!-- Sticky Bottom Bar -->
+<footer class="fixed bottom-0 right-0 left-sidebar-width h-20 bg-white/90 backdrop-blur-xl border-t border-outline-variant px-container-padding flex items-center justify-between z-50">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full border border-outline-variant object-cover" data-alt="A portrait of an professional middle aged Asian doctor with glasses wearing a white medical coat and a blue shirt underneath, studio lighting, professional corporate photography style, high resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDr2-_Sx93rD-mOjOBXXtaVXQXketYXqi2YqAZRWtk44c1FcuLxV0MuLw7b9k0xmQfa0sKIu9TVnwju77NNAEoR8o7-QGYqxnosYYlYjqAv1IoEAS2nYbjcaqlSZv8hM98HJEXbW8zck0gIbHtAaKhGbh-DvWHFLjtK_sbSFGul8VeongA5fzBYR-7m6locC2NEakGOnTIZDJhR9nftyU9ERprhU4rK5zIuw15Q-zupQbPV_3MLxrGm8N9TQzo5P58IuYzT9YQvv8">
+<div>
+<p class="text-sm font-extrabold text-on-surface">Dr. Anan Wattanakul<br><span class="text-xs font-normal opacity-70">นพ. อนันต์ วัฒนกุล</span></p>
+<p class="text-[10px] text-outline uppercase font-bold tracking-tight">Medical License: MD-45821</p>
+</div>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant"></div>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox">
+<span class="text-xs text-on-surface-variant group-hover:text-primary transition-colors">I confirm that I have reviewed all clinical information and authorize the issuance of this certificate.<br><span class="text-[10px] opacity-70">ข้าพเจ้ายืนยันว่าได้ตรวจสอบข้อมูลทางการแพทย์และข้อความในใบรับรองแล้ว</span></span>
+</label>
+</div>
+<div class="flex items-center gap-4">
+<div class="text-right mr-2">
+<p class="text-[10px] font-bold text-outline uppercase">Issue Status</p>
+<p class="text-xs font-bold text-secondary">92% Ready to Sign</p>
+</div>
+<button class="bg-primary text-on-primary px-10 py-3 rounded-xl font-bold flex items-center gap-3 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all"><span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">draw</span><div class="text-left">Sign &amp; Issue Certificate<br><span class="text-[10px] font-normal">ลงนามและออกใบรับรอง</span></div></button>
+</div>
+</footer>
+</main>
+<script>
+        // Micro-interactions and interactive elements
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggle = document.querySelector('.w-12.h-6.bg-primary');
+            toggle.addEventListener('click', () => {
+                const inner = toggle.querySelector('.absolute');
+                if(inner.classList.contains('right-1')) {
+                    inner.classList.remove('right-1');
+                    inner.classList.add('left-1');
+                    toggle.classList.replace('bg-primary', 'bg-outline-variant');
+                } else {
+                    inner.classList.remove('left-1');
+                    inner.classList.add('right-1');
+                    toggle.classList.replace('bg-outline-variant', 'bg-primary');
+                }
+            });
+
+            // Tab interactivity
+            const tabs = document.querySelectorAll('nav a');
+            tabs.forEach(tab => {
+                tab.addEventListener('mousedown', () => {
+                    tab.style.transform = 'scale(0.98)';
+                });
+                tab.addEventListener('mouseup', () => {
+                    tab.style.transform = 'scale(1)';
+                });
+            });
+        });
+    </script>
+
+</body></html>
