@@ -14,7 +14,6 @@ import {
   ClipboardCheck,
   Clock3,
   Edit3,
-  FileClock,
   FileText,
   History,
   LayoutDashboard,
@@ -93,13 +92,16 @@ export function SoapClinicalWorkspace({ data }: { data: SoapClinicalWorkspaceDat
   const watchValue = JSON.stringify(watchedSections);
   const autoSave = useSoapAutoSave(watchValue);
 
-  const formValues = {
-    subjective: watchedSections.subjective ?? "",
-    objective: watchedSections.objective ?? "",
-    assessment: watchedSections.assessment ?? "",
-    plan: watchedSections.plan ?? "",
-  };
-  const readiness = useMemo(() => summarizeSoapReadiness(formValues), [formValues]);
+  const readiness = useMemo(
+    () =>
+      summarizeSoapReadiness({
+        subjective: watchedSections.subjective ?? "",
+        objective: watchedSections.objective ?? "",
+        assessment: watchedSections.assessment ?? "",
+        plan: watchedSections.plan ?? "",
+      }),
+    [watchedSections.assessment, watchedSections.objective, watchedSections.plan, watchedSections.subjective],
+  );
   const criticalAlerts = alerts.filter((alert) => alert.severity === "Critical" && !alert.acknowledged);
 
   function showMessage(title: string, text: string) {

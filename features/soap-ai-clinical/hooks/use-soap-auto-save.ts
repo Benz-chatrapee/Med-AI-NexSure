@@ -10,13 +10,14 @@ export function useSoapAutoSave(watchValue: string) {
 
   useEffect(() => {
     if (!watchValue) return;
-    setState("unsaved");
+    const unsaved = window.setTimeout(() => setState("unsaved"), 0);
     const saving = window.setTimeout(() => setState("saving"), 500);
     const saved = window.setTimeout(() => {
       setState("saved");
       setSavedAt(new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }));
     }, 1100);
     return () => {
+      window.clearTimeout(unsaved);
       window.clearTimeout(saving);
       window.clearTimeout(saved);
     };
