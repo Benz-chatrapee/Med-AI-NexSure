@@ -169,3 +169,43 @@ flowchart TD
 - Replace or retire older migration `003` policies after a compatibility migration and test suite confirm equivalent behavior.
 - Add storage object RLS policies for `organization-assets`, `patient-documents`, `evidence-files`, `medical-certificates`, and `integration-files`.
 - Add RLS tests for anonymous denial, authenticated no-profile denial, cross-organization denial, cross-clinic denial, role assignment expiry, suspended memberships, and least-privilege mutation checks.
+
+## Migration 009 RLS Policy Hardening Update
+
+Task: DB-P1-RLS-POLICY-HARDENING
+
+Migration implemented: `supabase/migrations/009_core_foundation_rls_policy_hardening.sql`.
+
+Policy consolidation:
+
+- Removed legacy Core Foundation policies from migration `003`: `organizations_select_scoped`, `clinics_select_scoped`, `user_profiles_select_scoped`, `user_profiles_update_own`, `roles_select_scoped`, `permissions_select_authenticated`, `role_permissions_select_authenticated`, `user_roles_select_scoped`, and `user_roles_manage_admin`.
+- Removed and replaced overlapping `mvp1_organizations_select` and `mvp1_clinics_select`.
+- Retained replacement-table compatibility policies `mvp1_memberships_select`, `mvp1_clinic_memberships_select`, and `mvp1_role_assignments_select`.
+- No in-scope Core Foundation table has an `ALL` or `DELETE` policy after migration `009`.
+- `user_profiles` and legacy `user_roles` have no direct mutation policy after migration `009`.
+
+Canonical RLS policy model:
+
+| Table | Policy | Command | USING rule | WITH CHECK rule |
+|---|---|---|---|---|
+| `organizations` | `organizations_select_own_scope` | SELECT | `is_organization_member(id)` | None |
+| `clinics` | `clinics_select_authorized_scope` | SELECT | `has_clinic_access(organization_id, id)` and `has_permission('clinic.view', organization_id, id)` | None |
+| `user_profiles` | `user_profiles_select_self_or_admin` | SELECT | `id = auth.uid()` or `has_permission('role.assign', organization_id, primary_clinic_id)` | None |
+| `roles` | `roles_select_catalog_scope` | SELECT | Global role or `is_organization_member(organization_id)` | None |
+| `permissions` | `permissions_select_catalog_scope` | SELECT | Active and not soft-deleted | None |
+| `role_permissions` | `role_permissions_select_catalog_scope` | SELECT | Active mapping for active global or member-organization role | None |
+| `user_roles` | `user_roles_select_self_or_admin` | SELECT | `user_id = auth.uid()` or `has_permission('role.assign', organization_id, clinic_id)` | None |
+
+Security result:
+
+- Permissive-policy OR broadening between migration `003` and `mvp1_*` Core Foundation policies was removed for the in-scope tables.
+- Clinic visibility now requires both clinic access and an explicit `clinic.view` permission.
+- Catalog visibility no longer exposes inactive or soft-deleted permissions and mappings.
+- Direct self-assignment through legacy `user_roles` remains denied because mutation grants were removed in migration `008` and mutation policies were removed in migration `009`.
+
+Open security boundaries:
+
+- Tenant-safe composite foreign keys are not yet enforced.
+- Organization and clinic lifecycle states are not yet constrained.
+- Role assignment administration still needs a controlled workflow, audit model, and runtime tests.
+- Domain policies outside the Core Foundation scope still need separate consolidation.
