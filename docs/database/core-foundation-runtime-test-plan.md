@@ -588,3 +588,38 @@ Remaining planned coverage:
 
 - Full Phase 1 regression and phase-exit review remain after audit implementation.
 - Cross-domain audit events, audit exports, tamper-evidence controls, and retention automation remain later-phase work.
+
+## Full Phase 1 Regression Runtime Update
+
+Task: DB-P1-FULL-CORE-FOUNDATION-REGRESSION
+
+Local validation evidence:
+
+- `npx supabase migration list --local` listed migrations `001` through `013`.
+- `npx supabase db lint --local` passed with no schema errors.
+- `npx supabase db reset --local` rebuilt the database from zero, applied migrations `001` through `013`, and seeded `supabase/seed.sql`.
+- `npx supabase test db supabase/tests --local` passed 9 files and 229 tests.
+- `npx supabase gen types typescript --local` generated local TypeScript database types.
+- `npm run lint`, `npx tsc --noEmit`, and `npm run build` passed.
+
+Coverage confirmation:
+
+- Schema and seed contracts passed.
+- Auth context helpers and SQL grants passed.
+- Organization and clinic isolation passed.
+- RLS `USING` and `WITH CHECK` behavior passed.
+- Tenant-field mutation denial passed.
+- Self-assignment and platform-role escalation denial passed.
+- Tenant-safe FK tests passed.
+- Organization and clinic lifecycle tests passed.
+- Controlled role assignment and revocation tests passed.
+- Revoked and expired assignment denial passed.
+- Audit append-only controls, read isolation, transaction rollback, and metadata minimization passed.
+
+Runtime limitation:
+
+- `npx supabase status` was not executed because approval review rejected the command due potential local secret-bearing output.
+
+Phase 1 runtime readiness:
+
+READY WITH NON-BLOCKING FOLLOW-UP.

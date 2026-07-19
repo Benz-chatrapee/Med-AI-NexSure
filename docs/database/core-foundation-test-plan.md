@@ -161,3 +161,28 @@ Each test file should:
 - Set authenticated context in the supported Supabase local test style.
 - Assert both allowed and denied behavior.
 - Avoid relying on production credentials or real PHI.
+
+## Full Core Foundation Regression Evidence
+
+Task: DB-P1-FULL-CORE-FOUNDATION-REGRESSION
+
+Executable test suite status:
+
+- `supabase/tests/001_schema_contract.sql` passed.
+- `supabase/tests/002_seed_contract.sql` passed.
+- `supabase/tests/003_auth_context_helpers.sql` passed.
+- `supabase/tests/004_rls_baseline.sql` passed.
+- `supabase/tests/005_rls_policy_consolidation.sql` passed.
+- `supabase/tests/006_tenant_safe_fk_integrity.sql` passed.
+- `supabase/tests/007_core_foundation_lifecycle_controls.sql` passed.
+- `supabase/tests/008_controlled_role_assignment_workflow.sql` passed.
+- `supabase/tests/009_core_foundation_audit_events.sql` passed.
+
+Latest local result:
+
+- Command: `npx supabase test db supabase/tests --local`
+- Result: 9 files, 229 tests, all successful.
+- Failed: 0.
+- Skipped: 0 reported by the runner.
+
+Historical gaps in this document are closed for Phase 1 Core Foundation database regression. Later-domain Patient, Visit, Clinical, Claim, Evidence, Storage, AI, and backup/restore coverage remains outside Phase 1 Core Foundation exit.

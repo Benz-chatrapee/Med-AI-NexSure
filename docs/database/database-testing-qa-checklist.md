@@ -75,3 +75,33 @@ Checklist statuses: `not_started`, `in_progress`, `passed`, `failed`, `blocked`,
 
 ## 6. Notes
 `service_role` must not be used to prove normal-user RLS. Backup success does not prove restore success. Build success does not prove authorization correctness. Performance work cannot bypass security.
+
+## Phase 1 Core Foundation Regression Evidence
+
+Task: DB-P1-FULL-CORE-FOUNDATION-REGRESSION
+
+Executed local commands:
+
+| Check | Evidence | Result |
+|---|---|---|
+| Git status | `git status --short` executed before regression; existing Phase 1 files were modified/untracked from prior tasks. | Informational |
+| Local status | `npx supabase status` requested but rejected by approval review due potential local secret-bearing output. | Documented limitation |
+| Migration list | `npx supabase migration list --local` listed `001` through `013`. | Passed |
+| DB lint | `npx supabase db lint --local` reported no schema errors. | Passed |
+| Local reset | `npx supabase db reset --local` applied migrations `001` through `013` and seeded `supabase/seed.sql`. | Passed |
+| DB tests | `npx supabase test db supabase/tests --local` reported 9 files, 229 tests, all successful. | Passed |
+| Type generation | `npx supabase gen types typescript --local` generated local types in `lib/database.types.ts`; lifecycle, assignment, audit, and RPC fields were verified. | Passed |
+| App lint | `npm run lint` exited 0. | Passed |
+| TypeScript | `npx tsc --noEmit` exited 0. | Passed |
+| Build | `npm run build` exited 0. | Passed |
+
+QA finding classification:
+
+| Severity | Finding | Blocking |
+|---|---|---|
+| Informational | UI integration for Core Foundation lifecycle, controlled role assignment, and audit remains mock/static or not wired to RPC/query flows. | No |
+| Informational | Local Supabase status command was blocked by approval policy because it can reveal local URLs/keys. | No |
+
+Release recommendation:
+
+READY WITH NON-BLOCKING FOLLOW-UP for Phase 1 Core Foundation database regression.

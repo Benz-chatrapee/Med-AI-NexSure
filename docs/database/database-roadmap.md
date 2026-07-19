@@ -96,6 +96,27 @@ Retire `user_roles`, normalize permissions, migrate clinical state enums, add do
 ## 32. Review Required Decisions
 RPO/RTO, credential schema, insurance coverage schema, payer-rule schema, storage access model, analytics persistence, audit append-only design, and tenant-specific restore support.
 
+## Phase 1 Regression Closure Update
+
+Task: DB-P1-FULL-CORE-FOUNDATION-REGRESSION
+
+Phase 1 Core Foundation status is READY WITH NON-BLOCKING FOLLOW-UP after local-only validation:
+
+- Migrations `001` through `013` apply locally from zero.
+- Local seed applies successfully and is covered by seed-contract tests.
+- DB lint passes with no schema errors.
+- Full local DB test suite passes: 9 files, 229 tests.
+- Tenant isolation, RLS/grants/helpers, tenant-safe FKs, lifecycle controls, controlled role assignment, and audit controls are covered by executable tests.
+- Local TypeScript database types were regenerated from local Supabase.
+- Application lint, TypeScript, and production build pass.
+- No remote Supabase mutation, commit, or push was performed.
+
+Non-blocking follow-ups before live Core Foundation UI rollout:
+
+- Wire user-management and organization/clinic lifecycle UI to controlled RPCs.
+- Add authorized audit-query UI/server integration using scoped `audit.view`.
+- Keep Patient, Visit, Clinical, Claim, Evidence, Storage, AI, backup/restore, and production sign-off in their later roadmap phases.
+
 ## Design-system Flow Explanations
 | Flow | Initiating phase/module | Dependencies | Security controls | Tests | Release gate | Failure behavior | Rollback/fallback | Output |
 |---|---|---|---|---|---|---|---|---|

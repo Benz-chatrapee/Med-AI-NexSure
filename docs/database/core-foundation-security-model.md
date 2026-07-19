@@ -318,3 +318,28 @@ Remaining security work:
 
 - Denied/failed workflow event taxonomy outside the tested fail-closed path remains future governance work.
 - Cross-domain audit events, audit export controls, tamper evidence, retention automation, and break-glass audit design remain later-phase work.
+
+## Full Core Foundation Regression Security Exit Review
+
+Task: DB-P1-FULL-CORE-FOUNDATION-REGRESSION
+
+Security validation evidence:
+
+- Full local database test suite passed: 9 files, 229 tests, 0 failed.
+- Tenant isolation, clinic isolation, RLS `USING` and `WITH CHECK`, tenant-field mutation denial, tenant-safe FK rejection, revoked and expired assignment denial, lifecycle denial, self-assignment denial, platform-role escalation denial, audit read isolation, audit append-only controls, audit transaction rollback, and metadata minimization are covered by executable pgTAP tests.
+- Migration source scan confirms Core Foundation SECURITY DEFINER functions use fixed `search_path = public`.
+- Migration source scan confirms public/anon execution is revoked for sensitive helpers and controlled workflow functions; authenticated execution is limited to approved wrappers.
+- Migration source scan confirms direct runtime mutation is revoked for `user_role_assignments`, legacy `user_roles`, and `audit_logs`.
+- App source scan found no browser service-role usage under `app/`, `features/`, or `lib/`.
+- App source scan found no direct Core Foundation role-assignment or audit table write integration in UI code.
+
+Findings:
+
+| Severity | Finding | Status |
+|---|---|---|
+| Informational | Core Foundation UI screens currently use mock/static data and do not call lifecycle RPCs, controlled role-assignment RPCs, or audit queries. | Non-blocking follow-up |
+| Informational | `npx supabase status` was not executed because approval review rejected the command due potential local secret-bearing output. | Documented limitation |
+
+Release recommendation:
+
+READY WITH NON-BLOCKING FOLLOW-UP for Phase 1 Core Foundation database regression.

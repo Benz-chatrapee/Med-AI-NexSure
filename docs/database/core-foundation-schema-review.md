@@ -632,3 +632,23 @@ Remaining gaps:
 - Full Phase 1 regression and phase-exit review remain separate.
 - Domain audit events outside Core Foundation remain future phase work.
 - Audit export, retention automation, tamper-evidence controls, and break-glass audit design remain later-phase governance work.
+
+## 31. Full Core Foundation Regression Update
+
+Task: DB-P1-FULL-CORE-FOUNDATION-REGRESSION
+
+Validation result:
+
+- Local migration list showed migrations `001` through `013` present with no duplicate migration numbers found in repository filenames.
+- `npx supabase db lint --local` passed with no schema errors.
+- `npx supabase db reset --local` rebuilt the local database from zero, applied migrations `001` through `013` in order, and seeded `supabase/seed.sql`.
+- `npx supabase test db supabase/tests --local` passed 9 files and 229 tests.
+- `npx supabase gen types typescript --local` generated local TypeScript database types in `lib/database.types.ts`.
+- `npm run lint`, `npx tsc --noEmit`, and `npm run build` passed.
+
+Phase 1 readiness:
+
+- Core Foundation database implementation is READY WITH NON-BLOCKING FOLLOW-UP.
+- No High or Critical Core Foundation database security findings remained after local regression.
+- Application UI integration remains mock/static for Core Foundation lifecycle, controlled role-assignment RPCs, and audit queries; this is a follow-up integration task, not a database Phase 1 blocker.
+- `npx supabase status` was not executed because the approval reviewer rejected it due potential local secret-bearing output.

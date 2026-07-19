@@ -49,3 +49,21 @@ Canonical claim/evidence/audit permission namespace, break-glass schema, source-
 | Clinic lifecycle audit persistence | audit-event-catalogue.md | `clinics`, `audit_logs` | clinic lifecycle permissions | organization and clinic | controlled function plus audit RLS select | `clinic.lifecycle.*` | `009_core_foundation_audit_events.sql` | Phase 1 | Existing with local tests |
 | Role-assignment audit persistence | audit-event-catalogue.md | `user_role_assignments`, `audit_logs` | `role.assign`, `role.revoke` | organization and optional clinic | controlled function plus audit RLS select | `role_assignment.created`, `role_assignment.revoked` | `009_core_foundation_audit_events.sql` | Phase 1 | Existing with local tests |
 | Audit integrity for Core Foundation workflows | audit-versioning-strategy.md | `audit_logs` | `audit.view` for read only | organization and optional clinic | no runtime direct insert/update/delete; scoped select | implemented Core Foundation event catalogue | `001_schema_contract.sql`, `009_core_foundation_audit_events.sql` | Phase 1 | Existing with local tests |
+
+## Phase 1 Full Regression Traceability Update
+
+| Requirement | Evidence | Status |
+|---|---|---|
+| Migrations `001` through `013` apply locally | `npx supabase db reset --local` | Existing with local tests |
+| Seed deterministic/idempotent | `supabase/seed.sql`; `002_seed_contract.sql`; reset success | Existing with local tests |
+| Tenant/RBAC/RLS controls | `003_auth_context_helpers.sql`, `004_rls_baseline.sql`, `005_rls_policy_consolidation.sql` | Existing with local tests |
+| Tenant-safe FK controls | `006_tenant_safe_fk_integrity.sql` | Existing with local tests |
+| Lifecycle controls | `007_core_foundation_lifecycle_controls.sql` | Existing with local tests |
+| Controlled role workflow | `008_controlled_role_assignment_workflow.sql` | Existing with local tests |
+| Audit persistence and integrity | `009_core_foundation_audit_events.sql` | Existing with local tests |
+| Generated local TypeScript database contract | `lib/database.types.ts` from `npx supabase gen types typescript --local` | Existing with local validation |
+| Application validation | `npm run lint`, `npx tsc --noEmit`, `npm run build` | Existing with local validation |
+
+Final Phase 1 readiness:
+
+READY WITH NON-BLOCKING FOLLOW-UP.
