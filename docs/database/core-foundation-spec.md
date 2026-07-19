@@ -171,3 +171,46 @@ Compatibility note:
 - Nullable `clinic_id` remains supported for organization-level role assignments.
 - `clinic_users` remains absent and was not created.
 - No application schema contract was changed beyond stricter rejection of invalid tenant relationships.
+
+## Migration 011 Organization and Clinic Lifecycle Contract
+
+Task: DB-P1-LIFECYCLE-CONTROLS-HARDENING
+
+Implemented by `supabase/migrations/011_core_foundation_lifecycle_controls.sql`.
+
+Lifecycle columns:
+
+- `organizations.lifecycle_status text not null default 'active'`
+- `clinics.lifecycle_status text not null default 'active'`
+
+Allowed values for both tables: `active`, `suspended`, `closed`, `archived`.
+
+Allowed transitions for both organizations and clinics:
+
+- `active -> suspended`
+- `suspended -> active`
+- `active -> closed`
+- `suspended -> closed`
+- `closed -> archived`
+
+Denied by default:
+
+- `active -> archived`
+- `suspended -> archived`
+- `closed -> active`
+- `closed -> suspended`
+- any transition from `archived`
+- same-state status updates through the controlled lifecycle functions
+
+Controlled functions:
+
+- `transition_organization_lifecycle(organization_id uuid, target_status text, reason text)`
+- `transition_clinic_lifecycle(clinic_id uuid, target_status text, reason text)`
+
+Both functions derive the actor from `auth.uid()`, require a non-empty reason, validate the current row under lock, enforce the transition matrix, and are granted only to `authenticated`. Public and anonymous execution is revoked.
+
+Compatibility note:
+
+- `is_active` is synchronized from lifecycle status for Core Foundation organization and clinic transitions.
+- Existing soft-delete fields remain separate from lifecycle status.
+- No full audit-event infrastructure was added in this migration.

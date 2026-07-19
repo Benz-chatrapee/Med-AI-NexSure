@@ -505,3 +505,30 @@ Remaining blocked coverage:
 - Suspended organization and clinic lifecycle denial tests remain blocked until lifecycle statuses are constrained and enforced.
 - Controlled role-assignment workflow tests remain blocked until an approved workflow and audit model exist.
 - Professional credential and clinical authority tests remain outside this phase.
+
+## Migration 011 Runtime Test Update
+
+Task: DB-P1-LIFECYCLE-CONTROLS-HARDENING
+
+Implemented executable test coverage:
+
+- `supabase/tests/007_core_foundation_lifecycle_controls.sql` validates default lifecycle states, allowed values, allowed transitions, denied transitions, reason requirements, direct-update denial, anonymous execution denial, function security metadata, and helper fail-closed behavior.
+- The test validates organization active to suspended, suspended to active through platform recovery, active to closed, and closed to archived.
+- The test validates clinic active to suspended, suspended to active, active to closed, and closed to archived.
+- The test validates active to archived, closed to suspended, archived to active, empty reason, unauthorized actor, cross-organization actor, and cross-clinic actor denials.
+- The test validates organization-overrides-clinic behavior through helper denial for an active clinic inside a suspended organization.
+
+Red/green evidence:
+
+- Pre-migration red run failed because `lifecycle_status` columns and transition functions were absent.
+- Post-migration local run passed: `npx supabase test db supabase/tests --local` reported 7 files, 148 tests, all successful.
+
+Regression coverage retained:
+
+- Schema, seed, authorization-helper, grant, RLS baseline, RLS policy consolidation, and tenant-safe FK tests remain passing.
+
+Remaining blocked coverage:
+
+- Full lifecycle audit-event emission remains blocked until DB-P1-CORE-AUDIT-EVENT-IMPLEMENTATION.
+- Controlled role-assignment workflow tests remain blocked until the workflow exists.
+- Downstream Patient, Visit, Clinical, Claim, Evidence, and AI lifecycle enforcement remains later-phase scope.

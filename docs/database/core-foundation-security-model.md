@@ -209,3 +209,45 @@ Open security boundaries:
 - Organization and clinic lifecycle states are not yet constrained.
 - Role assignment administration still needs a controlled workflow, audit model, and runtime tests.
 - Domain policies outside the Core Foundation scope still need separate consolidation.
+
+## Migration 011 Lifecycle Security Update
+
+Task: DB-P1-LIFECYCLE-CONTROLS-HARDENING
+
+Migration implemented: `supabase/migrations/011_core_foundation_lifecycle_controls.sql`.
+
+Lifecycle security model:
+
+- Normal operational authorization helpers now require active organization lifecycle state.
+- Clinic-scoped helper access also requires the clinic lifecycle state to be active.
+- Organization lifecycle overrides clinic lifecycle; an active clinic inside a suspended, closed, or archived organization is operationally unavailable.
+- Lifecycle transitions occur only through controlled SECURITY DEFINER functions with fixed `search_path = public`.
+- The functions do not accept actor IDs from callers; actor identity is derived from `auth.uid()`.
+- Transition functions require a non-empty reason and reject unsupported or skipped transitions.
+- Anonymous and public execution are revoked; authenticated execution is granted only for the controlled functions.
+
+Permission mapping:
+
+| Permission | Purpose |
+|---|---|
+| `organization.lifecycle.read` | Read organization lifecycle state. |
+| `organization.lifecycle.suspend` | Move organization from active to suspended. |
+| `organization.lifecycle.reactivate` | Platform recovery for suspended to active. |
+| `organization.lifecycle.close` | Move active or suspended organization to closed. |
+| `organization.lifecycle.archive` | Move closed organization to archived. |
+| `clinic.lifecycle.read` | Read clinic lifecycle state. |
+| `clinic.lifecycle.suspend` | Move clinic from active to suspended. |
+| `clinic.lifecycle.reactivate` | Move suspended clinic to active when organization is active. |
+| `clinic.lifecycle.close` | Move active or suspended clinic to closed. |
+| `clinic.lifecycle.archive` | Move closed clinic to archived. |
+
+Role mapping:
+
+- `platform_admin` receives all organization and clinic lifecycle permissions and provides the explicit platform recovery path.
+- `organization_admin` receives organization suspend, close, archive, and clinic lifecycle permissions, but not organization reactivation.
+- `clinic_admin` receives clinic lifecycle permissions.
+
+Audit boundary:
+
+- Transition reasons, actor identity, target identifiers, and controlled workflow boundaries are present for future audit integration.
+- Full lifecycle audit event emission remains a separate audit workflow task.

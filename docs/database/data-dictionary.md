@@ -143,3 +143,27 @@ Runtime validation:
 - Local preflight counts were zero for cross-organization membership/profile mismatches, role-assignment/profile mismatches, and tenant-scoped role mismatches.
 - `supabase/tests/006_tenant_safe_fk_integrity.sql` validates valid same-tenant rows and invalid cross-tenant rows.
 - Lifecycle status, professional authority, and controlled assignment workflow fields were not added.
+
+## 26. Migration 011 Core Foundation Lifecycle Update
+
+Task: DB-P1-LIFECYCLE-CONTROLS-HARDENING
+
+New Core Foundation lifecycle fields:
+
+| Status | Owner | Table/entity | Authoritative | Columns or attributes | Constraints/index/RLS | Classification | Source | Review Required |
+|---|---|---|---|---|---|---|---|---|
+| Existing | Organization | `organizations` | Yes | `lifecycle_status text not null default 'active'` | `ck_organizations_lifecycle_status`; `idx_organizations_lifecycle_status`; controlled transition function | Confidential/Security | migration `011` | lifecycle audit events |
+| Existing | Clinic | `clinics` | Yes | `lifecycle_status text not null default 'active'` | `ck_clinics_lifecycle_status`; `idx_clinics_organization_lifecycle_status`; controlled transition function | Confidential/Security | migration `011` | lifecycle audit events |
+| Existing | RBAC | `permissions` | Yes | lifecycle permission keys | organization and clinic lifecycle permission keys seeded | Security | migration `011` | platform/tenant approval model |
+
+Allowed lifecycle values: `active`, `suspended`, `closed`, `archived`.
+
+Operational helper behavior:
+
+- `is_organization_member` requires the organization lifecycle to be `active`.
+- `has_clinic_access` requires the organization lifecycle and clinic lifecycle to be `active`.
+- `has_permission` inherits lifecycle denial from the membership and clinic helpers.
+
+Audit limitation:
+
+- Transition reason and actor identity are available at the controlled function boundary, but durable audit events are not emitted until the audit workflow task.

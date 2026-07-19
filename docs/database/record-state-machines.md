@@ -126,3 +126,32 @@ Existing database enum `visit_status` is Compatibility Sensitive because it curr
 
 ## Cross-Document Contract
 Future migrations, RLS policies, tests, and workflows must reference these canonical states unless a migration explicitly documents a compatibility transition from existing enum values. Existing implementation names remain Compatibility Sensitive until migrated.
+
+## Core Foundation Organization and Clinic Lifecycle
+
+Migration `011_core_foundation_lifecycle_controls.sql` implements the Core Foundation lifecycle vocabulary for organizations and clinics.
+
+States for both domains:
+
+| State | Meaning | Operational effect |
+|---|---|---|
+| `active` | Normal approved operational state. | Normal helper-mediated access may proceed within permission scope. |
+| `suspended` | Temporary operational access denial. | Normal operational access fails closed; records remain preserved. |
+| `closed` | Operations are no longer active. | Normal operational access fails closed; historical records remain preserved. |
+| `archived` | Long-term historical state. | Normal operational access fails closed; recovery is denied by default. |
+
+Allowed transitions:
+
+| Source | Target | Notes |
+|---|---|---|
+| `active` | `suspended` | Requires lifecycle suspend permission and reason. |
+| `suspended` | `active` | Organization reactivation requires platform recovery; clinic reactivation requires lifecycle permission and active organization. |
+| `active` | `closed` | Requires lifecycle close permission and reason. |
+| `suspended` | `closed` | Requires lifecycle close permission and reason. |
+| `closed` | `archived` | Requires lifecycle archive permission and reason. |
+
+Review Required:
+
+- `closed -> active` remains denied and requires product/security approval before any future implementation.
+- Full audit-event emission for lifecycle transitions remains planned.
+- Downstream Patient, Visit, Clinical, Claim, Evidence, and AI domain enforcement remains a later phase.

@@ -548,3 +548,32 @@ Remaining gaps:
 - Controlled role-assignment workflows and audit paths remain separate.
 - Professional authority remains separate.
 - Domain RLS outside Core Foundation remains separate.
+
+## 28. Migration 011 Lifecycle Controls Update
+
+Task: DB-P1-LIFECYCLE-CONTROLS-HARDENING
+
+Migration implemented: `supabase/migrations/011_core_foundation_lifecycle_controls.sql`.
+
+Runtime effect:
+
+- Added `lifecycle_status` to `organizations` and `clinics`.
+- Backfilled existing rows to `active`, `suspended`, or `archived` from existing `is_active` and `deleted_at` compatibility fields.
+- Added CHECK constraints for `active`, `suspended`, `closed`, and `archived`.
+- Added controlled transition functions for organization and clinic lifecycle changes.
+- Seeded lifecycle permission keys and mapped them to `platform_admin`, `organization_admin`, and `clinic_admin` according to scope.
+- Updated Core Foundation authorization helpers so normal operational access requires active organization lifecycle and active clinic lifecycle where clinic scope is used.
+
+Security result:
+
+- Normal authenticated users cannot directly update organization or clinic lifecycle status because table update grants remain unavailable.
+- Tenant admins cannot alter another organization.
+- Tenant organization admins cannot reactivate suspended organizations; platform recovery is explicit.
+- Clinic lifecycle transitions are blocked when the owning organization is not active.
+- Historical organization and clinic rows remain preserved after suspend, close, and archive transitions.
+
+Remaining gaps:
+
+- Full lifecycle audit-event emission remains a separate audit workflow task.
+- Controlled role-assignment workflow remains separate.
+- Downstream domain RLS and insert/update policies still need lifecycle-specific enforcement tests beyond the Core helper layer.
