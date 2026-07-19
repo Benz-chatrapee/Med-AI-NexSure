@@ -604,3 +604,31 @@ Remaining gaps:
 - Full audit-event persistence remains separate.
 - Professional credential authority remains outside Core Foundation Phase 1.
 - Application user-management UI still uses mock/local role data and will need RPC integration before live writes.
+
+## 30. Migration 013 Core Foundation Audit Events Update
+
+Task: DB-P1-CORE-AUDIT-EVENT-IMPLEMENTATION
+
+Migration implemented: `supabase/migrations/013_core_foundation_audit_events.sql`.
+
+Runtime effect:
+
+- Added normalized audit-event columns to `audit_logs` while retaining legacy compatibility columns.
+- Added `append_core_audit_event(...)` as the internal Core Foundation append boundary.
+- Wrapped organization lifecycle, clinic lifecycle, assignment, and revocation workflow functions so successful protected mutations persist audit events in the same transaction.
+- Removed direct runtime audit insert policy exposure and revoked direct insert, update, and delete table privileges from `anon` and `authenticated`.
+- Added indexes for event time, tenant/time, clinic/time, event type/time, resource identity, and correlation id.
+- Added JSON payload guardrails for prohibited secret-like keys and token-like values.
+
+Security result:
+
+- Organization and clinic lifecycle changes are durably audited.
+- Controlled role assignment creation and revocation are durably audited.
+- Runtime users cannot directly forge, alter, or delete audit rows.
+- Audit append failure rolls back the protected lifecycle or role-assignment mutation.
+
+Remaining gaps:
+
+- Full Phase 1 regression and phase-exit review remain separate.
+- Domain audit events outside Core Foundation remain future phase work.
+- Audit export, retention automation, tamper-evidence controls, and break-glass audit design remain later-phase governance work.

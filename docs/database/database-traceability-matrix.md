@@ -11,7 +11,7 @@ Maps high-risk database requirements to authoritative documentation, entities, p
 |---|---|---|---|---|---|---|---|---|---|
 | Tenant isolation | core-foundation-security-model.md | tenant-scoped tables | existing and canonical scoped keys | organization | every scoped policy | `permission_change`/security event | cross-organization negative RLS | Phase 1 | Existing with tests Review Required |
 | Clinic isolation | rls-policy-design.md | clinic-scoped tables | scoped permissions | clinic | `has_clinic_access` policies | access audit where high risk | clinic A/B negative RLS | Phase 1-2 | Existing with tests Review Required |
-| Privileged role assignment | rbac-design.md | `user_role_assignments` | `role.assign` future normalized key | organization/clinic | role assignment policy | `permission_change` | assign/revoke/expired tests | Phase 1 | Existing/Compatibility Sensitive |
+| Privileged role assignment | rbac-design.md | `user_role_assignments` | `role.assign` future normalized key | organization/clinic | controlled function plus assignment-table grants | `role_assignment.created`, `role_assignment.revoked` | `008_controlled_role_assignment_workflow.sql`, `009_core_foundation_audit_events.sql` | Phase 1 | Existing with local tests |
 | SOAP signing | soap-clinical-model.md | Future signatures + `soap_note_versions` | `clinical.soap.sign` | assigned visit + professional scope | Future SOAP sign policy | `soap.signed` | positive/negative signing test | Phase 3 | Planned/Future |
 | Diagnosis confirmation | diagnosis-icd-model.md | `visit_diagnoses`, Future versions | `clinical.diagnosis.confirm` | assigned visit + professional scope | Future diagnosis policy | `diagnosis.confirmed` | confirmation authority test | Phase 4 | Planned/Future |
 | Medication safety override | prescription-medication-model.md | Future `prescription_safety_alerts` | `prescription.safety_alert.override` | assigned visit/pharmacy scope | Future alert policy | `medication_alert.overridden` | high-severity override test | Phase 5 | Future |
@@ -40,3 +40,12 @@ Maps high-risk database requirements to authoritative documentation, entities, p
 
 ## Review Required
 Canonical claim/evidence/audit permission namespace, break-glass schema, source-version reference shape, and executable test IDs remain Review Required.
+
+## Phase 1 Migration 013 Traceability Update
+
+| Requirement | Authoritative document | Entity/table | Permission | Authorization scope | RLS responsibility | Audit event | Implemented test | Phase | Status |
+|---|---|---|---|---|---|---|---|---|---|
+| Organization lifecycle audit persistence | audit-event-catalogue.md | `organizations`, `audit_logs` | organization lifecycle permissions | organization | controlled function plus audit RLS select | `organization.lifecycle.*` | `009_core_foundation_audit_events.sql` | Phase 1 | Existing with local tests |
+| Clinic lifecycle audit persistence | audit-event-catalogue.md | `clinics`, `audit_logs` | clinic lifecycle permissions | organization and clinic | controlled function plus audit RLS select | `clinic.lifecycle.*` | `009_core_foundation_audit_events.sql` | Phase 1 | Existing with local tests |
+| Role-assignment audit persistence | audit-event-catalogue.md | `user_role_assignments`, `audit_logs` | `role.assign`, `role.revoke` | organization and optional clinic | controlled function plus audit RLS select | `role_assignment.created`, `role_assignment.revoked` | `009_core_foundation_audit_events.sql` | Phase 1 | Existing with local tests |
+| Audit integrity for Core Foundation workflows | audit-versioning-strategy.md | `audit_logs` | `audit.view` for read only | organization and optional clinic | no runtime direct insert/update/delete; scoped select | implemented Core Foundation event catalogue | `001_schema_contract.sql`, `009_core_foundation_audit_events.sql` | Phase 1 | Existing with local tests |

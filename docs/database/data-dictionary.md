@@ -190,3 +190,36 @@ Controlled function entries:
 Audit limitation:
 
 - The workflow captures reason and before/after context at the function boundary, but does not yet persist `role_assignment.created`, `role_assignment.revoked`, `role_assignment.denied`, `role_assignment.expired`, or `privilege_escalation.denied` events.
+
+## 28. Migration 013 Core Foundation Audit Events Update
+
+Task: DB-P1-CORE-AUDIT-EVENT-IMPLEMENTATION
+
+Updated Audit entries:
+
+| Status | Owner | Table/entity | Authoritative | Columns or attributes | Constraints/index/RLS | Classification | Source | Review Required |
+|---|---|---|---|---|---|---|---|---|
+| Existing | Audit | `audit_logs` | Yes | Existing legacy fields plus `occurred_at`, `event_type`, `actor_auth_user_id`, `actor_profile_id`, `resource_type`, `resource_id`, `action`, `before_state`, `after_state`, `metadata` | normalized event check; outcome check; tenant/time, clinic/time, event/time, resource, and correlation indexes; RLS select; direct runtime mutation revoked | Audit/Security | migration `013` | export, retention, tamper evidence |
+
+Implemented Core Foundation event types:
+
+- `organization.lifecycle.suspended`
+- `organization.lifecycle.reactivated`
+- `organization.lifecycle.closed`
+- `organization.lifecycle.archived`
+- `clinic.lifecycle.suspended`
+- `clinic.lifecycle.reactivated`
+- `clinic.lifecycle.closed`
+- `clinic.lifecycle.archived`
+- `role_assignment.created`
+- `role_assignment.revoked`
+
+Controlled function entries:
+
+| Function | Purpose | Data classification | Runtime access |
+|---|---|---|---|
+| `append_core_audit_event(...)` | Internal append boundary for implemented Core Foundation lifecycle and role-assignment events. | Audit/Security | Not granted to `anon` or `authenticated` |
+| `transition_organization_lifecycle(...)` | Performs controlled organization lifecycle mutation and appends audit event atomically. | Confidential/Security/Audit | `authenticated` EXECUTE only |
+| `transition_clinic_lifecycle(...)` | Performs controlled clinic lifecycle mutation and appends audit event atomically. | Confidential/Security/Audit | `authenticated` EXECUTE only |
+| `assign_role(...)` | Creates controlled role assignment and appends audit event atomically. | Security/Audit | `authenticated` EXECUTE only |
+| `revoke_role_assignment(...)` | Revokes controlled role assignment and appends audit event atomically. | Security/Audit | `authenticated` EXECUTE only |

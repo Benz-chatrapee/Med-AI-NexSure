@@ -288,3 +288,33 @@ Audit boundary:
 
 - Functions derive actor, target profile, role, organization, clinic, action, reason, before state, and after state.
 - Durable audit events such as `role_assignment.created`, `role_assignment.revoked`, and `privilege_escalation.denied` remain for DB-P1-CORE-AUDIT-EVENT-IMPLEMENTATION.
+
+## Migration 013 Core Foundation Audit Security Update
+
+Task: DB-P1-CORE-AUDIT-EVENT-IMPLEMENTATION
+
+Migration implemented: `supabase/migrations/013_core_foundation_audit_events.sql`.
+
+Security model:
+
+- `audit_logs` remains the authoritative durable audit table.
+- Normal runtime roles cannot directly insert, update, or delete audit rows.
+- Core Foundation audit appends occur through internal `append_core_audit_event(...)` only.
+- The internal append helper is SECURITY DEFINER with fixed `search_path = public` and is not granted to `anon` or `authenticated`.
+- Organization lifecycle, clinic lifecycle, role assignment, and role revocation functions append audit events in the same transaction as the protected mutation.
+- Audit append failure rolls back the protected mutation.
+- Audit read access remains scoped by RLS and `audit.view`.
+- Audit JSON payloads are minimized and screened for prohibited secret-like keys and token-like values.
+
+Implemented durable event boundary:
+
+| Workflow | Events |
+|---|---|
+| Organization lifecycle | `organization.lifecycle.suspended`, `organization.lifecycle.reactivated`, `organization.lifecycle.closed`, `organization.lifecycle.archived` |
+| Clinic lifecycle | `clinic.lifecycle.suspended`, `clinic.lifecycle.reactivated`, `clinic.lifecycle.closed`, `clinic.lifecycle.archived` |
+| Controlled role assignment | `role_assignment.created`, `role_assignment.revoked` |
+
+Remaining security work:
+
+- Denied/failed workflow event taxonomy outside the tested fail-closed path remains future governance work.
+- Cross-domain audit events, audit export controls, tamper evidence, retention automation, and break-glass audit design remain later-phase work.

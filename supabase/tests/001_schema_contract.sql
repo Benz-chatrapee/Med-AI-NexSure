@@ -193,14 +193,14 @@ select ok(
   'patients insert policy exists'
 );
 select ok(
-  exists (
+  not exists (
     select 1
     from pg_policies
     where schemaname = 'public'
       and tablename = 'audit_logs'
       and policyname = 'mvp1_audit_logs_insert'
   ),
-  'audit log insert policy exists'
+  'audit log direct insert policy is removed'
 );
 
 select ok(

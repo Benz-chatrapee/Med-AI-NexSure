@@ -557,3 +557,34 @@ Remaining planned coverage:
 
 - Durable audit-event assertions remain blocked until DB-P1-CORE-AUDIT-EVENT-IMPLEMENTATION.
 - Concurrent two-session race testing remains a future harness enhancement; duplicate active assignment is enforced by filtered unique indexes and tested sequentially.
+
+## Migration 013 Runtime Test Update
+
+Task: DB-P1-CORE-AUDIT-EVENT-IMPLEMENTATION
+
+Implemented executable test coverage:
+
+- `supabase/tests/009_core_foundation_audit_events.sql` validates durable audit-event persistence for organization lifecycle, clinic lifecycle, role assignment creation, and role assignment revocation.
+- The test validates actor profile capture, tenant and clinic scope, reason capture, before and after state, normalized event type, resource identity, and success outcome.
+- The test validates direct audit insert, update, and delete denial for runtime roles.
+- The test validates anonymous denial for the internal audit append helper.
+- The test validates scoped `audit.view` read access and cross-organization audit invisibility.
+- The test validates fail-closed transaction behavior when audit append fails after a protected lifecycle or role-assignment mutation starts.
+- The test validates that `append_core_audit_event(...)` is `SECURITY DEFINER` with fixed `search_path = public`.
+
+Red/green evidence:
+
+- Pre-migration red run failed because normalized audit columns were absent.
+- Post-migration focused run passed: `npx supabase test db supabase/tests/009_core_foundation_audit_events.sql --local` reported 1 file, 37 tests, all successful.
+- Full local DB suite passed: `npx supabase test db --local` reported 9 files, 229 tests, all successful.
+
+Previously blocked coverage unblocked:
+
+- Lifecycle audit-event emission is now executable and passing.
+- Controlled role-assignment audit-event persistence is now executable and passing.
+- Direct runtime audit mutation denial is now executable and passing.
+
+Remaining planned coverage:
+
+- Full Phase 1 regression and phase-exit review remain after audit implementation.
+- Cross-domain audit events, audit exports, tamper-evidence controls, and retention automation remain later-phase work.

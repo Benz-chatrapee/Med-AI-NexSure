@@ -105,3 +105,21 @@ Audit event taxonomy, redaction schema, immutable audit enforcement, export perm
 | High-risk mutation and audit | authorized user | mutation request | domain permission | org/clinic/record | current and new version | domain + version + audit | domain-specific | specific event | fail closed | committed change |
 | Historical version retrieval | clinician/reviewer/auditor | target record | read/audit permission | scoped record | immutable version IDs | read only | none | optional `view` | denied/empty | version timeline |
 | Audit export | auditor/compliance | filtered audit set | planned export | org/clinic/case | audit rows | export + audit | none | `export` | blocked export | redacted export |
+
+## Migration 013 Core Foundation Audit Update
+
+Task: DB-P1-CORE-AUDIT-EVENT-IMPLEMENTATION
+
+Implemented for Phase 1 Core Foundation:
+
+- `audit_logs` now has normalized event fields: `event_type`, `occurred_at`, `actor_auth_user_id`, `actor_profile_id`, `resource_type`, `resource_id`, `action`, `before_state`, `after_state`, and `metadata`.
+- `append_core_audit_event(...)` is the internal append boundary for implemented organization lifecycle, clinic lifecycle, and controlled role-assignment workflows.
+- Direct runtime `INSERT`, `UPDATE`, and `DELETE` privileges on `audit_logs` are revoked from `anon` and `authenticated`.
+- Controlled lifecycle and role-assignment functions append audit events in the same transaction as the protected mutation and roll back the mutation if audit append fails.
+- Implemented event types are listed in `docs/database/audit-event-catalogue.md`.
+- JSON audit payloads remain minimized; the append boundary rejects prohibited secret-like keys and token-like values.
+
+Remaining audit-versioning work:
+
+- Domain audit events outside Core Foundation remain future phase work.
+- Audit export, retention policy automation, cryptographic tamper evidence, and immutable storage controls remain future audit-governance work.
