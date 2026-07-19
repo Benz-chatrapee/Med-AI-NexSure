@@ -577,3 +577,30 @@ Remaining gaps:
 - Full lifecycle audit-event emission remains a separate audit workflow task.
 - Controlled role-assignment workflow remains separate.
 - Downstream domain RLS and insert/update policies still need lifecycle-specific enforcement tests beyond the Core helper layer.
+
+## 29. Migration 012 Controlled Role Assignment Update
+
+Task: DB-P1-CONTROLLED-ROLE-ASSIGNMENT-WORKFLOW
+
+Migration implemented: `supabase/migrations/012_core_foundation_controlled_role_assignment.sql`.
+
+Runtime effect:
+
+- Canonical write path is `user_role_assignments` through controlled functions.
+- Legacy `user_roles` remains available for compatibility reads only; it is not used by new workflow writes.
+- `assign_role(...)` validates actor, target profile, active memberships, role scope, tenant and clinic scope, lifecycle state, dates, self-assignment denial, duplicate active assignment denial, and platform-role authority.
+- `revoke_role_assignment(...)` locks the assignment, validates actor authority, preserves historical rows, records revoked metadata, and fails repeated revocation deterministically.
+- New role-assignment permissions are seeded without granting platform-role assignment authority to tenant or clinic administrators.
+
+Security result:
+
+- Direct assignment-table inserts, updates, deletes, role changes, target changes, and scope changes are denied to normal authenticated users.
+- Platform-role escalation by tenant and clinic administrators is denied.
+- Suspended, closed, and archived organizations or clinics block normal role-assignment workflow operations.
+- The controlled functions are SECURITY DEFINER with fixed `search_path = public` and minimal authenticated EXECUTE grants.
+
+Remaining gaps:
+
+- Full audit-event persistence remains separate.
+- Professional credential authority remains outside Core Foundation Phase 1.
+- Application user-management UI still uses mock/local role data and will need RPC integration before live writes.

@@ -251,3 +251,40 @@ Audit boundary:
 
 - Transition reasons, actor identity, target identifiers, and controlled workflow boundaries are present for future audit integration.
 - Full lifecycle audit event emission remains a separate audit workflow task.
+
+## Migration 012 Controlled Role Assignment Security Update
+
+Task: DB-P1-CONTROLLED-ROLE-ASSIGNMENT-WORKFLOW
+
+Migration implemented: `supabase/migrations/012_core_foundation_controlled_role_assignment.sql`.
+
+Security model:
+
+- `user_role_assignments` is the authoritative assignment table for new controlled writes.
+- Normal authenticated users cannot directly insert, update, or delete `user_role_assignments` or legacy `user_roles`.
+- Role assignment and revocation are exposed only through `assign_role(...)` and `revoke_role_assignment(...)`.
+- Both functions are SECURITY DEFINER with fixed `search_path = public`.
+- `public` and `anon` EXECUTE are revoked; `authenticated` receives EXECUTE only on the two workflow functions.
+- Actor identity is derived from `auth.uid()`; no caller-supplied actor id is accepted.
+- Target organization, clinic, profile, membership, role, lifecycle, dates, self-assignment, and platform-role authority are checked inside the transaction.
+
+Permission mapping:
+
+| Permission | Purpose |
+|---|---|
+| `role_assignment.read` | Read controlled assignment workflow state. |
+| `role_assignment.assign` | Assign non-platform roles through the workflow. |
+| `role_assignment.revoke` | Revoke non-platform roles through the workflow. |
+| `role_assignment.manage_expiry` | Set assignment expiry through the workflow. |
+| `role_assignment.assign_platform_role` | Assign or revoke protected platform roles. |
+
+Role mapping:
+
+- `platform_admin` receives all role-assignment workflow permissions, including platform-role assignment.
+- `organization_admin` receives read, assign, revoke, and expiry workflow permissions within tenant scope.
+- `clinic_admin` receives read, assign, revoke, and expiry workflow permissions within clinic scope only.
+
+Audit boundary:
+
+- Functions derive actor, target profile, role, organization, clinic, action, reason, before state, and after state.
+- Durable audit events such as `role_assignment.created`, `role_assignment.revoked`, and `privilege_escalation.denied` remain for DB-P1-CORE-AUDIT-EVENT-IMPLEMENTATION.

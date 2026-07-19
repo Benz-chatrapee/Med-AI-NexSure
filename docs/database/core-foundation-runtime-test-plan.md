@@ -532,3 +532,28 @@ Remaining blocked coverage:
 - Full lifecycle audit-event emission remains blocked until DB-P1-CORE-AUDIT-EVENT-IMPLEMENTATION.
 - Controlled role-assignment workflow tests remain blocked until the workflow exists.
 - Downstream Patient, Visit, Clinical, Claim, Evidence, and AI lifecycle enforcement remains later-phase scope.
+
+## Migration 012 Runtime Test Update
+
+Task: DB-P1-CONTROLLED-ROLE-ASSIGNMENT-WORKFLOW
+
+Implemented executable test coverage:
+
+- `supabase/tests/008_controlled_role_assignment_workflow.sql` validates controlled assignment and revocation behavior.
+- Assignment tests cover organization-scoped success, clinic-scoped success, persisted target/role/scope, actor derivation, reason requirement, duplicate active assignment rejection, inactive target rejection, missing membership rejection, self-assignment denial, unauthorized actor denial, platform-role escalation denial, invalid dates, and lifecycle denial for suspended, closed, and archived organizations and clinics.
+- Revocation tests cover authorized revocation, historical row preservation, revoked authorization denial, database-generated revocation metadata, actor-derived `revoked_by`, reason requirement, repeated revocation failure, cross-tenant denial, and clinic-admin organization-scope denial.
+- Security tests cover direct insert/update/delete denial, anonymous function denial, SECURITY DEFINER metadata, fixed search path, and minimal EXECUTE grants.
+
+Red/green evidence:
+
+- Pre-migration red run failed because `assign_role(...)` and `revoke_role_assignment(...)` were absent.
+- Post-migration focused run passed: `npx supabase test db supabase/tests/008_controlled_role_assignment_workflow.sql --local` reported 1 file, 43 tests, all successful.
+
+Regression coverage retained:
+
+- Schema, seed, authorization-helper, grant, RLS baseline, RLS policy consolidation, tenant-safe FK, and lifecycle tests remain in the full suite.
+
+Remaining planned coverage:
+
+- Durable audit-event assertions remain blocked until DB-P1-CORE-AUDIT-EVENT-IMPLEMENTATION.
+- Concurrent two-session race testing remains a future harness enhancement; duplicate active assignment is enforced by filtered unique indexes and tested sequentially.

@@ -214,3 +214,36 @@ Compatibility note:
 - `is_active` is synchronized from lifecycle status for Core Foundation organization and clinic transitions.
 - Existing soft-delete fields remain separate from lifecycle status.
 - No full audit-event infrastructure was added in this migration.
+
+## Migration 012 Controlled Role Assignment Contract
+
+Task: DB-P1-CONTROLLED-ROLE-ASSIGNMENT-WORKFLOW
+
+Implemented by `supabase/migrations/012_core_foundation_controlled_role_assignment.sql`.
+
+Authoritative assignment table:
+
+- `user_role_assignments` is the canonical write target for new role assignment and revocation workflows.
+- `user_roles` remains a legacy compatibility table and is not an approved write path for new workflows.
+
+Workflow functions:
+
+- `assign_role(target_profile_id uuid, organization_id uuid, clinic_id uuid, role_id uuid, effective_at timestamptz, expires_at timestamptz, reason text)` returns the created assignment id.
+- `revoke_role_assignment(assignment_id uuid, reason text)` returns the revoked assignment id.
+
+Assignment metadata added to `user_role_assignments`:
+
+- `assignment_reason`
+- `revoked_at`
+- `revoked_by`
+- `revocation_reason`
+
+Operational contract:
+
+- Actor identity is derived from `auth.uid()`.
+- Organization and clinic lifecycle must be active for normal workflow operations.
+- Target profile and target memberships must be active and tenant-aligned.
+- Platform role assignment requires `role_assignment.assign_platform_role`.
+- Self-assignment is denied.
+- Revocation preserves the assignment row and marks it revoked.
+- Full audit-event persistence remains a separate task.

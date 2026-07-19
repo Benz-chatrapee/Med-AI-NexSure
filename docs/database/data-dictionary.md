@@ -167,3 +167,26 @@ Operational helper behavior:
 Audit limitation:
 
 - Transition reason and actor identity are available at the controlled function boundary, but durable audit events are not emitted until the audit workflow task.
+
+## 27. Migration 012 Controlled Role Assignment Update
+
+Task: DB-P1-CONTROLLED-ROLE-ASSIGNMENT-WORKFLOW
+
+Updated Core Foundation RBAC entries:
+
+| Status | Owner | Table/entity | Authoritative | Columns or attributes | Constraints/index/RLS | Classification | Source | Review Required |
+|---|---|---|---|---|---|---|---|---|
+| Existing | RBAC | `user_role_assignments` | Yes | Existing assignment columns plus `assignment_reason`, `revoked_at`, `revoked_by`, `revocation_reason` | active duplicate-prevention indexes; revocation metadata check; controlled functions only for writes | Security/Audit | migration `012` | durable audit events |
+| Compatibility Sensitive | RBAC | `user_roles` | No for new writes | Legacy assignment columns unchanged | direct mutation remains revoked | Security | migration `012` | retirement timeline |
+| Existing | RBAC | `permissions` | Yes | role-assignment workflow permissions | seeded idempotently | Security | migration `012` | permission namespace cleanup |
+
+Controlled function entries:
+
+| Function | Purpose | Data classification | Runtime access |
+|---|---|---|---|
+| `assign_role(uuid, uuid, uuid, uuid, timestamptz, timestamptz, text)` | Creates active role assignments after tenant, clinic, lifecycle, date, self-assignment, and platform-role checks. | Security/Audit | `authenticated` EXECUTE only |
+| `revoke_role_assignment(uuid, text)` | Revokes active assignments while preserving history and recording revocation metadata. | Security/Audit | `authenticated` EXECUTE only |
+
+Audit limitation:
+
+- The workflow captures reason and before/after context at the function boundary, but does not yet persist `role_assignment.created`, `role_assignment.revoked`, `role_assignment.denied`, `role_assignment.expired`, or `privilege_escalation.denied` events.

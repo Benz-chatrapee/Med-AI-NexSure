@@ -155,3 +155,37 @@ Review Required:
 - `closed -> active` remains denied and requires product/security approval before any future implementation.
 - Full audit-event emission for lifecycle transitions remains planned.
 - Downstream Patient, Visit, Clinical, Claim, Evidence, and AI domain enforcement remains a later phase.
+
+## Core Foundation Role Assignment Lifecycle
+
+Migration `012_core_foundation_controlled_role_assignment.sql` implements controlled assignment and revocation against `user_role_assignments`.
+
+States:
+
+| State | Meaning | Operational effect |
+|---|---|---|
+| `active` | Assignment is currently valid when effective date and expiry permit. | Participates in authorization helpers. |
+| `suspended` | Assignment is temporarily unavailable. | Does not participate in authorization helpers. |
+| `revoked` | Assignment was explicitly removed through the controlled workflow. | Does not participate in authorization helpers; historical row remains. |
+| expired | Derived from `expires_at <= now()`. | Does not participate in authorization helpers without changing stored status. |
+| future effective | Derived from `assigned_at > now()`. | Stored by controlled workflow only when approved, but does not participate before start. |
+
+Controlled transitions:
+
+| Source | Target | Mechanism | Notes |
+|---|---|---|---|
+| none | `active` | `assign_role(...)` | Requires reason, active tenant/membership/scope, valid dates, and delegated authority. |
+| `active` | `revoked` | `revoke_role_assignment(...)` | Requires reason, actor-derived revocation metadata, and delegated authority. |
+
+Denied by default:
+
+- Direct row insertion, update, delete, role changes, target changes, and scope changes by normal authenticated users.
+- Self-assignment.
+- Tenant or clinic administrator assignment of `platform_admin`.
+- Clinic administrator assignment or revocation of organization-scoped roles.
+- Assignment while organization or clinic lifecycle is suspended, closed, or archived.
+
+Review Required:
+
+- Durable audit events for role assignment lifecycle remain planned.
+- Reactivation of revoked assignments is not exposed by this migration.

@@ -244,3 +244,24 @@ Rules: no wildcard permissions; no mixed naming styles in new work; business-dis
 | `claim.review` | `claim.readiness.review` | Review and override are not separated | Add override and evidence verification permissions | Override governance |
 | `audit.view` | `audit.event.read` | Audit export is absent | Keep read mapping; add export key separately | Audit export policy |
 | none | `ai.*` | AI governance tables absent | Add with AI governance schema and HITL tests | AI scope |
+
+## Migration 012 Role Assignment Workflow Permissions
+
+Task: DB-P1-CONTROLLED-ROLE-ASSIGNMENT-WORKFLOW
+
+New controlled RBAC permissions:
+
+| Permission | Domain | Assigned roles | Notes |
+|---|---|---|---|
+| `role_assignment.read` | rbac | `platform_admin`, `organization_admin`, `clinic_admin` | Read workflow-visible assignment state. |
+| `role_assignment.assign` | rbac | `platform_admin`, `organization_admin`, `clinic_admin` | Assign roles within delegated scope only. |
+| `role_assignment.revoke` | rbac | `platform_admin`, `organization_admin`, `clinic_admin` | Revoke roles within delegated scope only. |
+| `role_assignment.manage_expiry` | rbac | `platform_admin`, `organization_admin`, `clinic_admin` | Set expiry during controlled assignment. |
+| `role_assignment.assign_platform_role` | rbac | `platform_admin` only | Required for protected platform-role assignment and revocation. |
+
+Scope rules:
+
+- `platform_admin` may assign platform roles only through the controlled workflow.
+- `organization_admin` may assign organization-scoped and clinic-scoped roles inside its active organization, but not platform roles.
+- `clinic_admin` may assign and revoke clinic-scoped roles only for its authorized active clinic.
+- `role.assign` remains a compatibility/read-policy key; it is not sufficient for the new controlled write workflow.
