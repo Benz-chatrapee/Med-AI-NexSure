@@ -122,3 +122,24 @@ JSONB `old_value/new_value`: allowed minimized before/after fields; prohibited s
 
 ## 24. Review Required Decisions
 Professional credentials, payer-rule schema, insurance coverage schema, medical certificates, clinical documents, storage policies, analytics materialization, audit immutability, and tenant-specific restore support.
+
+## 25. Migration 010 Core Foundation Integrity Update
+
+Task: DB-P1-TENANT-SAFE-FK-HARDENING
+
+New Core Foundation constraints and indexes:
+
+| Status | Owner | Table/entity | Authoritative | Columns or attributes | Constraints/index/RLS | Classification | Source | Review Required |
+|---|---|---|---|---|---|---|---|---|
+| Existing | Identity | `user_profiles` | Yes | Existing columns unchanged | `uq_user_profiles_organization_id_id` supports tenant-safe child FKs | Credential/Confidential | migration `010` | multi-organization profile semantics |
+| Existing | RBAC | `roles` | Yes | Existing columns unchanged | `uq_roles_organization_id_id` supports tenant-scope relationship checks | Security | migration `010` | platform vs tenant role governance |
+| Existing | Membership | `organization_memberships` | Yes | Existing columns unchanged | `fk_organization_memberships_user_profile_tenant` enforces profile organization match | Security | migration `010` | membership workflow |
+| Existing | Membership | `clinic_memberships` | Yes | Existing columns unchanged | `fk_clinic_memberships_user_profile_tenant`; existing clinic tenant FK retained | Security | migration `010` | membership workflow |
+| Compatibility Sensitive | RBAC | `user_roles` | Yes legacy | Existing columns unchanged | tenant-safe clinic/profile FKs; `uq_user_roles_org_level_assignment`; role-scope trigger | Security | migration `010` | legacy retirement plan |
+| Existing | RBAC | `user_role_assignments` | Yes current | Existing columns unchanged | tenant-safe clinic/profile FKs; `uq_user_role_assignments_org_level_assignment`; role-scope trigger | Security | migration `010` | controlled assignment workflow |
+
+Runtime validation:
+
+- Local preflight counts were zero for cross-organization membership/profile mismatches, role-assignment/profile mismatches, and tenant-scoped role mismatches.
+- `supabase/tests/006_tenant_safe_fk_integrity.sql` validates valid same-tenant rows and invalid cross-tenant rows.
+- Lifecycle status, professional authority, and controlled assignment workflow fields were not added.

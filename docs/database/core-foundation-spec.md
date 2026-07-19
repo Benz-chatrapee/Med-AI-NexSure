@@ -136,3 +136,38 @@ erDiagram
 - Select one permission key format. Dot keys are used by the newer `mvp1_*` policies; colon keys are used by older policies and seeded roles.
 - Add SQL tests for table existence, tenant isolation, clinic isolation, permission enforcement, and core constraints.
 - Add storage object policies before clinical document or evidence uploads become live.
+
+## Migration 010 Tenant-safe Relationship Contract
+
+Task: DB-P1-TENANT-SAFE-FK-HARDENING
+
+Implemented by `supabase/migrations/010_core_foundation_tenant_safe_fk_hardening.sql`.
+
+Core relationship contracts now enforced:
+
+| Child table | Parent relationship | Contract |
+|---|---|---|
+| `organization_memberships` | `user_profiles(organization_id, id)` | Membership user must belong to the same profile default organization. |
+| `clinic_memberships` | `clinics(organization_id, id)` and `user_profiles(organization_id, id)` | Clinic and user profile must match the membership organization. |
+| `user_roles` | `clinics(organization_id, id)` and `user_profiles(organization_id, id)` | Legacy role assignment clinic and user profile must match the assignment organization. |
+| `user_role_assignments` | `clinics(organization_id, id)` and `user_profiles(organization_id, id)` | Current role assignment clinic and user profile must match the assignment organization. |
+| `user_roles`, `user_role_assignments` | `roles` via constraint trigger | Platform roles with `organization_id null` are assignable; tenant-scoped roles must match the assignment organization. |
+
+Uniqueness and index contract:
+
+- `user_profiles(organization_id, id)` is unique for composite child FKs.
+- `roles(organization_id, id)` is unique for tenant-scope relationship support.
+- Organization-level legacy assignments are unique through `uq_user_roles_org_level_assignment` where `clinic_id is null`.
+- Organization-level current assignments are unique through `uq_user_role_assignments_org_level_assignment` where `clinic_id is null`.
+- Child-side composite lookup indexes were added for role assignment profile and clinic relationships.
+
+Constraint validation strategy:
+
+- Constraints are immediately validated for the local MVP schema because preflight checks run first and the local data set is small.
+- `NOT VALID` was not used in this migration.
+
+Compatibility note:
+
+- Nullable `clinic_id` remains supported for organization-level role assignments.
+- `clinic_users` remains absent and was not created.
+- No application schema contract was changed beyond stricter rejection of invalid tenant relationships.
