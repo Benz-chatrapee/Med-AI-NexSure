@@ -753,6 +753,278 @@ export type Database = {
           },
         ]
       }
+      claim_decision_adjustments: {
+        Row: {
+          adjusted_amount: number
+          adjustment_amount: number | null
+          adjustment_number: number
+          adjustment_type: string
+          claim_decision_id: string
+          claim_id: string
+          claim_item_id: string | null
+          clinic_id: string
+          created_at: string
+          created_by: string
+          currency_code: string
+          id: string
+          metadata: Json
+          organization_id: string
+          original_amount: number
+          reason_code: string
+          reason_text: string
+          source_reference: string | null
+          source_type: string
+        }
+        Insert: {
+          adjusted_amount: number
+          adjustment_amount?: number | null
+          adjustment_number: number
+          adjustment_type: string
+          claim_decision_id: string
+          claim_id: string
+          claim_item_id?: string | null
+          clinic_id: string
+          created_at?: string
+          created_by: string
+          currency_code: string
+          id?: string
+          metadata?: Json
+          organization_id: string
+          original_amount: number
+          reason_code: string
+          reason_text: string
+          source_reference?: string | null
+          source_type?: string
+        }
+        Update: {
+          adjusted_amount?: number
+          adjustment_amount?: number | null
+          adjustment_number?: number
+          adjustment_type?: string
+          claim_decision_id?: string
+          claim_id?: string
+          claim_item_id?: string | null
+          clinic_id?: string
+          created_at?: string
+          created_by?: string
+          currency_code?: string
+          id?: string
+          metadata?: Json
+          organization_id?: string
+          original_amount?: number
+          reason_code?: string
+          reason_text?: string
+          source_reference?: string | null
+          source_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_decision_adjustments_created_by_fk"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_decision_adjustments_decision_claim_fk"
+            columns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "claim_decision_id",
+            ]
+            isOneToOne: false
+            referencedRelation: "claim_decisions"
+            referencedColumns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "id",
+            ]
+          },
+          {
+            foreignKeyName: "claim_decision_adjustments_item_claim_fk"
+            columns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "claim_item_id",
+            ]
+            isOneToOne: false
+            referencedRelation: "claim_items"
+            referencedColumns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "id",
+            ]
+          },
+          {
+            foreignKeyName: "claim_decision_adjustments_reason_code_fk"
+            columns: ["reason_code"]
+            isOneToOne: false
+            referencedRelation: "decision_reason_codes"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      claim_decisions: {
+        Row: {
+          approved_amount: number | null
+          claim_id: string
+          claim_review_id: string
+          clinic_id: string
+          created_at: string
+          created_by: string
+          currency_code: string
+          decided_at: string | null
+          decided_by: string | null
+          decision_outcome: string | null
+          decision_reason_code: string | null
+          decision_reason_text: string | null
+          decision_role_snapshot: string | null
+          decision_status: string
+          decision_summary: string | null
+          decision_version: number
+          id: string
+          metadata: Json
+          organization_id: string
+          patient_responsibility_amount: number | null
+          payer_responsibility_amount: number | null
+          rejected_amount: number | null
+          submitted_amount: number
+          supersedes_decision_id: string | null
+          updated_at: string
+          updated_by: string
+        }
+        Insert: {
+          approved_amount?: number | null
+          claim_id: string
+          claim_review_id: string
+          clinic_id: string
+          created_at?: string
+          created_by: string
+          currency_code: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_outcome?: string | null
+          decision_reason_code?: string | null
+          decision_reason_text?: string | null
+          decision_role_snapshot?: string | null
+          decision_status?: string
+          decision_summary?: string | null
+          decision_version: number
+          id?: string
+          metadata?: Json
+          organization_id: string
+          patient_responsibility_amount?: number | null
+          payer_responsibility_amount?: number | null
+          rejected_amount?: number | null
+          submitted_amount: number
+          supersedes_decision_id?: string | null
+          updated_at?: string
+          updated_by: string
+        }
+        Update: {
+          approved_amount?: number | null
+          claim_id?: string
+          claim_review_id?: string
+          clinic_id?: string
+          created_at?: string
+          created_by?: string
+          currency_code?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_outcome?: string | null
+          decision_reason_code?: string | null
+          decision_reason_text?: string | null
+          decision_role_snapshot?: string | null
+          decision_status?: string
+          decision_summary?: string | null
+          decision_version?: number
+          id?: string
+          metadata?: Json
+          organization_id?: string
+          patient_responsibility_amount?: number | null
+          payer_responsibility_amount?: number | null
+          rejected_amount?: number | null
+          submitted_amount?: number
+          supersedes_decision_id?: string | null
+          updated_at?: string
+          updated_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_decisions_claim_tenant_fk"
+            columns: ["organization_id", "clinic_id", "claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["organization_id", "clinic_id", "id"]
+          },
+          {
+            foreignKeyName: "claim_decisions_created_by_fk"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_decisions_decided_by_fk"
+            columns: ["decided_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_decisions_reason_code_fk"
+            columns: ["decision_reason_code"]
+            isOneToOne: false
+            referencedRelation: "decision_reason_codes"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "claim_decisions_review_claim_fk"
+            columns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "claim_review_id",
+            ]
+            isOneToOne: false
+            referencedRelation: "claim_reviews"
+            referencedColumns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "id",
+            ]
+          },
+          {
+            foreignKeyName: "claim_decisions_supersedes_claim_fk"
+            columns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "supersedes_decision_id",
+            ]
+            isOneToOne: false
+            referencedRelation: "claim_decisions"
+            referencedColumns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "id",
+            ]
+          },
+          {
+            foreignKeyName: "claim_decisions_updated_by_fk"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       claim_diagnoses: {
         Row: {
           claim_id: string
@@ -2150,6 +2422,262 @@ export type Database = {
           },
         ]
       }
+      claim_review_findings: {
+        Row: {
+          claim_id: string
+          claim_review_id: string
+          clinic_id: string
+          created_at: string
+          created_by: string
+          field_path: string | null
+          finding_category: string
+          finding_code: string
+          finding_status: string
+          finding_text: string
+          id: string
+          metadata: Json
+          organization_id: string
+          recommended_action: string
+          requires_response: boolean
+          resolution_code: string | null
+          resolution_text: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          response_due_at: string | null
+          severity: string
+          source_reference: string | null
+          source_type: string
+          subject_reference_id: string | null
+          subject_type: string
+          title: string
+          updated_at: string
+          updated_by: string
+        }
+        Insert: {
+          claim_id: string
+          claim_review_id: string
+          clinic_id: string
+          created_at?: string
+          created_by: string
+          field_path?: string | null
+          finding_category: string
+          finding_code: string
+          finding_status?: string
+          finding_text: string
+          id?: string
+          metadata?: Json
+          organization_id: string
+          recommended_action?: string
+          requires_response?: boolean
+          resolution_code?: string | null
+          resolution_text?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          response_due_at?: string | null
+          severity: string
+          source_reference?: string | null
+          source_type?: string
+          subject_reference_id?: string | null
+          subject_type?: string
+          title: string
+          updated_at?: string
+          updated_by: string
+        }
+        Update: {
+          claim_id?: string
+          claim_review_id?: string
+          clinic_id?: string
+          created_at?: string
+          created_by?: string
+          field_path?: string | null
+          finding_category?: string
+          finding_code?: string
+          finding_status?: string
+          finding_text?: string
+          id?: string
+          metadata?: Json
+          organization_id?: string
+          recommended_action?: string
+          requires_response?: boolean
+          resolution_code?: string | null
+          resolution_text?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          response_due_at?: string | null
+          severity?: string
+          source_reference?: string | null
+          source_type?: string
+          subject_reference_id?: string | null
+          subject_type?: string
+          title?: string
+          updated_at?: string
+          updated_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_review_findings_created_by_fk"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_review_findings_resolution_code_fk"
+            columns: ["resolution_code"]
+            isOneToOne: false
+            referencedRelation: "decision_reason_codes"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "claim_review_findings_resolved_by_fk"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_review_findings_review_claim_fk"
+            columns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "claim_review_id",
+            ]
+            isOneToOne: false
+            referencedRelation: "claim_reviews"
+            referencedColumns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "id",
+            ]
+          },
+          {
+            foreignKeyName: "claim_review_findings_updated_by_fk"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      claim_reviews: {
+        Row: {
+          assigned_at: string | null
+          assigned_role_snapshot: string | null
+          assigned_to: string | null
+          claim_id: string
+          clinic_id: string
+          completed_at: string | null
+          completion_reason_code: string | null
+          completion_reason_text: string | null
+          created_at: string
+          created_by: string
+          due_at: string | null
+          id: string
+          idempotency_key: string | null
+          metadata: Json
+          organization_id: string
+          review_number: number
+          review_priority: string
+          review_status: string
+          review_summary: string | null
+          review_type: string
+          started_at: string | null
+          trigger_source: string
+          updated_at: string
+          updated_by: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_role_snapshot?: string | null
+          assigned_to?: string | null
+          claim_id: string
+          clinic_id: string
+          completed_at?: string | null
+          completion_reason_code?: string | null
+          completion_reason_text?: string | null
+          created_at?: string
+          created_by: string
+          due_at?: string | null
+          id?: string
+          idempotency_key?: string | null
+          metadata?: Json
+          organization_id: string
+          review_number: number
+          review_priority?: string
+          review_status?: string
+          review_summary?: string | null
+          review_type: string
+          started_at?: string | null
+          trigger_source?: string
+          updated_at?: string
+          updated_by: string
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_role_snapshot?: string | null
+          assigned_to?: string | null
+          claim_id?: string
+          clinic_id?: string
+          completed_at?: string | null
+          completion_reason_code?: string | null
+          completion_reason_text?: string | null
+          created_at?: string
+          created_by?: string
+          due_at?: string | null
+          id?: string
+          idempotency_key?: string | null
+          metadata?: Json
+          organization_id?: string
+          review_number?: number
+          review_priority?: string
+          review_status?: string
+          review_summary?: string | null
+          review_type?: string
+          started_at?: string | null
+          trigger_source?: string
+          updated_at?: string
+          updated_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_reviews_assigned_to_fk"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_reviews_claim_tenant_fk"
+            columns: ["organization_id", "clinic_id", "claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["organization_id", "clinic_id", "id"]
+          },
+          {
+            foreignKeyName: "claim_reviews_completion_reason_code_fk"
+            columns: ["completion_reason_code"]
+            isOneToOne: false
+            referencedRelation: "decision_reason_codes"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "claim_reviews_created_by_fk"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_reviews_updated_by_fk"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       claim_status_history: {
         Row: {
           changed_at: string
@@ -2858,6 +3386,23 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claims_current_decision_claim_fk"
+            columns: [
+              "organization_id",
+              "clinic_id",
+              "id",
+              "current_decision_id",
+            ]
+            isOneToOne: false
+            referencedRelation: "claim_decisions"
+            referencedColumns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "id",
+            ]
           },
           {
             foreignKeyName: "claims_deleted_by_fk"
