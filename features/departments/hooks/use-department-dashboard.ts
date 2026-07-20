@@ -44,6 +44,14 @@ export function useDepartmentDashboard(filters: DepartmentDashboardFilters) {
     },
     onError: (error: Error) => setToast({ message: error.message, tone: "error" }),
   });
+  const lifecycleMutation = useMutation({
+    mutationFn: departmentService.transitionClinicLifecycle,
+    onSuccess: (result) => {
+      setToast({ message: result.message, tone: "success" });
+      void queryClient.invalidateQueries({ queryKey: departmentKeys.all });
+    },
+    onError: (error: Error) => setToast({ message: error.message, tone: "error" }),
+  });
   const exportMutation = useMutation({
     mutationFn: () => departmentService.exportDepartments(filters),
     onSuccess: (blob) => {
@@ -61,7 +69,7 @@ export function useDepartmentDashboard(filters: DepartmentDashboardFilters) {
   return {
     dashboardQuery, departmentsQuery, worklistQuery, directory, setDirectory, worklist, setWorklist,
     rankingMetric, setRankingMetric, rankingDirection, setRankingDirection,
-    createMutation, exportMutation, toast, setToast,
+    createMutation, lifecycleMutation, exportMutation, toast, setToast,
     resetLocalState: () => { setDirectory(defaultDirectory); setWorklist(defaultWorklist); setRankingMetric("claimReadyPercentage"); setRankingDirection("desc"); },
   };
 }
