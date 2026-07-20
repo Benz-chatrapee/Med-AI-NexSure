@@ -711,6 +711,173 @@ export type Database = {
           },
         ]
       }
+      clinical_documents: {
+        Row: {
+          checksum_sha256: string | null
+          clinic_id: string
+          correlation_id: string
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          description: string | null
+          document_status: string
+          document_type: string
+          file_size_bytes: number
+          id: string
+          is_active: boolean
+          mime_type: string
+          organization_id: string
+          original_filename: string
+          patient_id: string
+          source_type: string
+          storage_bucket: string
+          storage_path: string
+          supersedes_document_id: string | null
+          title: string | null
+          updated_at: string
+          updated_by: string | null
+          uploaded_by: string | null
+          verification_status: string
+          verified_at: string | null
+          verified_by: string | null
+          visit_id: string | null
+        }
+        Insert: {
+          checksum_sha256?: string | null
+          clinic_id: string
+          correlation_id?: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          description?: string | null
+          document_status?: string
+          document_type: string
+          file_size_bytes: number
+          id?: string
+          is_active?: boolean
+          mime_type: string
+          organization_id: string
+          original_filename: string
+          patient_id: string
+          source_type?: string
+          storage_bucket?: string
+          storage_path: string
+          supersedes_document_id?: string | null
+          title?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          uploaded_by?: string | null
+          verification_status?: string
+          verified_at?: string | null
+          verified_by?: string | null
+          visit_id?: string | null
+        }
+        Update: {
+          checksum_sha256?: string | null
+          clinic_id?: string
+          correlation_id?: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          description?: string | null
+          document_status?: string
+          document_type?: string
+          file_size_bytes?: number
+          id?: string
+          is_active?: boolean
+          mime_type?: string
+          organization_id?: string
+          original_filename?: string
+          patient_id?: string
+          source_type?: string
+          storage_bucket?: string
+          storage_path?: string
+          supersedes_document_id?: string | null
+          title?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          uploaded_by?: string | null
+          verification_status?: string
+          verified_at?: string | null
+          verified_by?: string | null
+          visit_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clinical_documents_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clinical_documents_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clinical_documents_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clinical_documents_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clinical_documents_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clinical_documents_supersedes_document_id_fkey"
+            columns: ["supersedes_document_id"]
+            isOneToOne: false
+            referencedRelation: "clinical_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clinical_documents_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clinical_documents_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clinical_documents_verified_by_fkey"
+            columns: ["verified_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clinical_documents_visit_id_fkey"
+            columns: ["visit_id"]
+            isOneToOne: false
+            referencedRelation: "visits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clinics: {
         Row: {
           address_line: string | null
@@ -2667,6 +2834,144 @@ export type Database = {
           },
         ]
       }
+      prescription_safety_alerts: {
+        Row: {
+          alert_status: string
+          alert_type: string
+          clinic_id: string
+          correlation_id: string
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          evidence: Json
+          id: string
+          is_active: boolean
+          message: string
+          organization_id: string
+          override_reason: string | null
+          prescription_id: string
+          prescription_item_id: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          severity: string
+          source_reference: string | null
+          source_type: string
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          alert_status?: string
+          alert_type: string
+          clinic_id: string
+          correlation_id?: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          evidence?: Json
+          id?: string
+          is_active?: boolean
+          message: string
+          organization_id: string
+          override_reason?: string | null
+          prescription_id: string
+          prescription_item_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          severity: string
+          source_reference?: string | null
+          source_type?: string
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          alert_status?: string
+          alert_type?: string
+          clinic_id?: string
+          correlation_id?: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          evidence?: Json
+          id?: string
+          is_active?: boolean
+          message?: string
+          organization_id?: string
+          override_reason?: string | null
+          prescription_id?: string
+          prescription_item_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          severity?: string
+          source_reference?: string | null
+          source_type?: string
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prescription_safety_alerts_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prescription_safety_alerts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prescription_safety_alerts_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prescription_safety_alerts_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prescription_safety_alerts_prescription_id_fkey"
+            columns: ["prescription_id"]
+            isOneToOne: false
+            referencedRelation: "prescriptions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prescription_safety_alerts_prescription_item_id_fkey"
+            columns: ["prescription_item_id"]
+            isOneToOne: false
+            referencedRelation: "prescription_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prescription_safety_alerts_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prescription_safety_alerts_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       prescriptions: {
         Row: {
           clinic_id: string
@@ -3770,6 +4075,74 @@ export type Database = {
           },
           {
             foreignKeyName: "visit_diagnoses_visit_id_fkey"
+            columns: ["visit_id"]
+            isOneToOne: false
+            referencedRelation: "visits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      visit_status_history: {
+        Row: {
+          changed_at: string
+          changed_by: string | null
+          clinic_id: string
+          correlation_id: string
+          from_status: Database["public"]["Enums"]["visit_status"] | null
+          id: string
+          organization_id: string
+          reason: string | null
+          to_status: Database["public"]["Enums"]["visit_status"]
+          visit_id: string
+        }
+        Insert: {
+          changed_at?: string
+          changed_by?: string | null
+          clinic_id: string
+          correlation_id?: string
+          from_status?: Database["public"]["Enums"]["visit_status"] | null
+          id?: string
+          organization_id: string
+          reason?: string | null
+          to_status: Database["public"]["Enums"]["visit_status"]
+          visit_id: string
+        }
+        Update: {
+          changed_at?: string
+          changed_by?: string | null
+          clinic_id?: string
+          correlation_id?: string
+          from_status?: Database["public"]["Enums"]["visit_status"] | null
+          id?: string
+          organization_id?: string
+          reason?: string | null
+          to_status?: Database["public"]["Enums"]["visit_status"]
+          visit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visit_status_history_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visit_status_history_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visit_status_history_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visit_status_history_visit_id_fkey"
             columns: ["visit_id"]
             isOneToOne: false
             referencedRelation: "visits"
