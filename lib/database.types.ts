@@ -147,6 +147,137 @@ export type Database = {
           },
         ]
       }
+      claim_benefit_limit_results: {
+        Row: {
+          benefit_code: string
+          benefit_name_snapshot: string | null
+          benefit_period: string
+          blocking_action: string
+          claim_amount: number
+          claim_id: string
+          clinic_id: string
+          created_at: string
+          created_by: string
+          currency_code: string
+          evaluated_at: string
+          evaluated_by: string | null
+          evaluation_source: string
+          field_path: string | null
+          id: string
+          limit_amount: number
+          organization_id: string
+          policy_coverage_id: string
+          reason_code: string | null
+          reason_text: string | null
+          remaining_amount_after_claim: number | null
+          remaining_amount_before_claim: number | null
+          result_data: Json
+          result_status: string
+          rule_code: string
+          rule_definition_hash: string | null
+          rule_version: string
+          subject_reference_id: string | null
+          subject_type: string
+          used_amount_before_claim: number
+        }
+        Insert: {
+          benefit_code: string
+          benefit_name_snapshot?: string | null
+          benefit_period: string
+          blocking_action?: string
+          claim_amount?: number
+          claim_id: string
+          clinic_id: string
+          created_at?: string
+          created_by: string
+          currency_code: string
+          evaluated_at?: string
+          evaluated_by?: string | null
+          evaluation_source?: string
+          field_path?: string | null
+          id?: string
+          limit_amount: number
+          organization_id: string
+          policy_coverage_id: string
+          reason_code?: string | null
+          reason_text?: string | null
+          remaining_amount_after_claim?: number | null
+          remaining_amount_before_claim?: number | null
+          result_data?: Json
+          result_status: string
+          rule_code: string
+          rule_definition_hash?: string | null
+          rule_version: string
+          subject_reference_id?: string | null
+          subject_type?: string
+          used_amount_before_claim?: number
+        }
+        Update: {
+          benefit_code?: string
+          benefit_name_snapshot?: string | null
+          benefit_period?: string
+          blocking_action?: string
+          claim_amount?: number
+          claim_id?: string
+          clinic_id?: string
+          created_at?: string
+          created_by?: string
+          currency_code?: string
+          evaluated_at?: string
+          evaluated_by?: string | null
+          evaluation_source?: string
+          field_path?: string | null
+          id?: string
+          limit_amount?: number
+          organization_id?: string
+          policy_coverage_id?: string
+          reason_code?: string | null
+          reason_text?: string | null
+          remaining_amount_after_claim?: number | null
+          remaining_amount_before_claim?: number | null
+          result_data?: Json
+          result_status?: string
+          rule_code?: string
+          rule_definition_hash?: string | null
+          rule_version?: string
+          subject_reference_id?: string | null
+          subject_type?: string
+          used_amount_before_claim?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_benefit_limit_results_coverage_claim_fk"
+            columns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "policy_coverage_id",
+            ]
+            isOneToOne: false
+            referencedRelation: "claim_policy_coverages"
+            referencedColumns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "id",
+            ]
+          },
+          {
+            foreignKeyName: "claim_benefit_limit_results_created_by_fk"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_benefit_limit_results_evaluated_by_fk"
+            columns: ["evaluated_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       claim_diagnoses: {
         Row: {
           claim_id: string
@@ -700,6 +831,128 @@ export type Database = {
           },
         ]
       }
+      claim_exclusion_results: {
+        Row: {
+          blocking_action: string
+          claim_id: string
+          clinic_id: string
+          created_at: string
+          created_by: string
+          evaluated_at: string
+          evaluated_by: string | null
+          evaluation_source: string
+          exclusion_category: string
+          exclusion_code: string
+          exclusion_text_snapshot: string
+          field_path: string | null
+          id: string
+          organization_id: string
+          policy_coverage_id: string
+          reason_code: string | null
+          reason_text: string | null
+          result_data: Json
+          result_status: string
+          rule_code: string
+          rule_definition_hash: string | null
+          rule_version: string
+          severity: string
+          source_reference: string | null
+          source_version: string | null
+          subject_reference_id: string | null
+          subject_type: string
+        }
+        Insert: {
+          blocking_action?: string
+          claim_id: string
+          clinic_id: string
+          created_at?: string
+          created_by: string
+          evaluated_at?: string
+          evaluated_by?: string | null
+          evaluation_source?: string
+          exclusion_category: string
+          exclusion_code: string
+          exclusion_text_snapshot: string
+          field_path?: string | null
+          id?: string
+          organization_id: string
+          policy_coverage_id: string
+          reason_code?: string | null
+          reason_text?: string | null
+          result_data?: Json
+          result_status: string
+          rule_code: string
+          rule_definition_hash?: string | null
+          rule_version: string
+          severity: string
+          source_reference?: string | null
+          source_version?: string | null
+          subject_reference_id?: string | null
+          subject_type?: string
+        }
+        Update: {
+          blocking_action?: string
+          claim_id?: string
+          clinic_id?: string
+          created_at?: string
+          created_by?: string
+          evaluated_at?: string
+          evaluated_by?: string | null
+          evaluation_source?: string
+          exclusion_category?: string
+          exclusion_code?: string
+          exclusion_text_snapshot?: string
+          field_path?: string | null
+          id?: string
+          organization_id?: string
+          policy_coverage_id?: string
+          reason_code?: string | null
+          reason_text?: string | null
+          result_data?: Json
+          result_status?: string
+          rule_code?: string
+          rule_definition_hash?: string | null
+          rule_version?: string
+          severity?: string
+          source_reference?: string | null
+          source_version?: string | null
+          subject_reference_id?: string | null
+          subject_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_exclusion_results_coverage_claim_fk"
+            columns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "policy_coverage_id",
+            ]
+            isOneToOne: false
+            referencedRelation: "claim_policy_coverages"
+            referencedColumns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "id",
+            ]
+          },
+          {
+            foreignKeyName: "claim_exclusion_results_created_by_fk"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_exclusion_results_evaluated_by_fk"
+            columns: ["evaluated_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       claim_items: {
         Row: {
           approved_amount: number | null
@@ -938,6 +1191,143 @@ export type Database = {
           {
             foreignKeyName: "claim_parties_user_profile_fk"
             columns: ["user_profile_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      claim_policy_coverages: {
+        Row: {
+          blocking_action: string
+          claim_id: string
+          clinic_id: string
+          coverage_end_date: string | null
+          coverage_reason_code: string | null
+          coverage_reason_text: string | null
+          coverage_start_date: string | null
+          coverage_status: string
+          created_at: string
+          created_by: string
+          evaluated_at: string | null
+          evaluated_by: string | null
+          evaluation_number: number
+          evaluation_status: string
+          id: string
+          member_number_snapshot: string | null
+          metadata: Json
+          organization_id: string
+          payer_name_snapshot: string | null
+          payer_reference: string | null
+          plan_code_snapshot: string | null
+          plan_name_snapshot: string | null
+          policy_number_snapshot: string
+          policy_snapshot: Json
+          result_data: Json
+          service_date: string
+          source_effective_at: string | null
+          source_hash: string | null
+          source_reference: string | null
+          source_type: string
+          source_version: string | null
+          updated_at: string
+          updated_by: string
+        }
+        Insert: {
+          blocking_action?: string
+          claim_id: string
+          clinic_id: string
+          coverage_end_date?: string | null
+          coverage_reason_code?: string | null
+          coverage_reason_text?: string | null
+          coverage_start_date?: string | null
+          coverage_status?: string
+          created_at?: string
+          created_by: string
+          evaluated_at?: string | null
+          evaluated_by?: string | null
+          evaluation_number: number
+          evaluation_status?: string
+          id?: string
+          member_number_snapshot?: string | null
+          metadata?: Json
+          organization_id: string
+          payer_name_snapshot?: string | null
+          payer_reference?: string | null
+          plan_code_snapshot?: string | null
+          plan_name_snapshot?: string | null
+          policy_number_snapshot: string
+          policy_snapshot?: Json
+          result_data?: Json
+          service_date: string
+          source_effective_at?: string | null
+          source_hash?: string | null
+          source_reference?: string | null
+          source_type: string
+          source_version?: string | null
+          updated_at?: string
+          updated_by: string
+        }
+        Update: {
+          blocking_action?: string
+          claim_id?: string
+          clinic_id?: string
+          coverage_end_date?: string | null
+          coverage_reason_code?: string | null
+          coverage_reason_text?: string | null
+          coverage_start_date?: string | null
+          coverage_status?: string
+          created_at?: string
+          created_by?: string
+          evaluated_at?: string | null
+          evaluated_by?: string | null
+          evaluation_number?: number
+          evaluation_status?: string
+          id?: string
+          member_number_snapshot?: string | null
+          metadata?: Json
+          organization_id?: string
+          payer_name_snapshot?: string | null
+          payer_reference?: string | null
+          plan_code_snapshot?: string | null
+          plan_name_snapshot?: string | null
+          policy_number_snapshot?: string
+          policy_snapshot?: Json
+          result_data?: Json
+          service_date?: string
+          source_effective_at?: string | null
+          source_hash?: string | null
+          source_reference?: string | null
+          source_type?: string
+          source_version?: string | null
+          updated_at?: string
+          updated_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_policy_coverages_claim_tenant_fk"
+            columns: ["organization_id", "clinic_id", "claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["organization_id", "clinic_id", "id"]
+          },
+          {
+            foreignKeyName: "claim_policy_coverages_created_by_fk"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_policy_coverages_evaluated_by_fk"
+            columns: ["evaluated_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_policy_coverages_updated_by_fk"
+            columns: ["updated_by"]
             isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
@@ -1741,6 +2131,131 @@ export type Database = {
           {
             foreignKeyName: "claim_validation_runs_updated_by_fk"
             columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      claim_waiting_period_results: {
+        Row: {
+          blocking_action: string
+          claim_id: string
+          clinic_id: string
+          created_at: string
+          created_by: string
+          effective_date: string
+          elapsed_days: number
+          evaluated_at: string
+          evaluated_by: string | null
+          evaluation_source: string
+          field_path: string | null
+          id: string
+          organization_id: string
+          policy_coverage_id: string
+          reason_code: string | null
+          reason_text: string | null
+          remaining_days: number
+          required_days: number
+          result_data: Json
+          result_status: string
+          rule_code: string
+          rule_definition_hash: string | null
+          rule_version: string
+          service_date: string
+          subject_reference_id: string | null
+          subject_type: string
+          waiting_period_code: string
+          waiting_period_type: string
+        }
+        Insert: {
+          blocking_action?: string
+          claim_id: string
+          clinic_id: string
+          created_at?: string
+          created_by: string
+          effective_date: string
+          elapsed_days: number
+          evaluated_at?: string
+          evaluated_by?: string | null
+          evaluation_source?: string
+          field_path?: string | null
+          id?: string
+          organization_id: string
+          policy_coverage_id: string
+          reason_code?: string | null
+          reason_text?: string | null
+          remaining_days: number
+          required_days: number
+          result_data?: Json
+          result_status: string
+          rule_code: string
+          rule_definition_hash?: string | null
+          rule_version: string
+          service_date: string
+          subject_reference_id?: string | null
+          subject_type?: string
+          waiting_period_code: string
+          waiting_period_type: string
+        }
+        Update: {
+          blocking_action?: string
+          claim_id?: string
+          clinic_id?: string
+          created_at?: string
+          created_by?: string
+          effective_date?: string
+          elapsed_days?: number
+          evaluated_at?: string
+          evaluated_by?: string | null
+          evaluation_source?: string
+          field_path?: string | null
+          id?: string
+          organization_id?: string
+          policy_coverage_id?: string
+          reason_code?: string | null
+          reason_text?: string | null
+          remaining_days?: number
+          required_days?: number
+          result_data?: Json
+          result_status?: string
+          rule_code?: string
+          rule_definition_hash?: string | null
+          rule_version?: string
+          service_date?: string
+          subject_reference_id?: string | null
+          subject_type?: string
+          waiting_period_code?: string
+          waiting_period_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_waiting_period_results_coverage_claim_fk"
+            columns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "policy_coverage_id",
+            ]
+            isOneToOne: false
+            referencedRelation: "claim_policy_coverages"
+            referencedColumns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "id",
+            ]
+          },
+          {
+            foreignKeyName: "claim_waiting_period_results_created_by_fk"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_waiting_period_results_evaluated_by_fk"
+            columns: ["evaluated_by"]
             isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
