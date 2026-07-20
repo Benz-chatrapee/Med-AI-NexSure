@@ -364,6 +364,342 @@ export type Database = {
           },
         ]
       }
+      claim_evidence_requirements: {
+        Row: {
+          allow_waiver: boolean
+          claim_id: string
+          clinic_id: string
+          condition_snapshot: Json
+          created_at: string
+          created_by: string
+          document_type: string | null
+          evidence_category: string
+          id: string
+          minimum_document_count: number
+          organization_id: string
+          requirement_code: string
+          requirement_level: string
+          requirement_status: string
+          requirement_text: string
+          source_reference: string | null
+          source_type: string
+          updated_at: string
+          updated_by: string
+        }
+        Insert: {
+          allow_waiver?: boolean
+          claim_id: string
+          clinic_id: string
+          condition_snapshot?: Json
+          created_at?: string
+          created_by: string
+          document_type?: string | null
+          evidence_category: string
+          id?: string
+          minimum_document_count?: number
+          organization_id: string
+          requirement_code: string
+          requirement_level?: string
+          requirement_status?: string
+          requirement_text: string
+          source_reference?: string | null
+          source_type: string
+          updated_at?: string
+          updated_by: string
+        }
+        Update: {
+          allow_waiver?: boolean
+          claim_id?: string
+          clinic_id?: string
+          condition_snapshot?: Json
+          created_at?: string
+          created_by?: string
+          document_type?: string | null
+          evidence_category?: string
+          id?: string
+          minimum_document_count?: number
+          organization_id?: string
+          requirement_code?: string
+          requirement_level?: string
+          requirement_status?: string
+          requirement_text?: string
+          source_reference?: string | null
+          source_type?: string
+          updated_at?: string
+          updated_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_evidence_requirements_claim_tenant_fk"
+            columns: ["organization_id", "clinic_id", "claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["organization_id", "clinic_id", "id"]
+          },
+          {
+            foreignKeyName: "claim_evidence_requirements_created_by_fk"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_evidence_requirements_updated_by_fk"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      claim_evidence_results: {
+        Row: {
+          accepted_document_count: number
+          claim_id: string
+          clinic_id: string
+          created_at: string
+          created_by: string
+          evaluated_at: string
+          evaluated_by: string | null
+          evaluation_source: string
+          id: string
+          matched_document_count: number
+          metadata: Json
+          organization_id: string
+          primary_claim_document_id: string | null
+          requirement_id: string
+          result_code: string | null
+          result_message: string | null
+          result_status: string
+          updated_at: string
+          updated_by: string
+        }
+        Insert: {
+          accepted_document_count?: number
+          claim_id: string
+          clinic_id: string
+          created_at?: string
+          created_by: string
+          evaluated_at?: string
+          evaluated_by?: string | null
+          evaluation_source?: string
+          id?: string
+          matched_document_count?: number
+          metadata?: Json
+          organization_id: string
+          primary_claim_document_id?: string | null
+          requirement_id: string
+          result_code?: string | null
+          result_message?: string | null
+          result_status?: string
+          updated_at?: string
+          updated_by: string
+        }
+        Update: {
+          accepted_document_count?: number
+          claim_id?: string
+          clinic_id?: string
+          created_at?: string
+          created_by?: string
+          evaluated_at?: string
+          evaluated_by?: string | null
+          evaluation_source?: string
+          id?: string
+          matched_document_count?: number
+          metadata?: Json
+          organization_id?: string
+          primary_claim_document_id?: string | null
+          requirement_id?: string
+          result_code?: string | null
+          result_message?: string | null
+          result_status?: string
+          updated_at?: string
+          updated_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_evidence_results_claim_tenant_fk"
+            columns: ["organization_id", "clinic_id", "claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["organization_id", "clinic_id", "id"]
+          },
+          {
+            foreignKeyName: "claim_evidence_results_created_by_fk"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_evidence_results_document_claim_fk"
+            columns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "primary_claim_document_id",
+            ]
+            isOneToOne: false
+            referencedRelation: "claim_documents"
+            referencedColumns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "id",
+            ]
+          },
+          {
+            foreignKeyName: "claim_evidence_results_evaluated_by_fk"
+            columns: ["evaluated_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_evidence_results_requirement_claim_fk"
+            columns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "requirement_id",
+            ]
+            isOneToOne: false
+            referencedRelation: "claim_evidence_requirements"
+            referencedColumns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "id",
+            ]
+          },
+          {
+            foreignKeyName: "claim_evidence_results_updated_by_fk"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      claim_evidence_waivers: {
+        Row: {
+          approved_at: string
+          approved_by: string
+          claim_id: string
+          clinic_id: string
+          created_at: string
+          created_by: string
+          expires_at: string | null
+          id: string
+          metadata: Json
+          organization_id: string
+          reason_code: string
+          reason_text: string
+          requirement_id: string
+          revocation_reason: string | null
+          revoked_at: string | null
+          revoked_by: string | null
+          updated_at: string
+          updated_by: string
+          waiver_status: string
+        }
+        Insert: {
+          approved_at?: string
+          approved_by: string
+          claim_id: string
+          clinic_id: string
+          created_at?: string
+          created_by: string
+          expires_at?: string | null
+          id?: string
+          metadata?: Json
+          organization_id: string
+          reason_code: string
+          reason_text: string
+          requirement_id: string
+          revocation_reason?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          updated_at?: string
+          updated_by: string
+          waiver_status?: string
+        }
+        Update: {
+          approved_at?: string
+          approved_by?: string
+          claim_id?: string
+          clinic_id?: string
+          created_at?: string
+          created_by?: string
+          expires_at?: string | null
+          id?: string
+          metadata?: Json
+          organization_id?: string
+          reason_code?: string
+          reason_text?: string
+          requirement_id?: string
+          revocation_reason?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          updated_at?: string
+          updated_by?: string
+          waiver_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_evidence_waivers_approved_by_fk"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_evidence_waivers_claim_tenant_fk"
+            columns: ["organization_id", "clinic_id", "claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["organization_id", "clinic_id", "id"]
+          },
+          {
+            foreignKeyName: "claim_evidence_waivers_created_by_fk"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_evidence_waivers_requirement_claim_fk"
+            columns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "requirement_id",
+            ]
+            isOneToOne: false
+            referencedRelation: "claim_evidence_requirements"
+            referencedColumns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "id",
+            ]
+          },
+          {
+            foreignKeyName: "claim_evidence_waivers_revoked_by_fk"
+            columns: ["revoked_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_evidence_waivers_updated_by_fk"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       claim_items: {
         Row: {
           approved_amount: number | null
