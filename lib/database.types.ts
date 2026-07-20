@@ -147,6 +147,481 @@ export type Database = {
           },
         ]
       }
+      claim_ai_assessments: {
+        Row: {
+          assessment_number: number
+          assessment_purpose: string
+          assessment_status: string
+          assessment_type: string
+          claim_id: string
+          clinic_id: string
+          completed_at: string | null
+          confidence_score: number | null
+          created_at: string
+          created_by: string
+          error_code: string | null
+          error_message: string | null
+          feature_set_hash: string | null
+          feature_set_version: string | null
+          governance_policy_version: string
+          id: string
+          idempotency_key: string | null
+          input_completeness_score: number | null
+          input_quality_status: string
+          input_snapshot: Json
+          metadata: Json
+          model_deployment_reference: string | null
+          model_hash: string | null
+          model_name: string
+          model_provider: string
+          model_version: string
+          organization_id: string
+          output_summary: Json
+          prompt_version: string | null
+          recommended_action: string
+          requires_human_review: boolean
+          review_required_by: string | null
+          risk_level: string
+          risk_score: number | null
+          ruleset_reference: string | null
+          ruleset_version: string | null
+          started_at: string | null
+          threshold_snapshot: Json
+          trigger_source: string
+          updated_at: string
+          updated_by: string
+        }
+        Insert: {
+          assessment_number: number
+          assessment_purpose: string
+          assessment_status?: string
+          assessment_type: string
+          claim_id: string
+          clinic_id: string
+          completed_at?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          created_by: string
+          error_code?: string | null
+          error_message?: string | null
+          feature_set_hash?: string | null
+          feature_set_version?: string | null
+          governance_policy_version: string
+          id?: string
+          idempotency_key?: string | null
+          input_completeness_score?: number | null
+          input_quality_status?: string
+          input_snapshot?: Json
+          metadata?: Json
+          model_deployment_reference?: string | null
+          model_hash?: string | null
+          model_name: string
+          model_provider: string
+          model_version: string
+          organization_id: string
+          output_summary?: Json
+          prompt_version?: string | null
+          recommended_action?: string
+          requires_human_review?: boolean
+          review_required_by?: string | null
+          risk_level?: string
+          risk_score?: number | null
+          ruleset_reference?: string | null
+          ruleset_version?: string | null
+          started_at?: string | null
+          threshold_snapshot?: Json
+          trigger_source: string
+          updated_at?: string
+          updated_by: string
+        }
+        Update: {
+          assessment_number?: number
+          assessment_purpose?: string
+          assessment_status?: string
+          assessment_type?: string
+          claim_id?: string
+          clinic_id?: string
+          completed_at?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          created_by?: string
+          error_code?: string | null
+          error_message?: string | null
+          feature_set_hash?: string | null
+          feature_set_version?: string | null
+          governance_policy_version?: string
+          id?: string
+          idempotency_key?: string | null
+          input_completeness_score?: number | null
+          input_quality_status?: string
+          input_snapshot?: Json
+          metadata?: Json
+          model_deployment_reference?: string | null
+          model_hash?: string | null
+          model_name?: string
+          model_provider?: string
+          model_version?: string
+          organization_id?: string
+          output_summary?: Json
+          prompt_version?: string | null
+          recommended_action?: string
+          requires_human_review?: boolean
+          review_required_by?: string | null
+          risk_level?: string
+          risk_score?: number | null
+          ruleset_reference?: string | null
+          ruleset_version?: string | null
+          started_at?: string | null
+          threshold_snapshot?: Json
+          trigger_source?: string
+          updated_at?: string
+          updated_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_ai_assessments_claim_tenant_fk"
+            columns: ["organization_id", "clinic_id", "claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["organization_id", "clinic_id", "id"]
+          },
+          {
+            foreignKeyName: "claim_ai_assessments_created_by_fk"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_ai_assessments_updated_by_fk"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      claim_ai_explanations: {
+        Row: {
+          ai_assessment_id: string
+          baseline_value: Json | null
+          claim_id: string
+          clinic_id: string
+          contribution_score: number | null
+          created_at: string
+          created_by: string
+          explanation_data: Json
+          explanation_type: string
+          feature_name: string | null
+          feature_value: Json | null
+          id: string
+          organization_id: string
+          risk_signal_id: string | null
+          sequence_number: number
+          source_reference: string | null
+          source_type: string | null
+          summary: string
+          title: string
+        }
+        Insert: {
+          ai_assessment_id: string
+          baseline_value?: Json | null
+          claim_id: string
+          clinic_id: string
+          contribution_score?: number | null
+          created_at?: string
+          created_by: string
+          explanation_data?: Json
+          explanation_type: string
+          feature_name?: string | null
+          feature_value?: Json | null
+          id?: string
+          organization_id: string
+          risk_signal_id?: string | null
+          sequence_number: number
+          source_reference?: string | null
+          source_type?: string | null
+          summary: string
+          title: string
+        }
+        Update: {
+          ai_assessment_id?: string
+          baseline_value?: Json | null
+          claim_id?: string
+          clinic_id?: string
+          contribution_score?: number | null
+          created_at?: string
+          created_by?: string
+          explanation_data?: Json
+          explanation_type?: string
+          feature_name?: string | null
+          feature_value?: Json | null
+          id?: string
+          organization_id?: string
+          risk_signal_id?: string | null
+          sequence_number?: number
+          source_reference?: string | null
+          source_type?: string | null
+          summary?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_ai_explanations_assessment_claim_fk"
+            columns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "ai_assessment_id",
+            ]
+            isOneToOne: false
+            referencedRelation: "claim_ai_assessments"
+            referencedColumns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "id",
+            ]
+          },
+          {
+            foreignKeyName: "claim_ai_explanations_created_by_fk"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_ai_explanations_signal_claim_fk"
+            columns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "ai_assessment_id",
+              "risk_signal_id",
+            ]
+            isOneToOne: false
+            referencedRelation: "claim_ai_risk_signals"
+            referencedColumns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "ai_assessment_id",
+              "id",
+            ]
+          },
+        ]
+      }
+      claim_ai_review_outcomes: {
+        Row: {
+          ai_assessment_id: string
+          claim_id: string
+          clinic_id: string
+          confirmed_action: string | null
+          confirmed_risk_level: string | null
+          created_at: string
+          created_by: string
+          feedback_label: string | null
+          feedback_notes: string | null
+          id: string
+          organization_id: string
+          review_decision: string | null
+          review_number: number
+          review_reason_code: string | null
+          review_reason_text: string | null
+          review_status: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          reviewer_role_snapshot: string | null
+          updated_at: string
+          updated_by: string
+        }
+        Insert: {
+          ai_assessment_id: string
+          claim_id: string
+          clinic_id: string
+          confirmed_action?: string | null
+          confirmed_risk_level?: string | null
+          created_at?: string
+          created_by: string
+          feedback_label?: string | null
+          feedback_notes?: string | null
+          id?: string
+          organization_id: string
+          review_decision?: string | null
+          review_number: number
+          review_reason_code?: string | null
+          review_reason_text?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_role_snapshot?: string | null
+          updated_at?: string
+          updated_by: string
+        }
+        Update: {
+          ai_assessment_id?: string
+          claim_id?: string
+          clinic_id?: string
+          confirmed_action?: string | null
+          confirmed_risk_level?: string | null
+          created_at?: string
+          created_by?: string
+          feedback_label?: string | null
+          feedback_notes?: string | null
+          id?: string
+          organization_id?: string
+          review_decision?: string | null
+          review_number?: number
+          review_reason_code?: string | null
+          review_reason_text?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_role_snapshot?: string | null
+          updated_at?: string
+          updated_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_ai_review_outcomes_assessment_claim_fk"
+            columns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "ai_assessment_id",
+            ]
+            isOneToOne: false
+            referencedRelation: "claim_ai_assessments"
+            referencedColumns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "id",
+            ]
+          },
+          {
+            foreignKeyName: "claim_ai_review_outcomes_created_by_fk"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_ai_review_outcomes_reviewed_by_fk"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_ai_review_outcomes_updated_by_fk"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      claim_ai_risk_signals: {
+        Row: {
+          ai_assessment_id: string
+          claim_id: string
+          clinic_id: string
+          confidence_score: number | null
+          created_at: string
+          created_by: string
+          evidence_references: Json
+          feature_values: Json
+          field_path: string | null
+          id: string
+          metadata: Json
+          organization_id: string
+          recommended_action: string
+          requires_human_review: boolean
+          risk_score: number | null
+          severity: string
+          signal_category: string
+          signal_code: string
+          signal_description: string
+          signal_title: string
+          subject_reference_id: string | null
+          subject_type: string
+        }
+        Insert: {
+          ai_assessment_id: string
+          claim_id: string
+          clinic_id: string
+          confidence_score?: number | null
+          created_at?: string
+          created_by: string
+          evidence_references?: Json
+          feature_values?: Json
+          field_path?: string | null
+          id?: string
+          metadata?: Json
+          organization_id: string
+          recommended_action: string
+          requires_human_review?: boolean
+          risk_score?: number | null
+          severity: string
+          signal_category: string
+          signal_code: string
+          signal_description: string
+          signal_title: string
+          subject_reference_id?: string | null
+          subject_type?: string
+        }
+        Update: {
+          ai_assessment_id?: string
+          claim_id?: string
+          clinic_id?: string
+          confidence_score?: number | null
+          created_at?: string
+          created_by?: string
+          evidence_references?: Json
+          feature_values?: Json
+          field_path?: string | null
+          id?: string
+          metadata?: Json
+          organization_id?: string
+          recommended_action?: string
+          requires_human_review?: boolean
+          risk_score?: number | null
+          severity?: string
+          signal_category?: string
+          signal_code?: string
+          signal_description?: string
+          signal_title?: string
+          subject_reference_id?: string | null
+          subject_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_ai_risk_signals_assessment_claim_fk"
+            columns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "ai_assessment_id",
+            ]
+            isOneToOne: false
+            referencedRelation: "claim_ai_assessments"
+            referencedColumns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "id",
+            ]
+          },
+          {
+            foreignKeyName: "claim_ai_risk_signals_created_by_fk"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       claim_benefit_limit_results: {
         Row: {
           benefit_code: string
