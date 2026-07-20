@@ -7994,6 +7994,44 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      allocate_claim_payment: {
+        Args: {
+          p_actor_id: string
+          p_allocated_amount: number
+          p_allocation_type?: string
+          p_claim_decision_adjustment_id?: string
+          p_claim_item_id?: string
+          p_claim_payment_id: string
+          p_metadata?: Json
+          p_reason_code?: string
+          p_reason_text?: string
+        }
+        Returns: {
+          allocated_amount: number
+          allocation_number: number
+          allocation_type: string
+          claim_decision_adjustment_id: string | null
+          claim_decision_id: string
+          claim_id: string
+          claim_item_id: string | null
+          claim_payment_id: string
+          clinic_id: string
+          created_at: string
+          created_by: string
+          currency_code: string
+          id: string
+          metadata: Json
+          organization_id: string
+          reason_code: string | null
+          reason_text: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "claim_payment_allocations"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       append_core_audit_event: {
         Args: {
           p_action: string
@@ -8073,6 +8111,48 @@ export type Database = {
         }
       }
       current_user_profile_id: { Args: never; Returns: string }
+      finalize_claim_decision: {
+        Args: {
+          p_actor_id: string
+          p_actor_role: string
+          p_decided_at?: string
+          p_decision_id: string
+        }
+        Returns: {
+          approved_amount: number | null
+          claim_id: string
+          claim_review_id: string
+          clinic_id: string
+          created_at: string
+          created_by: string
+          currency_code: string
+          decided_at: string | null
+          decided_by: string | null
+          decision_outcome: string | null
+          decision_reason_code: string | null
+          decision_reason_text: string | null
+          decision_role_snapshot: string | null
+          decision_status: string
+          decision_summary: string | null
+          decision_version: number
+          id: string
+          metadata: Json
+          organization_id: string
+          patient_responsibility_amount: number | null
+          payer_responsibility_amount: number | null
+          rejected_amount: number | null
+          submitted_amount: number
+          supersedes_decision_id: string | null
+          updated_at: string
+          updated_by: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "claim_decisions"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       has_clinic_access: {
         Args: { p_clinic_id: string; p_organization_id: string }
         Returns: boolean
@@ -8115,6 +8195,119 @@ export type Database = {
         Args: { p_subject: string; p_target_status: string }
         Returns: string
       }
+      reconcile_claim_payment: {
+        Args: {
+          p_actor_id: string
+          p_claim_payment_id: string
+          p_expected_amount?: number
+          p_external_statement_date?: string
+          p_external_statement_reference?: string
+          p_metadata?: Json
+          p_variance_reason_code?: string
+          p_variance_reason_text?: string
+        }
+        Returns: {
+          claim_decision_id: string
+          claim_id: string
+          claim_payment_id: string
+          clinic_id: string
+          created_at: string
+          created_by: string
+          currency_code: string
+          expected_amount: number
+          external_statement_date: string | null
+          external_statement_reference: string | null
+          id: string
+          metadata: Json
+          organization_id: string
+          received_amount: number
+          reconciled_at: string | null
+          reconciled_by: string | null
+          reconciliation_number: number
+          reconciliation_status: string
+          resolution_code: string | null
+          resolution_text: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          updated_at: string
+          updated_by: string
+          variance_amount: number | null
+          variance_reason_code: string | null
+          variance_reason_text: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "claim_payment_reconciliations"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      record_claim_payment: {
+        Args: {
+          p_actor_id: string
+          p_adjustment_amount?: number
+          p_claim_decision_id: string
+          p_currency_code: string
+          p_external_payload_hash?: string
+          p_external_source?: string
+          p_gross_payment_amount: number
+          p_idempotency_key?: string
+          p_metadata?: Json
+          p_payer_reference?: string
+          p_payment_method?: string
+          p_payment_reference: string
+          p_payment_status?: string
+          p_received_at?: string
+          p_remittance_reference?: string
+          p_value_date?: string
+          p_withholding_amount?: number
+        }
+        Returns: {
+          adjustment_amount: number
+          cancellation_reason_code: string | null
+          cancellation_reason_text: string | null
+          cancelled_at: string | null
+          claim_decision_id: string
+          claim_id: string
+          clinic_id: string
+          created_at: string
+          created_by: string
+          currency_code: string
+          external_payload_hash: string | null
+          external_source: string
+          failed_at: string | null
+          failure_code: string | null
+          failure_reason: string | null
+          gross_payment_amount: number
+          id: string
+          idempotency_key: string | null
+          metadata: Json
+          net_payment_amount: number | null
+          organization_id: string
+          payer_reference: string | null
+          payment_method: string
+          payment_number: number
+          payment_reference: string
+          payment_status: string
+          processing_started_at: string | null
+          received_at: string | null
+          remittance_reference: string | null
+          reversal_reason_code: string | null
+          reversal_reason_text: string | null
+          reversed_at: string | null
+          scheduled_at: string | null
+          updated_at: string
+          updated_by: string
+          value_date: string | null
+          withholding_amount: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "claim_payments"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       revoke_role_assignment: {
         Args: { p_assignment_id: string; p_reason: string }
         Returns: string
@@ -8126,6 +8319,49 @@ export type Database = {
       role_assignment_role_scope: {
         Args: { p_role_name: string }
         Returns: string
+      }
+      supersede_claim_decision: {
+        Args: {
+          p_actor_id: string
+          p_actor_role: string
+          p_decided_at?: string
+          p_previous_decision_id: string
+          p_replacement_decision_id: string
+        }
+        Returns: {
+          approved_amount: number | null
+          claim_id: string
+          claim_review_id: string
+          clinic_id: string
+          created_at: string
+          created_by: string
+          currency_code: string
+          decided_at: string | null
+          decided_by: string | null
+          decision_outcome: string | null
+          decision_reason_code: string | null
+          decision_reason_text: string | null
+          decision_role_snapshot: string | null
+          decision_status: string
+          decision_summary: string | null
+          decision_version: number
+          id: string
+          metadata: Json
+          organization_id: string
+          patient_responsibility_amount: number | null
+          payer_responsibility_amount: number | null
+          rejected_amount: number | null
+          submitted_amount: number
+          supersedes_decision_id: string | null
+          updated_at: string
+          updated_by: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "claim_decisions"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       transition_clinic_lifecycle: {
         Args: { p_clinic_id: string; p_reason: string; p_target_status: string }
