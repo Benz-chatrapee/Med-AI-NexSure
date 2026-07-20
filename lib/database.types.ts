@@ -1944,6 +1944,468 @@ export type Database = {
           },
         ]
       }
+      claim_payment_allocations: {
+        Row: {
+          allocated_amount: number
+          allocation_number: number
+          allocation_type: string
+          claim_decision_adjustment_id: string | null
+          claim_decision_id: string
+          claim_id: string
+          claim_item_id: string | null
+          claim_payment_id: string
+          clinic_id: string
+          created_at: string
+          created_by: string
+          currency_code: string
+          id: string
+          metadata: Json
+          organization_id: string
+          reason_code: string | null
+          reason_text: string | null
+        }
+        Insert: {
+          allocated_amount: number
+          allocation_number: number
+          allocation_type?: string
+          claim_decision_adjustment_id?: string | null
+          claim_decision_id: string
+          claim_id: string
+          claim_item_id?: string | null
+          claim_payment_id: string
+          clinic_id: string
+          created_at?: string
+          created_by: string
+          currency_code: string
+          id?: string
+          metadata?: Json
+          organization_id: string
+          reason_code?: string | null
+          reason_text?: string | null
+        }
+        Update: {
+          allocated_amount?: number
+          allocation_number?: number
+          allocation_type?: string
+          claim_decision_adjustment_id?: string | null
+          claim_decision_id?: string
+          claim_id?: string
+          claim_item_id?: string | null
+          claim_payment_id?: string
+          clinic_id?: string
+          created_at?: string
+          created_by?: string
+          currency_code?: string
+          id?: string
+          metadata?: Json
+          organization_id?: string
+          reason_code?: string | null
+          reason_text?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_payment_allocations_adjustment_claim_fk"
+            columns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "claim_decision_id",
+              "claim_decision_adjustment_id",
+            ]
+            isOneToOne: false
+            referencedRelation: "claim_decision_adjustments"
+            referencedColumns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "claim_decision_id",
+              "id",
+            ]
+          },
+          {
+            foreignKeyName: "claim_payment_allocations_created_by_fk"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_payment_allocations_item_claim_fk"
+            columns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "claim_item_id",
+            ]
+            isOneToOne: false
+            referencedRelation: "claim_items"
+            referencedColumns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "id",
+            ]
+          },
+          {
+            foreignKeyName: "claim_payment_allocations_payment_claim_fk"
+            columns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "claim_decision_id",
+              "claim_payment_id",
+            ]
+            isOneToOne: false
+            referencedRelation: "claim_payments"
+            referencedColumns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "claim_decision_id",
+              "id",
+            ]
+          },
+          {
+            foreignKeyName: "claim_payment_allocations_reason_code_fk"
+            columns: ["reason_code"]
+            isOneToOne: false
+            referencedRelation: "decision_reason_codes"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      claim_payment_reconciliations: {
+        Row: {
+          claim_decision_id: string
+          claim_id: string
+          claim_payment_id: string
+          clinic_id: string
+          created_at: string
+          created_by: string
+          currency_code: string
+          expected_amount: number
+          external_statement_date: string | null
+          external_statement_reference: string | null
+          id: string
+          metadata: Json
+          organization_id: string
+          received_amount: number
+          reconciled_at: string | null
+          reconciled_by: string | null
+          reconciliation_number: number
+          reconciliation_status: string
+          resolution_code: string | null
+          resolution_text: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          updated_at: string
+          updated_by: string
+          variance_amount: number | null
+          variance_reason_code: string | null
+          variance_reason_text: string | null
+        }
+        Insert: {
+          claim_decision_id: string
+          claim_id: string
+          claim_payment_id: string
+          clinic_id: string
+          created_at?: string
+          created_by: string
+          currency_code: string
+          expected_amount: number
+          external_statement_date?: string | null
+          external_statement_reference?: string | null
+          id?: string
+          metadata?: Json
+          organization_id: string
+          received_amount: number
+          reconciled_at?: string | null
+          reconciled_by?: string | null
+          reconciliation_number: number
+          reconciliation_status?: string
+          resolution_code?: string | null
+          resolution_text?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          updated_at?: string
+          updated_by: string
+          variance_amount?: number | null
+          variance_reason_code?: string | null
+          variance_reason_text?: string | null
+        }
+        Update: {
+          claim_decision_id?: string
+          claim_id?: string
+          claim_payment_id?: string
+          clinic_id?: string
+          created_at?: string
+          created_by?: string
+          currency_code?: string
+          expected_amount?: number
+          external_statement_date?: string | null
+          external_statement_reference?: string | null
+          id?: string
+          metadata?: Json
+          organization_id?: string
+          received_amount?: number
+          reconciled_at?: string | null
+          reconciled_by?: string | null
+          reconciliation_number?: number
+          reconciliation_status?: string
+          resolution_code?: string | null
+          resolution_text?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          updated_at?: string
+          updated_by?: string
+          variance_amount?: number | null
+          variance_reason_code?: string | null
+          variance_reason_text?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_payment_reconciliations_created_by_fk"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_payment_reconciliations_payment_claim_fk"
+            columns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "claim_decision_id",
+              "claim_payment_id",
+            ]
+            isOneToOne: false
+            referencedRelation: "claim_payments"
+            referencedColumns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "claim_decision_id",
+              "id",
+            ]
+          },
+          {
+            foreignKeyName: "claim_payment_reconciliations_reconciled_by_fk"
+            columns: ["reconciled_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_payment_reconciliations_resolution_code_fk"
+            columns: ["resolution_code"]
+            isOneToOne: false
+            referencedRelation: "decision_reason_codes"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "claim_payment_reconciliations_resolved_by_fk"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_payment_reconciliations_updated_by_fk"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_payment_reconciliations_variance_reason_code_fk"
+            columns: ["variance_reason_code"]
+            isOneToOne: false
+            referencedRelation: "decision_reason_codes"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      claim_payments: {
+        Row: {
+          adjustment_amount: number
+          cancellation_reason_code: string | null
+          cancellation_reason_text: string | null
+          cancelled_at: string | null
+          claim_decision_id: string
+          claim_id: string
+          clinic_id: string
+          created_at: string
+          created_by: string
+          currency_code: string
+          external_payload_hash: string | null
+          external_source: string
+          failed_at: string | null
+          failure_code: string | null
+          failure_reason: string | null
+          gross_payment_amount: number
+          id: string
+          idempotency_key: string | null
+          metadata: Json
+          net_payment_amount: number | null
+          organization_id: string
+          payer_reference: string | null
+          payment_method: string
+          payment_number: number
+          payment_reference: string
+          payment_status: string
+          processing_started_at: string | null
+          received_at: string | null
+          remittance_reference: string | null
+          reversal_reason_code: string | null
+          reversal_reason_text: string | null
+          reversed_at: string | null
+          scheduled_at: string | null
+          updated_at: string
+          updated_by: string
+          value_date: string | null
+          withholding_amount: number
+        }
+        Insert: {
+          adjustment_amount?: number
+          cancellation_reason_code?: string | null
+          cancellation_reason_text?: string | null
+          cancelled_at?: string | null
+          claim_decision_id: string
+          claim_id: string
+          clinic_id: string
+          created_at?: string
+          created_by: string
+          currency_code: string
+          external_payload_hash?: string | null
+          external_source?: string
+          failed_at?: string | null
+          failure_code?: string | null
+          failure_reason?: string | null
+          gross_payment_amount: number
+          id?: string
+          idempotency_key?: string | null
+          metadata?: Json
+          net_payment_amount?: number | null
+          organization_id: string
+          payer_reference?: string | null
+          payment_method?: string
+          payment_number: number
+          payment_reference: string
+          payment_status?: string
+          processing_started_at?: string | null
+          received_at?: string | null
+          remittance_reference?: string | null
+          reversal_reason_code?: string | null
+          reversal_reason_text?: string | null
+          reversed_at?: string | null
+          scheduled_at?: string | null
+          updated_at?: string
+          updated_by: string
+          value_date?: string | null
+          withholding_amount?: number
+        }
+        Update: {
+          adjustment_amount?: number
+          cancellation_reason_code?: string | null
+          cancellation_reason_text?: string | null
+          cancelled_at?: string | null
+          claim_decision_id?: string
+          claim_id?: string
+          clinic_id?: string
+          created_at?: string
+          created_by?: string
+          currency_code?: string
+          external_payload_hash?: string | null
+          external_source?: string
+          failed_at?: string | null
+          failure_code?: string | null
+          failure_reason?: string | null
+          gross_payment_amount?: number
+          id?: string
+          idempotency_key?: string | null
+          metadata?: Json
+          net_payment_amount?: number | null
+          organization_id?: string
+          payer_reference?: string | null
+          payment_method?: string
+          payment_number?: number
+          payment_reference?: string
+          payment_status?: string
+          processing_started_at?: string | null
+          received_at?: string | null
+          remittance_reference?: string | null
+          reversal_reason_code?: string | null
+          reversal_reason_text?: string | null
+          reversed_at?: string | null
+          scheduled_at?: string | null
+          updated_at?: string
+          updated_by?: string
+          value_date?: string | null
+          withholding_amount?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_payments_cancellation_reason_code_fk"
+            columns: ["cancellation_reason_code"]
+            isOneToOne: false
+            referencedRelation: "decision_reason_codes"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "claim_payments_claim_tenant_fk"
+            columns: ["organization_id", "clinic_id", "claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["organization_id", "clinic_id", "id"]
+          },
+          {
+            foreignKeyName: "claim_payments_created_by_fk"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_payments_decision_claim_fk"
+            columns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "claim_decision_id",
+            ]
+            isOneToOne: false
+            referencedRelation: "claim_decisions"
+            referencedColumns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "id",
+            ]
+          },
+          {
+            foreignKeyName: "claim_payments_failure_code_fk"
+            columns: ["failure_code"]
+            isOneToOne: false
+            referencedRelation: "decision_reason_codes"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "claim_payments_reversal_reason_code_fk"
+            columns: ["reversal_reason_code"]
+            isOneToOne: false
+            referencedRelation: "decision_reason_codes"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "claim_payments_updated_by_fk"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       claim_policy_coverages: {
         Row: {
           blocking_action: string
