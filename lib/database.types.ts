@@ -1387,6 +1387,366 @@ export type Database = {
         }
         Relationships: []
       }
+      claim_validation_overrides: {
+        Row: {
+          approved_at: string
+          approved_by: string
+          approved_role_snapshot: string
+          claim_id: string
+          clinic_id: string
+          created_at: string
+          created_by: string
+          expires_at: string | null
+          id: string
+          metadata: Json
+          organization_id: string
+          override_action: string
+          override_status: string
+          reason_code: string
+          reason_text: string
+          replacement_blocking_action: string | null
+          replacement_result_status: string | null
+          replacement_severity: string | null
+          revocation_reason: string | null
+          revoked_at: string | null
+          revoked_by: string | null
+          updated_at: string
+          updated_by: string
+          validation_result_id: string
+        }
+        Insert: {
+          approved_at?: string
+          approved_by: string
+          approved_role_snapshot: string
+          claim_id: string
+          clinic_id: string
+          created_at?: string
+          created_by: string
+          expires_at?: string | null
+          id?: string
+          metadata?: Json
+          organization_id: string
+          override_action: string
+          override_status?: string
+          reason_code: string
+          reason_text: string
+          replacement_blocking_action?: string | null
+          replacement_result_status?: string | null
+          replacement_severity?: string | null
+          revocation_reason?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          updated_at?: string
+          updated_by: string
+          validation_result_id: string
+        }
+        Update: {
+          approved_at?: string
+          approved_by?: string
+          approved_role_snapshot?: string
+          claim_id?: string
+          clinic_id?: string
+          created_at?: string
+          created_by?: string
+          expires_at?: string | null
+          id?: string
+          metadata?: Json
+          organization_id?: string
+          override_action?: string
+          override_status?: string
+          reason_code?: string
+          reason_text?: string
+          replacement_blocking_action?: string | null
+          replacement_result_status?: string | null
+          replacement_severity?: string | null
+          revocation_reason?: string | null
+          revoked_at?: string | null
+          revoked_by?: string | null
+          updated_at?: string
+          updated_by?: string
+          validation_result_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_validation_overrides_approved_by_fk"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_validation_overrides_claim_tenant_fk"
+            columns: ["organization_id", "clinic_id", "claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["organization_id", "clinic_id", "id"]
+          },
+          {
+            foreignKeyName: "claim_validation_overrides_created_by_fk"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_validation_overrides_result_claim_fk"
+            columns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "validation_result_id",
+            ]
+            isOneToOne: false
+            referencedRelation: "claim_validation_results"
+            referencedColumns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "id",
+            ]
+          },
+          {
+            foreignKeyName: "claim_validation_overrides_revoked_by_fk"
+            columns: ["revoked_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_validation_overrides_updated_by_fk"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      claim_validation_results: {
+        Row: {
+          actual_value: Json | null
+          blocking_action: string
+          claim_id: string
+          clinic_id: string
+          created_at: string
+          created_by: string
+          evaluated_at: string
+          evaluated_by: string | null
+          evaluation_source: string
+          expected_value: Json | null
+          id: string
+          message: string
+          organization_id: string
+          result_code: string | null
+          result_data: Json
+          result_status: string
+          rule_category: string
+          rule_code: string
+          rule_version: string
+          severity: string
+          subject_reference_id: string | null
+          subject_type: string
+          validation_run_id: string
+        }
+        Insert: {
+          actual_value?: Json | null
+          blocking_action?: string
+          claim_id: string
+          clinic_id: string
+          created_at?: string
+          created_by: string
+          evaluated_at?: string
+          evaluated_by?: string | null
+          evaluation_source?: string
+          expected_value?: Json | null
+          id?: string
+          message: string
+          organization_id: string
+          result_code?: string | null
+          result_data?: Json
+          result_status: string
+          rule_category: string
+          rule_code: string
+          rule_version: string
+          severity: string
+          subject_reference_id?: string | null
+          subject_type?: string
+          validation_run_id: string
+        }
+        Update: {
+          actual_value?: Json | null
+          blocking_action?: string
+          claim_id?: string
+          clinic_id?: string
+          created_at?: string
+          created_by?: string
+          evaluated_at?: string
+          evaluated_by?: string | null
+          evaluation_source?: string
+          expected_value?: Json | null
+          id?: string
+          message?: string
+          organization_id?: string
+          result_code?: string | null
+          result_data?: Json
+          result_status?: string
+          rule_category?: string
+          rule_code?: string
+          rule_version?: string
+          severity?: string
+          subject_reference_id?: string | null
+          subject_type?: string
+          validation_run_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_validation_results_claim_tenant_fk"
+            columns: ["organization_id", "clinic_id", "claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["organization_id", "clinic_id", "id"]
+          },
+          {
+            foreignKeyName: "claim_validation_results_created_by_fk"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_validation_results_evaluated_by_fk"
+            columns: ["evaluated_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_validation_results_run_claim_fk"
+            columns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "validation_run_id",
+            ]
+            isOneToOne: false
+            referencedRelation: "claim_validation_runs"
+            referencedColumns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "id",
+            ]
+          },
+        ]
+      }
+      claim_validation_runs: {
+        Row: {
+          blocked_count: number
+          claim_id: string
+          clinic_id: string
+          completed_at: string | null
+          created_at: string
+          created_by: string
+          error_code: string | null
+          error_message: string | null
+          failed_count: number
+          id: string
+          metadata: Json
+          needs_review_count: number
+          not_applicable_count: number
+          organization_id: string
+          passed_count: number
+          ruleset_reference: string
+          ruleset_snapshot: Json
+          ruleset_version: string
+          run_status: string
+          started_at: string | null
+          summary_status: string
+          trigger_source: string
+          updated_at: string
+          updated_by: string
+          validation_stage: string
+          warning_count: number
+        }
+        Insert: {
+          blocked_count?: number
+          claim_id: string
+          clinic_id: string
+          completed_at?: string | null
+          created_at?: string
+          created_by: string
+          error_code?: string | null
+          error_message?: string | null
+          failed_count?: number
+          id?: string
+          metadata?: Json
+          needs_review_count?: number
+          not_applicable_count?: number
+          organization_id: string
+          passed_count?: number
+          ruleset_reference: string
+          ruleset_snapshot?: Json
+          ruleset_version: string
+          run_status?: string
+          started_at?: string | null
+          summary_status?: string
+          trigger_source: string
+          updated_at?: string
+          updated_by: string
+          validation_stage: string
+          warning_count?: number
+        }
+        Update: {
+          blocked_count?: number
+          claim_id?: string
+          clinic_id?: string
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string
+          error_code?: string | null
+          error_message?: string | null
+          failed_count?: number
+          id?: string
+          metadata?: Json
+          needs_review_count?: number
+          not_applicable_count?: number
+          organization_id?: string
+          passed_count?: number
+          ruleset_reference?: string
+          ruleset_snapshot?: Json
+          ruleset_version?: string
+          run_status?: string
+          started_at?: string | null
+          summary_status?: string
+          trigger_source?: string
+          updated_at?: string
+          updated_by?: string
+          validation_stage?: string
+          warning_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_validation_runs_claim_tenant_fk"
+            columns: ["organization_id", "clinic_id", "claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["organization_id", "clinic_id", "id"]
+          },
+          {
+            foreignKeyName: "claim_validation_runs_created_by_fk"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_validation_runs_updated_by_fk"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       claims: {
         Row: {
           claim_number: string
