@@ -21,9 +21,6 @@
 --   a transaction. For large production tables, deploy equivalent indexes in a
 --   separately approved non-transactional operation.
 -- =============================================================================
-
-begin;
-
 -- =============================================================================
 -- 1. INTEGRITY AND IDEMPOTENCY
 -- =============================================================================
@@ -56,12 +53,6 @@ create index claim_reviews_active_queue_idx
     due_at,
     created_at
   )
-  include (
-    claim_id,
-    review_type,
-    review_status,
-    assigned_to
-  )
   where review_status in (
     'pending',
     'assigned',
@@ -76,14 +67,6 @@ create index claim_reviews_assignee_queue_idx
     due_at,
     created_at
   )
-  include (
-    organization_id,
-    clinic_id,
-    claim_id,
-    review_type,
-    review_priority,
-    review_status
-  )
   where assigned_to is not null
     and review_status in (
       'assigned',
@@ -96,13 +79,6 @@ create index claim_reviews_claim_timeline_idx
   on public.claim_reviews (
     claim_id,
     review_number desc
-  )
-  include (
-    review_type,
-    review_status,
-    assigned_to,
-    created_at,
-    completed_at
   );
 
 -- =============================================================================
@@ -117,12 +93,6 @@ create index claim_review_findings_open_queue_idx
     response_due_at,
     created_at
   )
-  include (
-    finding_category,
-    finding_code,
-    finding_status,
-    requires_response
-  )
   where finding_status in (
     'open',
     'acknowledged',
@@ -136,12 +106,6 @@ create index claim_review_findings_tenant_high_risk_idx
     clinic_id,
     created_at desc
   )
-  include (
-    claim_id,
-    claim_review_id,
-    finding_category,
-    finding_status
-  )
   where severity in ('high', 'critical')
     and finding_status in (
       'open',
@@ -154,12 +118,6 @@ create index claim_review_findings_subject_idx
   on public.claim_review_findings (
     subject_type,
     subject_reference_id
-  )
-  include (
-    claim_id,
-    claim_review_id,
-    finding_code,
-    finding_status
   )
   where subject_reference_id is not null;
 
@@ -175,14 +133,6 @@ create index claim_decisions_claim_history_idx
   on public.claim_decisions (
     claim_id,
     decision_version desc
-  )
-  include (
-    decision_status,
-    decision_outcome,
-    approved_amount,
-    rejected_amount,
-    payer_responsibility_amount,
-    decided_at
   );
 
 -- Human decision activity by tenant and date.
@@ -192,12 +142,6 @@ create index claim_decisions_tenant_activity_idx
     clinic_id,
     decided_at desc
   )
-  include (
-    claim_id,
-    decision_version,
-    decision_outcome,
-    decided_by
-  )
   where decision_status in ('final', 'superseded');
 
 -- Adjustment aggregation and line-level adjudication lookup.
@@ -205,24 +149,12 @@ create index claim_decision_adjustments_decision_idx
   on public.claim_decision_adjustments (
     claim_decision_id,
     adjustment_number
-  )
-  include (
-    claim_item_id,
-    adjustment_type,
-    adjustment_amount,
-    reason_code
   );
 
 create index claim_decision_adjustments_item_idx
   on public.claim_decision_adjustments (
     claim_item_id,
     created_at
-  )
-  include (
-    claim_id,
-    claim_decision_id,
-    adjustment_type,
-    adjustment_amount
   )
   where claim_item_id is not null;
 
@@ -237,11 +169,6 @@ create index claim_payments_decision_active_amount_idx
     claim_decision_id,
     payment_status
   )
-  include (
-    net_payment_amount,
-    payment_number,
-    received_at
-  )
   where payment_status in (
     'pending',
     'scheduled',
@@ -254,13 +181,6 @@ create index claim_payments_claim_timeline_idx
   on public.claim_payments (
     claim_id,
     payment_number desc
-  )
-  include (
-    payment_status,
-    net_payment_amount,
-    currency_code,
-    received_at,
-    payment_reference
   );
 
 -- Finance operations queue.
@@ -271,13 +191,6 @@ create index claim_payments_processing_queue_idx
     payment_status,
     scheduled_at,
     created_at
-  )
-  include (
-    claim_id,
-    claim_decision_id,
-    net_payment_amount,
-    currency_code,
-    payment_reference
   )
   where payment_status in (
     'pending',
@@ -292,24 +205,12 @@ create index claim_payments_payer_reference_idx
     organization_id,
     payer_reference
   )
-  include (
-    claim_id,
-    payment_status,
-    net_payment_amount,
-    received_at
-  )
   where payer_reference is not null;
 
 create index claim_payments_remittance_reference_idx
   on public.claim_payments (
     organization_id,
     remittance_reference
-  )
-  include (
-    claim_id,
-    payment_status,
-    net_payment_amount,
-    received_at
   )
   where remittance_reference is not null;
 
@@ -322,12 +223,6 @@ create index claim_payment_allocations_payment_amount_idx
   on public.claim_payment_allocations (
     claim_payment_id,
     allocation_number
-  )
-  include (
-    allocated_amount,
-    allocation_type,
-    claim_item_id,
-    claim_decision_adjustment_id
   );
 
 -- Item payment history.
@@ -336,12 +231,6 @@ create index claim_payment_allocations_item_idx
     claim_item_id,
     created_at
   )
-  include (
-    claim_id,
-    claim_payment_id,
-    allocated_amount,
-    currency_code
-  )
   where claim_item_id is not null;
 
 -- Adjustment settlement history.
@@ -349,12 +238,6 @@ create index claim_payment_allocations_adjustment_idx
   on public.claim_payment_allocations (
     claim_decision_adjustment_id,
     created_at
-  )
-  include (
-    claim_id,
-    claim_payment_id,
-    allocated_amount,
-    currency_code
   )
   where claim_decision_adjustment_id is not null;
 
@@ -370,13 +253,6 @@ create index claim_payment_reconciliations_queue_idx
     reconciliation_status,
     created_at
   )
-  include (
-    claim_id,
-    claim_payment_id,
-    variance_amount,
-    currency_code,
-    external_statement_reference
-  )
   where reconciliation_status in (
     'pending',
     'mismatched',
@@ -389,13 +265,6 @@ create index claim_payment_reconciliations_payment_idx
   on public.claim_payment_reconciliations (
     claim_payment_id,
     reconciliation_number desc
-  )
-  include (
-    reconciliation_status,
-    expected_amount,
-    received_amount,
-    variance_amount,
-    reconciled_at
   );
 
 -- External statement lookup.
@@ -403,12 +272,6 @@ create index claim_payment_reconciliations_statement_idx
   on public.claim_payment_reconciliations (
     organization_id,
     external_statement_reference
-  )
-  include (
-    claim_payment_id,
-    reconciliation_status,
-    external_statement_date,
-    variance_amount
   )
   where external_statement_reference is not null;
 
@@ -423,13 +286,6 @@ create index claim_status_history_claim_timeline_idx
   on public.claim_status_history (
     claim_id,
     changed_at desc
-  )
-  include (
-    sequence_number,
-    from_status,
-    to_status,
-    changed_by,
-    reason_code
   );
 
 -- Tenant operational status activity.
@@ -438,12 +294,6 @@ create index claim_status_history_tenant_activity_idx
     organization_id,
     clinic_id,
     changed_at desc
-  )
-  include (
-    claim_id,
-    from_status,
-    to_status,
-    changed_by
   );
 
 -- =============================================================================
@@ -473,63 +323,32 @@ create index claim_evidence_waivers_claim_idx
 -- 10. VALIDATION AND POLICY COVERAGE
 -- =============================================================================
 
--- Latest validation run for a claim.
-create index claim_validation_runs_claim_latest_idx
-  on public.claim_validation_runs (
-    claim_id,
-    created_at desc
-  )
-  include (
-    validation_stage,
-    run_status,
-    summary_status,
-    started_at,
-    completed_at,
-    ruleset_version
-  );
-
--- Blocking/high-severity result queue.
-create index claim_validation_results_blocking_idx
-  on public.claim_validation_results (
-    organization_id,
-    clinic_id,
-    created_at
-  )
-  include (
-    claim_id,
-    claim_validation_run_id,
-    severity,
-    validation_status
-  )
- 
-  include (
-    claim_validation_result_id,
-    override_status,
-    overridden_by
-  );
-
+-- Latest policy coverage evaluation for a claim.
 create index claim_policy_coverages_claim_idx
   on public.claim_policy_coverages (
     claim_id,
     evaluated_at desc
   );
 
+-- Benefit limit evaluation history.
 create index claim_benefit_limit_results_coverage_idx
   on public.claim_benefit_limit_results (
-    claim_policy_coverage_id,
-    created_at
+    policy_coverage_id,
+    evaluated_at desc
   );
 
+-- Exclusion evaluation history.
 create index claim_exclusion_results_coverage_idx
   on public.claim_exclusion_results (
-    claim_policy_coverage_id,
-    created_at
+    policy_coverage_id,
+    evaluated_at desc
   );
 
+-- Waiting-period evaluation history.
 create index claim_waiting_period_results_coverage_idx
   on public.claim_waiting_period_results (
-    claim_policy_coverage_id,
-    created_at
+    policy_coverage_id,
+    evaluated_at desc
   );
 
 -- =============================================================================
@@ -541,13 +360,6 @@ create index claim_ai_assessments_claim_latest_idx
   on public.claim_ai_assessments (
     claim_id,
     assessment_number desc
-  )
-  include (
-    assessment_status,
-    risk_level,
-    confidence_score,
-    requires_human_review,
-    completed_at
   );
 
 -- Human-review queue for high-risk or low-confidence AI outputs.
@@ -558,33 +370,27 @@ create index claim_ai_assessments_review_queue_idx
     risk_level,
     created_at
   )
-  include (
-    claim_id,
-    confidence_score,
-    assessment_status
-  )
   where requires_human_review = true;
 
+-- AI risk signals by assessment.
 create index claim_ai_risk_signals_assessment_idx
   on public.claim_ai_risk_signals (
-    claim_ai_assessment_id,
+    ai_assessment_id,
     severity,
     created_at
   );
 
+-- AI explanations in display order.
 create index claim_ai_explanations_assessment_idx
   on public.claim_ai_explanations (
-    claim_ai_assessment_id,
-    explanation_order
+    ai_assessment_id,
+    sequence_number
   );
 
+-- Human review history for each AI assessment.
 create index claim_ai_review_outcomes_assessment_idx
   on public.claim_ai_review_outcomes (
-    claim_ai_assessment_id,
-    reviewed_at desc
-  );
-
-commit;
-
-
+    ai_assessment_id,
+    review_number desc
+ );
 
