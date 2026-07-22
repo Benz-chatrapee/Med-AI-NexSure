@@ -2174,3 +2174,43 @@ Amount and currency rules:
 | Stored totals | `claims.total_approved_amount` is updated only for approved, partially approved, and rejected outcomes; payment totals are untouched. |
 
 Direct-write protection: ordinary application roles must not directly insert `claim_decisions`, update finalized `claim_decisions`, delete `claim_decisions`, update `claims.decision_status`, or update `claims.current_decision_id`. Batch 4 controlled path is authorized function execution plus restricted protected-column updates, restricted direct decision writes, and append-only finalized evidence. Privileged service/database recovery remains available outside ordinary application roles.
+
+---
+
+## 40. Phase 4 Batch 5 Payment Settlement Clarification
+
+**Status:** Confirmed Finding / Recommendation
+**Decision Date:** 2026-07-22
+
+Batch 5 clarifies the payment workflow boundary after Batch 1 through Batch 4.
+
+### 40.1 Approved Boundary
+
+Payment mutation is independent from workflow and payer decision mutation.
+
+```text
+workflow mutation does not set payment_status
+decision mutation does not set payment_status
+payment mutation does not set workflow_status or decision_status
+```
+
+Payment records remain authoritative financial evidence. `claims.payment_status` is only the current operational payment summary.
+
+### 40.2 Batch 5 Scope
+
+Batch 5 should implement a controlled payment settlement path that:
+
+- reuses `claim_payments`, `claim_payment_allocations`, and `claim_payment_reconciliations`;
+- updates `claims.payment_status` and `claims.total_paid_amount` atomically;
+- uses `claims.version` for optimistic locking;
+- requires payment authority through `claim.payment.record`;
+- preserves tenant and clinic scope;
+- prevents direct ordinary updates to payment summary and financial totals;
+- rejects duplicate/conflicting external payment events;
+- records payment evidence without representing readiness or decision status as claim approval.
+
+### 40.3 Out of Scope
+
+Batch 5 does not implement formal appeals, refund lifecycle, legacy `claims.status` removal, backend/API/frontend cutover, generated types, fixtures, seed data, or database reset.
+
+Refund and reversal remain distinguishable requirements. Refund behavior is deferred to a later financial-exception batch unless the Batch 5 implementation encounters a blocking dependency that requires a narrower decision-closure task first.

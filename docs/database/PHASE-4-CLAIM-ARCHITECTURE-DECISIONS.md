@@ -1261,3 +1261,50 @@ Remaining items are implementation gaps that are allowed inside Batch 4:
 5. Add planned functional and security tests.
 
 Batch 4 readiness: `READY FOR BATCH 4`.
+
+---
+
+## 19. Phase 4 Batch 5 Payment Settlement Contract Traceability
+
+**Status:** Confirmed Finding / Recommendation
+**Decision Date:** 2026-07-22
+**Approval Impact:** This section does not change ADR-001 through ADR-008 text, approval status, rationale, or implementation status.
+
+### 19.1 Confirmed Findings
+
+| Evidence | Classification | Architectural impact |
+| --- | --- | --- |
+| `claims.payment_status public.claim_payment_state_domain` exists from Batch 1. | Confirmed Finding | A payment current-state snapshot is available but requires controlled synchronization. |
+| `public.transition_claim_workflow` does not mutate `claims.payment_status`. | Confirmed Finding | Workflow and payment remain independent per ADR-001 and ADR-003. |
+| `public.record_claim_decision` does not mutate `claims.payment_status`, `claims.total_paid_amount`, `claim_payments`, allocations, or reconciliations. | Confirmed Finding | Decision and payment remain independent. |
+| Phase 3 payment objects exist: `claim_payments`, `claim_payment_allocations`, and `claim_payment_reconciliations`. | Confirmed Finding | Batch 5 must reuse these objects as financial evidence. |
+| Existing Phase 3 `record_claim_payment` accepts payment status and idempotency data but predates the Phase 4 split payment snapshot. | Confirmed Finding | A Phase 4 wrapper or replacement controlled path is required rather than relying on legacy status side effects. |
+| Refund and reversal are documented as production-required exception capabilities, but a controlled refund function was not verified. | Not Verified / Implementation Gap | Refund must not be folded into Batch 5 unless refund ceiling and exception rules are closed. |
+
+### 19.2 Recommendation
+
+Batch 5 should implement controlled Claim payment settlement mutation before appeal or refund/reversal lifecycle work.
+
+Approved ADR alignment:
+
+| ADR | Batch 5 traceability |
+| --- | --- |
+| ADR-001 | Payment settlement remains independent from operational closure. |
+| ADR-003 | Payment transactions remain authoritative; Claim payment status is only a current summary. |
+| ADR-006 | Payer decision mutation remains separate and does not imply payment. |
+| ADR-007 | Payment/reconciliation authority controls financial mutation; AI has no authority. |
+| ADR-008 | Legacy status remains staged and is not removed by Batch 5. |
+
+### 19.3 Open Decisions
+
+| Open Decision | Impact | Recommended handling |
+| --- | --- | --- |
+| Refund ceiling and partial/full refund semantics | Required before implementing `partially_refunded` or `refunded` | Defer to a later refund/reversal batch. |
+| Reversal operation authority and external ordering | Required before broad reversal automation | Allow Batch 5 to record only the minimal `reversed` settlement evidence if existing Phase 3 fields support it; otherwise stop. |
+| Legacy `claims.status` retirement timing | Required before final cutover | Keep legacy status unchanged in Batch 5. |
+
+### 19.4 Batch 5 Readiness Recommendation
+
+`READY FOR BATCH 5`
+
+This readiness applies only to the controlled payment settlement contract. It is not proof that Batch 5 migrations or tests have been executed.

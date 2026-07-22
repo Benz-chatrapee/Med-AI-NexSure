@@ -1640,3 +1640,102 @@ database reset or validation execution in this documentation closure task
 ```
 
 Batch 4 readiness: `READY FOR BATCH 4`.
+
+---
+
+## 28. Batch 5 Approved Implementation Contract - Controlled Claim Payment Settlement Mutations
+
+**Batch name:** Phase 4 Batch 5 - Controlled Claim Payment Settlement Mutations
+**Objective:** Implement one controlled split-state Claim payment mutation path that reuses existing `claim_payments`, preserves payment records as authoritative financial evidence, updates `claims.payment_status` and `claims.total_paid_amount` atomically, and prevents unauthorized direct payment-summary writes.
+
+### 28.1 Evidence-Based Selection
+
+| Area | Classification | Evidence |
+| --- | --- | --- |
+| Batch 1 split payment snapshot | Confirmed Implemented | `20260722140100_phase4_claim_state_columns.sql` adds nullable `claims.payment_status public.claim_payment_state_domain`. |
+| Batch 3/4 non-payment preservation | Confirmed Implemented | `transition_claim_workflow` and `record_claim_decision` do not authoritatively mutate payment state. |
+| Existing payment source of truth | Confirmed Implemented | Phase 3 provides `claim_payments`, `claim_payment_allocations`, `claim_payment_reconciliations`, `record_claim_payment`, payment idempotency indexes, RLS, and service-role function grants. |
+| Split payment synchronization | Implementation Gap | Existing `record_claim_payment` updates legacy `claims.status` and `claims.total_paid_amount`; no Phase 4 controlled split `claims.payment_status` mutation was found. |
+| Refund/reversal operations | Documented but Not Implemented | Reversal fields exist on `claim_payments`; no `record_claim_refund` or `record_claim_reversal` function was verified. |
+| Formal appeal entity | Documented but Not Implemented | Approved by ADR-002 but dependent on workflow/decision evidence; not safer than closing payment summary after decision mutation. |
+
+Batch 5 is selected because payment summary control is the next highest-priority valid Phase 4 dependency after split states, workflow mutation, and decision mutation. It closes the financial-current-state gap without combining appeal or legacy backfill scope.
+
+### 28.2 Exact Batch 5 Contract
+
+| Contract Field | Value | Applicability |
+| --- | --- | --- |
+| Batch name | Phase 4 Batch 5 - Controlled Claim Payment Settlement Mutations | CONFIRMED |
+| Objective | Reuse authoritative Phase 3 payment records and add one controlled Phase 4 function that records payment outcomes, synchronizes `claims.payment_status` and `claims.total_paid_amount`, increments `claims.version`, and protects direct financial summary writes. | CONFIRMED |
+| Prerequisites | Batch 1 state types/columns, Batch 2 workflow events, Batch 3 workflow mutation, Batch 4 decision mutation, Phase 3 payment tables/functions/indexes/RLS, `public.has_permission(text, uuid, uuid)`, and existing `claim.payment.record`. | CONFIRMED |
+| Allowed files | `supabase/migrations/20260722162000_phase4_claim_payment_mutation.sql`; `supabase/tests/phase4_claim_payment_mutation_test.sql`; `supabase/tests/phase4_claim_payment_security_test.sql`. | CONFIRMED |
+| Migration filename | `supabase/migrations/20260722162000_phase4_claim_payment_mutation.sql` | CONFIRMED |
+| Test filenames | `supabase/tests/phase4_claim_payment_mutation_test.sql`; `supabase/tests/phase4_claim_payment_security_test.sql` | CONFIRMED |
+| Authoritative objects | `public.claim_payments`, `public.claim_payment_allocations`, `public.claim_payment_reconciliations`, `public.claims.payment_status`, `public.claims.total_paid_amount`, `public.claims.version`. | CONFIRMED |
+| Functions/mutation paths | New `public.record_claim_payment_settlement(...)`; existing `public.record_claim_payment(...)` remains legacy/Phase 3 evidence and must not be broadened without explicit compatibility review. | CONFIRMED |
+| Permissions | Existing `claim.payment.record`; existing `claim.payment.allocate`; existing `claim.payment.reconcile`; new `claim.payment.reverse` only for reversal support inside this batch; no refund operation in Batch 5. | CONFIRMED |
+| Tenant/security behavior | Actor from `auth.uid()`; tenant and clinic from locked Claim; `public.has_permission(...)`; no `PUBLIC` or `anon` execute; ordinary authenticated users cannot directly update payment snapshot/version/totals or write payment tables outside controlled paths. | CONFIRMED |
+| Version/locking | Lock Claim by `p_claim_id` and `deleted_at is null`; use `claims.version` as the sole optimistic lock; success increments once; stale request writes nothing. | CONFIRMED |
+| Idempotency | External payments require existing or new idempotency identity in `claim_payments`; equivalent retry returns prior result with `idempotent_replay = true`; conflicting retry fails with no data change. | CONFIRMED |
+| Transaction boundary | Payment record, payment summary, Claim total, Claim version, and audit evidence commit or roll back together. | CONFIRMED |
+| Direct-write protection | Deny ordinary direct updates to `claims.payment_status`, `claims.total_paid_amount`, `claims.version`, `state_updated_at`, and `state_updated_by`; deny ordinary direct payment table writes unless already controlled by Phase 3 RLS/service-role boundaries. | CONFIRMED |
+| Audit requirements | Existing Claim/payment audit triggers plus typed payment row evidence; no failed operation writes authoritative payment evidence. | CONFIRMED |
+| Regression scope | Batch 1 schema, Batch 2 workflow history, Batch 3 workflow mutation/security, Batch 4 decision mutation/security, Phase 3 permissions/security/tenant/self-scope/audit, and existing Phase 3 payment function behavior. | CONFIRMED |
+| Acceptance criteria | Function exists with exact contract; valid received/failed/reversed payments update only payment snapshot and totals; decision/workflow snapshots remain unchanged; duplicate external events do not double-count; invalid amounts/currency/status/version/authorization write nothing; direct protected writes are denied. | CONFIRMED |
+| Out of scope | Formal appeals, refund lifecycle, payment allocation redesign, reconciliation redesign, legacy `claims.status` removal, backend/API/frontend/generated type changes, fixtures, seed data, and database reset in the contract task. | CONFIRMED |
+| Stop conditions | Missing Phase 3 payment objects; missing `claim.payment.record`; incompatible existing `record_claim_payment` behavior; unresolved refund ceiling requirement if refund is requested; inability to protect payment snapshot/totals without weakening existing Claim update behavior. | CONFIRMED |
+
+### 28.3 Function Contract
+
+```text
+public.record_claim_payment_settlement(
+  p_claim_id uuid,
+  p_expected_version integer,
+  p_payment_amount numeric,
+  p_payment_status text default 'received',
+  p_payment_reference text default null,
+  p_payer_reference text default null,
+  p_received_at timestamptz default null,
+  p_value_date date default null,
+  p_source_system text default 'internal',
+  p_external_event_id text default null,
+  p_correlation_id uuid default null,
+  p_reason_code text default null,
+  p_reason_text text default null,
+  p_metadata jsonb default '{}'::jsonb
+)
+```
+
+Return:
+
+```text
+claim_id uuid
+previous_payment_status public.claim_payment_state_domain
+payment_status public.claim_payment_state_domain
+version integer
+payment_id uuid
+total_paid_amount numeric
+state_updated_at timestamptz
+idempotent_replay boolean
+```
+
+Payment status mapping:
+
+| Payment evidence | Claim payment snapshot |
+| --- | --- |
+| no payable approved amount or rejected/request-information/void decision | `not_paid` |
+| accepted pending/scheduled/processing payment evidence | `payment_pending` |
+| received amount greater than 0 and less than approved amount | `partially_paid` |
+| received amount equals approved amount | `paid` |
+| failed payment attempt with outstanding approved amount | `payment_failed` |
+| reversed payment evidence | `reversed` |
+
+Batch 5 must not implement `partially_refunded` or `refunded`; those remain a later refund lifecycle batch because refund ceiling and production exception rules require their own primary responsibility.
+
+### 28.4 Readiness
+
+Open design blockers: `0`
+
+Implementation dependencies are known and fit one primary database responsibility.
+
+Batch 5 readiness: `READY FOR BATCH 5`

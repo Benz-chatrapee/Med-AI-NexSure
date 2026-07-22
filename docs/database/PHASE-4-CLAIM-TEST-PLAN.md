@@ -1175,3 +1175,81 @@ fixed decision timestamps
 ```
 
 No test is marked executed or passed by this plan.
+
+---
+
+## 39. Batch 5 Controlled Claim Payment Settlement Test Scope
+
+**Status:** Planned, not implemented, not executed
+**Decision Date:** 2026-07-22
+**Approval Reference:** Phase 4 Batch 5 Roadmap and Contract Definition
+
+This section defines planned coverage only. It does not create tests, run tests, reset the database, or mark any Batch 5 assertion as passed.
+
+### 39.1 Exact Batch 5 Test Files
+
+| Test file | Purpose | Status |
+| --- | --- | --- |
+| `supabase/tests/phase4_claim_payment_mutation_test.sql` | Functional tests for payment settlement recording, split payment snapshot synchronization, totals, idempotency, versioning, workflow/decision preservation, and rollback | Planned |
+| `supabase/tests/phase4_claim_payment_security_test.sql` | Security tests for payment authorization, tenant/clinic denial, direct financial-state mutation protection, EXECUTE grants, AI non-authority, and sanitized errors | Planned |
+
+### 39.2 Functional Coverage
+
+| Coverage | Expected assertion |
+| --- | --- |
+| Function contract | `public.record_claim_payment_settlement(...)` exists with the exact Batch 5 signature and return columns. |
+| Received partial payment | Valid received amount less than approved amount creates payment evidence, updates `claims.total_paid_amount`, sets `claims.payment_status = partially_paid`, and increments `claims.version` once. |
+| Received full payment | Valid received amount equal to approved amount sets `claims.payment_status = paid`. |
+| Pending payment | Pending/scheduled/processing evidence sets `claims.payment_status = payment_pending` without falsely increasing settled amount. |
+| Failed payment | Failed evidence with outstanding approved amount sets `claims.payment_status = payment_failed` and preserves failure reason. |
+| Reversed payment | Reversal evidence sets `claims.payment_status = reversed` only when existing Phase 3 fields and rules support it. |
+| Not paid baseline | Claim with no payable approved amount remains or becomes `not_paid`; no approved amount is fabricated. |
+| Decision prerequisite | Payment settlement requires an approved or partially approved decision snapshot unless status evidence is non-settling failure/pending behavior explicitly allowed. |
+| Workflow preservation | Payment mutation does not change `claims.workflow_status` or insert `claim_workflow_events`. |
+| Decision preservation | Payment mutation does not change `claims.decision_status`, `claims.current_decision_id`, or `claim_decisions`. |
+| Version increment | Successful mutation increments `claims.version` exactly once. |
+| Stale conflict | Wrong `p_expected_version` fails with no payment row, total change, snapshot change, version increment, or audit evidence. |
+| Equivalent replay | Same payment identity plus equivalent typed payload returns prior result with `idempotent_replay = true`, no new row, and no version increment. |
+| Conflicting replay | Same identity plus conflicting payload fails with no data change. |
+| Amount validation | Negative, zero received settlement where not allowed, over-payment beyond approved amount, and invalid precision behavior fail. |
+| Currency validation | Payment currency must match locked Claim currency and cannot be caller-overridden. |
+| Soft-deleted Claim rejection | Soft-deleted Claim cannot receive payment settlement mutation. |
+| Atomic rollback | Simulated insert/update failure leaves payment evidence, Claim totals, payment snapshot, version, and audit evidence unchanged. |
+| Legacy preservation | Batch 5 does not remove `claims.status` and must not rely on it as the split payment source of truth. |
+| Refund exclusion | No `record_claim_refund` behavior is asserted in Batch 5. |
+
+### 39.3 Security Coverage
+
+| Coverage | Expected assertion |
+| --- | --- |
+| Same-tenant authorized success | Actor with `claim.payment.record` in the Claim organization and clinic succeeds through the controlled function. |
+| Missing authentication | Anonymous/no `auth.uid()` actor cannot execute or mutate. |
+| Missing membership | Authenticated non-member receives sanitized denial and no write. |
+| Missing permission | Actor without payment authority is denied. |
+| Cross-organization denial | Known Claim UUID from another organization is not disclosed or mutated. |
+| Cross-clinic denial | Actor lacking clinic access cannot mutate or discover the Claim. |
+| Direct payment snapshot denial | Ordinary authenticated users cannot directly update `claims.payment_status`, `claims.total_paid_amount`, `claims.version`, `state_updated_at`, or `state_updated_by`. |
+| Direct payment evidence denial | Ordinary authenticated users cannot directly insert, update, or delete `claim_payments`, allocations, or reconciliations outside approved controlled paths. |
+| AI non-authority | AI/system actor without explicit payment permission cannot record payment, failure, reversal, refund, or settlement. |
+| Restricted SECURITY DEFINER execution | Function is `SECURITY DEFINER`, fixed search path, no EXECUTE for `PUBLIC` or `anon`, EXECUTE only for `authenticated` and `service_role`. |
+| Tenant-safe errors | Not found, unauthorized, stale, idempotency conflict, amount, and currency errors do not expose PHI, tenant existence, internal policy names, raw SQL diagnostics, or unrestricted metadata. |
+
+### 39.4 Required Regression Coverage
+
+Batch 5 must retain relevant existing coverage:
+
+```text
+supabase/tests/phase4_claim_schema_test.sql
+supabase/tests/phase4_claim_workflow_history_test.sql
+supabase/tests/phase4_claim_workflow_mutation_test.sql
+supabase/tests/phase4_claim_workflow_security_test.sql
+supabase/tests/phase4_claim_decision_mutation_test.sql
+supabase/tests/phase4_claim_decision_security_test.sql
+supabase/tests/phase3_claim_permissions_test.sql
+supabase/tests/phase3_claim_security_test.sql
+supabase/tests/phase3_claim_tenant_isolation_test.sql
+supabase/tests/phase3_claim_self_scope_test.sql
+supabase/tests/phase3_claim_audit_test.sql
+```
+
+No test is marked executed or passed by this plan.
