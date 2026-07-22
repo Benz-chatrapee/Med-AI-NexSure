@@ -1947,3 +1947,230 @@ Error behavior:
 | Event insertion failure | Full rollback | None |
 
 Open design blockers: `0`.
+
+---
+
+## 39. Phase 4 Batch 4 Claim Decision Contract Closure
+
+**Status:** Approved
+**Decision Date:** 2026-07-22
+**Approved By:** Project Owner / Product Owner
+**Approval Reference:** Phase 4 Batch 4 Claim Decision Contract Closure
+
+This section is the authoritative Batch 4 controlled Claim decision/adjudication mutation contract. It uses actual Batch 1 through Batch 3 objects and closes the decision design contract without creating SQL, tests, backend, frontend, generated types, seed data, fixtures, or Git history.
+
+### 39.1 Evidence Classification and Readiness
+
+| Area | Classification | Finding |
+| --- | --- | --- |
+| Authoritative decision object | Confirmed Finding | `public.claim_decisions` is the authoritative adjudication record. |
+| Split decision snapshot | Confirmed Finding | `public.claims.decision_status public.claim_decision_state_domain` exists and is nullable from Batch 1. |
+| Current decision pointer | Confirmed Finding | `public.claims.current_decision_id` has a tenant-safe FK to `public.claim_decisions`. |
+| Existing decision functions | Confirmed Finding | `finalize_claim_decision` and `supersede_claim_decision` exist but update legacy `claims.status`, not split `claims.decision_status`. |
+| Direct decision writes | Confirmed Finding | Authenticated direct INSERT/UPDATE/DELETE on `claim_decisions` is revoked by Phase 3 RLS. |
+| External decision identity | Implementation Gap | `claim_decisions` has no typed `source_system` or `external_event_id`; Batch 4 may add them. |
+| Authenticated decision wrapper | Implementation Gap | Existing decision functions accept actor inputs and are service-role only; Batch 4 may add one secure wrapper deriving actor from trusted context. |
+| Decision snapshot synchronization | Implementation Gap | Batch 4 may synchronize `claims.decision_status`, `current_decision_id`, Claim totals, version, and audit atomically. |
+
+Batch 4 readiness: `READY FOR BATCH 4`.
+
+### 39.2 Authoritative Decision Object
+
+| Contract item | Exact value |
+| --- | --- |
+| Table purpose | Versioned authoritative human or trusted-payer adjudication rounds for one Claim. |
+| Primary key | `claim_decisions.id uuid primary key default gen_random_uuid()` |
+| Organization and clinic ownership | `organization_id uuid not null`, `clinic_id uuid not null`; tenant-safe Claim FK `(organization_id, clinic_id, claim_id)` references `claims`. |
+| Claim foreign key | `claim_id uuid not null`; `claim_decisions_claim_tenant_fk`. |
+| Decision status column/type | `decision_status text` with values `draft`, `final`, `superseded`, `cancelled`; this is record lifecycle, not Claim snapshot. |
+| Adjudication outcome column/type | `decision_outcome text` with values `approved`, `partially_approved`, `rejected`, `request_information`, `returned_for_correction`. Batch 4 maps only implemented split snapshot values. |
+| Amount and currency columns | `currency_code char(3)`, `submitted_amount numeric(18,2)`, `approved_amount numeric(18,2)`, `rejected_amount numeric(18,2)`, `patient_responsibility_amount numeric(18,2)`, `payer_responsibility_amount numeric(18,2)`. |
+| Actor/source columns | Existing actor columns are `decided_by`, `decision_role_snapshot`, `decided_at`, `created_by`, `updated_by`. Batch 4 adds typed source evidence for adjudication events. |
+| External identity | Not implemented on `claim_decisions`; Batch 4 adds `source_system text` and `external_event_id text`. |
+| Timestamps | `decided_at`, `created_at`, `updated_at`; Batch 4 uses `p_decision_at` for business time and database `now()` for recorded/update timestamps. |
+| Soft-delete columns | None on `claim_decisions`; finalized evidence is preserved by lifecycle/supersession, not soft delete. Parent `claims.deleted_at` blocks new Batch 4 decisions. |
+| Version/order fields | `decision_version integer not null`; unique `(claim_id, decision_version)`. |
+| Current-decision linkage | `claims.current_decision_id` points to the effective current decision; `claim_decisions_one_final_per_claim_uq` allows one `final` decision per Claim. |
+| Item/line relationship | `claim_decision_adjustments.claim_item_id` links adjustments to `claim_items`; dedicated `claim_line_decisions` remains deferred by ADR-004. |
+| RLS and grants | RLS enabled; authenticated users may read by Claim scope; authenticated direct decision writes are revoked; service-role existing functions are granted. |
+| Object classification | Authoritative decision evidence, not a draft-only work table, snapshot, or generic audit table. Draft rows are not authoritative until finalized. |
+
+### 39.3 Approved Append-Only Decision Model
+
+Approved model:
+
+```text
+append-only authoritative decision records
+claims.current_decision_id points to the active decision
+finalized decision rows are immutable
+correction creates a superseding decision record
+business voiding does not delete prior evidence
+```
+
+| Behavior | Approved rule |
+| --- | --- |
+| Initial decision | Create and finalize the first authoritative decision with `decision_version = 1`, `supersedes_decision_id = null`, and `claims.current_decision_id = new decision id`. |
+| Supersession | A correction creates a new decision with `decision_version = previous + 1` and `supersedes_decision_id = previous current decision id`; prior final row becomes `superseded`. |
+| Current pointer | Successful mutation updates `claims.current_decision_id` to the new authoritative decision unless the new snapshot is `voided`, where the void decision is the current evidence. |
+| Void behavior | Voiding creates a new authoritative decision row with `decision_outcome = null`, lifecycle `final`, metadata reason context, and split snapshot `voided`; prior evidence is superseded, not deleted. |
+| Correction behavior | Correction is supersession; it must include a reason and expected version and must not update a finalized row in place. |
+| Resubmission behavior | Resubmission after request-information or rejection uses workflow mutation separately; a later payer response creates a new superseding decision. |
+| Soft-delete behavior | Soft-deleted Claims reject decision mutation; `claim_decisions` rows are not soft-deleted by ordinary application actors. |
+| Decision order/version | Use `decision_version = coalesce(max(decision_version), 0) + 1` inside the locked Claim transaction. |
+
+### 39.4 Decision Status Transition Matrix
+
+`request_information` is an intermediate adjudication outcome requiring human follow-up. It is stored in `claims.decision_status` but does not mean approved, rejected, paid, or closed.
+
+All unlisted transitions are forbidden. Same-state requests are invalid unless they are verified idempotent replays.
+
+| Current Snapshot | Requested Decision | Allowed | Prior Record Action | New Record | Snapshot Result | Reason Required |
+| --- | --- | --- | --- | --- | --- | --- |
+| `not_decided` | `approved` | Yes | None | Final decision v1 | `approved` | No |
+| `not_decided` | `partially_approved` | Yes | None | Final decision v1 | `partially_approved` | Yes |
+| `not_decided` | `rejected` | Yes | None | Final decision v1 | `rejected` | Yes |
+| `not_decided` | `request_information` | Yes | None | Final decision v1 with nonfinancial outcome | `request_information` | Yes |
+| `not_decided` | `voided` | No | None | None | No change | Yes |
+| `approved` | `approved` | Replay only | None | None | `approved` | No |
+| `approved` | `partially_approved` | Yes | Supersede current | Final replacement | `partially_approved` | Yes |
+| `approved` | `rejected` | Yes | Supersede current | Final replacement | `rejected` | Yes |
+| `approved` | `request_information` | Yes | Supersede current | Final replacement | `request_information` | Yes |
+| `approved` | `voided` | Yes | Supersede current | Final void evidence | `voided` | Yes |
+| `partially_approved` | `approved` | Yes | Supersede current | Final replacement | `approved` | Yes |
+| `partially_approved` | `partially_approved` | Replay only | None | None | `partially_approved` | Yes |
+| `partially_approved` | `rejected` | Yes | Supersede current | Final replacement | `rejected` | Yes |
+| `partially_approved` | `request_information` | Yes | Supersede current | Final replacement | `request_information` | Yes |
+| `partially_approved` | `voided` | Yes | Supersede current | Final void evidence | `voided` | Yes |
+| `rejected` | `approved` | Yes | Supersede current | Final replacement | `approved` | Yes |
+| `rejected` | `partially_approved` | Yes | Supersede current | Final replacement | `partially_approved` | Yes |
+| `rejected` | `rejected` | Replay only | None | None | `rejected` | Yes |
+| `rejected` | `request_information` | Yes | Supersede current | Final replacement | `request_information` | Yes |
+| `rejected` | `voided` | Yes | Supersede current | Final void evidence | `voided` | Yes |
+| `request_information` | `approved` | Yes | Supersede current | Final replacement | `approved` | No |
+| `request_information` | `partially_approved` | Yes | Supersede current | Final replacement | `partially_approved` | Yes |
+| `request_information` | `rejected` | Yes | Supersede current | Final replacement | `rejected` | Yes |
+| `request_information` | `request_information` | Replay only | None | None | `request_information` | Yes |
+| `request_information` | `voided` | Yes | Supersede current | Final void evidence | `voided` | Yes |
+| `voided` | `approved` | Yes | Supersede current void | Final replacement | `approved` | Yes |
+| `voided` | `partially_approved` | Yes | Supersede current void | Final replacement | `partially_approved` | Yes |
+| `voided` | `rejected` | Yes | Supersede current void | Final replacement | `rejected` | Yes |
+| `voided` | `request_information` | Yes | Supersede current void | Final replacement | `request_information` | Yes |
+| `voided` | `voided` | Replay only | None | None | `voided` | Yes |
+
+`approved` and `partially_approved` do not mean paid. Decision mutation must not silently alter `claims.payment_status`, `claims.total_paid_amount`, or payment records.
+
+### 39.5 Workflow Coupling
+
+Approved boundary:
+
+```text
+Decision mutation does not directly mutate workflow_status.
+Workflow changes use public.transition_claim_workflow.
+```
+
+| Decision Status | Required Workflow Eligibility | Direct Workflow Change | Follow-up Workflow Transition | Workflow Event |
+| --- | --- | --- | --- | --- |
+| `approved` | Claim must not be `draft`, `collecting_data`, `validation_pending`, `ready_to_submit`, `closed`, or `cancelled`; expected workflow is `submitted` or `under_review`. | None | If operations need closure, call `transition_claim_workflow(..., 'closed', ...)` separately. | None from decision function |
+| `partially_approved` | Same as `approved`. | None | Optional workflow closure or appeal through workflow function. | None from decision function |
+| `rejected` | Same as `approved`. | None | Optional `under_review -> appealed` or `under_review -> closed` through workflow function. | None from decision function |
+| `request_information` | Claim must be `submitted` or `under_review`; not terminal. | None | Use `transition_claim_workflow` only if operations require `needs_review` or another approved workflow state. | None from decision function |
+| `voided` | Requires existing current authoritative decision; parent Claim must not be soft-deleted. | None | Use workflow function separately for reopen, appeal, closure, or cancellation if required. | None from decision function |
+
+Batch 4 does not atomically change workflow and decision together. Any application orchestration requiring both must call the decision function and workflow function as separate controlled operations with fresh versions, or introduce a later approved orchestration function.
+
+### 39.6 Controlled Function Contract
+
+Approved Batch 4 function:
+
+```text
+public.record_claim_decision(
+  p_claim_id uuid,
+  p_target_decision_status public.claim_decision_state_domain,
+  p_expected_version integer,
+  p_reason_code text,
+  p_reason_text text,
+  p_approved_amount numeric default null,
+  p_rejected_amount numeric default null,
+  p_payer_reference text default null,
+  p_decision_at timestamptz default null,
+  p_source_system text default 'internal',
+  p_external_event_id text default null,
+  p_correlation_id uuid default null,
+  p_metadata jsonb default '{}'::jsonb
+)
+```
+
+Return one row:
+
+```text
+claim_id uuid
+previous_decision_status public.claim_decision_state_domain
+decision_status public.claim_decision_state_domain
+version integer
+decision_id uuid
+current_decision_id uuid
+state_updated_at timestamptz
+idempotent_replay boolean
+```
+
+Caller inputs: `p_claim_id`, `p_target_decision_status`, `p_expected_version`, `p_reason_code`, `p_reason_text`, `p_approved_amount`, `p_rejected_amount`, `p_payer_reference`, `p_decision_at`, `p_source_system`, `p_external_event_id`, `p_correlation_id`, `p_metadata`.
+
+Derived values: organization, clinic, actor identity from `auth.uid()`, current decision, current Claim version, submitted/requested amount basis from `claims.total_eligible_amount` then `claims.total_claimed_amount`, currency from `claims.currency_code`, and next `decision_version`.
+
+Database-generated values: decision ID, recorded timestamps, new Claim version, audit identifiers through existing audit triggers/events.
+
+| Contract item | Exact value |
+| --- | --- |
+| Security mode | `SECURITY DEFINER` |
+| Safe search path | `set search_path = public, private, auth, pg_temp` |
+| EXECUTE roles | `authenticated`, `service_role`; not `PUBLIC` or `anon` |
+| Authorization helper | `public.has_permission(text, uuid, uuid)` with locked Claim organization and clinic |
+| Required permissions | `claim.decide` for approved, partially approved, rejected, request-information; `claim.decision.supersede` for replacing an existing current decision; `claim.decision.void` for voiding |
+| Locking order | Lock Claim by `p_claim_id` and `deleted_at is null`; lock current decision if present; then inspect idempotency identity |
+| Idempotency order | For external identity, find existing `claim_decisions` row by `organization_id + source_system + external_event_id` after the Claim lock and before version validation side effects |
+| Insert/supersession | Insert a new final decision row; mark prior current final as `superseded` when present |
+| Snapshot update | Update `claims.current_decision_id`, `claims.decision_status`, `claims.total_approved_amount` for financial outcomes, `claims.version`, `claims.state_updated_at`, `claims.state_updated_by`, `claims.updated_at`, `claims.updated_by` |
+| Audit behavior | Existing Claim audit trigger plus authoritative decision row; no failed operation writes evidence |
+| Error categories | Sanitized not authorized/not found, missing permission, invalid transition, stale version, idempotency conflict, invalid amount/currency, missing reason, soft-deleted Claim, unsupported actor/source, rollback on any insert/update failure |
+
+The caller must not provide actor, organization, clinic, current status, decision version/order, or new Claim version as authoritative input.
+
+### 39.7 Authorization Contract
+
+| Decision Action | Existing Permission | Verified Helper | Status |
+| --- | --- | --- | --- |
+| Decision read | `claim.read` | RLS uses `private.claim_can_read` and `public.has_permission` | Confirmed Finding |
+| Decision create/adjudicate | `claim.decide` | `public.has_permission(text, uuid, uuid)` | Confirmed Finding |
+| Partial approval | `claim.decide` | `public.has_permission(text, uuid, uuid)` | Approved Decision |
+| Rejection | `claim.decide` | `public.has_permission(text, uuid, uuid)` | Approved Decision |
+| Request information | `claim.request_information` exists; Batch 4 uses `claim.decide` for adjudication record creation | `public.has_permission(text, uuid, uuid)` | Approved Decision |
+| Void/supersede | `claim.decision.supersede` exists; `claim.decision.void` is new | `public.has_permission(text, uuid, uuid)` | Implementation Gap |
+| Decision audit | `claim.audit.read` | RLS/audit helper pattern | Confirmed Finding |
+
+Generic `claim.update` and workflow permissions do not authorize adjudication. Cross-tenant failures return sanitized denial. AI cannot be the authoritative adjudicator.
+
+### 39.8 Version, Idempotency, Amount, and Direct-Write Contract
+
+Version model: `claims.version` is the sole optimistic-lock counter. Success increments it exactly once. Stale expected version writes no decision, no snapshot, and no audit evidence beyond database error handling. Decision row, supersession/current pointer, `claims.decision_status`, version increment, and audit evidence commit or roll back together.
+
+Idempotency identity: external adjudication uses `organization_id + source_system + external_event_id`. Batch 4 adds typed `source_system` and `external_event_id` columns to `claim_decisions` plus a partial unique index. Equivalent payload compares only stored typed columns: `claim_id`, `decision_status`, `approved_amount`, `rejected_amount`, `currency_code`, `reason_code`, normalized `reason_text`, `payer_reference`, `decision_at`, and `source_system`. Exclude database IDs, recorded timestamps, actor display names, unrestricted metadata, and decision sequence.
+
+Amount and currency rules:
+
+| Area | Rule |
+| --- | --- |
+| Requested amount basis | `coalesce(claims.total_eligible_amount, claims.total_claimed_amount)` |
+| Approved amount | Required and greater than or equal to 0 for `approved` and `partially_approved`; null for `request_information` and `voided`; zero for `rejected`. |
+| Rejected amount | Stored, not derived; required and greater than or equal to 0 for `approved`, `partially_approved`, and `rejected`; null for `request_information` and `voided`. |
+| Approved invariant | `approved_amount = requested amount basis` and `rejected_amount = 0`. |
+| Partial invariant | `approved_amount > 0`, `rejected_amount > 0`, and `approved_amount + rejected_amount = requested amount basis`. |
+| Rejected invariant | `approved_amount = 0` and `rejected_amount = requested amount basis`. |
+| Rounding | Store numeric values rounded to scale 2 using PostgreSQL `round(value, 2)` before comparison and insert. |
+| Currency | Always derived from `claims.currency_code`; caller currency is not accepted. |
+| Mismatch behavior | No caller currency exists; decision row currency must equal locked Claim currency. |
+| Over-approval | Forbidden: approved amount must not exceed requested amount basis. |
+| Void/request-information amounts | Amount fields must be null and must not change payment status. |
+| Item relationship | Existing item adjustments support partial approval evidence; dedicated line decisions remain out of scope. |
+| Stored totals | `claims.total_approved_amount` is updated only for approved, partially approved, and rejected outcomes; payment totals are untouched. |
+
+Direct-write protection: ordinary application roles must not directly insert `claim_decisions`, update finalized `claim_decisions`, delete `claim_decisions`, update `claims.decision_status`, or update `claims.current_decision_id`. Batch 4 controlled path is authorized function execution plus restricted protected-column updates, restricted direct decision writes, and append-only finalized evidence. Privileged service/database recovery remains available outside ordinary application roles.

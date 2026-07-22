@@ -1070,3 +1070,108 @@ supabase/tests/phase3_claim_audit_test.sql
 ```
 
 No test is marked implemented or passed by this documentation task.
+
+---
+
+## 38. Batch 4 Controlled Claim Decision Mutation Test Scope
+
+**Status:** Planned, not implemented, not executed
+**Decision Date:** 2026-07-22
+**Approved By:** Project Owner / Product Owner
+**Approval Reference:** Phase 4 Batch 4 Claim Decision Contract Closure
+
+This section defines planned coverage only. It does not create tests, run tests, reset the database, or mark any Batch 4 assertion as passed.
+
+### 38.1 Exact Batch 4 Test Files
+
+| Test file | Purpose | Status |
+| --- | --- | --- |
+| `supabase/tests/phase4_claim_decision_mutation_test.sql` | Functional tests for `public.record_claim_decision`, decision transition behavior, supersession, idempotency, versioning, amount/currency rules, pointer/snapshot consistency, and rollback | Planned |
+| `supabase/tests/phase4_claim_decision_security_test.sql` | Security tests for adjudication authorization, tenant/clinic denial, direct mutation protection, EXECUTE grants, AI non-authority, and sanitized errors | Planned |
+
+### 38.2 Functional Coverage
+
+| Coverage | Expected assertion |
+| --- | --- |
+| Function contract | `public.record_claim_decision(...)` exists with the exact Batch 4 signature and return columns. |
+| Approved decision | `not_decided -> approved` creates final decision v1, sets `claims.current_decision_id`, sets `claims.decision_status = approved`, updates approved total, and increments `claims.version` once. |
+| Partially approved decision | Valid partial amounts create authoritative evidence and snapshot `partially_approved`. |
+| Rejected decision | Rejected decision stores zero approved amount, rejected basis amount, required reason, and snapshot `rejected`. |
+| Request information | Stores `request_information` as intermediate adjudication outcome with null amounts and required reason. |
+| Void behavior | Requires existing current decision, creates void evidence, supersedes current row, sets snapshot `voided`, and preserves prior evidence. |
+| Correction/supersession | Replacement decision creates next `decision_version`, links `supersedes_decision_id`, updates current pointer, and marks prior current final as `superseded`. |
+| Invalid requested decision | Unlisted or unsupported status request fails with no data change. |
+| Same-state request | Fails with no new decision unless it is a verified equivalent idempotent replay. |
+| Workflow eligibility | Pre-submission and terminal Claim workflows reject decision mutation; submitted/under_review eligible Claims can be decided. |
+| Workflow preservation | Decision mutation does not change `claims.workflow_status` or insert `claim_workflow_events`. |
+| Current pointer consistency | `claims.current_decision_id` equals the new authoritative decision after success. |
+| Snapshot consistency | `claims.decision_status` equals the requested approved Batch 1 decision value after success. |
+| Version increment | Successful mutation increments `claims.version` exactly once. |
+| Stale conflict | Wrong `p_expected_version` fails with no decision row, pointer change, snapshot change, total change, or version increment. |
+| Atomic rollback | Simulated insert/update failure leaves decision record, supersession, pointer, snapshot, totals, version, and audit evidence unchanged. |
+| Equivalent replay | Same external identity plus equivalent typed payload returns prior result with `idempotent_replay = true`, no new row, and no version increment. |
+| Conflicting replay | Same external identity plus conflicting payload fails with idempotency conflict and no data change. |
+| Amount validation | Negative, over-approved, missing required, non-null request-information/void amounts, and inconsistent partial totals fail. |
+| Currency validation | Decision currency is derived from `claims.currency_code`; no caller-provided currency can override it. |
+| Soft-deleted Claim rejection | Soft-deleted Claim cannot receive a new decision mutation. |
+| Payment preservation | Decision mutation does not update `claims.payment_status`, `claims.total_paid_amount`, `claim_payments`, allocations, or reconciliations. |
+| Legacy preservation | Decision mutation does not use legacy `claims.status` as the split decision source of truth. |
+
+### 38.3 Security Coverage
+
+| Coverage | Expected assertion |
+| --- | --- |
+| Same-tenant authorized success | Actor with required permission in the Claim organization and clinic succeeds through `record_claim_decision`. |
+| Missing authentication | Anonymous/no `auth.uid()` actor cannot execute or mutate. |
+| Missing membership | Authenticated non-member receives sanitized denial and no write. |
+| Missing permission | Actor without `claim.decide`, `claim.decision.supersede`, or `claim.decision.void` as applicable is denied. |
+| Cross-organization denial | Known Claim UUID from another organization is not disclosed or mutated. |
+| Cross-clinic denial | Actor lacking clinic access cannot mutate or discover the Claim. |
+| Known UUID non-bypass | Direct UUID targeting does not bypass tenant, clinic, or permission checks. |
+| Direct snapshot mutation denial | Ordinary authenticated users cannot directly update `claims.decision_status`, `claims.current_decision_id`, `claims.version`, `state_updated_at`, or `state_updated_by`. |
+| Direct authoritative decision mutation denial | Ordinary authenticated users cannot directly insert, update finalized rows, or delete `claim_decisions`. |
+| AI non-authority | AI/system actor without explicit adjudication permission cannot create approved, partially approved, rejected, request-information, or voided authoritative decisions. |
+| Restricted SECURITY DEFINER execution | Function is `SECURITY DEFINER`, fixed search path, no EXECUTE for `PUBLIC` or `anon`, EXECUTE only for `authenticated` and `service_role`. |
+| Tenant-safe errors | Not found, unauthorized, stale, invalid transition, idempotency conflict, and amount errors do not expose PHI, tenant existence, internal policy names, raw SQL diagnostics, or unrestricted metadata. |
+
+### 38.4 Required Regression Coverage
+
+Batch 4 must retain relevant existing coverage:
+
+```text
+supabase/tests/phase4_claim_schema_test.sql
+supabase/tests/phase4_claim_workflow_history_test.sql
+supabase/tests/phase4_claim_workflow_mutation_test.sql
+supabase/tests/phase4_claim_workflow_security_test.sql
+supabase/tests/phase3_claim_permissions_test.sql
+supabase/tests/phase3_claim_security_test.sql
+supabase/tests/phase3_claim_tenant_isolation_test.sql
+supabase/tests/phase3_claim_self_scope_test.sql
+supabase/tests/phase3_claim_audit_test.sql
+```
+
+### 38.5 Planned Test Data Requirements
+
+Use deterministic synthetic data only:
+
+```text
+fixed organization and clinic UUIDs
+authorized adjudicator user
+unauthorized same-tenant user
+cross-organization user
+cross-clinic user
+AI/system user without adjudication permission
+submitted Claim with no decision
+under_review Claim with current approved decision
+under_review Claim with current partially approved decision
+under_review Claim with current rejected decision
+under_review Claim with current request_information decision
+under_review Claim with current voided decision
+soft-deleted Claim
+fixed THB currency
+fixed requested amount basis values
+stable source_system and external_event_id values
+fixed decision timestamps
+```
+
+No test is marked executed or passed by this plan.

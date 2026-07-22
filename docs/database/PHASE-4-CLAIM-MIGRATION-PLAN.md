@@ -1372,3 +1372,271 @@ supabase/tests/phase3_claim_audit_test.sql
 Exclusions: no decision/payment/appeal implementation, no appeal entity, no backfill, no generated types, no frontend/backend/API changes, no fixtures, no seed data, and no legacy-status removal.
 
 Batch 3 readiness: `READY FOR BATCH 3`.
+
+---
+
+## 27. Batch 4 Approved Implementation Contract - Controlled Claim Decision Mutations
+
+**Batch name:** Phase 4 Batch 4 - Controlled Claim Decision / Adjudication Mutations
+**Objective:** Implement one controlled split-state Claim decision mutation path that preserves `claim_decisions` as authoritative evidence, updates `claims.current_decision_id` and `claims.decision_status` atomically, and prevents unauthorized direct adjudication writes.
+
+### 27.1 Prerequisites
+
+| Prerequisite | Required evidence |
+| --- | --- |
+| Batch 1 state types | `20260722140000_phase4_claim_state_types.sql` applied. |
+| Batch 1 state columns | `20260722140100_phase4_claim_state_columns.sql` applied. |
+| Batch 2 workflow events | `20260722140200_phase4_claim_workflow_events.sql` applied. |
+| Batch 3 workflow mutation | `20260722160000_phase4_claim_workflow_mutation.sql` applied. |
+| Phase 3 decision object | `public.claim_decisions`, `public.claim_decision_adjustments`, `claims.current_decision_id`, and `claim_decisions_one_final_per_claim_uq` exist. |
+| Authorization helper | `public.has_permission(text, uuid, uuid)` exists. |
+
+### 27.2 Exact Allowed Files for Batch 4 Implementation
+
+Batch 4 implementation may create or modify only these implementation artifacts:
+
+```text
+supabase/migrations/20260722161000_phase4_claim_decision_mutation.sql
+supabase/tests/phase4_claim_decision_mutation_test.sql
+supabase/tests/phase4_claim_decision_security_test.sql
+```
+
+This documentation closure task does not create those files.
+
+### 27.3 Exact Function Signature and Return
+
+Function:
+
+```text
+public.record_claim_decision(
+  p_claim_id uuid,
+  p_target_decision_status public.claim_decision_state_domain,
+  p_expected_version integer,
+  p_reason_code text,
+  p_reason_text text,
+  p_approved_amount numeric default null,
+  p_rejected_amount numeric default null,
+  p_payer_reference text default null,
+  p_decision_at timestamptz default null,
+  p_source_system text default 'internal',
+  p_external_event_id text default null,
+  p_correlation_id uuid default null,
+  p_metadata jsonb default '{}'::jsonb
+)
+```
+
+Return one row:
+
+```text
+claim_id uuid
+previous_decision_status public.claim_decision_state_domain
+decision_status public.claim_decision_state_domain
+version integer
+decision_id uuid
+current_decision_id uuid
+state_updated_at timestamptz
+idempotent_replay boolean
+```
+
+Security and grants:
+
+| Item | Contract |
+| --- | --- |
+| Security mode | `SECURITY DEFINER` |
+| Search path | `set search_path = public, private, auth, pg_temp` |
+| EXECUTE denied | `PUBLIC`, `anon` |
+| EXECUTE granted | `authenticated`, `service_role` |
+| Authorization helper | `public.has_permission(text, uuid, uuid)` using locked Claim tenant and clinic |
+
+### 27.4 Authoritative Decision Object
+
+`public.claim_decisions` is the authoritative decision evidence table. It is reused, not duplicated.
+
+Batch 4 may add these exact columns to `public.claim_decisions`:
+
+```text
+source_system text
+external_event_id text
+correlation_id uuid
+```
+
+Batch 4 must add a partial uniqueness control for external decision events:
+
+```text
+organization_id + source_system + external_event_id
+where external_event_id is not null
+```
+
+### 27.5 Decision Transition Matrix
+
+All unlisted transitions are forbidden. Same-state requests are invalid unless they are verified idempotent replays.
+
+| Current Snapshot | Requested Decision | Allowed | Prior Record Action | New Record | Snapshot Result | Reason Required |
+| --- | --- | --- | --- | --- | --- | --- |
+| `not_decided` | `approved` | Yes | None | Final decision v1 | `approved` | No |
+| `not_decided` | `partially_approved` | Yes | None | Final decision v1 | `partially_approved` | Yes |
+| `not_decided` | `rejected` | Yes | None | Final decision v1 | `rejected` | Yes |
+| `not_decided` | `request_information` | Yes | None | Final decision v1 | `request_information` | Yes |
+| `not_decided` | `voided` | No | None | None | No change | Yes |
+| Any current value | Same requested value | Replay only | None | None | Unchanged | Existing requirement applies |
+| `approved`, `partially_approved`, `rejected`, `request_information`, `voided` | `approved` | Yes | Supersede current | Final replacement | `approved` | Required unless current is `request_information` |
+| `approved`, `partially_approved`, `rejected`, `request_information`, `voided` | `partially_approved` | Yes | Supersede current | Final replacement | `partially_approved` | Yes |
+| `approved`, `partially_approved`, `rejected`, `request_information`, `voided` | `rejected` | Yes | Supersede current | Final replacement | `rejected` | Yes |
+| `approved`, `partially_approved`, `rejected`, `request_information`, `voided` | `request_information` | Yes | Supersede current | Final replacement | `request_information` | Yes |
+| `approved`, `partially_approved`, `rejected`, `request_information`, `voided` | `voided` | Yes | Supersede current | Final void evidence | `voided` | Yes |
+
+`request_information` is an intermediate adjudication outcome and does not mean final approval, rejection, payment, closure, or appeal. `voided` preserves prior evidence and does not delete rows.
+
+### 27.6 Workflow Eligibility and Coupling
+
+Decision mutation must not directly mutate `claims.workflow_status`.
+
+| Decision Status | Required Workflow Eligibility | Direct Workflow Change | Follow-up Workflow Transition | Workflow Event |
+| --- | --- | --- | --- | --- |
+| `approved` | `submitted` or `under_review`; not terminal; not pre-submission | None | Optional controlled closure through `transition_claim_workflow` | None |
+| `partially_approved` | `submitted` or `under_review`; not terminal; not pre-submission | None | Optional appeal or closure through `transition_claim_workflow` | None |
+| `rejected` | `submitted` or `under_review`; not terminal; not pre-submission | None | Optional appeal or closure through `transition_claim_workflow` | None |
+| `request_information` | `submitted` or `under_review`; not terminal | None | Optional controlled workflow movement if product flow requires it | None |
+| `voided` | Existing current authoritative decision required; Claim not soft-deleted | None | Optional workflow action through `transition_claim_workflow` | None |
+
+### 27.7 Permissions
+
+| Decision Action | Permission | Status |
+| --- | --- | --- |
+| Read decision | `claim.read` | Existing |
+| Create/adjudicate first decision | `claim.decide` | Existing |
+| Partial approval | `claim.decide` | Existing |
+| Rejection | `claim.decide` | Existing |
+| Request information | `claim.decide` for decision row creation | Existing |
+| Supersede/correct decision | `claim.decision.supersede` | Existing |
+| Void current decision | `claim.decision.void` | New in Batch 4 |
+| Decision audit | `claim.audit.read` | Existing |
+
+Generic `claim.update` and workflow permissions do not authorize decision mutation.
+
+### 27.8 Version, Locking, and Idempotency
+
+Version model: global Claim lock using `claims.version`.
+
+Required operation order:
+
+```text
+resolve actor
+-> locate and lock Claim where deleted_at is null
+-> lock current decision when present
+-> validate tenant, clinic, membership, and permission
+-> check external idempotency identity when supplied
+-> validate current snapshot and expected version
+-> validate transition
+-> validate amounts and currency
+-> allocate decision_version
+-> supersede prior current decision when present
+-> insert new final decision
+-> update claims.current_decision_id, claims.decision_status, totals, version, and state metadata
+-> return sanitized result
+```
+
+Idempotency identity for external adjudication:
+
+```text
+organization_id + source_system + external_event_id
+```
+
+Equivalent payload fields:
+
+```text
+claim_id
+decision_status
+approved_amount
+rejected_amount
+currency_code
+reason_code
+normalized reason_text
+payer_reference
+decision_at
+source_system
+```
+
+Equivalent replay returns the prior result with `idempotent_replay = true`, no new decision, no snapshot change, and no version increment. Conflicting replay fails with no data change.
+
+### 27.9 Amount and Currency Validation
+
+| Area | Contract |
+| --- | --- |
+| Requested amount basis | `coalesce(claims.total_eligible_amount, claims.total_claimed_amount)` |
+| Currency | Derived from `claims.currency_code`; caller does not provide currency |
+| Approved | `approved_amount = basis`, `rejected_amount = 0` |
+| Partially approved | `approved_amount > 0`, `rejected_amount > 0`, sum equals basis |
+| Rejected | `approved_amount = 0`, `rejected_amount = basis` |
+| Request information | Amounts must be null |
+| Voided | Amounts must be null |
+| Over approval | Forbidden |
+| Financial types | PostgreSQL `numeric`, rounded to scale 2 |
+| Payment impact | None; payment status and payment rows remain unchanged |
+
+### 27.10 Decision Supersession, Void, and Direct-Write Protection
+
+Batch 4 must preserve:
+
+```text
+decision record
++ supersession/current pointer
++ claims.decision_status
++ authoritative version increment
++ audit evidence
+commit or roll back together
+```
+
+Direct-write protection:
+
+- Ordinary roles must not directly insert `claim_decisions`.
+- Ordinary roles must not update finalized `claim_decisions`.
+- Ordinary roles must not delete `claim_decisions`.
+- Ordinary roles must not update `claims.decision_status`.
+- Ordinary roles must not update `claims.current_decision_id`.
+- Privileged service/database recovery remains available outside ordinary application roles.
+
+### 27.11 Regression Scope and Acceptance Criteria
+
+Regression scope:
+
+```text
+supabase/tests/phase4_claim_schema_test.sql
+supabase/tests/phase4_claim_workflow_history_test.sql
+supabase/tests/phase4_claim_workflow_mutation_test.sql
+supabase/tests/phase4_claim_workflow_security_test.sql
+supabase/tests/phase3_claim_permissions_test.sql
+supabase/tests/phase3_claim_security_test.sql
+supabase/tests/phase3_claim_tenant_isolation_test.sql
+supabase/tests/phase3_claim_self_scope_test.sql
+supabase/tests/phase3_claim_audit_test.sql
+```
+
+Acceptance criteria:
+
+- `public.record_claim_decision` exists with the exact signature and return contract.
+- `claim_decisions` remains the authoritative evidence table.
+- Valid decisions insert a new final decision row, update pointer/snapshot/totals/version atomically, and preserve tenant and clinic scope.
+- Invalid, same-state non-replay, stale, unauthorized, cross-tenant, cross-clinic, soft-deleted Claim, conflicting-idempotency, invalid amount, and invalid currency attempts write nothing.
+- Equivalent external replay returns the prior result without incrementing version.
+- Payment status and workflow status are not mutated by decision mutation.
+- Direct protected decision and Claim snapshot writes are denied to ordinary authenticated users.
+- AI/system actors without explicit adjudication authority cannot finalize decisions.
+- Error messages are tenant-safe and sanitized.
+
+### 27.12 Explicit Exclusions
+
+Batch 4 excludes:
+
+```text
+workflow mutation changes
+payment/refund/reversal mutation changes
+appeal entity implementation
+dedicated claim_line_decisions
+legacy status removal
+backend/API/frontend/generated type changes
+fixtures or seed data unless separately approved
+database reset or validation execution in this documentation closure task
+```
+
+Batch 4 readiness: `READY FOR BATCH 4`.
