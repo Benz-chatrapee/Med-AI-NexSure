@@ -338,13 +338,12 @@ select ok(
       on n.oid = p.pronamespace
     where n.nspname = 'public'
       and p.proname in (
-        'transition_claim_workflow',
         'submit_claim_appeal',
         'record_claim_refund',
         'record_claim_reversal'
       )
   ),
-  'no Batch 2 claim mutation functions are introduced'
+  'no out-of-scope claim mutation functions are introduced'
 );
 
 select * from finish();

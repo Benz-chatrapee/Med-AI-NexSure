@@ -168,17 +168,17 @@ select ok(
 );
 
 select ok(
-  not exists (
+  to_regprocedure(
+    'public.transition_claim_workflow(uuid, public.claim_workflow_state_domain, integer, text, text, text, text, uuid, timestamptz)'
+  ) is not null
+  and not exists (
     select 1
     from pg_proc p
     join pg_namespace n on n.oid = p.pronamespace
     where n.nspname = 'public'
-      and p.proname in (
-        'transition_claim_workflow',
-        'record_claim_workflow_event'
-      )
+      and p.proname = 'record_claim_workflow_event'
   ),
-  'Batch 2 introduces no workflow mutation or sequence-allocation function'
+  'workflow history is written through the Batch 3 controlled transition function only'
 );
 
 select * from finish();
