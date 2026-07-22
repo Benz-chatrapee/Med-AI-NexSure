@@ -1571,6 +1571,191 @@ No open **P0** risk is confirmed by repository evidence in this static pass, bec
 
 ---
 
+## Technical P1 Gate Closure
+
+**Confirmed Finding**
+
+Static repository inspection was performed for the Phase 4 P1 gates using:
+
+```text
+docs/database/PHASE-3-VALIDATION-REPORT.md
+docs/database/PHASE-4-CLAIM-WORKFLOW-SPEC.md
+docs/database/PHASE-4-CLAIM-IMPACT-ANALYSIS.md
+docs/database/PHASE-4-CLAIM-ARCHITECTURE-DECISIONS.md
+docs/database/PHASE-4-CLAIM-MIGRATION-PLAN.md
+docs/database/PHASE-4-CLAIM-TEST-PLAN.md
+supabase/migrations/**/*.sql
+supabase/tests/**/*.sql
+supabase/seed.sql
+supabase/config.toml
+lib/database.types.ts
+selected application files containing Claim status references
+```
+
+No database reset, migration execution, pgTAP run, lint, build, type generation, or production data query was performed for this gate-closure pass.
+
+### P1-01 - Claim and Decision Source of Truth
+
+| Required Record | Evidence |
+|---|---|
+| File path | `supabase/migrations/20260720082357_phase3_claim_core_tables.sql`; `supabase/migrations/20260720082438_phase3_claim_review_decision.sql`; `supabase/migrations/20260720082444_phase3_claim_functions.sql`; `supabase/migrations/20260720082450_phase3_claim_permissions.sql`; `supabase/migrations/20260720082453_phase3_claim_rls.sql`; `lib/database.types.ts` |
+| Object/function/policy | `public.claims`; `public.claim_decisions`; `public.claim_decision_adjustments`; `claims.current_decision_id`; `finalize_claim_decision`; `supersede_claim_decision`; `claims_select_authorized`; `claims_insert_authorized`; `claims_update_authorized` |
+| Confirmed evidence | `public.claims.status` is the current legacy Claim state; `claim_decisions` supports decision versioning, final/superseded/cancelled lifecycle, outcome values, amounts, human decision metadata, and `supersedes_decision_id`; `claims.current_decision_id` provides a current decision pointer; one-final-decision indexing and supersession functions provide current-decision protection; decision/payment write functions are granted to `service_role`, not general `authenticated` users. |
+| Remaining gap | `claims.decision_status` split snapshot is not implemented; payer `external_event_id` / source ordering is absent for decisions; decision authority is architecturally approved but the authenticated/user-facing secure wrapper and payer integration identity are not implemented; line-level adjudication is limited to existing items and adjustments, not a dedicated line decision table. |
+| Gate result | `SATISFIED WITH FOLLOW-UP` |
+
+```text
+Claim workflow source:
+Current implementation uses overloaded claims.status plus claim_status_history. Phase 4 workflow_status and controlled workflow operations are not implemented.
+
+Decision source of truth:
+claim_decisions is the authoritative decision history, with claims.current_decision_id as the current pointer.
+
+Current decision representation:
+claims.current_decision_id exists. claims.decision_status current snapshot is missing.
+
+Decision authority:
+Service-role SQL functions and claim.decide / claim.decision.supersede permissions exist, but payer integration identity and authenticated secure wrappers remain follow-up work.
+
+Conflicts:
+claims.status still mirrors workflow, decision, and payment states.
+
+Gate result:
+SATISFIED WITH FOLLOW-UP
+```
+
+### P1-02 - Payment and Financial Source of Truth
+
+| Required Record | Evidence |
+|---|---|
+| File path | `supabase/migrations/20260720082441_phase3_claim_payment.sql`; `supabase/migrations/20260720082444_phase3_claim_functions.sql`; `supabase/migrations/20260720082447_phase3_claim_indexes.sql`; `supabase/migrations/20260720082450_phase3_claim_permissions.sql`; `supabase/migrations/20260720082453_phase3_claim_rls.sql`; `lib/database.types.ts` |
+| Object/function/policy | `claim_payments`; `claim_payment_allocations`; `claim_payment_reconciliations`; `record_claim_payment`; `allocate_claim_payment`; `reconcile_claim_payment`; `claim_payments_reference_uq`; `claim_payments_claim_identity_uq`; `claim_payments_idempotency_key_idx` |
+| Confirmed evidence | Payment header, allocation, and reconciliation tables exist; payment rows include `payment_reference`, `payer_reference`, `idempotency_key`, payment lifecycle statuses, exact numeric amount fields, currency constraints, failure/reversal/cancellation fields, `received_at`, and tenant-safe Claim/decision foreign keys; `record_claim_payment` supports duplicate handling through idempotency key and payment reference; indexes support payment references and idempotency lookup. |
+| Remaining gap | `claims.payment_status` split snapshot is missing; refund is not a distinct implemented operation; reversal fields exist but no `record_claim_reversal` function was found; no refund ceiling rule was confirmed; no complete external event ordering model was found; financial summary still maps into legacy `claims.status` and `claims.total_paid_amount`. |
+| Gate result | `SATISFIED WITH FOLLOW-UP` |
+
+```text
+Payment source of truth:
+claim_payments, claim_payment_allocations, and claim_payment_reconciliations.
+
+Payment summary location:
+claims.total_paid_amount exists; claims.payment_status is missing.
+
+Synchronization:
+record_claim_payment updates Claim totals and legacy status for received payments; split-state synchronization is not implemented.
+
+Currency and precision:
+PostgreSQL numeric fields and currency constraints are present. Rounding tolerance and refund ceiling remain follow-up rules.
+
+Reconciliation:
+claim_payment_reconciliations exists with expected, received, variance, status, reason, and resolution fields.
+
+Payment authority:
+claim.payment.record / allocate / reconcile permissions and service-role functions exist. Finance/user-facing wrappers and refund/reversal authority remain follow-up.
+
+Integrity risks:
+Refund/reversal operations, event ordering, split payment summary, and reconciliation tolerance are incomplete.
+
+Gate result:
+SATISFIED WITH FOLLOW-UP
+```
+
+### P1-03 - External Events, Idempotency, and Ordering
+
+| Domain | Event Identity | Duplicate Protection | Ordering/Supersession | Gap | Result |
+|---|---|---|---|---|---|
+| Payer decision | `payer_reference` exists on `claims`; no `external_event_id` on `claim_decisions` was confirmed | One current final decision and supersession lineage protect internal duplicates | `decision_version` and `supersedes_decision_id` support supersession | No unique payer event identity, source sequence, effective/received ordering, or old-event rejection was confirmed | `OPEN` |
+| Payment | `payment_reference`, `payer_reference`, `idempotency_key`, `received_at` exist | Unique `payment_reference`; partial idempotency index; `record_claim_payment` duplicate handling | Payment lifecycle timestamps and status checks exist | No explicit `external_event_id`, source sequence, or out-of-order source event rule was confirmed | `SATISFIED WITH FOLLOW-UP` |
+| Refund/reversal | Reversal fields exist on payment rows | Not confirmed for distinct refund/reversal operations | Not confirmed | No `record_claim_refund`, `record_claim_reversal`, refund idempotency, or reversal ordering operation found | `OPEN` |
+
+Gate result: `OPEN`
+
+Older external payer/payment events must not overwrite newer effective records. Repository evidence does not yet prove this rule for payer decisions, refund, or reversal.
+
+### P1-04 - RBAC, RLS, and Controlled Mutations
+
+| Action | Permission | Enforcement | Bypass Risk | Gap | Priority |
+|---|---|---|---|---|---|
+| Claim create | `claim.create` | `claims_insert_authorized` checks permission and tenant/clinic scope | Low | Latest executed INSERT RLS evidence remains incomplete in Phase 3 report | P1 |
+| Claim read | `claim.read`; `claim.audit.read` for deleted Claims | `claims_select_authorized` and `private.claim_can_read` | Low | None for active/deleted read baseline | P2 |
+| Claim update | `claim.update` | `claims_update_authorized`; `claims_self_update_own_draft` | Medium | Protected-column mutation hardening for financial/state/pointer/version fields not proven | P1 |
+| Submit/review | `claim.submit`; `claim.review` | Permissions exist; review policies exist | Medium | No `submit_claim` controlled function found | P1 |
+| Close/cancel/reopen | `claim.cancel`; `claim.reopen`; no `claim.close` found | Permissions partially exist | Medium | No controlled close/cancel/reopen functions found | P1 |
+| Record decision | `claim.decide`; `claim.decision.supersede` | Service-role functions exist | Medium | No authenticated secure wrapper or payer integration identity found | P1 |
+| Record payment | `claim.payment.record` | Service-role function exists | Medium | No authenticated finance wrapper found | P1 |
+| Record refund/reversal | Missing or incomplete | Not found | Medium | Refund/reversal permissions and functions absent/incomplete | P1 |
+| Read audit | `claim.audit.read` / `claim.audit.export` | Audit RLS and trigger evidence exists | Low | Live/complete rerun not performed | P2 |
+
+Gate result: `OPEN`
+
+No confirmed P0 unauthorized decision, financial, cross-tenant, or cross-clinic mutation was found in static inspection. The gate remains open because controlled Phase 4 mutation functions and protected-column hardening are incomplete.
+
+### P1-05 - Legacy Status and Migration Dependencies
+
+| Dependency | Existing Evidence | Batch 1 Need | Conflict | Result |
+|---|---|---|---|---|
+| Legacy `claims.status` | `public.claims.status` check includes workflow, decision, and payment values | Keep temporarily; add split states additively | Overloaded source still used by SQL functions and generated types | `OPEN` |
+| Visit `claim_status` | `001_core_schema.sql` defines `claim_status` enum on `visits`; indexed in `004_indexes.sql` | Do not migrate as Claim decision/payment state | Naming collision with readiness/preparation semantics | `SATISFIED WITH FOLLOW-UP` |
+| Decision dependencies | `claim_decisions`, `claim_decision_adjustments`, `claims.current_decision_id`, supersession functions | Reuse existing objects | Missing split snapshot and external event identity | `SATISFIED WITH FOLLOW-UP` |
+| Payment dependencies | `claim_payments`, allocations, reconciliations, payment functions | Reuse existing objects | Missing refund function and split payment snapshot | `SATISFIED WITH FOLLOW-UP` |
+| Permissions/RLS | Phase 3 permission and RLS migrations exist | Extend without weakening baseline | Missing Phase 4 operation-specific controls | `OPEN` |
+| Application dependencies | `lib/database.types.ts`, payer rules, patient claims, dashboards, visit list, executive dashboard references | Inventory and cut over readers/writers | Mixed `claimStatus` semantics remain | `OPEN` |
+
+Gate result: `OPEN`
+
+Batch 1 can be additive only if it does not stop legacy reads/writes, does not drop `claims.status`, and does not introduce authoritative split states without controlled synchronization and validation.
+
+### P1-06 - Repository Validation Baseline
+
+```text
+Phase 3 baseline:
+Reviewed from existing evidence - READY WITH CONDITIONS. Focused Claim self-scope PASS 45/45, tenant isolation PASS 43/43, recorded security PASS 29/29, recorded audit PASS 38/38, earlier full database regression PASS 322/322.
+
+Relevant tests:
+supabase/tests/phase3_claim_permissions_test.sql
+supabase/tests/phase3_claim_security_test.sql
+supabase/tests/phase3_claim_audit_test.sql
+supabase/tests/phase3_claim_self_scope_test.sql
+supabase/tests/phase3_claim_tenant_isolation_test.sql
+
+Last executed evidence:
+Reviewed from existing evidence - Not rerun.
+
+Working-tree status:
+Existing modified docs were present before this pass: PHASE-4-CLAIM-ARCHITECTURE-DECISIONS.md, PHASE-4-CLAIM-MIGRATION-PLAN.md, PHASE-4-CLAIM-TEST-PLAN.md.
+
+Known gaps:
+Latest consolidated database regression not rerun; Claim permission assertion count not captured; INSERT RLS incomplete; hard DELETE not evidenced; application validation not current.
+
+Gate result:
+SATISFIED WITH FOLLOW-UP
+```
+
+### Gate Closure Matrix
+
+| Gate | Key Evidence | Result | Remaining Gap | Required Action | Blocks Batch 1 |
+|---|---|---|---|---|---|
+| P1-01 Claim/decision source | `claim_decisions`, `claims.current_decision_id`, decision functions, decision RLS | `SATISFIED WITH FOLLOW-UP` | Split `claims.decision_status`, payer event identity, secure wrapper | Reuse existing decision tables; add snapshot and controlled authority in Batch 1 | No |
+| P1-02 Payment/financial source | `claim_payments`, allocations, reconciliations, numeric constraints, payment idempotency | `SATISFIED WITH FOLLOW-UP` | Split `payment_status`, refund/reversal operations, tolerance/ceiling rules | Reuse existing payment tables; add controlled summary and exception rules | No |
+| P1-03 Events/idempotency/order | Payment idempotency exists; decision supersession exists | `OPEN` | Payer/refund/reversal event identity and source ordering incomplete | Define stable event identity, effective/received ordering, stale-event handling before migration | Yes |
+| P1-04 RBAC/RLS/mutations | Phase 3 RLS/RBAC baseline and service-role decision/payment functions | `OPEN` | Phase 4 controlled operations and protected-column hardening incomplete | Add operation-specific functions, permissions, RLS `WITH CHECK`, and tests | Yes |
+| P1-05 Legacy/migration dependencies | Legacy status inventory in SQL, types, frontend/dashboard references | `OPEN` | Legacy `claims.status` still authoritative and mixed app dependencies remain | Keep migration additive; require accepted inventory and cutover plan before implementation | Yes |
+| P1-06 Validation baseline | Phase 3 validation report and test inventory | `SATISFIED WITH FOLLOW-UP` | Latest full rerun and app validation absent | Run permitted Phase 4 baseline when implementation begins | No |
+
+### Batch 1 Readiness
+
+```text
+NOT READY
+```
+
+ADR approval alone is not sufficient. Batch 1 is blocked by open event/idempotency/order controls, open RBAC/RLS/controlled-mutation gate, and open legacy/migration dependency gate.
+
+Recommended Batch 1 definition:
+
+```text
+Batch 1 definition cannot be finalized safely.
+```
+
 ## Decision Summary
 
 - Overall Impact: Major. Phase 4 affects Claim current state, legacy status constraints, controlled mutations, RBAC/RLS, service wrappers, generated types, frontend filters, dashboards, tests, and validation docs.

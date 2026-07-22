@@ -9,14 +9,17 @@
 | File | `docs/database/PHASE-4-CLAIM-ARCHITECTURE-DECISIONS.md` |
 | Phase | Phase 4 - Claim Architecture |
 | Version | 0.2 |
-| Overall ADR status | Review Required / Pending Approval |
+| Overall ADR status | Approved |
 | Implementation status | Not Started |
 | Created date | 2026-07-22 |
 | Last updated | 2026-07-22 |
 | Repository branch | `main` |
 | Repository commit | `6ff0621` |
-| Required approvers | Role-specific approval by Product Owner, Claim Domain Owner, Database Architect, Security Lead, Finance Owner, Integration Owner, and Backend Lead as applicable |
-| Implementation gate | Blocked until mandatory ADRs are approved and all P1 dependency decisions are resolved |
+| Required approvers | Project Owner / Product Owner approval recorded for ADR-001 through ADR-008; role-specific technical reviews remain required where applicable |
+| Implementation gate | Blocked until all remaining P1 technical dependency decisions and verification gates are resolved |
+| Approval date | 2026-07-22 |
+| Approval authority | Project Owner / Product Owner |
+| Approval reference | Explicit Phase 4 approval dated 2026-07-22 |
 
 ## 2. Purpose and Scope
 
@@ -33,7 +36,7 @@ Evidence classifications used here:
 | Recommendation | Proposed technical direction awaiting approval |
 | Not Verified | Evidence is unavailable, incomplete, or not executed |
 
-ADR statuses are `Draft`, `Review Required`, `Pending Approval`, `Approved`, `Rejected`, and `Superseded`. Implementation statuses are tracked separately as `Not Started`, `Planned`, `In Progress`, `Implemented`, `Validated`, or `Deferred`.
+ADR records in this document now use `Approved`. Implementation statuses are tracked separately as `Not Started`, `Planned`, `In Progress`, `Implemented`, `Validated`, or `Deferred`.
 
 ## 3. Architecture Principles
 
@@ -60,7 +63,7 @@ ADR statuses are `Draft`, `Review Required`, `Pending Approval`, `Approved`, `Re
 | Claim Readiness | Existing readiness rules and assessments | Readiness-specific fields/views, not Claim decision or payment state | Authorized readiness/review operation | Existing readiness/audit records where implemented | Confirmed Finding |
 | Payer Decision | `claim_decisions` plus `claims.current_decision_id` | Target: `claims.decision_status`; currently missing | Trusted payer integration or explicitly authorized adjudication role | `claim_decisions`, `claim_status_history`, audit trigger | Partially Implemented |
 | Payment | `claim_payments`, `claim_payment_allocations`, `claim_payment_reconciliations` | `claims.total_paid_amount`; target `claims.payment_status` missing | Payment/reconciliation integration or authorized finance role | Payment tables and audit trigger | Partially Implemented |
-| Appeal | Target dedicated `claim_appeals`; repository implementation not found | `workflow_status = appealed` summary only | Authorized appeal operation | Dedicated appeal record plus workflow event | Missing / Pending Approval |
+| Appeal | Target dedicated `claim_appeals`; repository implementation not found | `workflow_status = appealed` summary only | Authorized appeal operation | Dedicated appeal record plus workflow event | Missing / Approved Scope |
 | AI Recommendation | Decision-support records only | AI assessment pointer or recommendation state | AI service may recommend only | AI assessment/recommendation audit where implemented | Non-authoritative |
 
 AI Recommendation must never be an authoritative source for payer decision or payment.
@@ -69,35 +72,35 @@ AI Recommendation must never be an authoritative source for payer decision or pa
 
 | ADR | Decision | Final Direction | ADR Status | Implementation Status | Owner | Phase |
 | --- | --- | --- | --- | --- | --- | --- |
-| ADR-001 | Closed Semantics | `closed` means operational completion; payment remains independent | Pending Approval | Not Started | Product Owner / Claim Domain Owner | Phase 4 |
-| ADR-002 | Appeal Scope | Every formal appeal requires a dedicated Appeal record; workflow `appealed` is summary only | Pending Approval | Not Started | Claim Domain Owner | Phase 4 |
-| ADR-003 | Refund and Reversal MVP Scope | Transactions are authoritative; refund/reversal remain distinguishable history | Pending Approval | Not Started | Product Owner / Finance Owner | Phase 4 |
-| ADR-004 | Claim-Line Adjudication Scope | Phase 4 MVP uses current Claim decision header plus item adjustments; dedicated line decisions are deferred to a separately approved work package | Pending Approval | Not Started | Claim Domain Owner / Database Architect | Phase 4 |
-| ADR-005 | Claim Reopen Rules | No ordinary terminal reopen; dedicated elevated action only, with post-submission cases preferring linked revision or resubmission | Pending Approval | Not Started | Security Lead / Claim Domain Owner | Phase 4 |
-| ADR-006 | Payer Decision Authority | Trusted payer integration primary; controlled adjudication fallback; AI recommendation only | Pending Approval | Not Started | Claim Domain Owner / Security Lead | Phase 4 |
-| ADR-007 | Payment Authority | Payment/reconciliation integration primary; controlled finance fallback; AI has no authority | Pending Approval | Not Started | Finance Owner / Security Lead | Phase 4 |
-| ADR-008 | Legacy Status Retirement | Staged retirement; no indefinite dual-write and no immediate removal | Pending Approval | Not Started | Database Architect / Product Owner | Phase 4 |
+| ADR-001 | Closed Semantics | `closed` means operational completion; payment remains independent | Approved | Not Started | Product Owner / Claim Domain Owner | Phase 4 |
+| ADR-002 | Appeal Scope | Every formal appeal requires a dedicated Appeal record; workflow `appealed` is summary only | Approved | Not Started | Claim Domain Owner | Phase 4 |
+| ADR-003 | Refund and Reversal MVP Scope | Transactions are authoritative; refund/reversal remain distinguishable history | Approved | Not Started | Product Owner / Finance Owner | Phase 4 |
+| ADR-004 | Claim-Line Adjudication Scope | Phase 4 MVP uses current Claim decision header plus item adjustments; dedicated line decisions are deferred to a separately approved work package | Approved | Not Started | Claim Domain Owner / Database Architect | Phase 4 |
+| ADR-005 | Claim Reopen Rules | No ordinary terminal reopen; dedicated elevated action only, with post-submission cases preferring linked revision or resubmission | Approved | Not Started | Security Lead / Claim Domain Owner | Phase 4 |
+| ADR-006 | Payer Decision Authority | Trusted payer integration primary; controlled adjudication fallback; AI recommendation only | Approved | Not Started | Claim Domain Owner / Security Lead | Phase 4 |
+| ADR-007 | Payment Authority | Payment/reconciliation integration primary; controlled finance fallback; AI has no authority | Approved | Not Started | Finance Owner / Security Lead | Phase 4 |
+| ADR-008 | Legacy Status Retirement | Staged retirement; no indefinite dual-write and no immediate removal | Approved | Not Started | Database Architect / Product Owner | Phase 4 |
 
 ## 6. Architecture Decision Records
 
 ### ADR-001 - Closed Semantics
 
-**ADR Status:** Pending Approval  
-**Implementation Status:** Not Started  
-**Owner:** Product Owner / Claim Domain Owner  
-**Version:** 0.1  
-**Drafted Date:** 2026-07-22  
-**Decision Date:** Pending approval  
-**Effective Date:** Pending approval  
-**Review Date:** Before Phase 4 implementation begins  
-**Approved By:** Pending role-specific approval  
-**Approval Reference:** Pending explicit approval record  
-**Implementation Phase:** Phase 4  
-**Supersedes:** None  
-**Superseded By:** None  
-**Related Requirements:** P4-REQ-001 (Proposed), P4-REQ-002 (Proposed)  
-**Related Risks:** P4-RISK-001, P4-RISK-002  
-**Related Tests:** P4-TEST-WF-001 (Proposed), P4-TEST-PAY-001 (Proposed)  
+**ADR Status:** Approved
+**Implementation Status:** Not Started
+**Owner:** Product Owner / Claim Domain Owner
+**Version:** 0.1
+**Drafted Date:** 2026-07-22
+**Decision Date:** 2026-07-22
+**Effective Date:** 2026-07-22
+**Review Date:** Before Phase 4 implementation begins
+**Approved By:** Project Owner / Product Owner
+**Approval Reference:** Explicit Phase 4 approval dated 2026-07-22
+**Implementation Phase:** Phase 4
+**Supersedes:** None
+**Superseded By:** None
+**Related Requirements:** P4-REQ-001 (Proposed), P4-REQ-002 (Proposed)
+**Related Risks:** P4-RISK-001, P4-RISK-002
+**Related Tests:** P4-TEST-WF-001 (Proposed), P4-TEST-PAY-001 (Proposed)
 **Repository Evidence:** Confirmed Finding - `claims.status` currently includes `closed`, decision states, and payment states, while payment is represented separately in `claim_payments`. Not Verified - the full schema and authority of the reported workflow history structure have not yet been independently validated in this ADR.
 
 #### Context
@@ -114,7 +117,7 @@ The current overloaded `claims.status` cannot represent operational closure inde
 
 #### Proposed Decision
 
-Recommended option pending approval: `closed = operational processing complete`. Payment exceptions, appeals, and unresolved tasks do not automatically block closure unless an approved configurable closure rule explicitly requires them.
+Approved decision: `closed = operational processing complete`. Payment exceptions, appeals, and unresolved tasks do not automatically block closure unless an approved configurable closure rule explicitly requires them.
 
 #### Rationale
 
@@ -160,22 +163,22 @@ Add or update workflow state columns/functions, closure rules, UI badges, API DT
 
 ### ADR-002 - Appeal Scope
 
-**ADR Status:** Pending Approval  
-**Implementation Status:** Not Started  
-**Owner:** Claim Domain Owner  
-**Version:** 0.1  
-**Drafted Date:** 2026-07-22  
-**Decision Date:** Pending approval  
-**Effective Date:** Pending approval  
-**Review Date:** Before Phase 4 implementation begins  
-**Approved By:** Pending role-specific approval  
-**Approval Reference:** Pending explicit approval record  
-**Implementation Phase:** Phase 4  
-**Supersedes:** None  
-**Superseded By:** None  
-**Related Requirements:** P4-REQ-003 (Proposed)  
-**Related Risks:** P4-RISK-003  
-**Related Tests:** P4-TEST-APP-001 (Proposed)  
+**ADR Status:** Approved
+**Implementation Status:** Not Started
+**Owner:** Claim Domain Owner
+**Version:** 0.1
+**Drafted Date:** 2026-07-22
+**Decision Date:** 2026-07-22
+**Effective Date:** 2026-07-22
+**Review Date:** Before Phase 4 implementation begins
+**Approved By:** Project Owner / Product Owner
+**Approval Reference:** Explicit Phase 4 approval dated 2026-07-22
+**Implementation Phase:** Phase 4
+**Supersedes:** None
+**Superseded By:** None
+**Related Requirements:** P4-REQ-003 (Proposed)
+**Related Risks:** P4-RISK-003
+**Related Tests:** P4-TEST-APP-001 (Proposed)
 **Repository Evidence:** Confirmed Finding - no `claim_appeals`, appeal status, appeal reason, or appeal deadline implementation was found outside the Phase 4 specification.
 
 #### Context
@@ -192,7 +195,7 @@ The Phase 4 workflow includes `appealed`, but a workflow state alone cannot pres
 
 #### Proposed Decision
 
-Recommended option pending approval: every formal appeal must create a dedicated MVP Appeal record. `workflow_status = appealed` is a summary only and must never be the sole source for appeal reason, ownership, deadline, evidence, payer reference, or outcome. Informal rework and `request_information` are not classified as appeals. Defer full multi-round appeal automation unless explicitly approved for Phase 4.
+Approved decision: every formal appeal must create a dedicated MVP Appeal record. `workflow_status = appealed` is a summary only and must never be the sole source for appeal reason, ownership, deadline, evidence, payer reference, or outcome. Informal rework and `request_information` are not classified as appeals. Defer full multi-round appeal automation unless explicitly approved for Phase 4.
 
 #### Rationale
 
@@ -238,22 +241,22 @@ If approved, Phase 4 must add `claim_appeals`, controlled appeal operations, ten
 
 ### ADR-003 - Refund and Reversal MVP Scope
 
-**ADR Status:** Pending Approval  
-**Implementation Status:** Not Started  
-**Owner:** Product Owner / Finance Owner  
-**Version:** 0.1  
-**Drafted Date:** 2026-07-22  
-**Decision Date:** Pending approval  
-**Effective Date:** Pending approval  
-**Review Date:** Before Phase 4 implementation begins  
-**Approved By:** Pending role-specific approval  
-**Approval Reference:** Pending explicit approval record  
-**Implementation Phase:** Phase 4  
-**Supersedes:** None  
-**Superseded By:** None  
-**Related Requirements:** P4-REQ-004 (Proposed), P4-REQ-005 (Proposed)  
-**Related Risks:** P4-RISK-004, P4-RISK-005  
-**Related Tests:** P4-TEST-PAY-002 (Proposed), P4-TEST-PAY-003 (Proposed)  
+**ADR Status:** Approved
+**Implementation Status:** Not Started
+**Owner:** Product Owner / Finance Owner
+**Version:** 0.1
+**Drafted Date:** 2026-07-22
+**Decision Date:** 2026-07-22
+**Effective Date:** 2026-07-22
+**Review Date:** Before Phase 4 implementation begins
+**Approved By:** Project Owner / Product Owner
+**Approval Reference:** Explicit Phase 4 approval dated 2026-07-22
+**Implementation Phase:** Phase 4
+**Supersedes:** None
+**Superseded By:** None
+**Related Requirements:** P4-REQ-004 (Proposed), P4-REQ-005 (Proposed)
+**Related Risks:** P4-RISK-004, P4-RISK-005
+**Related Tests:** P4-TEST-PAY-002 (Proposed), P4-TEST-PAY-003 (Proposed)
 **Repository Evidence:** Confirmed Finding - `claim_payments`, allocations, reconciliations, payment references, idempotency-related structures, and failure-related fields exist. Not Verified - a complete authoritative refund and reversal transaction workflow was not confirmed.
 
 #### Context
@@ -276,7 +279,7 @@ For this ADR:
 
 #### Proposed Decision
 
-Recommended option pending approval: transactions are authoritative; Claim payment status is a current summary. Refund and reversal must remain distinguishable in audit history.
+Approved decision: transactions are authoritative; Claim payment status is a current summary. Refund and reversal must remain distinguishable in audit history.
 
 | Capability | MVP Classification | Belongs As |
 | --- | --- | --- |
@@ -331,22 +334,22 @@ Add/refine payment summary, refund/reversal operations, permissions, idempotency
 
 ### ADR-004 - Claim-Line Adjudication Scope
 
-**ADR Status:** Pending Approval  
-**Implementation Status:** Not Started  
-**Owner:** Claim Domain Owner / Database Architect  
-**Version:** 0.1  
-**Drafted Date:** 2026-07-22  
-**Decision Date:** Pending approval  
-**Effective Date:** Pending approval  
-**Review Date:** Before Phase 4 implementation begins  
-**Approved By:** Pending role-specific approval  
-**Approval Reference:** Pending explicit approval record  
-**Implementation Phase:** Phase 4  
-**Supersedes:** None  
-**Superseded By:** None  
-**Related Requirements:** P4-REQ-006 (Proposed)  
-**Related Risks:** P4-RISK-006  
-**Related Tests:** P4-TEST-DEC-001 (Proposed), P4-TEST-LINE-001 (Proposed)  
+**ADR Status:** Approved
+**Implementation Status:** Not Started
+**Owner:** Claim Domain Owner / Database Architect
+**Version:** 0.1
+**Drafted Date:** 2026-07-22
+**Decision Date:** 2026-07-22
+**Effective Date:** 2026-07-22
+**Review Date:** Before Phase 4 implementation begins
+**Approved By:** Project Owner / Product Owner
+**Approval Reference:** Explicit Phase 4 approval dated 2026-07-22
+**Implementation Phase:** Phase 4
+**Supersedes:** None
+**Superseded By:** None
+**Related Requirements:** P4-REQ-006 (Proposed)
+**Related Risks:** P4-RISK-006
+**Related Tests:** P4-TEST-DEC-001 (Proposed), P4-TEST-LINE-001 (Proposed)
 **Repository Evidence:** Confirmed Finding - `claim_items` and item-level decision adjustments exist; no dedicated `claim_line_decisions` table was found.
 
 #### Context
@@ -363,7 +366,7 @@ Partial approval can currently be represented by decision amount comparisons and
 
 #### Proposed Decision
 
-Recommended Phase 4 MVP option pending approval: preserve `claim_decisions` as the authoritative decision-round header and use existing item-level adjustments for explainable partial approval. Do not introduce a dedicated `claim_line_decisions` table in the initial Phase 4 migration. Dedicated line adjudication is deferred to a separately approved work package with its own schema, aggregation, RLS, API, UI, and test scope. The MVP adjustment model must not be represented as complete line adjudication.
+Approved Phase 4 MVP option: preserve `claim_decisions` as the authoritative decision-round header and use existing item-level adjustments for explainable partial approval. Do not introduce a dedicated `claim_line_decisions` table in the initial Phase 4 migration. Dedicated line adjudication is deferred to a separately approved work package with its own schema, aggregation, RLS, API, UI, and test scope. The MVP adjustment model must not be represented as complete line adjudication.
 
 #### Rationale
 
@@ -409,22 +412,22 @@ For Phase 4 MVP, document and enforce the limits of header decision plus item ad
 
 ### ADR-005 - Claim Reopen Rules
 
-**ADR Status:** Pending Approval  
-**Implementation Status:** Not Started  
-**Owner:** Security Lead / Claim Domain Owner  
-**Version:** 0.1  
-**Drafted Date:** 2026-07-22  
-**Decision Date:** Pending approval  
-**Effective Date:** Pending approval  
-**Review Date:** Before Phase 4 implementation begins  
-**Approved By:** Pending role-specific approval  
-**Approval Reference:** Pending explicit approval record  
-**Implementation Phase:** Phase 4  
-**Supersedes:** None  
-**Superseded By:** None  
-**Related Requirements:** P4-REQ-007 (Proposed)  
-**Related Risks:** P4-RISK-007  
-**Related Tests:** P4-TEST-WF-002 (Proposed), P4-TEST-SEC-001 (Proposed)  
+**ADR Status:** Approved
+**Implementation Status:** Not Started
+**Owner:** Security Lead / Claim Domain Owner
+**Version:** 0.1
+**Drafted Date:** 2026-07-22
+**Decision Date:** 2026-07-22
+**Effective Date:** 2026-07-22
+**Review Date:** Before Phase 4 implementation begins
+**Approved By:** Project Owner / Product Owner
+**Approval Reference:** Explicit Phase 4 approval dated 2026-07-22
+**Implementation Phase:** Phase 4
+**Supersedes:** None
+**Superseded By:** None
+**Related Requirements:** P4-REQ-007 (Proposed)
+**Related Risks:** P4-RISK-007
+**Related Tests:** P4-TEST-WF-002 (Proposed), P4-TEST-SEC-001 (Proposed)
 **Repository Evidence:** Confirmed Finding - `claim.reopen` permission exists; no controlled `reopen_claim` function was found.
 
 #### Context
@@ -441,9 +444,9 @@ Terminal states such as `closed` and `cancelled` must not be casually reopened b
 
 #### Proposed Decision
 
-Recommended option pending approval: no direct ordinary reopen. Reopen requires dedicated action, elevated permission, reason code and text, audit history preservation, version check, protected external payer references, and no rewriting of payment or decision history.
+Approved decision: no direct ordinary reopen. Reopen requires dedicated action, elevated permission, reason code and text, audit history preservation, version check, protected external payer references, and no rewriting of payment or decision history.
 
-Allowed source states and targets are pending approval. Default proposal: `closed -> needs_review` or `appealed` through a controlled action. A pre-submission cancelled Claim may be reopened only under an approved rule. A post-submission cancellation must create a linked Claim revision or resubmission rather than resetting the original Claim to `draft`. External payer references and history must never be silently reused or rewritten.
+Allowed source states and targets require technical verification before implementation. Default approved direction: `closed -> needs_review` or `appealed` through a controlled action. A pre-submission cancelled Claim may be reopened only under an approved rule. A post-submission cancellation must create a linked Claim revision or resubmission rather than resetting the original Claim to `draft`. External payer references and history must never be silently reused or rewritten.
 
 #### Rationale
 
@@ -488,22 +491,22 @@ Add controlled `reopen_claim` operation, permission enforcement, transition test
 
 ### ADR-006 - Payer Decision Authority
 
-**ADR Status:** Pending Approval  
-**Implementation Status:** Not Started  
-**Owner:** Claim Domain Owner / Security Lead  
-**Version:** 0.1  
-**Drafted Date:** 2026-07-22  
-**Decision Date:** Pending approval  
-**Effective Date:** Pending approval  
-**Review Date:** Before Phase 4 implementation begins  
-**Approved By:** Pending role-specific approval  
-**Approval Reference:** Pending explicit approval record  
-**Implementation Phase:** Phase 4  
-**Supersedes:** None  
-**Superseded By:** None  
-**Related Requirements:** P4-REQ-008 (Proposed)  
-**Related Risks:** P4-RISK-008  
-**Related Tests:** P4-TEST-DEC-002 (Proposed), P4-TEST-SEC-002 (Proposed)  
+**ADR Status:** Approved
+**Implementation Status:** Not Started
+**Owner:** Claim Domain Owner / Security Lead
+**Version:** 0.1
+**Drafted Date:** 2026-07-22
+**Decision Date:** 2026-07-22
+**Effective Date:** 2026-07-22
+**Review Date:** Before Phase 4 implementation begins
+**Approved By:** Project Owner / Product Owner
+**Approval Reference:** Explicit Phase 4 approval dated 2026-07-22
+**Implementation Phase:** Phase 4
+**Supersedes:** None
+**Superseded By:** None
+**Related Requirements:** P4-REQ-008 (Proposed)
+**Related Risks:** P4-RISK-008
+**Related Tests:** P4-TEST-DEC-002 (Proposed), P4-TEST-SEC-002 (Proposed)
 **Repository Evidence:** Confirmed Finding - `claim.decide`, service-role `finalize_claim_decision`, `supersede_claim_decision`, `claim_decisions`, and current decision pointer exist; secure authenticated wrapper and external event ID strategy are not verified.
 
 #### Context
@@ -520,7 +523,7 @@ Payer decisions alter claim liability and must come from an authoritative payer 
 
 #### Proposed Decision
 
-Recommended option pending approval: primary authority is trusted payer integration. Fallback is an explicitly authorized adjudication role. AI is recommendation only. Generic Claim editor is prohibited from setting decision status.
+Approved decision: primary authority is trusted payer integration. Fallback is an explicitly authorized adjudication role. AI is recommendation only. Generic Claim editor is prohibited from setting decision status.
 
 Decision records must include permission, source reference, payer reference, external event ID where available, effective time, idempotency, supersession, and override audit.
 
@@ -568,22 +571,22 @@ Add secure authenticated wrappers or domain services, external event metadata, e
 
 ### ADR-007 - Payment Authority
 
-**ADR Status:** Pending Approval  
-**Implementation Status:** Not Started  
-**Owner:** Finance Owner / Security Lead  
-**Version:** 0.1  
-**Drafted Date:** 2026-07-22  
-**Decision Date:** Pending approval  
-**Effective Date:** Pending approval  
-**Review Date:** Before Phase 4 implementation begins  
-**Approved By:** Pending role-specific approval  
-**Approval Reference:** Pending explicit approval record  
-**Implementation Phase:** Phase 4  
-**Supersedes:** None  
-**Superseded By:** None  
-**Related Requirements:** P4-REQ-009 (Proposed)  
-**Related Risks:** P4-RISK-009  
-**Related Tests:** P4-TEST-PAY-004 (Proposed), P4-TEST-SEC-003 (Proposed)  
+**ADR Status:** Approved
+**Implementation Status:** Not Started
+**Owner:** Finance Owner / Security Lead
+**Version:** 0.1
+**Drafted Date:** 2026-07-22
+**Decision Date:** 2026-07-22
+**Effective Date:** 2026-07-22
+**Review Date:** Before Phase 4 implementation begins
+**Approved By:** Project Owner / Product Owner
+**Approval Reference:** Explicit Phase 4 approval dated 2026-07-22
+**Implementation Phase:** Phase 4
+**Supersedes:** None
+**Superseded By:** None
+**Related Requirements:** P4-REQ-009 (Proposed)
+**Related Risks:** P4-RISK-009
+**Related Tests:** P4-TEST-PAY-004 (Proposed), P4-TEST-SEC-003 (Proposed)
 **Repository Evidence:** Confirmed Finding - `claim.payment.record`, `record_claim_payment`, `claim_payments`, allocations, reconciliations, payment references, idempotency key, and finance role mappings exist; refund/reversal authority is incomplete.
 
 #### Context
@@ -600,7 +603,7 @@ Payment state must be based on transaction or reconciliation evidence. Generic C
 
 #### Proposed Decision
 
-Recommended option pending approval: payment/reconciliation integration is primary authority; authorized finance role is controlled fallback. Generic Claim editor is prohibited. AI has no authoritative financial mutation rights.
+Approved decision: payment/reconciliation integration is primary authority; authorized finance role is controlled fallback. Generic Claim editor is prohibited. AI has no authoritative financial mutation rights.
 
 Payments require permissions, payment reference, idempotency, amount/currency checks, reconciliation evidence where applicable, duplicate prevention, and audit.
 
@@ -649,22 +652,22 @@ Add/refine payment, refund, reversal, and reconciliation operations; secure wrap
 
 ### ADR-008 - Legacy Status Retirement
 
-**ADR Status:** Pending Approval  
-**Implementation Status:** Not Started  
-**Owner:** Database Architect / Product Owner  
-**Version:** 0.1  
-**Drafted Date:** 2026-07-22  
-**Decision Date:** Pending approval  
-**Effective Date:** Pending approval  
-**Review Date:** Before Phase 4 implementation begins  
-**Approved By:** Pending role-specific approval  
-**Approval Reference:** Pending explicit approval record  
-**Implementation Phase:** Phase 4 and later migration phase  
-**Supersedes:** None  
-**Superseded By:** None  
-**Related Requirements:** P4-REQ-010 (Proposed)  
-**Related Risks:** P4-RISK-010  
-**Related Tests:** P4-TEST-MIG-001 (Proposed), P4-TEST-APP-001 (Proposed)  
+**ADR Status:** Approved
+**Implementation Status:** Not Started
+**Owner:** Database Architect / Product Owner
+**Version:** 0.1
+**Drafted Date:** 2026-07-22
+**Decision Date:** 2026-07-22
+**Effective Date:** 2026-07-22
+**Review Date:** Before Phase 4 implementation begins
+**Approved By:** Project Owner / Product Owner
+**Approval Reference:** Explicit Phase 4 approval dated 2026-07-22
+**Implementation Phase:** Phase 4 and later migration phase
+**Supersedes:** None
+**Superseded By:** None
+**Related Requirements:** P4-REQ-010 (Proposed)
+**Related Risks:** P4-RISK-010
+**Related Tests:** P4-TEST-MIG-001 (Proposed), P4-TEST-APP-001 (Proposed)
 **Repository Evidence:** Confirmed Finding - `claims.status`, generated database types, SQL functions, RLS/policies, and frontend references still depend on single/mixed status semantics.
 
 #### Context
@@ -682,7 +685,7 @@ The legacy status field is overloaded but still used by schema constraints, func
 
 #### Proposed Decision
 
-Recommended option pending approval: staged retirement.
+Approved decision: staged retirement.
 
 Required stages:
 
@@ -805,31 +808,31 @@ Repository Phase 3 tests are recorded as PASS where evidenced in `PHASE-3-VALIDA
 
 | ADR | Required Approver(s) | Required Technical Reviewer(s) | Final Status |
 | --- | --- | --- | --- |
-| ADR-001 | Product Owner, Claim Domain Owner | Database Architect, Security Lead | Pending Approval |
-| ADR-002 | Product Owner, Claim Domain Owner | Security Lead, Database Architect | Pending Approval |
-| ADR-003 | Product Owner, Finance Owner | Database Architect, Security Lead | Pending Approval |
-| ADR-004 | Claim Domain Owner, Product Owner | Database Architect, Backend Lead | Pending Approval |
-| ADR-005 | Claim Domain Owner, Security Lead | Database Architect, Backend Lead | Pending Approval |
-| ADR-006 | Claim Domain Owner, Security Lead | Integration Owner, Backend Lead, Database Architect | Pending Approval |
-| ADR-007 | Finance Owner, Security Lead | Integration Owner, Backend Lead, Database Architect | Pending Approval |
-| ADR-008 | Database Architect, Product Owner | Backend Lead, Security Lead, QA Lead | Pending Approval |
+| ADR-001 | Product Owner, Claim Domain Owner | Database Architect, Security Lead | Approved by Project Owner / Product Owner on 2026-07-22 |
+| ADR-002 | Product Owner, Claim Domain Owner | Security Lead, Database Architect | Approved by Project Owner / Product Owner on 2026-07-22 |
+| ADR-003 | Product Owner, Finance Owner | Database Architect, Security Lead | Approved by Project Owner / Product Owner on 2026-07-22 |
+| ADR-004 | Claim Domain Owner, Product Owner | Database Architect, Backend Lead | Approved by Project Owner / Product Owner on 2026-07-22 |
+| ADR-005 | Claim Domain Owner, Security Lead | Database Architect, Backend Lead | Approved by Project Owner / Product Owner on 2026-07-22 |
+| ADR-006 | Claim Domain Owner, Security Lead | Integration Owner, Backend Lead, Database Architect | Approved by Project Owner / Product Owner on 2026-07-22 |
+| ADR-007 | Finance Owner, Security Lead | Integration Owner, Backend Lead, Database Architect | Approved by Project Owner / Product Owner on 2026-07-22 |
+| ADR-008 | Database Architect, Product Owner | Backend Lead, Security Lead, QA Lead | Approved by Project Owner / Product Owner on 2026-07-22 |
 
-No ADR is marked `Approved` because no explicit approval evidence was provided.
+ADR-001 through ADR-008 are approved for architecture direction only. This approval does not mark implementation, migration readiness, test execution, or validation as complete.
 
 ## 12. Blocking Actions
 
-| ADR | Required Approval or Evidence | Owner | Priority | Blocking Impact |
+| ADR | Remaining Technical Evidence | Owner | Priority | Blocking Impact |
 | --- | --- | --- | --- | --- |
-| ADR-001 | Approve closed semantics and closure blockers | Product Owner / Claim Domain Owner | P1 | Phase 4 workflow implementation blocker |
-| ADR-002 | Approve appeal MVP scope and dedicated record requirement | Claim Domain Owner | P1 | Appeal workflow and schema blocker |
-| ADR-003 | Approve refund/reversal/failure/adjustment/overpayment MVP classification | Product Owner / Finance Owner | P1 | Payment schema and operations blocker |
-| ADR-004 | Approve Phase 4 MVP header decision plus item-adjustment model and defer dedicated line adjudication | Claim Domain Owner / Product Owner | P1 | Decision semantics and test-scope blocker |
-| ADR-005 | Approve reopen source/target states, permissions, time limits, and revision preference | Security Lead / Claim Domain Owner | P1 | Terminal workflow mutation blocker |
-| ADR-006 | Approve payer decision authority, manual fallback, and external event strategy | Claim Domain Owner / Security Lead | P1 | Decision write-path blocker |
-| ADR-007 | Approve payment authority, finance fallback, refund/reversal permissions, and reconciliation rules | Finance Owner / Security Lead | P1 | Financial mutation blocker |
-| ADR-008 | Approve staged legacy retirement and migration gates | Database Architect / Product Owner | P1 | Migration/cutover blocker |
+| ADR-001 | Verify closure blockers and workflow implementation rules before migration execution | Product Owner / Claim Domain Owner | P1 | Phase 4 workflow implementation blocker |
+| ADR-002 | Verify Appeal table fields, permissions, RLS, and operation design before implementation | Claim Domain Owner | P1 | Appeal workflow and schema blocker |
+| ADR-003 | Verify refund/reversal/failure/adjustment/overpayment technical rules before payment migration execution | Product Owner / Finance Owner | P1 | Payment schema and operations blocker |
+| ADR-004 | Verify item-adjustment coverage and decision snapshot synchronization before test closure | Claim Domain Owner / Product Owner | P1 | Decision semantics and test-scope blocker |
+| ADR-005 | Verify reopen source/target states, permissions, time limits, and revision preference before implementation | Security Lead / Claim Domain Owner | P1 | Terminal workflow mutation blocker |
+| ADR-006 | Verify payer decision writer identity, manual fallback controls, and external event strategy before implementation | Claim Domain Owner / Security Lead | P1 | Decision write-path blocker |
+| ADR-007 | Verify payment authority, finance fallback controls, refund/reversal permissions, and reconciliation rules before implementation | Finance Owner / Security Lead | P1 | Financial mutation blocker |
+| ADR-008 | Verify staged retirement gates, baseline validation, and cutover inventory before migration execution | Database Architect / Product Owner | P1 | Migration/cutover blocker |
 
-No confirmed P0 blocker is recorded by static repository evidence. This does not prove that no P0 issue exists because migrations, RLS behavior, controlled mutations, integration ordering, and application paths were not executed dynamically during this ADR task. All mandatory ADRs are P1 blockers for Phase 4 implementation until approved.
+No confirmed P0 blocker is recorded by static repository evidence. This does not prove that no P0 issue exists because migrations, RLS behavior, controlled mutations, integration ordering, and application paths were not executed dynamically during this ADR task. ADR approval blockers are closed; the technical P1 blockers above remain active until verified.
 
 ## 13. Architecture Guardrails
 
@@ -857,7 +860,7 @@ No confirmed P0 blocker is recorded by static repository evidence. This does not
 - No tests were executed for this ADR task.
 - No local or production data was changed.
 - Repository findings depend on inspected files and the Phase 4 impact analysis.
-- Pending ADRs require explicit approval by the role-specific approvers in the Approval Matrix.
+- ADR-001 through ADR-008 are approved by Project Owner / Product Owner as of 2026-07-22; technical readiness still requires the remaining verification gates in this document.
 - Static review did not prove the absence of P0 security, integrity, or integration defects.
 - Approved architecture does not mean implementation validation passed.
 - Phase 3 validation evidence is recorded in `PHASE-3-VALIDATION-REPORT.md`, but latest consolidated regression and application validation remain not run in that report.
@@ -868,3 +871,4 @@ No confirmed P0 blocker is recorded by static repository evidence. This does not
 | --- | --- | --- | --- |
 | 2026-07-22 | 0.1 | Created mandatory Phase 4 Claim ADRs, approval matrix, blockers, guardrails, traceability, dependencies, assumptions, and deferred scope | AI-assisted Technical Documentation Lead |
 | 2026-07-22 | 0.2 | Revised approval terminology, evidence precision, formal appeal rule, payment definitions, Phase 4 MVP adjudication scope, reopen rules, role-specific approvals, event identity, currency/reconciliation controls, and P0 validation caveat | AI-assisted Technical Documentation Lead |
+| 2026-07-22 | 0.3 | Recorded Project Owner / Product Owner approval for ADR-001 through ADR-008 and retained unresolved technical P1 gates | AI-assisted Technical Documentation Lead |
