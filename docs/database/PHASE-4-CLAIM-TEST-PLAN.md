@@ -926,3 +926,147 @@ ADR-001 through ADR-008 are approved by Project Owner / Product Owner on 2026-07
 - Static inspection must not be reported as PASS
 - Planned, Blocked, Deferred, and Not Applicable statuses do not represent execution results
 - Phase 4 closure needs evidence in `PHASE-4-VALIDATION-REPORT.md`; no tests run..
+## 36. Pre-Batch 3 RED-Test Scope
+
+This section reconciles planned Batch 3 test scope with actual Batch 1 split-state schema and Batch 2 workflow-history schema. It does not create tests, execute tests, or report runtime PASS.
+
+### 36.1 Exact Batch 3 Test Files
+
+| Test file | Purpose | Status |
+| --- | --- | --- |
+| `supabase/tests/phase4_claim_workflow_transition_test.sql` | Functional RED tests for controlled workflow transitions, versioning, event insertion, and rollback behavior | Planned |
+| `supabase/tests/phase4_claim_workflow_security_test.sql` | Security RED tests for authorization, direct mutation protection, tenant/clinic isolation, and service-role containment | Planned |
+
+If implementation combines these files, the combined-test decision must be recorded before Batch 3 begins. Current readiness assumes separate functional and security files.
+
+### 36.2 Functional RED Scenarios
+
+| Scenario | Expected RED assertion before Batch 3 implementation |
+| --- | --- |
+| Function exists | `public.transition_claim_workflow(...)` does not exist yet, so the test must fail until Batch 3 creates it |
+| Valid transition | `draft -> collecting_data` succeeds only through the function |
+| Invalid transition | Unlisted transition fails with no Claim snapshot update and no event |
+| Same-state transition | `submitted -> submitted` fails with no event |
+| Stale version | Wrong `expected_version` returns conflict and changes nothing |
+| Version increment | Successful transition increments `claims.version` exactly once |
+| Event write | Successful transition inserts exactly one `claim_workflow_events` row |
+| Event mapping | Event stores Claim ID, organization, clinic, from/to status, sequence, before/after version, actor/source, reason, timestamps, and metadata in actual Batch 2 columns |
+| Sequence allocation | Next `sequence_number` is allocated per locked Claim |
+| Manual retry | Retrying with stale version does not create a duplicate event |
+| Integration retry | Same `source_system` + `external_event_id` with equivalent payload returns deterministic prior result or no-op |
+| Integration conflict | Same `source_system` + `external_event_id` with conflicting payload is rejected |
+| Event insert failure | Snapshot update rolls back if event insertion fails |
+| Terminal reopen | `closed` or `cancelled` cannot transition without dedicated elevated reopen behavior |
+| Milestone | First successful transition to `submitted` sets `submitted_at`; no unverified milestone is fabricated |
+
+### 36.3 Security RED Scenarios
+
+| Scenario | Expected RED assertion before Batch 3 implementation |
+| --- | --- |
+| Missing authentication | Anonymous actor cannot execute the transition function |
+| Missing membership | Non-member receives sanitized denial/no write |
+| Cross-organization | Known Claim UUID in another organization is not mutated or disclosed |
+| Cross-clinic | Unauthorized clinic actor is denied |
+| Missing transition permission | Actor with read/update only cannot perform protected transitions unless explicitly approved |
+| Generic update bypass | Direct update of `claims.workflow_status`, `decision_status`, `payment_status`, version, ownership, financial totals, and state metadata is denied or proven protected |
+| Event direct write | Authenticated user cannot directly insert, update, or delete `claim_workflow_events` |
+| Service-role containment | Service-role path is allowed only through controlled operation semantics |
+| AI non-authority | AI/system actor without approved authority cannot perform final workflow, decision, payment, close, reopen, refund, reversal, or appeal authority |
+| Sensitive errors | Denials and conflicts do not expose PHI, tenant existence, internal policy names, raw SQL diagnostics, or unrestricted payloads |
+
+### 36.4 Required Regression Set
+
+Batch 3 must retain or rerun the relevant existing coverage by repository convention:
+
+```text
+supabase/tests/phase4_claim_schema_test.sql
+supabase/tests/phase4_claim_workflow_history_test.sql
+supabase/tests/phase3_claim_permissions_test.sql
+supabase/tests/phase3_claim_security_test.sql
+supabase/tests/phase3_claim_tenant_isolation_test.sql
+supabase/tests/phase3_claim_self_scope_test.sql
+supabase/tests/phase3_claim_audit_test.sql
+```
+
+Tests in this plan show intended coverage only. They do not prove runtime PASS unless executed evidence is recorded.
+
+### 36.5 Unresolved Blockers
+
+| Blocker | Evidence | Readiness |
+| --- | --- | --- |
+| Workflow Spec state-name mismatch | Batch 1 implements `under_review`; Workflow Spec references `payer_processing` and `decision_received` | NOT READY |
+| Decision/payment baseline name mismatch | Batch 1 implements `not_decided`, `not_paid`, and `payment_pending`; Workflow Spec references `pending` and `not_billable` | NOT READY |
+| Transition permission authority | Existing permissions include `claim.submit`, `claim.review`, `claim.cancel`, and `claim.reopen`; no `claim.transition` or `claim.close` verified | NOT READY |
+| Direct Claim-state update protection | New Batch 1 state columns exist; protected direct-update behavior is not proven | NOT READY |
+| Integration idempotency | Batch 2 has `source_system` and optional `external_event_id`; equivalent-payload retry behavior is not implemented | NOT READY |
+| Sequence allocation | Batch 2 table stores `sequence_number`; no allocator function exists | NOT READY |
+
+### 36.6 Runtime-Validation Limitations
+
+- No Batch 3 SQL exists.
+- No Batch 3 test file exists.
+- No database reset was run for this documentation reconciliation.
+- No pgTAP test was executed.
+- No migration was executed.
+- No RLS behavior was dynamically validated.
+- No concurrency test was run.
+- No backend, frontend, API, generated type, fixture, or seed validation was run.
+- Static inspection cannot prove runtime PASS.
+
+---
+
+## 37. Pre-Batch 3 Approved Test Scope
+
+**Status:** Planned, not implemented, not executed
+**Decision Date:** 2026-07-22
+**Approved By:** Project Owner / Product Owner
+**Approval Reference:** Pre-Batch 3 Decision Closure
+
+This section supersedes the unresolved-blocker wording in Section 36 for Batch 3 design closure. D1-D6 are approved; open design blockers: `0`; Batch 3 readiness: `READY FOR BATCH 3`. Remaining entries are implementation gaps and planned tests, not open decisions.
+
+### 37.1 Exact Batch 3 Test Files
+
+| Test file | Purpose | Status |
+| --- | --- | --- |
+| `supabase/tests/phase4_claim_workflow_mutations_test.sql` | Functional tests for allowed transitions, invalid transitions, stale version, atomic snapshot/event update, version increments, sequence allocation, idempotent replay, and rollback | Planned |
+| `supabase/tests/phase4_claim_workflow_mutations_security_test.sql` | Security tests for authorization, cross-tenant and cross-clinic denial, direct state-update rejection, direct event mutation rejection, EXECUTE grants, and sanitized errors | Planned |
+
+### 37.2 Required Functional Coverage
+
+| Coverage | Expected assertion |
+| --- | --- |
+| All allowed transitions | Each D2 transition succeeds through `public.transition_claim_workflow` only |
+| Unlisted transitions | Forbidden with no data change |
+| Same-state transitions | Invalid transition with no event |
+| Terminal behavior | `cancelled` remains terminal |
+| Reopen behavior | `closed -> needs_review` requires `claim.reopen` and reason |
+| Authorized actors | Approved permission and actor combinations succeed |
+| Unauthorized actors | Missing permission fails with no tenant leakage |
+| Cross-tenant access | Known Claim UUID in another organization is not mutated or disclosed |
+| Cross-clinic access | Unauthorized clinic actor is denied |
+| Stale expected version | Version conflict and no data change |
+| Direct state-update rejection | Protected Claim state columns cannot be changed by ordinary update paths |
+| Atomic snapshot/event update | Snapshot update and workflow event insert commit or roll back together |
+| Event insertion failure rollback | Simulated event failure leaves Claim unchanged |
+| Version increment | Successful transition increments `claims.version` exactly once |
+| Sequence uniqueness | Per-Claim `sequence_number` is unique and monotonic |
+| Equivalent external retry | Prior result returned with `idempotent_replay = true` |
+| Conflicting external retry | Idempotency conflict and no data change |
+| Legacy status preservation | `claims.status` remains unchanged by Batch 3 transition function |
+| Non-workflow domain preservation | `decision_status` and `payment_status` are not rewritten by workflow transition |
+
+### 37.3 Required Regression Coverage
+
+Batch 3 must retain relevant existing coverage:
+
+```text
+supabase/tests/phase4_claim_schema_test.sql
+supabase/tests/phase4_claim_workflow_history_test.sql
+supabase/tests/phase3_claim_permissions_test.sql
+supabase/tests/phase3_claim_security_test.sql
+supabase/tests/phase3_claim_tenant_isolation_test.sql
+supabase/tests/phase3_claim_self_scope_test.sql
+supabase/tests/phase3_claim_audit_test.sql
+```
+
+No test is marked implemented or passed by this documentation task.

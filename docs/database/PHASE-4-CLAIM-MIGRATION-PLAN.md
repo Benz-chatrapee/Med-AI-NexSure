@@ -1081,3 +1081,294 @@ Each deferred item requires a separate approved ADR or implementation phase.
 | --- | --- | --- | --- |
 | 2026-07-22 | 0.1 | Created Phase 4 Claim migration plan | AI-assisted Database Architecture Lead |
 | 2026-07-22 | 0.2 | Recorded ADR approval evidence; migration execution still blocked by technical gates | AI-assisted Documentation Lead                                |
+
+## 25. Pre-Batch 3 Workflow Contract Reconciliation
+
+This section reconciles the approved workflow contract with actual Batch 1 and Batch 2 implementation facts. No Batch 3 SQL or tests are created by this documentation update.
+
+### 25.1 Implemented Workflow-State Contract
+
+**Status:** `Confirmed`
+
+| Contract item | Actual value |
+| --- | --- |
+| Type name | `public.claim_workflow_state` |
+| Domain name | `public.claim_workflow_state_domain` |
+| Domain constraint | `claim_workflow_state_domain_chk` |
+| Schema | `public` |
+| Representation | PostgreSQL enum wrapped by a PostgreSQL domain |
+| Workflow values in declaration order | `draft`, `collecting_data`, `validation_pending`, `needs_review`, `ready_to_submit`, `submitted`, `under_review`, `appealed`, `closed`, `cancelled` |
+| Claim column name | `claims.workflow_status` |
+| Column type | `public.claim_workflow_state_domain` |
+| Nullability | Nullable in Batch 1 |
+| Default | No Batch 1 default |
+| Legacy status column | `claims.status` remains present and unchanged |
+| Legacy status constraint | `claims_status_chk` |
+| `claims.version` | `integer not null`; no competing `claims.state_version` exists |
+
+**Conflict:** The approved Workflow Spec references `payer_processing` and `decision_received`, but those values are not implemented. The approved decision/payment baseline names `pending` and `not_billable` are also not implemented; Batch 1 uses `not_decided` and `not_paid` / `payment_pending`. Batch 3 cannot safely implement transitions requiring missing values without a prior approved reconciliation migration or approved terminology decision.
+
+### 25.2 Authoritative Transition Matrix
+
+Only implemented workflow values are listed. Targets not listed are forbidden by default. Same-state transitions are forbidden.
+
+| Source State | Allowed Targets | Permission | Actor Category | Reason | Version Check | Event Required | Milestone | Terminal/Reopen | Status |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `draft` | `collecting_data`, `cancelled` | `claim.update`; `claim.cancel` for cancellation | human | Required for `cancelled`; optional otherwise | `expected_version` required | Yes | None | Not terminal before target | READY WITH FOLLOW-UP |
+| `collecting_data` | `validation_pending`, `needs_review`, `cancelled` | `claim.update`; `claim.review`; `claim.cancel` | human, system | Required for `needs_review` and `cancelled` | `expected_version` required | Yes | None | Not terminal before target | READY WITH FOLLOW-UP |
+| `validation_pending` | `collecting_data`, `needs_review`, `ready_to_submit`, `cancelled` | `claim.review`; `claim.submit` for `ready_to_submit` if approved as submission readiness | human, system | Required for `needs_review` and `cancelled`; readiness evidence required for `ready_to_submit` | `expected_version` required | Yes | None | Not terminal before target | READY WITH FOLLOW-UP |
+| `needs_review` | `collecting_data`, `validation_pending`, `ready_to_submit`, `cancelled` | `claim.review`; `claim.submit` for `ready_to_submit` if approved | human | Required for review outcome and cancellation | `expected_version` required | Yes | None | Not terminal before target | READY WITH FOLLOW-UP |
+| `ready_to_submit` | `submitted`, `needs_review`, `cancelled` | `claim.submit`; `claim.review`; `claim.cancel` | human, system | Required for rollback to `needs_review` and cancellation | `expected_version` required | Yes | `submitted_at` when target is `submitted` | Not terminal before target | READY WITH FOLLOW-UP |
+| `submitted` | `under_review`, `cancelled` | `claim.review`; `claim.cancel` | human, integration, system | Required for cancellation; source reference recommended for integration | `expected_version` required | Yes | None verified | Not terminal before target | READY WITH FOLLOW-UP |
+| `submitted` | Missing approved target `decision_received` | Not verified | integration, system | Required | `expected_version` required | Yes | Not verified | Not terminal before target | Conflict |
+| `under_review` | `appealed`, `closed`, `cancelled` | `claim.review`; `claim.cancel` | human, integration | Required for `appealed`, `closed`, and `cancelled` | `expected_version` required | Yes | None verified | `closed` and `cancelled` terminal after target | READY WITH FOLLOW-UP |
+| `under_review` | Missing approved target `decision_received` / `payer_processing` semantic split | Not verified | integration, system | Required | `expected_version` required | Yes | Not verified | Not terminal before target | Conflict |
+| `appealed` | `under_review`, `closed` | `claim.review`; appeal-specific permission not verified | human, integration | Required | `expected_version` required | Yes | None verified | `closed` terminal after target | READY WITH FOLLOW-UP |
+| `closed` | Dedicated reopen target not verified | `claim.reopen` exists; target-specific authority not verified | human | Required reason code and reason text | `expected_version` required | Yes | None verified | Terminal reopen only | NOT READY |
+| `cancelled` | Dedicated reopen target not verified | `claim.reopen` exists; target-specific authority not verified | human | Required reason code and reason text | `expected_version` required | Yes | None verified | Terminal reopen only | NOT READY |
+
+Transition matrix status: `NOT READY` because approved target states are missing and exact transition permission authority is incomplete.
+
+### 25.3 Proposed Batch 3 Function Contract
+
+**Status:** `NOT READY` until permission authority and state-name conflicts are resolved.
+
+| Contract item | Proposed exact contract |
+| --- | --- |
+| Objective | Implement one controlled workflow transition RPC using actual Batch 1/2 schema while preserving ADR terminal/reopen rules and immutable workflow history. |
+| Exact migration filename | `supabase/migrations/20260722140500_phase4_claim_controlled_operations.sql` |
+| Exact functional test filename | `supabase/tests/phase4_claim_workflow_transition_test.sql` |
+| Exact security test filename | `supabase/tests/phase4_claim_workflow_security_test.sql` |
+| Function name | `public.transition_claim_workflow` |
+| Signature | `public.transition_claim_workflow(p_claim_id uuid, p_target_workflow_status public.claim_workflow_state_domain, p_expected_version integer, p_reason_code text default null, p_reason_text text default null, p_source_system text default 'med_ai_nexsure', p_external_event_id text default null, p_correlation_id text default null, p_occurred_at timestamptz default now(), p_metadata jsonb default '{}'::jsonb)` |
+| Return type | `claim_id uuid`, `workflow_status public.claim_workflow_state_domain`, `version integer`, `event_id uuid`, `sequence_number integer`, `recorded_at timestamptz` |
+| Security mode | `security definer` only if hardened; otherwise `security invoker` is preferred but may not be sufficient for atomic event insert because ordinary direct insert is denied |
+| Safe search path | `set search_path = public, private, pg_temp` |
+| EXECUTE roles | `authenticated` after permission checks; `service_role` for trusted backend/integration execution. Do not grant to `anon` or `public`. |
+| Authorization helper/source | `public.has_permission(text, uuid, uuid)` and existing private Claim helpers where suitable |
+| Tenant and clinic validation | Lock Claim by `p_claim_id`; validate membership and clinic access using the locked Claim row, not caller-supplied tenant values |
+| Assignment/self-scope behavior | Self-scope only for approved draft mutation behavior; elevated transitions require explicit permission independent of assignment |
+| Expected version rule | `p_expected_version` must equal locked `claims.version`; stale version returns conflict and writes nothing |
+| Row-lock strategy | `select ... from public.claims where id = p_claim_id and deleted_at is null for update` before validation, sequence allocation, snapshot update, and event insert |
+| Transition validation source | Static transition matrix in the function for Batch 3, using implemented values only, until an approved transition registry exists |
+| Sequence allocation | `coalesce(max(sequence_number), 0) + 1` for the locked Claim inside the same transaction |
+| Idempotency behavior | For `(organization_id, source_system, external_event_id)` when supplied, equivalent retry returns the recorded result or no-op; conflicting payload is rejected |
+| Snapshot update | Update only `claims.workflow_status`, `claims.state_updated_at`, `claims.state_updated_by`, and `claims.version` |
+| Event insertion | Insert one `claim_workflow_events` row with before/after state, before/after version, actor/source/reason/timestamps, sequence, metadata, and correlation |
+| Milestone behavior | Set `submitted_at` only for first successful transition to `submitted`; other milestones are `Not Verified` in current Batch 1/2 schema |
+| Error behavior | Sanitized not-found/unauthorized, denied, invalid transition, stale version, duplicate conflict, invalid actor/source, and rollback-on-event-failure behavior |
+| Audit behavior | Workflow event is mandatory; existing audit trigger behavior is not enough alone for Batch 3 transition evidence |
+
+Required operation order: resolve actor -> locate and lock Claim -> validate tenant/clinic/permission -> validate source state and expected version -> validate transition -> allocate event sequence -> update snapshot/version/milestone -> insert event -> return sanitized result.
+
+Snapshot update and event insertion must be atomic. No partial write is allowed.
+
+### 25.4 Version, Event Mapping, Idempotency, Security, and Errors
+
+| Area | Contract | Status |
+| --- | --- | --- |
+| Version/concurrency | `claims.version` is the sole optimistic-lock counter; input uses `p_expected_version`; success increments once; stale version changes nothing; event stores `claim_version_before` and `claim_version_after`; sequence allocation occurs inside the Claim lock. | READY WITH FOLLOW-UP |
+| Manual idempotency | Manual transitions may omit `external_event_id`; optimistic locking prevents duplicate state changes; same-state retry must not insert an event. | READY WITH FOLLOW-UP |
+| Integration idempotency | Use `source_system` and `external_event_id`; equivalent duplicate returns prior result/no-op; conflicting duplicate rejects; retry does not increment version or insert another event; ordering uses `sequence_number`, not timestamp alone. | NOT READY |
+| Security | Authenticate actor, validate organization/clinic scope, require explicit transition permission, restrict EXECUTE, protect direct Claim-state updates, deny direct event mutation, preserve service-role exception, keep AI non-authoritative. | NOT READY |
+| Error handling | Sanitized not-found/unauthorized, denied, invalid transition, stale version, duplicate equivalent no-op, duplicate conflicting conflict, invalid actor/source denied, event insert failure full rollback. | READY WITH FOLLOW-UP |
+
+| Concept | Actual Column | Required | Population Rule | Gap |
+| --- | --- | --- | --- | --- |
+| Claim ID | `claim_id` | Yes | Locked Claim `id` | None |
+| Organization | `organization_id` | Yes | Locked Claim `organization_id` | None |
+| Clinic | `clinic_id` | Yes | Locked Claim `clinic_id` | None |
+| From status | `from_workflow_status` | Initial event may be null; transition event required | Current locked `claims.workflow_status` before update | Batch 1 leaves snapshot nullable |
+| To status | `to_workflow_status` | Yes | `p_target_workflow_status` after validation | None |
+| Sequence | `sequence_number` | Yes | Next integer per locked Claim | Batch 2 does not allocate |
+| Version before | `claim_version_before` | Yes | Locked `claims.version` before update | None |
+| Version after | `claim_version_after` | Yes | `claims.version + 1` | None |
+| Actor type | `actor_type` | Yes | `human`, `integration`, `system`, or `migration` | Actor resolution not implemented |
+| Actor user/reference | `actor_user_id`, `actor_reference` | Conditional | Human requires `actor_user_id`; non-human may use `actor_reference` | Integration identity rules not verified |
+| Source system | `source_system` | Yes | Nonblank function input or controlled default | Exact source registry not verified |
+| Reason | `reason_code`, `reason_text` | Conditional | Required for material exception, cancellation, close, appeal, and reopen | Reason-code registry not implemented |
+| External event ID | `external_event_id` | Required for integration idempotency | Integration source event identity | Optional in Batch 2 |
+| Correlation ID | `correlation_id` | Recommended | Request or integration correlation | Optional in Batch 2 |
+| Occurred/effective time | `occurred_at` | Yes | Business event time; default only for user action | No separate `effective_at` column |
+| Recorded time | `recorded_at`, `created_at` | Yes | Database timestamp | None |
+| Metadata | `metadata` | Yes | JSON object with non-authoritative supplemental data only | No schema beyond JSON object |
+
+### 25.5 Batch 3 Exact Contract and Readiness
+
+| Item | Exact value |
+| --- | --- |
+| Objective | Implement controlled Claim workflow transitions using actual Batch 1 split-state and Batch 2 workflow-event schema only. |
+| Exact migration filename | `supabase/migrations/20260722140500_phase4_claim_controlled_operations.sql` |
+| Exact functional test filename | `supabase/tests/phase4_claim_workflow_transition_test.sql` |
+| Exact security test filename | `supabase/tests/phase4_claim_workflow_security_test.sql` |
+| Exact function name and signature | `public.transition_claim_workflow(p_claim_id uuid, p_target_workflow_status public.claim_workflow_state_domain, p_expected_version integer, p_reason_code text default null, p_reason_text text default null, p_source_system text default 'med_ai_nexsure', p_external_event_id text default null, p_correlation_id text default null, p_occurred_at timestamptz default now(), p_metadata jsonb default '{}'::jsonb)` |
+| Required reusable helpers | `public.has_permission(text, uuid, uuid)`; existing private Claim scope helpers where compatible |
+| Allowed transition source | Static Batch 3 matrix above until a transition registry is approved |
+| Acceptance criteria | Valid transitions update snapshot, increment version once, insert exactly one event, preserve tenant/clinic scope, reject invalid/stale/unauthorized/duplicate-conflicting operations, and return sanitized results |
+| Required regressions | Batch 1 schema contract; Batch 2 workflow-history contract; Phase 3 Claim permissions/security/tenant-isolation/self-scope/audit suites by repository convention |
+| Explicit exclusions | No Batch 3 SQL in this task; no decision/payment/appeal implementation; no backfill; no generated types; no frontend/backend/API changes |
+
+| Contract Area | Evidence | Status | Blocker/Follow-up |
+| --- | --- | --- | --- |
+| Workflow values | Batch 1 migration and schema test | READY WITH FOLLOW-UP | Conflict with Workflow Spec names |
+| Transition matrix | Approved spec plus implemented values | NOT READY | `payer_processing` and `decision_received` missing; `claim.transition` / `claim.close` missing |
+| Permission authority | Phase 3 permission migration and Batch 2 RLS | NOT READY | No verified transition-specific permission |
+| Function signature | Proposed exact Batch 3 contract | READY WITH FOLLOW-UP | Security mode and grants need implementation review |
+| Version/locking | `claims.version`; Batch 2 version columns | READY WITH FOLLOW-UP | Batch 3 row lock and stale-write logic absent |
+| Event mapping | Batch 2 `claim_workflow_events` columns | READY WITH FOLLOW-UP | `effective_at` absent; integration identity optional |
+| Sequence/idempotency | `sequence_number`; unique external identity | NOT READY | Sequence allocation and equivalent-payload retry not implemented |
+| Snapshot/milestones | Batch 1 snapshot columns; `submitted_at` exists | READY WITH FOLLOW-UP | Snapshot nullable; only `submitted_at` milestone verified for proposed use |
+| Direct mutation protection | Batch 2 event grants; Phase 3 Claim update policies | NOT READY | New Batch 1 state-column direct update protection not proven |
+| Test scope | Existing Batch 1/2 tests; proposed exact Batch 3 tests | READY WITH FOLLOW-UP | Tests are planned, not run; Batch 3 files absent |
+
+Overall readiness: `NOT READY`.
+
+`READY WITH CONDITIONS` is not appropriate because unresolved follow-ups affect authorization, optimistic locking, atomicity, event identity, and history integrity.
+
+---
+
+## 26. Pre-Batch 3 Approved Implementation Contract
+
+**Status:** Approved
+**Decision Date:** 2026-07-22
+**Approved By:** Project Owner / Product Owner
+**Approval Reference:** Pre-Batch 3 Decision Closure
+
+This section supersedes earlier `NOT READY` reconciliation language for Batch 3 design closure. Open design blockers: `0`. Remaining gaps are implementation work inside the approved Batch 3 migration and test scope.
+
+### 26.1 Objective
+
+Implement controlled Claim workflow transitions using the actual Batch 1 split-state schema and Batch 2 workflow-event schema.
+
+### 26.2 Exact Files for Batch 3
+
+| Artifact | Exact path |
+| --- | --- |
+| Migration filename | `supabase/migrations/20260722140300_phase4_claim_controlled_workflow_mutations.sql` |
+| Functional test filename | `supabase/tests/phase4_claim_workflow_mutations_test.sql` |
+| Security test filename | `supabase/tests/phase4_claim_workflow_mutations_security_test.sql` |
+
+The migration timestamp is the next unused repository timestamp after `20260722140200_phase4_claim_workflow_events.sql`.
+
+### 26.3 Function Contract
+
+Function:
+
+```text
+public.transition_claim_workflow(
+  p_claim_id uuid,
+  p_target_status public.claim_workflow_state_domain,
+  p_expected_version integer,
+  p_reason_code text,
+  p_reason_text text default null,
+  p_source_system text default 'internal',
+  p_external_event_id text default null,
+  p_correlation_id uuid default null,
+  p_occurred_at timestamptz default null
+)
+```
+
+Return:
+
+```text
+claim_id uuid
+previous_workflow_status public.claim_workflow_state_domain
+workflow_status public.claim_workflow_state_domain
+version integer
+workflow_event_id uuid
+state_updated_at timestamptz
+idempotent_replay boolean
+```
+
+Security: `SECURITY DEFINER`, fixed safe `search_path`, schema-qualified objects, EXECUTE denied to `PUBLIC` and `anon`, EXECUTE granted only to approved authenticated/service roles, actor and tenant derived from trusted context.
+
+### 26.4 Transition Matrix
+
+All unlisted transitions are forbidden. Same-state transitions are forbidden. `cancelled` is terminal in Batch 3.
+
+| Source | Target | Permission | Actor | Reason |
+| --- | --- | --- | --- | --- |
+| `draft` | `collecting_data` | `claim.update` | Human/service | Optional |
+| `collecting_data` | `validation_pending` | `claim.submit` | Human/service | Optional |
+| `validation_pending` | `needs_review` | `claim.review` | Reviewer/service | Required |
+| `validation_pending` | `ready_to_submit` | `claim.review` | Reviewer/service | Optional |
+| `needs_review` | `validation_pending` | `claim.review` | Reviewer | Required |
+| `ready_to_submit` | `submitted` | `claim.submit` | Human/integration | Optional |
+| `submitted` | `under_review` | `claim.review` | Integration/reviewer fallback | Optional |
+| `under_review` | `appealed` | `claim.review` | Reviewer | Required |
+| `under_review` | `closed` | `claim.review` | Reviewer | Required |
+| `appealed` | `under_review` | `claim.review` | Reviewer/integration | Required |
+| `closed` | `needs_review` | `claim.reopen` | Authorized reviewer | Required |
+| Any non-terminal allowed state | `cancelled` | `claim.cancel` | Authorized user | Required |
+
+Do not create `claim.transition` or `claim.close`; `claim.review` is the approved MVP authority for operational closure.
+
+### 26.5 Locking, Idempotency, and Sequence
+
+Required order:
+
+```text
+resolve actor
+-> locate and lock Claim
+-> validate tenant, clinic, membership, and permission
+-> validate current state and expected version
+-> validate transition
+-> check idempotency
+-> allocate sequence
+-> update snapshot/version/milestone
+-> insert workflow event
+-> return sanitized result
+```
+
+`claims.version` is the sole optimistic-lock counter and remains `integer`. Do not introduce `state_version`. Success increments version exactly once; stale version changes nothing; failed transition inserts no event.
+
+External integration transitions require `source_system` and `external_event_id`. Use the actual Batch 2 uniqueness scope `organization_id + source_system + external_event_id`. Equivalent payload retry returns prior result with `idempotent_replay = true`; conflicting retry fails with no data change.
+
+Sequence allocation occurs inside the locked Claim transaction:
+
+```text
+coalesce(max(sequence_number) for the Claim, 0) + 1
+```
+
+### 26.6 Permissions and Direct-Update Protection
+
+Batch 3 must restrict ordinary direct updates to:
+
+```text
+workflow_status
+version
+state_updated_at
+state_updated_by
+workflow milestone fields
+```
+
+Preserve already-authorized non-state Claim updates. Restrict direct workflow-event INSERT/UPDATE/DELETE for authenticated users. Repository-compatible mechanism: protected column privileges plus controlled function execution, without redesigning unrelated Claim RLS/RBAC.
+
+### 26.7 Acceptance Criteria and Regression Tests
+
+Acceptance criteria:
+
+- D1-D6 are implemented exactly.
+- Allowed transitions update snapshot, increment version once, and insert exactly one event.
+- Invalid, same-state, stale, unauthorized, cross-tenant, cross-clinic, and conflicting-idempotency attempts write nothing.
+- Equivalent external retry returns the prior result with replay flag true.
+- Direct protected state-column updates and direct event mutations are rejected.
+- Error responses are sanitized and do not leak PHI, tenant existence, policy internals, or raw SQL.
+
+Regression tests:
+
+```text
+supabase/tests/phase4_claim_schema_test.sql
+supabase/tests/phase4_claim_workflow_history_test.sql
+supabase/tests/phase3_claim_permissions_test.sql
+supabase/tests/phase3_claim_security_test.sql
+supabase/tests/phase3_claim_tenant_isolation_test.sql
+supabase/tests/phase3_claim_self_scope_test.sql
+supabase/tests/phase3_claim_audit_test.sql
+```
+
+### 26.8 Exclusions and Readiness
+
+Exclusions: no decision/payment/appeal implementation, no appeal entity, no backfill, no generated types, no frontend/backend/API changes, no fixtures, no seed data, and no legacy-status removal.
+
+Batch 3 readiness: `READY FOR BATCH 3`.

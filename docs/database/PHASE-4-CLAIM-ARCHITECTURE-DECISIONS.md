@@ -872,3 +872,255 @@ No confirmed P0 blocker is recorded by static repository evidence. This does not
 | 2026-07-22 | 0.1 | Created mandatory Phase 4 Claim ADRs, approval matrix, blockers, guardrails, traceability, dependencies, assumptions, and deferred scope | AI-assisted Technical Documentation Lead |
 | 2026-07-22 | 0.2 | Revised approval terminology, evidence precision, formal appeal rule, payment definitions, Phase 4 MVP adjudication scope, reopen rules, role-specific approvals, event identity, currency/reconciliation controls, and P0 validation caveat | AI-assisted Technical Documentation Lead |
 | 2026-07-22 | 0.3 | Recorded Project Owner / Product Owner approval for ADR-001 through ADR-008 and retained unresolved technical P1 gates | AI-assisted Technical Documentation Lead |
+
+## 16. Pre-Batch 3 Contract Reconciliation Notes
+
+These notes reconcile approved ADR direction with the implemented Phase 4 Batch 1 split-state schema and Batch 2 workflow-history schema. They do not change ADR decision text, rationale, version, approval status, or implementation status.
+
+### 16.1 Implemented State Contract
+
+**Confirmed**
+
+| Area | Actual implementation |
+| --- | --- |
+| Workflow type | `public.claim_workflow_state` |
+| Workflow domain | `public.claim_workflow_state_domain` with constraint `claim_workflow_state_domain_chk` |
+| Workflow values in declaration order | `draft`, `collecting_data`, `validation_pending`, `needs_review`, `ready_to_submit`, `submitted`, `under_review`, `appealed`, `closed`, `cancelled` |
+| Decision type | `public.claim_decision_state` |
+| Decision domain | `public.claim_decision_state_domain` with constraint `claim_decision_state_domain_chk` |
+| Decision values in declaration order | `not_decided`, `approved`, `partially_approved`, `rejected`, `request_information`, `voided` |
+| Payment type | `public.claim_payment_state` |
+| Payment domain | `public.claim_payment_state_domain` with constraint `claim_payment_state_domain_chk` |
+| Payment values in declaration order | `not_paid`, `payment_pending`, `partially_paid`, `paid`, `payment_failed`, `partially_refunded`, `refunded`, `reversed` |
+| Claim columns | `claims.workflow_status`, `claims.decision_status`, `claims.payment_status`, `claims.state_updated_at`, `claims.state_updated_by`, `claims.legacy_status_migration_state` |
+| Split-state nullability | All Batch 1 split-state and state metadata columns are nullable |
+| Split-state defaults | No Batch 1 default exists for `workflow_status`, `decision_status`, or `payment_status` |
+| Legacy status | `claims.status` remains present with constraint `claims_status_chk` unchanged |
+| Version | `claims.version` remains `integer not null`; no `claims.state_version` exists |
+
+### 16.2 Conflicts Against Approved Workflow Spec
+
+**Conflict**
+
+The implemented Batch 1 enum values do not exactly match the approved Workflow Spec state names. The following approved-spec values are not implemented in Batch 1:
+
+```text
+payer_processing
+decision_received
+pending
+not_billable
+```
+
+The following implemented values are not named in the approved Workflow Spec target sets:
+
+```text
+under_review
+not_decided
+request_information
+not_paid
+payment_pending
+```
+
+Batch 3 must use actual implemented values for SQL object references. Because target transition behavior in the Workflow Spec depends on missing states, any Batch 3 transition that requires `payer_processing`, `decision_received`, `pending`, or `not_billable` is a `Conflict` until the ADR/spec or Batch 1 schema is reconciled by an approved follow-up.
+
+### 16.3 Workflow History Contract
+
+**Confirmed**
+
+Batch 2 introduced `public.claim_workflow_events` with typed workflow columns, tenant-safe Claim foreign key, per-Claim sequence uniqueness, forward version check, RLS, and no ordinary authenticated insert/update/delete grants.
+
+Actual Batch 2 event columns used for workflow history are:
+
+```text
+id
+organization_id
+clinic_id
+claim_id
+from_workflow_status
+to_workflow_status
+sequence_number
+claim_version_before
+claim_version_after
+actor_type
+actor_user_id
+actor_reference
+source_system
+external_event_id
+correlation_id
+reason_code
+reason_text
+occurred_at
+received_at
+recorded_at
+created_at
+metadata
+supersedes_event_id
+```
+
+**READY WITH FOLLOW-UP:** The table supports append-only workflow history foundations, but Batch 2 explicitly does not allocate sequences concurrently, mutate Claim snapshots, create transition functions, backfill history, or implement automatic triggers.
+
+### 16.4 Security and Authority Notes
+
+**Confirmed**
+
+Existing exact relevant permission codes include:
+
+```text
+claim.read
+claim.update
+claim.submit
+claim.review
+claim.reopen
+claim.cancel
+claim.decide
+claim.decision.supersede
+claim.payment.record
+claim.payment.allocate
+claim.payment.reconcile
+claim.audit.read
+```
+
+Existing authorization helpers include `public.has_permission(text, uuid, uuid)` and private Claim helper functions in the Phase 3 RLS migration. `claim_workflow_events` uses `public.has_permission(...)` for read access. Direct writes to `claim_workflow_events` are restricted to `service_role`.
+
+**Conflict / Open Decision**
+
+No verified `claim.transition` or `claim.close` permission exists. No verified Batch 3 workflow transition permission authority exists that safely authorizes all proposed workflow transitions. Generic `claim.update` is insufficient for workflow-state transitions unless an approved controlled operation explicitly narrows its use.
+
+### 16.5 ADR Traceability Impact
+
+| ADR | Reconciliation impact |
+| --- | --- |
+| ADR-001 | `closed` exists as implemented workflow value, but no `claim.close` permission or controlled close operation is verified. |
+| ADR-002 | `appealed` exists as implemented workflow value, but dedicated Appeal entity implementation remains out of scope and absent from Batch 1/2 evidence. |
+| ADR-003 | Payment summary states exist with implemented names, but `not_billable` from the spec is not implemented; use `not_paid` only if approved as equivalent. |
+| ADR-004 | No change; dedicated line decisions remain deferred. |
+| ADR-005 | `claim.reopen` permission exists, but no controlled reopen operation or allowed target contract is verified. |
+| ADR-006 | Decision states exist with implemented names, but payer decision event identity remains outside workflow-history coverage. |
+| ADR-007 | Payment permissions exist for record/allocate/reconcile; refund/reversal workflow authority remains unverified. |
+| ADR-008 | Legacy `claims.status` remains unchanged and split-state columns are nullable with no defaults or backfill. |
+
+Pre-Batch 3 readiness from ADR reconciliation: superseded by Section 17 decision closure. Design blockers are closed; remaining items are Batch 3 implementation gaps.
+
+## 17. Pre-Batch 3 Decision Closure
+
+**Status:** Approved
+**Decision Date:** 2026-07-22
+**Approved By:** Project Owner / Product Owner
+**Approval Reference:** Pre-Batch 3 Decision Closure
+
+This section closes the six remaining Batch 3 design blockers. It extends ADR traceability without reopening ADR-001 through ADR-008.
+
+### 17.1 D1 - Authoritative State Contract
+
+Approved: use actual Batch 1 state values as authoritative.
+
+| Domain | Authoritative values |
+| --- | --- |
+| Workflow | `draft`, `collecting_data`, `validation_pending`, `needs_review`, `ready_to_submit`, `submitted`, `under_review`, `appealed`, `closed`, `cancelled` |
+| Decision | `not_decided`, `approved`, `partially_approved`, `rejected`, `request_information`, `voided` |
+| Payment | `not_paid`, `payment_pending`, `partially_paid`, `paid`, `payment_failed`, `partially_refunded`, `refunded`, `reversed` |
+
+Mappings: `payer_processing -> under_review`; `decision_received -> decision_status`; decision `pending -> not_decided`; payment `pending -> payment_pending`; `not_billable -> not_paid` with reason context.
+
+### 17.2 D2 - Transition and Permission Matrix
+
+Approved: Batch 3 uses the following matrix. All unlisted and same-state transitions are forbidden. `cancelled` is terminal.
+
+| Source | Target | Permission | Actor | Reason |
+| --- | --- | --- | --- | --- |
+| `draft` | `collecting_data` | `claim.update` | Human/service | Optional |
+| `collecting_data` | `validation_pending` | `claim.submit` | Human/service | Optional |
+| `validation_pending` | `needs_review` | `claim.review` | Reviewer/service | Required |
+| `validation_pending` | `ready_to_submit` | `claim.review` | Reviewer/service | Optional |
+| `needs_review` | `validation_pending` | `claim.review` | Reviewer | Required |
+| `ready_to_submit` | `submitted` | `claim.submit` | Human/integration | Optional |
+| `submitted` | `under_review` | `claim.review` | Integration/reviewer fallback | Optional |
+| `under_review` | `appealed` | `claim.review` | Reviewer | Required |
+| `under_review` | `closed` | `claim.review` | Reviewer | Required |
+| `appealed` | `under_review` | `claim.review` | Reviewer/integration | Required |
+| `closed` | `needs_review` | `claim.reopen` | Authorized reviewer | Required |
+| Any non-terminal allowed state | `cancelled` | `claim.cancel` | Authorized user | Required |
+
+Closure authority is `claim.review`. Reopen from `closed` targets `needs_review` and does not rewrite decision or payment history. Do not create `claim.transition` or `claim.close` in Batch 3.
+
+### 17.3 D3 - Controlled Function Contract
+
+Approved function: `public.transition_claim_workflow`.
+
+Inputs:
+
+```text
+p_claim_id uuid
+p_target_status public.claim_workflow_state_domain
+p_expected_version integer
+p_reason_code text
+p_reason_text text default null
+p_source_system text default 'internal'
+p_external_event_id text default null
+p_correlation_id uuid default null
+p_occurred_at timestamptz default null
+```
+
+Return:
+
+```text
+claim_id uuid
+previous_workflow_status public.claim_workflow_state_domain
+workflow_status public.claim_workflow_state_domain
+version integer
+workflow_event_id uuid
+state_updated_at timestamptz
+idempotent_replay boolean
+```
+
+Security: `SECURITY DEFINER`, fixed safe `search_path`, schema-qualified objects, no EXECUTE to `PUBLIC` or `anon`, EXECUTE only for approved authenticated/service roles, and actor/tenant derived from trusted context.
+
+Atomic order: resolve actor -> lock Claim -> validate tenant/clinic/membership/permission -> validate current state and expected version -> validate transition -> check idempotency -> allocate sequence -> update snapshot/version/milestone -> insert workflow event -> return sanitized result.
+
+### 17.4 D4 - Version and Direct-Update Protection
+
+Approved: `claims.version` is the sole optimistic-lock counter. `claims.version` is implemented as `integer`; no `state_version` is allowed. Successful transition increments once. Stale versions and failed transitions write nothing and insert no event.
+
+Batch 3 must restrict ordinary direct updates to protected state columns while preserving already-authorized non-state Claim updates. Direct workflow-event INSERT/UPDATE/DELETE remains restricted. Repository-compatible mechanism: column-level privileges and controlled function execution, plus RLS/RBAC tests, without redesigning unrelated Claim RLS.
+
+### 17.5 D5 - Idempotency Contract
+
+Internal human transition: `external_event_id` optional; optimistic locking prevents duplicate state mutation; repeated same-state request creates no event.
+
+External integration transition: `source_system` and `external_event_id` required. Use actual Batch 2 uniqueness scope `organization_id + source_system + external_event_id`.
+
+Equivalent payload compares `claim_id`, `target_workflow_status`, `expected_version`, normalized `reason_code`, normalized `reason_text`, `source_system`, and `occurred_at`. Equivalent retry returns the prior result with `idempotent_replay = true`, no version increment, and no new event. Conflicting retry fails with no data change.
+
+### 17.6 D6 - Sequence Allocation
+
+Approved: per-Claim monotonic sequencing.
+
+```text
+lock Claim row
+-> validate expected version
+-> check idempotency
+-> calculate next sequence as coalesce(max(sequence_number), 0) + 1
+-> update Claim
+-> insert event
+```
+
+Batch 2 already provides `claim_workflow_events_claim_sequence_uq` on `(claim_id, sequence_number)`, which remains the final duplicate safeguard.
+
+### 17.7 Blocker Closure Matrix
+
+| Blocker | Approved Resolution | Repository Gap | Batch 3 Action | Status |
+| --- | --- | --- | --- | --- |
+| State names | D1 | Earlier docs used legacy terms | Use Batch 1 values and legacy mappings | Closed |
+| Transition permissions/close authority | D2 | Function not implemented yet | Implement matrix with existing `claim.update`, `claim.submit`, `claim.review`, `claim.reopen`, `claim.cancel` | Closed |
+| Function contract | D3 | `public.transition_claim_workflow` absent | Create controlled function in Batch 3 | Closed |
+| Version/direct-update protection | D4 | Protected state-column updates not proven | Add column/function privileges and tests | Closed |
+| Idempotency | D5 | Equivalent-payload replay not implemented | Implement with Batch 2 external identity scope | Closed |
+| Sequence allocation | D6 | Allocator function absent | Allocate while Claim row is locked | Closed |
+
+Open design blockers: `0`
+
+### 17.8 Batch 3 Readiness
+
+`READY FOR BATCH 3`
+
+Remaining gaps are implementable inside the approved Batch 3 migration/tests and do not require another business decision.

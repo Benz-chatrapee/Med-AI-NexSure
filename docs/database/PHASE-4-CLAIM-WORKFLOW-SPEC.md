@@ -2,11 +2,11 @@
 
 ## Med AI NexSure — Enterprise Healthcare & Insurance Intelligence Platform
 
-**Document Type:** Database and Domain Architecture Specification  
-**Phase:** Phase 4 — Core Claim Workflow  
-**Status:** Draft for Implementation  
-**Primary Domains:** Claim Workflow, Payer Decision, Payment Settlement, Appeal, Audit, RBAC, RLS  
-**Platform:** PostgreSQL / Supabase / Next.js / TypeScript  
+**Document Type:** Database and Domain Architecture Specification
+**Phase:** Phase 4 — Core Claim Workflow
+**Status:** Draft for Implementation
+**Primary Domains:** Claim Workflow, Payer Decision, Payment Settlement, Appeal, Audit, RBAC, RLS
+**Platform:** PostgreSQL / Supabase / Next.js / TypeScript
 **Language Direction:** English-first with Thai supporting explanations
 
 ---
@@ -125,34 +125,34 @@ The system must support independent states while preventing contradictory combin
 
 The Claim architecture must follow these principles:
 
-1. **Separate state domains**  
+1. **Separate state domains**
    Workflow, decision, and payment states are independent.
 
-2. **Current state for operational queries**  
+2. **Current state for operational queries**
    Current-state fields remain on `claims` for queues, filters, and dashboards.
 
-3. **Domain events for history**  
+3. **Domain events for history**
    Workflow, payer decision, payment, and appeal histories are stored separately.
 
-4. **Database remains authoritative**  
+4. **Database remains authoritative**
    TypeScript and Zod validation supplement, but do not replace, database integrity.
 
-5. **Tenant isolation by default**  
+5. **Tenant isolation by default**
    Organization and clinic access are enforced through database membership and RLS.
 
-6. **Human-in-the-Loop**  
+6. **Human-in-the-Loop**
    AI may recommend but must not approve, reject, pay, refund, reverse, or close Claims.
 
-7. **No lost updates**  
+7. **No lost updates**
    Optimistic concurrency and row locking protect sensitive multi-actor workflows.
 
-8. **External events are idempotent**  
+8. **External events are idempotent**
    Duplicate payer or payment events must not create duplicate history or amounts.
 
-9. **Forward-only migration**  
+9. **Forward-only migration**
    Previously applied migrations must not be rewritten.
 
-10. **Audit every material change**  
+10. **Audit every material change**
     Sensitive changes require actor, source, reason, timestamps, and correlation context.
 
 ---
@@ -880,7 +880,7 @@ reason_code
 reason_text
 ```
 
-`reason_code` supports analytics.  
+`reason_code` supports analytics.
 `reason_text` provides context.
 
 The platform must not rely only on unrestricted free text.
@@ -1772,3 +1772,178 @@ Status: NOT RUN
 ```
 
 No implementation or validation success is claimed by this specification.
+
+---
+
+## 38. Pre-Batch 3 Decision Closure Contract
+
+**Status:** Approved
+**Decision Date:** 2026-07-22
+**Approved By:** Project Owner / Product Owner
+**Approval Reference:** Pre-Batch 3 Decision Closure
+
+This section is the authoritative Batch 3 controlled workflow mutation contract. Earlier references in this document to `payer_processing`, `decision_received`, decision `pending`, payment `pending`, or `not_billable` are legacy terminology unless explicitly mapped below.
+
+### 38.1 Authoritative State Values
+
+Workflow uses the actual Batch 1 `public.claim_workflow_state_domain` values:
+
+```text
+draft
+collecting_data
+validation_pending
+needs_review
+ready_to_submit
+submitted
+under_review
+appealed
+closed
+cancelled
+```
+
+Decision uses `public.claim_decision_state_domain`:
+
+```text
+not_decided
+approved
+partially_approved
+rejected
+request_information
+voided
+```
+
+Payment uses `public.claim_payment_state_domain`:
+
+```text
+not_paid
+payment_pending
+partially_paid
+paid
+payment_failed
+partially_refunded
+refunded
+reversed
+```
+
+Legacy terminology mapping:
+
+| Legacy term | Authoritative Batch 3 meaning |
+| --- | --- |
+| `payer_processing` | Use `under_review` |
+| `decision_received` | Not a workflow state; represented by `decision_status` |
+| decision `pending` | Use `not_decided` |
+| payment `pending` | Use `payment_pending` |
+| `not_billable` | Use `not_paid` with reason context where required |
+
+### 38.2 Transition and Permission Matrix
+
+All unlisted transitions are forbidden. Same-state transitions are forbidden. `cancelled` is terminal in Batch 3.
+
+| Source | Target | Permission | Actor | Reason |
+| --- | --- | --- | --- | --- |
+| `draft` | `collecting_data` | `claim.update` | Human/service | Optional |
+| `collecting_data` | `validation_pending` | `claim.submit` | Human/service | Optional |
+| `validation_pending` | `needs_review` | `claim.review` | Reviewer/service | Required |
+| `validation_pending` | `ready_to_submit` | `claim.review` | Reviewer/service | Optional |
+| `needs_review` | `validation_pending` | `claim.review` | Reviewer | Required |
+| `ready_to_submit` | `submitted` | `claim.submit` | Human/integration | Optional |
+| `submitted` | `under_review` | `claim.review` | Integration/reviewer fallback | Optional |
+| `under_review` | `appealed` | `claim.review` | Reviewer | Required |
+| `under_review` | `closed` | `claim.review` | Reviewer | Required |
+| `appealed` | `under_review` | `claim.review` | Reviewer/integration | Required |
+| `closed` | `needs_review` | `claim.reopen` | Authorized reviewer | Required |
+| Any non-terminal allowed state | `cancelled` | `claim.cancel` | Authorized user | Required |
+
+Rules:
+
+- Reopen from `closed` targets `needs_review`.
+- Reopen does not rewrite decision or payment history.
+- Appeal entity implementation remains out of scope for Batch 3.
+- `claim.review` is the approved MVP authority for operational closure.
+- Batch 3 does not create `claim.transition` or `claim.close`.
+
+### 38.3 Controlled Function and Data Protection
+
+Batch 3 approves exactly one controlled mutation function:
+
+```text
+public.transition_claim_workflow(
+  p_claim_id uuid,
+  p_target_status public.claim_workflow_state_domain,
+  p_expected_version integer,
+  p_reason_code text,
+  p_reason_text text default null,
+  p_source_system text default 'internal',
+  p_external_event_id text default null,
+  p_correlation_id uuid default null,
+  p_occurred_at timestamptz default null
+)
+```
+
+Return one row:
+
+```text
+claim_id uuid
+previous_workflow_status public.claim_workflow_state_domain
+workflow_status public.claim_workflow_state_domain
+version integer
+workflow_event_id uuid
+state_updated_at timestamptz
+idempotent_replay boolean
+```
+
+Required operation order:
+
+```text
+resolve actor
+-> locate and lock Claim
+-> validate tenant, clinic, membership, and permission
+-> validate current state and expected version
+-> validate transition
+-> check idempotency
+-> allocate sequence
+-> update snapshot/version/milestone
+-> insert workflow event
+-> return sanitized result
+```
+
+`claims.version` is the sole optimistic-lock counter. Do not introduce `state_version`. A successful transition increments `claims.version` exactly once; stale versions and failed transitions change nothing and insert no event. Controlled mutation is the only supported application path for `workflow_status`, `version`, `state_updated_at`, `state_updated_by`, and workflow milestone fields. Ordinary direct updates to protected state columns and direct authenticated `claim_workflow_events` writes must be restricted.
+
+### 38.4 Idempotency, Sequence, and Error Contract
+
+Internal human transitions may omit `external_event_id`; optimistic locking prevents duplicate mutation. External integration transitions require `source_system` and `external_event_id` and use the implemented Batch 2 uniqueness scope `organization_id + source_system + external_event_id`.
+
+Equivalent payload comparison normalizes:
+
+```text
+claim_id
+target_workflow_status
+expected_version
+reason_code
+reason_text after null/whitespace normalization
+source_system
+occurred_at
+```
+
+Equivalent retries return the prior result with `idempotent_replay = true`, without version increment or new event. Conflicting retries fail with no data change.
+
+Sequence allocation is per Claim and monotonic inside the locked Claim transaction:
+
+```text
+next_sequence = coalesce(max(sequence_number) for the Claim, 0) + 1
+```
+
+Error behavior:
+
+| Condition | Result | Data Change |
+| --- | --- | --- |
+| Missing/inaccessible Claim | Sanitized not-found/denied | None |
+| Missing permission | Denied without tenant leakage | None |
+| Invalid transition | Domain validation error | None |
+| Same-state transition | Invalid transition | None |
+| Stale version | Version conflict | None |
+| Equivalent external retry | Prior result, replay flag true | None |
+| Conflicting external retry | Idempotency conflict | None |
+| Event insertion failure | Full rollback | None |
+
+Open design blockers: `0`.
