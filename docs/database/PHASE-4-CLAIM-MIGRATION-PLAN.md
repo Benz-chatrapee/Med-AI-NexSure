@@ -16,9 +16,13 @@
 | Created date | 2026-07-22 |
 | Last updated | 2026-07-22 |
 | Repository branch | `main` |
-| Approval basis | ADR-001 through ADR-008 |
+| Approval basis | ADR-001 through ADR-008 approved by Project Owner / Product Owner |
+| ADR approval evidence | Satisfied |
+| ADR approval date | 2026-07-22 |
+| ADR approval authority | Project Owner / Product Owner |
+| Migration readiness | NOT READY - ADR approval is satisfied, but remaining technical P1 gates require verification before migration execution |
 | Required reviewers | Product Owner, Claim Domain Owner, Database Architect, Security Lead, Finance Owner, Integration Owner, Backend Lead, QA Lead |
-| Execution gate | Do not execute migrations until ADR approval evidence and all P1 dependencies are recorded |
+| Execution gate | Do not execute migrations until remaining technical P1 dependencies are recorded and repository baseline validation passes |
 
 ## 2. Goal
 
@@ -78,14 +82,14 @@ The implementation lead must verify and record all items below before creating t
 
 | ID | Required Evidence | Pass Condition |
 | --- | --- | --- |
-| GATE-001 | ADR approval evidence | ADR-001 through ADR-008 are marked `Approved`, with approvers and approval date |
-| GATE-002 | Payment source of truth | Existing `claim_payments`, allocations, and reconciliations are confirmed authoritative |
-| GATE-003 | Decision authority | Payer integration and manual fallback authority are approved |
-| GATE-004 | Payment authority | Payment integration and Finance fallback authority are approved |
-| GATE-005 | External event strategy | Stable external event ID, idempotency key, source timestamp, and ordering rules are documented |
-| GATE-006 | Currency rules | Claim currency, numeric scale, rounding, reconciliation tolerance, and refund ceiling are approved |
-| GATE-007 | Appeal scope | Formal Appeal minimum fields and permissions are approved |
-| GATE-008 | Reopen rules | Allowed source/target states, time limits, and revision rules are approved |
+| GATE-001 | ADR approval evidence | Satisfied - ADR-001 through ADR-008 are approved by Project Owner / Product Owner on 2026-07-22 |
+| GATE-002 | Payment source of truth | Existing `claim_payments`, allocations, and reconciliations require implementation-time verification before migration execution |
+| GATE-003 | Decision authority | Approved direction recorded; payer integration identity, manual fallback controls, and event strategy require technical verification |
+| GATE-004 | Payment authority | Approved direction recorded; payment integration identity, Finance fallback controls, refund/reversal permissions, and reconciliation rules require technical verification |
+| GATE-005 | External event strategy | Stable external event ID, idempotency key, source timestamp, and ordering rules remain required before migration execution |
+| GATE-006 | Currency rules | Claim currency, numeric scale, rounding, reconciliation tolerance, and refund ceiling remain required before migration execution |
+| GATE-007 | Appeal scope | Approved direction recorded; formal Appeal minimum fields, permissions, RLS, and operation design require technical verification |
+| GATE-008 | Reopen rules | Approved direction recorded; allowed source/target states, time limits, and revision rules require technical verification |
 | GATE-009 | Repository baseline | Local Supabase starts successfully and Phase 3 regression tests pass |
 | GATE-010 | Working tree | `git status --short` is clean before migration work begins |
 
@@ -1063,7 +1067,7 @@ Each deferred item requires a separate approved ADR or implementation phase.
 
 **Approved architecture direction:** Split workflow, decision, and payment state; formal appeals use dedicated records; payments remain transaction-authoritative; Phase 4 MVP retains header decision plus item adjustments; terminal reopen is controlled; payer and payment authorities are distinct; legacy status retirement is staged.
 
-**Implementation gate:** Blocked until explicit ADR approval evidence and all P1 dependencies are recorded.
+**Implementation gate:** ADR approval evidence is satisfied as of 2026-07-22. Migration execution remains blocked until remaining technical P1 dependencies are recorded and repository baseline validation passes.
 
 **Migration approach:** Additive schema → authoritative event/domain records → controlled operations → RBAC/RLS → deterministic backfill → validation guards → compatible reads → controlled writes → UI/API cutover → staged legacy retirement.
 
@@ -1075,4 +1079,5 @@ Each deferred item requires a separate approved ADR or implementation phase.
 
 | Date | Version | Change | Author |
 | --- | --- | --- | --- |
-| 2026-07-22 | 0.1 | Created Phase 4 Claim migration plan from ADR-001 through ADR-008, including gates, migration sequence, state mapping, controlled operations, security, backfill, cutover, validation, and exit criteria | AI-assisted Database Architecture Lead |
+| 2026-07-22 | 0.1 | Created Phase 4 Claim migration plan | AI-assisted Database Architecture Lead |
+| 2026-07-22 | 0.2 | Recorded ADR approval evidence; migration execution still blocked by technical gates | AI-assisted Documentation Lead                                |

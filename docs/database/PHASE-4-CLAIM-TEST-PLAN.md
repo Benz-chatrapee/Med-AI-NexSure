@@ -15,7 +15,7 @@
 | Last updated | 2026-07-22 |
 | Repository branch | `main` |
 | Required reviewers | Product Owner, Claim Domain Owner, Database Architect, Security Lead, QA Lead |
-| Implementation gate | Blocked until mandatory ADRs, Phase 4 implementation, deterministic fixtures, and required test environments are available |
+| Implementation gate | ADR approval is satisfied as of 2026-07-22; blocked until Phase 4 implementation, deterministic fixtures, required test environments, and technical verification are available |
 | Scope control | Documentation and test planning only |
 
 ## 2. Purpose and Scope
@@ -44,7 +44,7 @@ This document does not implement tests, execute migrations, reset databases, mod
 | --- | --- | --- |
 | `docs/database/PHASE-4-CLAIM-WORKFLOW-SPEC.md` | Target workflow and domain rules | Target specification |
 | `docs/database/PHASE-4-CLAIM-IMPACT-ANALYSIS.md` | Existing-state findings, affected files, gaps, risks | Static repository analysis |
-| `docs/database/PHASE-4-CLAIM-ARCHITECTURE-DECISIONS.md` | ADR-001 through ADR-008 | Target direction; approval status must be checked |
+| `docs/database/PHASE-4-CLAIM-ARCHITECTURE-DECISIONS.md` | ADR-001 through ADR-008 | Approved target direction; approval recorded on 2026-07-22 |
 | `docs/database/PHASE-3-VALIDATION-REPORT.md` | Executed Phase 3 evidence | PASS/FAIL evidence only where explicitly recorded |
 | `docs/database/PHASE-4-CLAIM-MIGRATION-PLAN.md` | Planned migration and cutover sequence | Planning artifact |
 
@@ -270,12 +270,12 @@ cancelled + voided + refunded
 | ADR / Requirement | Risk | Test Area | Planned Test IDs | Priority | Status |
 | --- | --- | --- | --- | --- | --- |
 | ADR-001 Closed Semantics | P4-RISK-015 | Workflow, dashboard | P4-WF-004, P4-UI-004, P4-DASH-001 | P1 | Planned |
-| ADR-002 Appeal Scope | P4-RISK-018 | Appeal, workflow, RLS | P4-APP-001–007 | P1 | Blocked until Appeal implementation exists |
-| ADR-003 Refund/Reversal Scope | P4-RISK-008, 012, 019 | Payment and reconciliation | P4-PAY-005–016, P4-IDEM-003–004 | P0/P1 | Blocked until scope and implementation are available |
+| ADR-002 Appeal Scope | P4-RISK-018 | Appeal, workflow, RLS | P4-APP-001–007 | P1 | Blocked pending implementation |
+| ADR-003 Refund/Reversal Scope | P4-RISK-008, 012, 019 | Payment and reconciliation | P4-PAY-005–016, P4-IDEM-003–004 | P0/P1 | Blocked pending implementation and technical verification |
 | ADR-004 Claim-Line Adjudication | P4-RISK-011 | Decision/item adjustment | P4-DEC-010–013 | P1 | Planned for MVP adjustment model; dedicated line decisions Deferred |
-| ADR-005 Reopen Rules | P4-RISK-014 | Controlled mutation, audit | P4-REOPEN-001–008 | P1 | Blocked until operation exists |
-| ADR-006 Payer Decision Authority | P4-RISK-003, 007, 009 | Decision, integration, security | P4-DEC-001–009, P4-IDEM-001–002 | P0 | Blocked until secure write path exists |
-| ADR-007 Payment Authority | P4-RISK-004, 008, 012, 019 | Payment, finance security | P4-PAY-001–016, P4-RBAC-006 | P0 | Blocked until secure write path exists |
+| ADR-005 Reopen Rules | P4-RISK-014 | Controlled mutation, audit | P4-REOPEN-001–008 | P1 | Blocked pending implementation |
+| ADR-006 Payer Decision Authority | P4-RISK-003, 007, 009 | Decision, integration, security | P4-DEC-001–009, P4-IDEM-001–002 | P0 | Blocked pending implementation and technical verification |
+| ADR-007 Payment Authority | P4-RISK-004, 008, 012, 019 | Payment, finance security | P4-PAY-001–016, P4-RBAC-006 | P0 | Blocked pending implementation and technical verification |
 | ADR-008 Legacy Status Retirement | P4-RISK-006, 016 | Migration, API compatibility | P4-MIG-001–012, P4-LEG-001–010 | P0/P1 | Planned |
 | Phase 3 Security Regression | P4-RISK-020 | RBAC/RLS/regression | P4-REG-001–006 | P0 | Planned |
 | Claim Readiness Compatibility | P4-RISK-017 | Clinical/rule integration | P4-INT-001–010 | P1 | Planned |
@@ -721,7 +721,7 @@ Stop immediately on any P0 failure.
 
 ### Entry Criteria
 
-- Mandatory ADRs approved
+- Mandatory ADRs approved - satisfied on 2026-07-22 by Project Owner / Product Owner
 - Phase 3 validation available
 - Phase 4 implementation exists
 - Local Supabase available
@@ -788,7 +788,7 @@ A flaky test is treated as failed until determinism is proven.
 
 | Blocker ID | Blocker | Impact | Status |
 | --- | --- | --- | --- |
-| BLK-001 | ADR approval evidence incomplete | Cannot finalize expected behavior | Blocked |
+| BLK-001 | ADR approval evidence recorded | Architecture expectations approved; implementation evidence still absent | Satisfied |
 | BLK-002 | Phase 4 migrations not implemented | Database/migration tests cannot run | Blocked |
 | BLK-003 | Formal Appeal model not implemented | Appeal tests cannot run | Blocked |
 | BLK-004 | Refund/reversal operations not implemented | Financial exception tests cannot run | Blocked |
@@ -895,17 +895,17 @@ Only intended files changed
 
 | Area | Product Owner | Claim Domain Owner | Database Architect | Security Lead | QA Lead |
 | --- | --- | --- | --- | --- | --- |
-| Test scope | Pending | Pending | Pending | Pending | Pending |
-| Workflow expectations | Pending | Pending | Pending | Not Required | Pending |
-| Decision and item-adjustment expectations | Pending | Pending | Pending | Pending | Pending |
-| Payment/refund/reconciliation expectations | Pending | Pending | Pending | Pending | Pending |
-| Appeal and reopen expectations | Pending | Pending | Pending | Pending | Pending |
-| RBAC/RLS and tenant isolation | Not Required | Pending | Pending | Pending | Pending |
-| Migration/backfill strategy | Not Required | Pending | Pending | Pending | Pending |
-| API/UI compatibility | Pending | Pending | Not Required | Pending | Pending |
-| Entry/exit/release gates | Pending | Pending | Pending | Pending | Pending |
+| Test scope | ADR scope approved on 2026-07-22 | Technical review pending | Technical review pending | Technical review pending | Technical review pending |
+| Workflow expectations | ADR direction approved on 2026-07-22 | Technical review pending | Technical review pending | Not Required | Technical review pending |
+| Decision and item-adjustment expectations | ADR direction approved on 2026-07-22 | Technical review pending | Technical review pending | Technical review pending | Technical review pending |
+| Payment/refund/reconciliation expectations | ADR direction approved on 2026-07-22 | Technical review pending | Technical review pending | Technical review pending | Technical review pending |
+| Appeal and reopen expectations | ADR direction approved on 2026-07-22 | Technical review pending | Technical review pending | Technical review pending | Technical review pending |
+| RBAC/RLS and tenant isolation | Not Required | Technical review pending | Technical review pending | Technical review pending | Technical review pending |
+| Migration/backfill strategy | Not Required | Technical review pending | Technical review pending | Technical review pending | Technical review pending |
+| API/UI compatibility | ADR direction approved on 2026-07-22 | Technical review pending | Not Required | Technical review pending | Technical review pending |
+| Entry/exit/release gates | ADR direction approved on 2026-07-22 | Technical review pending | Technical review pending | Technical review pending | Technical review pending |
 
-No approval is inferred from document creation.
+ADR-001 through ADR-008 are approved by Project Owner / Product Owner on 2026-07-22. This approval does not mark tests as implemented, run, passed, failed, or validated.
 
 ## 35. Validation Limitations
 
@@ -925,4 +925,4 @@ No approval is inferred from document creation.
 - Performance thresholds may remain pending
 - Static inspection must not be reported as PASS
 - Planned, Blocked, Deferred, and Not Applicable statuses do not represent execution results
-- Phase 4 closure requires executed evidence in `PHASE-4-VALIDATION-REPORT.md`
+- Phase 4 closure needs evidence in `PHASE-4-VALIDATION-REPORT.md`; no tests run..
