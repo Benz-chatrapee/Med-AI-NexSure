@@ -459,18 +459,33 @@ select ok(
         and pg_get_functiondef(p.oid) not ilike '%set decision_status%'
         and pg_get_functiondef(p.oid) not ilike '%set payment_status%'
     )
+    and to_regprocedure(
+      'public.record_claim_refund(uuid, uuid, integer, numeric, text, text, timestamptz, text, text, uuid, jsonb)'
+    ) is not null
+    and exists (
+      select 1
+      from pg_proc p
+      join pg_namespace n
+        on n.oid = p.pronamespace
+      where n.nspname = 'public'
+        and p.proname = 'record_claim_refund'
+        and pg_get_functiondef(p.oid) ilike '%''claim.payment.refund''%'
+        and pg_get_functiondef(p.oid) ilike '%public.has_permission(%'
+        and pg_get_functiondef(p.oid) ilike '%v_claim.version <> p_expected_version%'
+        and pg_get_functiondef(p.oid) ilike '%idempotent_replay%'
+        and pg_get_functiondef(p.oid) not ilike '%workflow_status =%'
+        and pg_get_functiondef(p.oid) not ilike '%decision_status =%'
+        and pg_get_functiondef(p.oid) not ilike '%claim_appeals%'
+    )
     and not exists (
       select 1
       from pg_proc p
       join pg_namespace n
         on n.oid = p.pronamespace
       where n.nspname = 'public'
-        and p.proname in (
-          'record_claim_refund',
-          'record_claim_reversal'
-        )
+        and p.proname = 'record_claim_reversal'
     ),
-  'Batch 6 appeal functions are approved and unapproved refund or reversal functions remain absent'
+  'Batch 6 appeal and Batch 7 refund functions are approved while unapproved reversal functions remain absent'
 );
 
 select * from finish();
