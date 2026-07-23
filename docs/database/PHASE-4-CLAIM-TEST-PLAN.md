@@ -10,9 +10,9 @@
 | Phase | Phase 4 - Claim Architecture |
 | Version | 0.2 |
 | Document status | Ready for Review |
-| Test execution status | Not Started |
+| Test execution status | Phase 4 Batch 6 runtime validation PASS |
 | Created date | 2026-07-22 |
-| Last updated | 2026-07-22 |
+| Last updated | 2026-07-23 |
 | Repository branch | `main` |
 | Required reviewers | Product Owner, Claim Domain Owner, Database Architect, Security Lead, QA Lead |
 | Implementation gate | ADR approval is satisfied as of 2026-07-22; blocked until Phase 4 implementation, deterministic fixtures, required test environments, and technical verification are available |
@@ -1377,3 +1377,90 @@ This authorization is limited to `supabase/tests/phase4_claim_schema_test.sql` a
 - No full-file rewrite, wildcard scope, generic acceptance of future objects, or broad removal of out-of-scope assertions is authorized.
 - No authorization is granted for `claim_line_decisions`, `record_claim_refund`, `record_claim_reversal`, refund lifecycle, reversal lifecycle, legacy `claims.status` removal, or Batch 7+ reconciliation.
 - No weakened security assertion, tenant-scope assertion, direct-write protection assertion, or Batch 1-5 invariant is authorized.
+
+---
+
+## 42. Batch 6 Runtime Validation Closure
+
+**Validation Date:** 2026-07-23
+**Validated Commit SHA:** `033f0532561420af947aa9b185120cc3fadc349a`
+**Implementation Commit:** `033f053 feat(claims): add controlled claim appeal mutations`
+**Regression Authorization Commit:** `ae73c8b docs(database): authorize batch 6 schema regression reconciliation`
+**Initial Working Tree State:** clean; `git status --short --untracked-files=all` returned no paths.
+**Initial Diff State:** clean; `git diff --check` and `git diff --name-only` returned no findings.
+**Final Batch 6 Validation Status:** `PASS`
+**Batch 6 Validation Prerequisite for Batch 7 Analysis:** `SATISFIED`
+**Batch 7 Implementation Authorized:** `NO`
+
+### 42.1 Resolved Runtime Paths
+
+```text
+supabase/migrations/20260722163000_phase4_claim_appeals.sql
+supabase/tests/phase4_claim_schema_test.sql
+supabase/tests/phase4_claim_appeal_test.sql
+supabase/tests/phase4_claim_appeal_security_test.sql
+supabase/tests/phase4_claim_workflow_history_test.sql
+supabase/tests/phase4_claim_workflow_mutation_test.sql
+supabase/tests/phase4_claim_workflow_security_test.sql
+supabase/tests/phase4_claim_decision_mutation_test.sql
+supabase/tests/phase4_claim_decision_security_test.sql
+supabase/tests/phase4_claim_payment_mutation_test.sql
+supabase/tests/phase4_claim_payment_security_test.sql
+supabase/tests/phase3_claim_permissions_test.sql
+supabase/tests/phase3_claim_security_test.sql
+supabase/tests/phase3_claim_tenant_isolation_test.sql
+supabase/tests/phase3_claim_self_scope_test.sql
+supabase/tests/phase3_claim_audit_test.sql
+```
+
+All required paths were verified present before runtime execution.
+
+### 42.2 Command Results
+
+| Order | Exact command | Test path | Result | Planned | Passed | Failed | Material diagnostics |
+| --- | --- | --- | --- | ---: | ---: | ---: | --- |
+| 1 | `npx supabase db reset` | `NOT APPLICABLE` | `PASS` | `NOT APPLICABLE` | `NOT APPLICABLE` | `0` | Reset completed on branch `main`; applied migrations through `20260722163000_phase4_claim_appeals.sql`; seeded `supabase/seed.sql`; CLI emitted idempotent NOTICE lines for pre-existing or missing policy/trigger drops. |
+| 2 | `npx supabase db lint` | `NOT APPLICABLE` | `PASS` | `NOT APPLICABLE` | `NOT APPLICABLE` | `0` | `No schema errors found`; linted `extensions`, `private`, and `public`. |
+| 3 | `npx supabase test db .\supabase\tests\phase4_claim_schema_test.sql` | `supabase/tests/phase4_claim_schema_test.sql` | `PASS` | `51` | `51` | `0` | `All tests successful`; `Files=1, Tests=51`; `Result: PASS`. |
+| 4 | `npx supabase test db .\supabase\tests\phase4_claim_appeal_test.sql` | `supabase/tests/phase4_claim_appeal_test.sql` | `PASS` | `19` | `19` | `0` | `All tests successful`; `Files=1, Tests=19`; `Result: PASS`. |
+| 5 | `npx supabase test db .\supabase\tests\phase4_claim_appeal_security_test.sql` | `supabase/tests/phase4_claim_appeal_security_test.sql` | `PASS` | `16` | `16` | `0` | `All tests successful`; `Files=1, Tests=16`; `Result: PASS`. |
+| 6 | `npx supabase test db .\supabase\tests\phase4_claim_workflow_history_test.sql` | `supabase/tests/phase4_claim_workflow_history_test.sql` | `PASS` | `47` | `47` | `0` | `All tests successful`; `Files=1, Tests=47`; `Result: PASS`. |
+| 7 | `npx supabase test db .\supabase\tests\phase4_claim_workflow_mutation_test.sql` | `supabase/tests/phase4_claim_workflow_mutation_test.sql` | `PASS` | `12` | `12` | `0` | `All tests successful`; `Files=1, Tests=12`; `Result: PASS`. |
+| 8 | `npx supabase test db .\supabase\tests\phase4_claim_workflow_security_test.sql` | `supabase/tests/phase4_claim_workflow_security_test.sql` | `PASS` | `10` | `10` | `0` | `All tests successful`; `Files=1, Tests=10`; `Result: PASS`. |
+| 9 | `npx supabase test db .\supabase\tests\phase4_claim_decision_mutation_test.sql` | `supabase/tests/phase4_claim_decision_mutation_test.sql` | `PASS` | `19` | `19` | `0` | `All tests successful`; `Files=1, Tests=19`; `Result: PASS`. |
+| 10 | `npx supabase test db .\supabase\tests\phase4_claim_decision_security_test.sql` | `supabase/tests/phase4_claim_decision_security_test.sql` | `PASS` | `12` | `12` | `0` | `All tests successful`; `Files=1, Tests=12`; `Result: PASS`. |
+| 11 | `npx supabase test db .\supabase\tests\phase4_claim_payment_mutation_test.sql` | `supabase/tests/phase4_claim_payment_mutation_test.sql` | `PASS` | `18` | `18` | `0` | `All tests successful`; `Files=1, Tests=18`; `Result: PASS`. |
+| 12 | `npx supabase test db .\supabase\tests\phase4_claim_payment_security_test.sql` | `supabase/tests/phase4_claim_payment_security_test.sql` | `PASS` | `15` | `15` | `0` | `All tests successful`; `Files=1, Tests=15`; `Result: PASS`. |
+| 13 | `npx supabase test db .\supabase\tests\phase3_claim_permissions_test.sql` | `supabase/tests/phase3_claim_permissions_test.sql` | `PASS` | `26` | `26` | `0` | `All tests successful`; `Files=1, Tests=26`; `Result: PASS`. |
+| 14 | `npx supabase test db .\supabase\tests\phase3_claim_security_test.sql` | `supabase/tests/phase3_claim_security_test.sql` | `PASS` | `29` | `29` | `0` | `All tests successful`; `Files=1, Tests=29`; `Result: PASS`. |
+| 15 | `npx supabase test db .\supabase\tests\phase3_claim_tenant_isolation_test.sql` | `supabase/tests/phase3_claim_tenant_isolation_test.sql` | `PASS` | `43` | `43` | `0` | `All tests successful`; `Files=1, Tests=43`; `Result: PASS`. |
+| 16 | `npx supabase test db .\supabase\tests\phase3_claim_self_scope_test.sql` | `supabase/tests/phase3_claim_self_scope_test.sql` | `PASS` | `45` | `45` | `0` | `All tests successful`; `Files=1, Tests=45`; `Result: PASS`. |
+| 17 | `npx supabase test db .\supabase\tests\phase3_claim_audit_test.sql` | `supabase/tests/phase3_claim_audit_test.sql` | `PASS` | `38` | `38` | `0` | `All tests successful`; `Files=1, Tests=38`; `Result: PASS`. |
+
+### 42.3 Validation Summary
+
+| Evidence Area | Result |
+| --- | --- |
+| Database reset | `PASS` |
+| Database lint | `PASS` |
+| Schema regression | `PASS` |
+| Batch 6 functional appeal tests | `PASS` |
+| Batch 6 appeal security tests | `PASS` |
+| Required Batch 1-5 regressions | `PASS` |
+| Required SQL test files modified during validation | `NO` |
+| Required migrations modified during validation | `NO` |
+| Batch 6 semantic contract changed | `NO` |
+
+Total executed pgTAP test assertions recorded by CLI output: `400` planned, `400` passed, `0` failed.
+
+### 42.4 Warnings and Advisories
+
+- `npx supabase db reset` emitted NOTICE diagnostics for idempotent policy and trigger cleanup, including missing policies/triggers skipped during migration setup.
+- `npx supabase db lint` returned no schema errors.
+- No failing TAP assertions, failed commands, or unverified mandatory Batch 6 runtime test paths remain.
+
+### 42.5 Batch 7 Analysis Prerequisite
+
+`Batch 6 Validation Prerequisite for Batch 7 Analysis: SATISFIED`
+
+This satisfies the analysis prerequisite only. It does not authorize Batch 7 implementation.
