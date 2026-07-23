@@ -1308,3 +1308,60 @@ Approved ADR alignment:
 `READY FOR BATCH 5`
 
 This readiness applies only to the controlled payment settlement contract. It is not proof that Batch 5 migrations or tests have been executed.
+
+---
+
+## 20. Phase 4 Batch 6 Formal Appeal Contract Traceability
+
+**Status:** Approved
+**Decision Date:** 2026-07-23
+**Approval Reference:** Phase 4 Batch 6 Contract Approval Closure
+**Approval Impact:** This section does not change ADR-001 through ADR-008 text, approval status, rationale, or implementation status.
+
+### 20.1 Confirmed Findings
+
+| Evidence | Classification | Architectural impact |
+| --- | --- | --- |
+| ADR-002 is approved and requires every formal appeal to have a dedicated Appeal record. | Approved Decision | Batch 6 may define `claim_appeals` without reopening the appeal source-of-truth decision. |
+| Existing docs state `workflow_status = appealed` is summary only. | Approved Decision | Workflow state cannot be the authoritative appeal object. |
+| Batch 3 provides the controlled workflow boundary and `appealed` workflow value. | Confirmed Finding | Appeal submit can coordinate with workflow without inventing generic Claim update behavior. |
+| Batch 4 preserves payer decision mutation as a separate controlled function. | Confirmed Finding | Appeal resolution may reference decisions but must not create payer decisions implicitly. |
+| Batch 5 excludes formal appeals. | Confirmed Finding | Formal Appeal remains an open Phase 4 capability gap after payment settlement. |
+| Refund ceiling and refund/reversal exception semantics remain unresolved. | Open Decision | Refund/reversal should not be selected as Batch 6 without a separate decision-closure task. |
+
+### 20.2 Recommendation
+
+Batch 6 should define the Formal Claim Appeal Entity and controlled appeal mutations.
+
+Approved ADR alignment:
+
+| ADR | Batch 6 traceability |
+| --- | --- |
+| ADR-001 | Appeal workflow does not imply financial settlement or closure. |
+| ADR-002 | Dedicated `claim_appeals` is the appeal source of truth. |
+| ADR-004 | Appeal does not introduce dedicated claim-line decisions. |
+| ADR-005 | Terminal reopen remains a separate elevated operation. |
+| ADR-006 | Appeal outcome may reference payer decision evidence but AI cannot decide appeals. |
+| ADR-007 | Appeal mutation does not alter payment authority. |
+| ADR-008 | Legacy `claims.status` remains staged and is not removed by Batch 6. |
+
+### 20.3 Proposed Decisions
+
+| Decision | Classification | Rationale |
+| --- | --- | --- |
+| `public.claim_appeals` is the authoritative object for formal appeal facts. | Recommendation | It preserves appeal reason, sequence, owner, deadline, evidence, payer reference, and outcome linkage. |
+| `claims.workflow_status = appealed` remains a summary only. | Approved Decision | Prevents lossy appeal handling and preserves workflow/domain separation. |
+| Appeal submit and resolve use controlled functions. | Recommendation | Appeal mutation is sensitive and must enforce tenant, clinic, permission, expected version, audit, and rollback behavior. |
+| Appeal mutation must not mutate payment snapshots or records. | Recommendation | Preserves ADR-003 and ADR-007 financial authority. |
+| Appeal resolution does not create payer decisions directly. | Recommendation | Any authoritative decision remains under the Batch 4 decision function or trusted payer integration. |
+
+### 20.4 Open Decisions
+
+| Decision | Why it is required | Options | Recommended option | Decision owner | Implementation blocker |
+| --- | --- | --- | --- | --- | --- |
+| Exact appeal submit eligibility | Avoid invalid formal appeals from pre-submission or terminal states | Restrict to `under_review`; allow selected post-decision workflows; allow elevated terminal exceptions | Restrict Batch 6 to `under_review` and already appeal-compatible states | Claim Domain Owner | NO |
+| Appeal outcome workflow mapping | Avoid implicit closure or reopen side effects | No workflow change; move back to `under_review`; close on final appeal outcome | Keep closure explicit; allow only narrow reviewed mapping if approved | Product Owner / Claim Domain Owner | NO |
+| Appeal permission names | Preserve least privilege and reuse existing RBAC where possible | Add exact appeal permissions; reuse `claim.review`; hybrid | Add exact appeal permissions when no exact existing names are found | Security Lead | NO |
+| Multi-round appeal depth | Bound MVP scope | Single appeal; sequenced appeals; full multi-level automation | Sequenced appeal records, no multi-level automation | Product Owner | NO |
+
+Batch 6 readiness recommendation: `READY FOR BATCH 6`.

@@ -1739,3 +1739,270 @@ Open design blockers: `0`
 Implementation dependencies are known and fit one primary database responsibility.
 
 Batch 5 readiness: `READY FOR BATCH 5`
+
+---
+
+## 29. Batch 6 Proposed Implementation Contract - Formal Claim Appeal Entity and Controlled Appeal Mutations
+
+**Batch name:** Phase 4 Batch 6 - Formal Claim Appeal Entity and Controlled Appeal Mutations
+**Status:** Approved
+**Objective:** Implement the smallest independently deployable formal Appeal domain by adding a dedicated `claim_appeals` source of truth and controlled submit/resolve mutation paths that preserve workflow, payer decision, payment, evidence, tenant, RLS, and audit boundaries.
+
+### 29.1 Evidence-Based Selection
+
+| Area | Classification | Evidence |
+| --- | --- | --- |
+| ADR-002 appeal source of truth | Approved Decision | ADR-002 states every formal appeal requires a dedicated Appeal record and `workflow_status = appealed` is only a summary. |
+| Current implementation gap | Confirmed Finding | Batch 5 impact analysis reports no `claim_appeals` table found and formal appeals deferred as a separate domain. |
+| Workflow dependency | Confirmed Finding | Batch 3 provides `public.transition_claim_workflow` and an implemented `appealed` workflow value. |
+| Decision dependency | Confirmed Finding | Batch 4 provides `public.record_claim_decision` and preserves decision authority separately from workflow. |
+| Payment dependency | Confirmed Finding | Batch 5 contract keeps payment mutation independent and excludes formal appeals. |
+| Refund/reversal alternative | Open Decision | Refund ceiling, refund semantics, and broad reversal ordering remain unresolved; refund/reversal is not selected for Batch 6. |
+
+Batch 6 is selected as the next proposed Phase 4 contract because formal Appeal scope is already approved by ADR-002, has a distinct source-of-truth responsibility, and is less blocked than refund/reversal lifecycle work.
+
+### 29.2 Scope
+
+| Contract Field | Value | Classification |
+| --- | --- | --- |
+| Business objective | Preserve formal appeal cases as auditable, tenant-scoped records instead of relying on `claims.workflow_status = appealed` alone. | Recommendation |
+| In scope | `claim_appeals` table; appeal status domain or constrained values; appeal sequence; submit and resolve controlled functions; RLS/RBAC; tenant-safe relationships; workflow-event linkage; optional outcome decision reference. | Recommendation |
+| Out of scope | Refund lifecycle, reversal lifecycle, payment allocation redesign, legacy `claims.status` removal, dedicated `claim_line_decisions`, backend/API/frontend/generated type changes, fixtures, seed data, and database reset. | Recommendation |
+| Dependencies | Batch 1 state types/columns; Batch 2 workflow events; Batch 3 workflow mutation; Batch 4 decision mutation; Batch 5 payment boundary; Phase 3 RBAC/RLS helpers; `public.has_permission(text, uuid, uuid)`. | Confirmed Finding |
+| Entry criteria | Batch 1-5 implementation files exist; `claims.workflow_status` supports `appealed`; `claim_workflow_events` exists; `public.transition_claim_workflow` exists; `claim_decisions` and `claims.current_decision_id` exist; `public.has_permission(...)` exists. | Recommendation |
+| Exit criteria | Appeal table and controlled functions are implemented and tested; all blocking Open Decisions for Batch 6 are zero; tenant isolation, direct-write protection, stale-version behavior, atomic rollback, and evidence immutability are covered by tests. | Recommendation |
+
+### 29.3 Domain and Source of Truth
+
+| Concept | Contract | Classification |
+| --- | --- | --- |
+| Formal appeal | A payer-facing or reviewer-controlled challenge to a prior payer decision, represented by one durable appeal case record. | Approved Decision |
+| Authoritative object | `public.claim_appeals` is the authoritative object for appeal reason, sequence, owner, submission, deadline, payer reference, evidence, and outcome linkage. | Recommendation |
+| Workflow summary | `claims.workflow_status = appealed` is a current operational summary only and must not store appeal-specific facts. | Approved Decision |
+| Decision boundary | Appeal outcome may reference an authoritative `claim_decisions` row when a payer decision exists; the appeal operation must not fabricate approval, rejection, payment, refund, or reversal. | Recommendation |
+| Payment boundary | Appeal mutation must not change `claims.payment_status`, `claims.total_paid_amount`, `claim_payments`, allocations, or reconciliations. | Recommendation |
+| Tenant ownership | Appeal records inherit `organization_id` and `clinic_id` from the locked parent Claim and must reject caller-supplied tenant authority. | Recommendation |
+
+### 29.4 Proposed Database Objects
+
+Proposed table: `public.claim_appeals`.
+
+Minimum justified fields:
+
+```text
+id
+organization_id
+clinic_id
+claim_id
+appeal_sequence
+appeal_status
+appeal_reason_code
+appeal_reason_text
+submitted_by
+submitted_at
+deadline_at
+owner_user_id
+payer_reference
+external_event_id
+evidence_package_id
+outcome_decision_id
+resolved_at
+created_at
+created_by
+updated_at
+updated_by
+deleted_at
+```
+
+Minimum appeal statuses:
+
+```text
+draft
+submitted
+under_review
+request_information
+approved
+partially_approved
+rejected
+withdrawn
+closed
+```
+
+Constraints and invariants:
+
+- `organization_id`, `clinic_id`, and `claim_id` must reference the parent Claim with tenant-safe keys.
+- `(organization_id, clinic_id, claim_id, appeal_sequence)` must be unique.
+- `appeal_sequence` must be allocated while the Claim row is locked.
+- Submitted appeals require `appeal_reason_code` and `submitted_by`.
+- Outcome statuses require `outcome_decision_id` when an authoritative decision exists.
+- `deleted_at` is only for administrative recovery or cancellation scope explicitly approved by RLS; resolved appeal evidence must not be hard-deleted by ordinary actors.
+- Metadata, if any, must not be a substitute for core appeal fields and must not contain unrestricted PHI/PII.
+
+Minimum indexes:
+
+```text
+(organization_id, clinic_id, appeal_status, deleted_at)
+(organization_id, claim_id, appeal_sequence)
+(organization_id, owner_user_id, appeal_status)
+(organization_id, deadline_at) where deadline_at is not null
+(outcome_decision_id) where outcome_decision_id is not null
+```
+
+### 29.5 Controlled Mutations
+
+Proposed functions:
+
+```text
+public.submit_claim_appeal(
+  p_claim_id uuid,
+  p_expected_version integer,
+  p_appeal_reason_code text,
+  p_appeal_reason_text text default null,
+  p_deadline_at timestamptz default null,
+  p_owner_user_id uuid default null,
+  p_payer_reference text default null,
+  p_evidence_package_id uuid default null,
+  p_source_system text default 'internal',
+  p_external_event_id text default null,
+  p_correlation_id uuid default null,
+  p_metadata jsonb default '{}'::jsonb
+)
+```
+
+Return:
+
+```text
+claim_id uuid
+appeal_id uuid
+appeal_sequence integer
+previous_workflow_status public.claim_workflow_state_domain
+workflow_status public.claim_workflow_state_domain
+version integer
+workflow_event_id uuid
+state_updated_at timestamptz
+idempotent_replay boolean
+```
+
+```text
+public.resolve_claim_appeal(
+  p_appeal_id uuid,
+  p_expected_version integer,
+  p_target_appeal_status text,
+  p_reason_code text,
+  p_reason_text text default null,
+  p_outcome_decision_id uuid default null,
+  p_resolved_at timestamptz default null,
+  p_source_system text default 'internal',
+  p_external_event_id text default null,
+  p_correlation_id uuid default null,
+  p_metadata jsonb default '{}'::jsonb
+)
+```
+
+Return:
+
+```text
+claim_id uuid
+appeal_id uuid
+appeal_status text
+workflow_status public.claim_workflow_state_domain
+version integer
+state_updated_at timestamptz
+idempotent_replay boolean
+```
+
+Required operation model:
+
+```text
+authenticate
+-> resolve trusted actor and tenant from locked Claim/Appeal
+-> authorize
+-> validate ownership and current state
+-> validate expected Claim version
+-> validate appeal operation
+-> create or update appeal evidence
+-> write workflow event only when workflow_status changes
+-> update canonical Claim workflow snapshot when applicable
+-> return canonical result
+```
+
+Submit behavior:
+
+- Authorized actor requires `claim.appeal.submit` or an approved equivalent.
+- Claim must not be soft-deleted.
+- Claim workflow should be `under_review` or another approved post-decision review state; pre-submission and terminal states require explicit rejection unless a later approved rule allows them.
+- Success creates one appeal record, sets workflow to `appealed` through the same transition authority or equivalent atomic logic, writes workflow evidence, increments `claims.version` once, and does not mutate decision or payment snapshots.
+
+Resolve behavior:
+
+- Authorized actor requires `claim.appeal.decide` or an approved equivalent.
+- Resolution must preserve appeal evidence and may link `outcome_decision_id` to an existing authoritative decision in the same tenant/clinic/Claim.
+- Resolution must not create a payer decision unless separately orchestrated through `public.record_claim_decision`.
+- Resolution must not change payment state.
+
+### 29.6 Security, Audit, Concurrency, and Idempotency
+
+Security:
+
+- `claim_appeals` SELECT requires Claim read or appeal read permission within organization/clinic scope.
+- Ordinary INSERT/UPDATE/DELETE must be denied except through controlled functions or narrow administrative recovery paths.
+- Functions use `SECURITY DEFINER`, fixed `search_path = public, private, auth, pg_temp`, schema-qualified objects, no EXECUTE to `PUBLIC` or `anon`, and EXECUTE only for approved `authenticated` and `service_role`.
+- Caller must not provide authoritative actor, organization, clinic, current state, appeal sequence, or resulting Claim version.
+
+Audit and immutable evidence:
+
+- Each submit/resolve action records actor, permission boundary, source, reason, request identity, timestamps, and correlation ID.
+- Failed operations write no appeal evidence, no workflow event, and no Claim snapshot change.
+- Direct hard delete of submitted/resolved appeals by ordinary users is prohibited.
+
+Concurrency and idempotency:
+
+- Use `claims.version` as the sole optimistic lock for appeal submit/resolve operations.
+- Success increments `claims.version` exactly once.
+- Stale expected version fails with no data change.
+- External appeal events use `organization_id + source_system + external_event_id` when supplied.
+- Equivalent replay returns the prior result with `idempotent_replay = true`; conflicting replay fails with no data change.
+
+### 29.7 Proposed Files and Execution Order
+
+Allowed implementation artifacts for a future Batch 6 implementation:
+
+```text
+supabase/migrations/20260722163000_phase4_claim_appeals.sql
+supabase/tests/phase4_claim_appeal_test.sql
+supabase/tests/phase4_claim_appeal_security_test.sql
+```
+
+This contract-definition task does not create those files.
+
+Future implementation order:
+
+1. Create appeal status domain/table and `claim_appeals`.
+2. Add minimal appeal permissions and grants.
+3. Add RLS and direct-write protection.
+4. Add controlled submit and resolve functions.
+5. Add functional and security pgTAP tests.
+6. Rerun Batch 1-5 regression tests.
+
+### 29.8 Open Decisions
+
+| Decision | Why required | Options | Recommended option | Decision owner | Implementation blocker |
+| --- | --- | --- | --- | --- | --- |
+| Exact appeal submit eligibility | Prevent invalid appeals before a payer decision or from terminal states | Restrict to `under_review`; allow selected post-decision states; allow elevated terminal reopen plus appeal | Restrict Batch 6 submit to `under_review` and already appealed-compatible workflows; require later rule for terminal exceptions | Claim Domain Owner | NO |
+| Appeal outcome to workflow mapping | Avoid silently closing or reopening Claims on appeal resolution | No workflow change; move `appealed -> under_review`; move `appealed -> closed` for final outcomes | No automatic closure; keep workflow change explicit or limited to `appealed -> under_review` after request-information | Claim Domain Owner / Product Owner | NO |
+| Appeal permissions naming | Reuse existing permission names where equivalent | Add `claim.appeal.view/create/submit/decide`; reuse `claim.review`; mix model | Add precise appeal permissions if no exact existing names are found | Security Lead | NO |
+| Multi-round appeal scope | Decide whether Batch 6 handles only one appeal or multiple sequences | Single appeal only; multiple sequenced appeals; full multi-level automation | Multiple sequenced records with no multi-level automation | Product Owner / Claim Domain Owner | NO |
+
+Blocking Open Decisions: `0`
+
+### 29.9 Readiness
+
+Batch 6 contract readiness: `READY FOR BATCH 6`.
+
+Approval status: `Approved`.
+
+Approval date: `2026-07-23`.
+
+Approval reference: `Phase 4 Batch 6 Contract Approval Closure`.
+
+Migration implementation authorization: `YES`.

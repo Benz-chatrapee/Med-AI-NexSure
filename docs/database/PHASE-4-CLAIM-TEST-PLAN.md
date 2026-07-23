@@ -1176,8 +1176,6 @@ fixed decision timestamps
 
 No test is marked executed or passed by this plan.
 
----
-
 ## 39. Batch 5 Controlled Claim Payment Settlement Test Scope
 
 **Status:** Planned, not implemented, not executed
@@ -1245,6 +1243,86 @@ supabase/tests/phase4_claim_workflow_mutation_test.sql
 supabase/tests/phase4_claim_workflow_security_test.sql
 supabase/tests/phase4_claim_decision_mutation_test.sql
 supabase/tests/phase4_claim_decision_security_test.sql
+supabase/tests/phase3_claim_permissions_test.sql
+supabase/tests/phase3_claim_security_test.sql
+supabase/tests/phase3_claim_tenant_isolation_test.sql
+supabase/tests/phase3_claim_self_scope_test.sql
+supabase/tests/phase3_claim_audit_test.sql
+```
+
+No test is marked executed or passed by this plan.
+
+---
+
+## 40. Batch 6 Formal Claim Appeal Test Scope
+
+**Status:** Planned, not implemented, not executed
+**Decision Date:** 2026-07-23
+**Approval Reference:** Phase 4 Batch 6 Contract Approval Closure
+
+This section defines planned coverage only. It does not create tests, run tests, reset the database, or mark any Batch 6 assertion as passed.
+
+### 40.1 Exact Batch 6 Test Files
+
+| Test file | Purpose | Status |
+| --- | --- | --- |
+| `supabase/tests/phase4_claim_appeal_test.sql` | Functional tests for formal appeal table, submit/resolve functions, workflow synchronization, sequence allocation, idempotency, versioning, decision/payment preservation, and rollback | Planned |
+| `supabase/tests/phase4_claim_appeal_security_test.sql` | Security tests for appeal authorization, tenant/clinic denial, direct appeal mutation protection, EXECUTE grants, AI non-authority, and sanitized errors | Planned |
+
+### 40.2 Functional Coverage
+
+| Coverage | Expected assertion |
+| --- | --- |
+| Table contract | `public.claim_appeals` exists with tenant ownership, Claim relationship, appeal sequence, status, reason, owner, deadline, payer reference, evidence package, outcome decision, and audit fields. |
+| Status contract | Approved Batch 6 appeal states are constrained and invalid states are rejected. |
+| Submit function contract | `public.submit_claim_appeal(...)` exists with the exact approved Batch 6 signature and return columns. |
+| Resolve function contract | `public.resolve_claim_appeal(...)` exists with the exact approved Batch 6 signature and return columns. |
+| Valid submit | Eligible Claim creates one appeal record, sets or preserves workflow according to the approved rule, writes workflow evidence when status changes, and increments `claims.version` once. |
+| Sequence allocation | Multiple appeals for one Claim receive unique monotonic `appeal_sequence` values. |
+| Required reason | Submit without required appeal reason fails with no data change. |
+| Unsupported workflow | Pre-submission, terminal, soft-deleted, or otherwise ineligible Claims reject appeal submit with no data change. |
+| Resolve to outcome | Valid resolution updates appeal lifecycle and may link same-tenant authoritative decision evidence. |
+| Invalid outcome link | Cross-tenant, cross-clinic, wrong-Claim, draft, or missing decision references are rejected. |
+| Workflow preservation | Appeal resolution does not silently close, reopen, or submit Claims unless the approved Batch 6 workflow mapping explicitly requires it. |
+| Decision preservation | Appeal submit/resolve does not change `claims.decision_status`, `claims.current_decision_id`, or `claim_decisions` unless a separate controlled decision function is called. |
+| Payment preservation | Appeal submit/resolve does not change `claims.payment_status`, `claims.total_paid_amount`, `claim_payments`, allocations, or reconciliations. |
+| Version increment | Successful submit or resolve increments `claims.version` exactly once. |
+| Stale conflict | Wrong `p_expected_version` fails with no appeal row/change, workflow event, snapshot change, version increment, or audit evidence. |
+| Equivalent replay | Same external appeal identity plus equivalent typed payload returns prior result with `idempotent_replay = true`, no new row, and no version increment. |
+| Conflicting replay | Same external identity plus conflicting payload fails with no data change. |
+| Atomic rollback | Simulated insert/update failure leaves appeal evidence, workflow event, Claim snapshot, version, and audit evidence unchanged. |
+| Legacy preservation | Batch 6 does not remove `claims.status` and must not rely on it as the formal appeal source of truth. |
+
+### 40.3 Security Coverage
+
+| Coverage | Expected assertion |
+| --- | --- |
+| Same-tenant authorized submit | Actor with `claim.appeal.submit` or approved equivalent in the Claim organization and clinic succeeds through the controlled function. |
+| Same-tenant authorized resolve | Actor with `claim.appeal.decide` or approved equivalent in the Claim organization and clinic succeeds through the controlled function. |
+| Missing authentication | Anonymous/no `auth.uid()` actor cannot execute or mutate. |
+| Missing membership | Authenticated non-member receives sanitized denial and no write. |
+| Missing permission | Actor without appeal authority is denied. |
+| Cross-organization denial | Known Claim or Appeal UUID from another organization is not disclosed or mutated. |
+| Cross-clinic denial | Actor lacking clinic access cannot mutate or discover the Claim or Appeal. |
+| Direct appeal mutation denial | Ordinary authenticated users cannot directly insert, update submitted/resolved appeal evidence, or delete `claim_appeals`. |
+| Direct Claim-state bypass denial | Appeal permissions do not authorize ordinary direct updates to protected Claim workflow, decision, payment, version, or state metadata columns. |
+| AI non-authority | AI/system actor without explicit appeal permission cannot submit, resolve, approve, reject, close, or withdraw appeals. |
+| Restricted SECURITY DEFINER execution | Functions are `SECURITY DEFINER`, fixed search path, no EXECUTE for `PUBLIC` or `anon`, EXECUTE only for approved `authenticated` and `service_role`. |
+| Tenant-safe errors | Not found, unauthorized, stale, invalid state, idempotency conflict, and decision-link errors do not expose PHI, tenant existence, internal policy names, raw SQL diagnostics, or unrestricted metadata. |
+
+### 40.4 Required Regression Coverage
+
+Batch 6 must retain relevant existing coverage:
+
+```text
+supabase/tests/phase4_claim_schema_test.sql
+supabase/tests/phase4_claim_workflow_history_test.sql
+supabase/tests/phase4_claim_workflow_mutation_test.sql
+supabase/tests/phase4_claim_workflow_security_test.sql
+supabase/tests/phase4_claim_decision_mutation_test.sql
+supabase/tests/phase4_claim_decision_security_test.sql
+supabase/tests/phase4_claim_payment_mutation_test.sql
+supabase/tests/phase4_claim_payment_security_test.sql
 supabase/tests/phase3_claim_permissions_test.sql
 supabase/tests/phase3_claim_security_test.sql
 supabase/tests/phase3_claim_tenant_isolation_test.sql
