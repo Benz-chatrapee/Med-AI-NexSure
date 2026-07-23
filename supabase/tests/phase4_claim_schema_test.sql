@@ -314,36 +314,163 @@ select ok(
 );
 
 select ok(
-  not exists (
-    select 1
-    from pg_class c
-    join pg_namespace n
-      on n.oid = c.relnamespace
-    where n.nspname = 'public'
-      and c.relkind in ('r', 'p')
-      and c.relname in (
-        'claim_appeals',
-        'claim_line_decisions',
-        'claim_payment_transactions'
-      )
-  ),
-  'no Batch 2 claim tables are introduced'
+  to_regclass('public.claim_appeals') is not null
+    and exists (
+      select 1
+      from pg_constraint c
+      join pg_class r
+        on r.oid = c.conrelid
+      join pg_namespace n
+        on n.oid = r.relnamespace
+      where n.nspname = 'public'
+        and r.relname = 'claim_appeals'
+        and c.conname = 'claim_appeals_claim_tenant_fk'
+    )
+    and exists (
+      select 1
+      from pg_constraint c
+      join pg_class r
+        on r.oid = c.conrelid
+      join pg_namespace n
+        on n.oid = r.relnamespace
+      where n.nspname = 'public'
+        and r.relname = 'claim_appeals'
+        and c.conname = 'claim_appeals_status_chk'
+    )
+    and exists (
+      select 1
+      from pg_indexes
+      where schemaname = 'public'
+        and tablename = 'claim_appeals'
+        and indexname = 'claim_appeals_claim_sequence_uq'
+    )
+    and exists (
+      select 1
+      from pg_class c
+      join pg_namespace n
+        on n.oid = c.relnamespace
+      where n.nspname = 'public'
+        and c.relname = 'claim_appeals'
+        and c.relrowsecurity
+    )
+    and has_table_privilege('authenticated', 'public.claim_appeals', 'select')
+    and not has_table_privilege('authenticated', 'public.claim_appeals', 'insert')
+    and not has_table_privilege('authenticated', 'public.claim_appeals', 'update')
+    and not has_table_privilege('authenticated', 'public.claim_appeals', 'delete')
+    and not exists (
+      select 1
+      from pg_class c
+      join pg_namespace n
+        on n.oid = c.relnamespace
+      where n.nspname = 'public'
+        and c.relkind in ('r', 'p')
+        and c.relname in (
+          'claim_line_decisions',
+          'claim_payment_transactions'
+        )
+    ),
+  'Batch 6 appeal table is approved and unapproved claim tables remain absent'
 );
 
 select ok(
-  not exists (
-    select 1
-    from pg_proc p
-    join pg_namespace n
-      on n.oid = p.pronamespace
-    where n.nspname = 'public'
-      and p.proname in (
-        'submit_claim_appeal',
-        'record_claim_refund',
-        'record_claim_reversal'
-      )
-  ),
-  'no out-of-scope claim mutation functions are introduced'
+  to_regprocedure(
+    'public.submit_claim_appeal(uuid, integer, text, text, timestamptz, uuid, text, uuid, text, text, uuid, jsonb)'
+  ) is not null
+    and to_regprocedure(
+      'public.resolve_claim_appeal(uuid, integer, text, text, text, uuid, timestamptz, text, text, uuid, jsonb)'
+    ) is not null
+    and exists (
+      select 1
+      from pg_proc p
+      join pg_namespace n
+        on n.oid = p.pronamespace
+      where n.nspname = 'public'
+        and p.proname in ('submit_claim_appeal', 'resolve_claim_appeal')
+        and p.prosecdef
+        and p.proconfig @> array['search_path=public, private, auth, pg_temp']
+      group by n.nspname
+      having count(*) = 2
+    )
+    and not has_function_privilege(
+      'public',
+      'public.submit_claim_appeal(uuid, integer, text, text, timestamptz, uuid, text, uuid, text, text, uuid, jsonb)',
+      'execute'
+    )
+    and not has_function_privilege(
+      'anon',
+      'public.submit_claim_appeal(uuid, integer, text, text, timestamptz, uuid, text, uuid, text, text, uuid, jsonb)',
+      'execute'
+    )
+    and not has_function_privilege(
+      'public',
+      'public.resolve_claim_appeal(uuid, integer, text, text, text, uuid, timestamptz, text, text, uuid, jsonb)',
+      'execute'
+    )
+    and not has_function_privilege(
+      'anon',
+      'public.resolve_claim_appeal(uuid, integer, text, text, text, uuid, timestamptz, text, text, uuid, jsonb)',
+      'execute'
+    )
+    and has_function_privilege(
+      'authenticated',
+      'public.submit_claim_appeal(uuid, integer, text, text, timestamptz, uuid, text, uuid, text, text, uuid, jsonb)',
+      'execute'
+    )
+    and has_function_privilege(
+      'service_role',
+      'public.submit_claim_appeal(uuid, integer, text, text, timestamptz, uuid, text, uuid, text, text, uuid, jsonb)',
+      'execute'
+    )
+    and has_function_privilege(
+      'authenticated',
+      'public.resolve_claim_appeal(uuid, integer, text, text, text, uuid, timestamptz, text, text, uuid, jsonb)',
+      'execute'
+    )
+    and has_function_privilege(
+      'service_role',
+      'public.resolve_claim_appeal(uuid, integer, text, text, text, uuid, timestamptz, text, text, uuid, jsonb)',
+      'execute'
+    )
+    and exists (
+      select 1
+      from pg_proc p
+      join pg_namespace n
+        on n.oid = p.pronamespace
+      where n.nspname = 'public'
+        and p.proname = 'submit_claim_appeal'
+        and pg_get_functiondef(p.oid) ilike '%''claim.appeal.submit''%'
+        and pg_get_functiondef(p.oid) ilike '%public.has_permission(%'
+        and pg_get_functiondef(p.oid) ilike '%v_claim.version <> p_expected_version%'
+        and pg_get_functiondef(p.oid) ilike '%idempotent_replay%'
+        and pg_get_functiondef(p.oid) not ilike '%set decision_status%'
+        and pg_get_functiondef(p.oid) not ilike '%set payment_status%'
+    )
+    and exists (
+      select 1
+      from pg_proc p
+      join pg_namespace n
+        on n.oid = p.pronamespace
+      where n.nspname = 'public'
+        and p.proname = 'resolve_claim_appeal'
+        and pg_get_functiondef(p.oid) ilike '%''claim.appeal.decide''%'
+        and pg_get_functiondef(p.oid) ilike '%public.has_permission(%'
+        and pg_get_functiondef(p.oid) ilike '%v_claim.version <> p_expected_version%'
+        and pg_get_functiondef(p.oid) ilike '%idempotent_replay%'
+        and pg_get_functiondef(p.oid) not ilike '%set decision_status%'
+        and pg_get_functiondef(p.oid) not ilike '%set payment_status%'
+    )
+    and not exists (
+      select 1
+      from pg_proc p
+      join pg_namespace n
+        on n.oid = p.pronamespace
+      where n.nspname = 'public'
+        and p.proname in (
+          'record_claim_refund',
+          'record_claim_reversal'
+        )
+    ),
+  'Batch 6 appeal functions are approved and unapproved refund or reversal functions remain absent'
 );
 
 select * from finish();

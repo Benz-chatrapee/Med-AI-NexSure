@@ -1864,3 +1864,90 @@ Deferred candidates:
 - Refund/Reversal Lifecycle is deferred because refund ceiling and full exception semantics should be isolated in a later financial-exception batch after payment settlement summary is controlled.
 
 Batch 5 readiness: `READY FOR BATCH 5`
+
+---
+
+## Phase 4 Batch 6 Roadmap and Gap Selection
+
+**Confirmed Finding**
+
+Static repository inspection for Batch 6 used the required Phase 4 documents, the Phase 3 validation report, and these implementation artifacts:
+
+```text
+supabase/migrations/20260722140000_phase4_claim_state_types.sql
+supabase/migrations/20260722140100_phase4_claim_state_columns.sql
+supabase/migrations/20260722140200_phase4_claim_workflow_events.sql
+supabase/migrations/20260722160000_phase4_claim_workflow_mutation.sql
+supabase/migrations/20260722161000_phase4_claim_decision_mutation.sql
+supabase/migrations/20260722162000_phase4_claim_payment_mutation.sql
+supabase/tests/phase4_claim_schema_test.sql
+supabase/tests/phase4_claim_workflow_history_test.sql
+supabase/tests/phase4_claim_workflow_mutation_test.sql
+supabase/tests/phase4_claim_workflow_security_test.sql
+supabase/tests/phase4_claim_decision_mutation_test.sql
+supabase/tests/phase4_claim_decision_security_test.sql
+supabase/tests/phase4_claim_payment_mutation_test.sql
+supabase/tests/phase4_claim_payment_security_test.sql
+```
+
+No migrations or tests were executed for this documentation pass.
+
+### Batch 1-5 Baseline
+
+| Batch | Migration Present | Tests Present | PASS Evidence | Capability Delivered | Status |
+| --- | --- | --- | --- | --- | --- |
+| Batch 1 - Split-state schema | Yes | Yes | Not executed in this pass | Workflow, decision, and payment domains plus nullable Claim snapshots and queue indexes | COMPLETE WITH FOLLOW-UP |
+| Batch 2 - Workflow history | Yes | Yes | Not executed in this pass | Append-only workflow event table, tenant-safe FK, RLS read policy, service-role write boundary | COMPLETE WITH FOLLOW-UP |
+| Batch 3 - Workflow mutation | Yes | Yes | Not executed in this pass | `public.transition_claim_workflow`, allowed matrix, optimistic versioning, event insertion, direct workflow-column protection | COMPLETE WITH FOLLOW-UP |
+| Batch 4 - Decision mutation | Yes | Yes | Not executed in this pass | `public.record_claim_decision`, decision event identity, current-decision pointer/snapshot synchronization, direct decision-write protection | COMPLETE WITH FOLLOW-UP |
+| Batch 5 - Payment settlement mutation | Yes: `20260722162000_phase4_claim_payment_mutation.sql` | Yes: `phase4_claim_payment_mutation_test.sql`; `phase4_claim_payment_security_test.sql` | Not executed in this pass | `public.record_claim_payment_settlement`, split payment snapshot synchronization, payment authority, and payment direct-write protection | COMPLETE WITH FOLLOW-UP |
+
+`COMPLETE WITH FOLLOW-UP` means files exist and static inspection confirms the intended capability, but runtime PASS is not claimed.
+
+### Remaining Capability Gaps After Batch 5
+
+| Capability Gap | Evidence | Dependency | Risk | Demo Impact | Production Impact | Decision Status | Priority |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Formal appeal entity | ADR-002 approved; no `claim_appeals` implementation found | Batch 3 workflow and Batch 4 decisions | Appeal evidence remains lossy | Medium | Required for formal appeal operations | Approved architecture; implementation gap | P1 |
+| Refund lifecycle | Payment states include refund values; no refund function verified | Payment settlement contract and finance refund ceiling rules | Double-count/refund overrun risk | Low for basic demo | Required before production exception handling | Open technical/product detail | P1 |
+| Reversal lifecycle | `claim_payments` has reversal fields; no controlled reversal wrapper verified | Payment settlement contract | Reversal can remain unsynchronized | Medium | Required before production exception handling | Partially documented | P1 |
+| Legacy split-state migration/finalization | `claims.status` remains unchanged; split columns require cutover | Stable controlled operations and application migration | Mixed reads/writes | Low if demo uses controlled functions | Required before cutover | Open cutover task | P1 |
+| Application/type integration | `lib/database.types.ts` and app references not updated in this batch | Stable database contract | UI/API mismatch | Medium | Required before release | Not verified | P1 |
+
+### Candidate Batch 6 Options
+
+| Candidate | Evidence | Objective | Dependencies | Security Risk | Migration Risk | Test Scope | Readiness |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Formal Claim Appeal Entity and Controlled Appeal Mutations | ADR-002 approved; workflow `appealed` exists; decision function exists; no `claim_appeals` table found | Add dedicated appeal source of truth and submit/resolve operations | Batch 1-5, Phase 3 RBAC/RLS helpers | High due sensitive evidence and deadlines; mitigated by RLS and controlled functions | Moderate additive table/function/protection migration | Schema, submit/resolve, sequence, workflow linkage, tenant isolation, direct-write security, regression | READY FOR BATCH 6 |
+| Refund/Reversal Lifecycle | ADR-003 requires distinguishable refund/reversal before production; refund function missing | Add refund/reversal operations and summary states | Payment settlement plus refund ceiling and reversal authority | High financial integrity risk | Higher due exception math and ordering | Refund ceiling, reversal, idempotency, reconciliation | DECISION CLOSURE REQUIRED |
+| Legacy Status Cutover | ADR-008 staged retirement | Backfill and transition readers/writers from legacy `claims.status` | Stable appeal and financial exception contracts, application inventory | High if readers/writers diverge | High due compatibility and generated type changes | Backfill, compatibility, app regression | NOT READY |
+
+### Selected Batch 6
+
+**Recommendation**
+
+Select `Formal Claim Appeal Entity and Controlled Appeal Mutations` as Phase 4 Batch 6.
+
+Rationale:
+
+- ADR-002 already approves the dedicated Appeal source-of-truth boundary.
+- It has one primary database responsibility: formal appeal evidence and controlled appeal lifecycle mutation.
+- It reuses Batch 3 workflow events and Batch 4 decision evidence instead of duplicating workflow or adjudication truth.
+- Batch 5 explicitly deferred formal appeals and kept payment independent.
+- Refund/reversal remains less ready because refund ceiling, partial/full refund semantics, and broad reversal ordering are still Open Decisions.
+
+Deferred candidates:
+
+- Refund/Reversal Lifecycle is deferred to a financial-exception decision-closure task.
+- Legacy Status Cutover is deferred until formal appeals and financial exceptions are stable and application/type integration is planned.
+
+### Batch 6 Open Decisions
+
+| Decision | Why it is required | Options | Recommended option | Decision owner | Implementation blocker |
+| --- | --- | --- | --- | --- | --- |
+| Exact appeal submit eligibility | Prevent invalid formal appeals from pre-submission or terminal states | Restrict to `under_review`; allow selected post-decision workflows; allow elevated terminal exceptions | Restrict Batch 6 to `under_review` and already appeal-compatible states | Claim Domain Owner | NO |
+| Appeal outcome workflow mapping | Avoid implicit closure or reopen side effects | No workflow change; move back to `under_review`; close on final appeal outcome | Keep closure explicit; allow only narrow reviewed mapping if approved | Product Owner / Claim Domain Owner | NO |
+| Appeal permission names | Preserve least privilege and reuse existing RBAC where possible | Add exact appeal permissions; reuse `claim.review`; hybrid | Add exact appeal permissions when no exact existing names are found | Security Lead | NO |
+| Multi-round appeal depth | Bound MVP scope | Single appeal; sequenced appeals; full multi-level automation | Sequenced appeal records, no multi-level automation | Product Owner | NO |
+
+Batch 6 readiness: `READY FOR BATCH 6`

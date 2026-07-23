@@ -2214,3 +2214,107 @@ Batch 5 should implement a controlled payment settlement path that:
 Batch 5 does not implement formal appeals, refund lifecycle, legacy `claims.status` removal, backend/API/frontend cutover, generated types, fixtures, seed data, or database reset.
 
 Refund and reversal remain distinguishable requirements. Refund behavior is deferred to a later financial-exception batch unless the Batch 5 implementation encounters a blocking dependency that requires a narrower decision-closure task first.
+
+---
+
+## 41. Phase 4 Batch 6 Formal Appeal Contract Clarification
+
+**Status:** Approved
+**Decision Date:** 2026-07-23
+**Approval Reference:** Phase 4 Batch 6 Contract Approval Closure
+
+Batch 6 defines formal appeals after split workflow, decision, and payment mutation boundaries are established.
+
+### 41.1 Approved Boundary
+
+Formal appeal mutation is independent from payer decision and payment mutation.
+
+```text
+appeal submit may set workflow_status = appealed through controlled workflow authority
+appeal submit does not set decision_status
+appeal submit does not set payment_status
+appeal resolve may link an authoritative decision
+appeal resolve does not create a decision or payment record by itself
+```
+
+`public.claim_appeals` is the proposed source of truth for appeal-specific facts. `claims.workflow_status = appealed` is only the operational queue summary.
+
+### 41.2 Batch 6 Scope
+
+Batch 6 should implement a controlled appeal path that:
+
+- creates `claim_appeals` as the formal appeal record;
+- allocates `appeal_sequence` while the parent Claim is locked;
+- requires tenant and clinic scope from the locked Claim;
+- supports submit and resolve operations;
+- links to existing evidence package and decision objects when supplied and tenant-safe;
+- writes workflow evidence when the Claim workflow changes to `appealed`;
+- uses `claims.version` as the optimistic lock;
+- preserves workflow, decision, and payment authority separation;
+- rejects direct ordinary writes to submitted or resolved appeal evidence;
+- records actor, authority, reason, request identity, and timestamps.
+
+### 41.3 Appeal State Model
+
+Minimum proposed appeal states:
+
+```text
+draft
+submitted
+under_review
+request_information
+approved
+partially_approved
+rejected
+withdrawn
+closed
+```
+
+Appeal states describe the appeal case lifecycle only. They must not be copied directly into `claims.decision_status` or `claims.payment_status`.
+
+### 41.4 Submit Appeal Mutation
+
+Proposed function:
+
+```text
+public.submit_claim_appeal(...)
+```
+
+Responsibility:
+
+- authenticate and resolve actor from trusted context;
+- lock the parent Claim and validate `p_expected_version`;
+- validate tenant, clinic, membership, and `claim.appeal.submit` permission or approved equivalent;
+- reject soft-deleted Claims;
+- reject unsupported workflow states;
+- create one appeal record with reason, owner, optional deadline, payer reference, optional evidence package, source, external identity, and correlation metadata;
+- transition workflow to `appealed` atomically when required;
+- write workflow event and audit evidence;
+- increment `claims.version` exactly once;
+- return appeal and canonical Claim state.
+
+### 41.5 Resolve Appeal Mutation
+
+Proposed function:
+
+```text
+public.resolve_claim_appeal(...)
+```
+
+Responsibility:
+
+- authenticate and resolve actor from trusted context;
+- lock the parent Claim through the Appeal and validate `p_expected_version`;
+- validate `claim.appeal.decide` permission or approved equivalent;
+- validate allowed appeal status movement;
+- optionally link `outcome_decision_id` to an existing authoritative decision for the same tenant, clinic, and Claim;
+- preserve existing decision and payment snapshots unless separate controlled functions are called;
+- record reason, source, external identity, correlation, and audit evidence;
+- increment `claims.version` exactly once;
+- return canonical appeal and Claim state.
+
+### 41.6 Explicit Exclusions
+
+Batch 6 does not implement refund lifecycle, reversal lifecycle, payment allocation changes, legacy `claims.status` removal, dedicated line decisions, backend/API/frontend/generated type changes, fixtures, seed data, or database reset.
+
+Open decisions in the Batch 6 contract are non-blocking for a minimal implementation if the implementation uses the recommended narrow defaults and leaves broader behavior disabled until approved.
