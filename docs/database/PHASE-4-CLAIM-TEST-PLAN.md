@@ -1608,3 +1608,114 @@ Implementation Gate Status: `READY`
 Migration Implementation Authorized: `YES`
 
 Semantic Contract Changed During Approval: `NO`
+
+---
+
+## 44. Batch 7 Runtime Validation Closure
+
+**Validation Date:** 2026-07-23
+**Validated Commit SHA:** `ab84c83fb781df4336d50964d93012df0af92fde`
+**Branch:** `main`
+**Initial Working Tree State:** clean; `git status --short --untracked-files=all` returned no paths.
+**Initial Diff State:** clean; `git diff --check` and `git diff --name-only` returned no findings.
+**Final Batch 7 Validation Status:** `PASS`
+**Batch 7 Validation Gate for Batch 8 Analysis:** `SATISFIED`
+**Batch 8 Contract Defined:** `NO`
+**Batch 8 Implementation Authorized:** `NO`
+
+### 44.1 Resolved Runtime Paths
+
+```text
+supabase/migrations/20260722164000_phase4_claim_refund_mutation.sql
+supabase/tests/phase4_claim_schema_test.sql
+supabase/tests/phase4_claim_refund_mutation_test.sql
+supabase/tests/phase4_claim_refund_security_test.sql
+supabase/tests/phase4_claim_workflow_history_test.sql
+supabase/tests/phase4_claim_workflow_mutation_test.sql
+supabase/tests/phase4_claim_workflow_security_test.sql
+supabase/tests/phase4_claim_decision_mutation_test.sql
+supabase/tests/phase4_claim_decision_security_test.sql
+supabase/tests/phase4_claim_payment_mutation_test.sql
+supabase/tests/phase4_claim_payment_security_test.sql
+supabase/tests/phase4_claim_appeal_test.sql
+supabase/tests/phase4_claim_appeal_security_test.sql
+supabase/tests/phase3_claim_permissions_test.sql
+supabase/tests/phase3_claim_security_test.sql
+supabase/tests/phase3_claim_tenant_isolation_test.sql
+supabase/tests/phase3_claim_self_scope_test.sql
+supabase/tests/phase3_claim_audit_test.sql
+```
+
+All required paths were verified present before runtime execution.
+
+### 44.2 Command Results
+
+| Order | Classification | Exact command | Test path | Executed | Result | Planned | Passed | Failed | Material diagnostics |
+| --- | --- | --- | --- | --- | --- | ---: | ---: | ---: | --- |
+| 1 | `MANDATORY` | `npx supabase db reset` | `NOT APPLICABLE` | `YES` | `PASS` | `NOT APPLICABLE` | `NOT APPLICABLE` | `0` | Reset completed on branch `main`; applied migrations through `20260722164000_phase4_claim_refund_mutation.sql`; seeded `supabase/seed.sql`; CLI emitted idempotent NOTICE lines for existing extensions and missing policy/trigger drops skipped during migration setup. |
+| 2 | `MANDATORY` | `npx supabase db lint` | `NOT APPLICABLE` | `YES` | `PASS` | `NOT APPLICABLE` | `NOT APPLICABLE` | `0` | `No schema errors found`; linted `extensions`, `private`, and `public`. |
+| 3 | `MANDATORY` | `npx supabase test db .\supabase\tests\phase4_claim_schema_test.sql` | `supabase/tests/phase4_claim_schema_test.sql` | `YES` | `PASS` | `51` | `51` | `0` | `All tests successful`; `Files=1, Tests=51`; `Result: PASS`. |
+| 4 | `MANDATORY` | `npx supabase test db .\supabase\tests\phase4_claim_refund_mutation_test.sql` | `supabase/tests/phase4_claim_refund_mutation_test.sql` | `YES` | `PASS` | `19` | `19` | `0` | `All tests successful`; `Files=1, Tests=19`; `Result: PASS`. |
+| 5 | `MANDATORY` | `npx supabase test db .\supabase\tests\phase4_claim_refund_security_test.sql` | `supabase/tests/phase4_claim_refund_security_test.sql` | `YES` | `PASS` | `15` | `15` | `0` | `All tests successful`; `Files=1, Tests=15`; `Result: PASS`. |
+| 6 | `MANDATORY` | `npx supabase test db .\supabase\tests\phase4_claim_workflow_history_test.sql` | `supabase/tests/phase4_claim_workflow_history_test.sql` | `YES` | `PASS` | `47` | `47` | `0` | `All tests successful`; `Files=1, Tests=47`; `Result: PASS`. |
+| 7 | `MANDATORY` | `npx supabase test db .\supabase\tests\phase4_claim_workflow_mutation_test.sql` | `supabase/tests/phase4_claim_workflow_mutation_test.sql` | `YES` | `PASS` | `12` | `12` | `0` | `All tests successful`; `Files=1, Tests=12`; `Result: PASS`. |
+| 8 | `MANDATORY` | `npx supabase test db .\supabase\tests\phase4_claim_workflow_security_test.sql` | `supabase/tests/phase4_claim_workflow_security_test.sql` | `YES` | `PASS` | `10` | `10` | `0` | `All tests successful`; `Files=1, Tests=10`; `Result: PASS`. |
+| 9 | `MANDATORY` | `npx supabase test db .\supabase\tests\phase4_claim_decision_mutation_test.sql` | `supabase/tests/phase4_claim_decision_mutation_test.sql` | `YES` | `PASS` | `19` | `19` | `0` | `All tests successful`; `Files=1, Tests=19`; `Result: PASS`. |
+| 10 | `MANDATORY` | `npx supabase test db .\supabase\tests\phase4_claim_decision_security_test.sql` | `supabase/tests/phase4_claim_decision_security_test.sql` | `YES` | `PASS` | `12` | `12` | `0` | `All tests successful`; `Files=1, Tests=12`; `Result: PASS`. |
+| 11 | `MANDATORY` | `npx supabase test db .\supabase\tests\phase4_claim_payment_mutation_test.sql` | `supabase/tests/phase4_claim_payment_mutation_test.sql` | `YES` | `PASS` | `18` | `18` | `0` | `All tests successful`; `Files=1, Tests=18`; `Result: PASS`. |
+| 12 | `MANDATORY` | `npx supabase test db .\supabase\tests\phase4_claim_payment_security_test.sql` | `supabase/tests/phase4_claim_payment_security_test.sql` | `YES` | `PASS` | `15` | `15` | `0` | `All tests successful`; `Files=1, Tests=15`; `Result: PASS`. |
+| 13 | `MANDATORY` | `npx supabase test db .\supabase\tests\phase4_claim_appeal_test.sql` | `supabase/tests/phase4_claim_appeal_test.sql` | `YES` | `PASS` | `19` | `19` | `0` | `All tests successful`; `Files=1, Tests=19`; `Result: PASS`. |
+| 14 | `MANDATORY` | `npx supabase test db .\supabase\tests\phase4_claim_appeal_security_test.sql` | `supabase/tests/phase4_claim_appeal_security_test.sql` | `YES` | `PASS` | `16` | `16` | `0` | `All tests successful`; `Files=1, Tests=16`; `Result: PASS`. |
+| 15 | `MANDATORY` | `npx supabase test db .\supabase\tests\phase3_claim_permissions_test.sql` | `supabase/tests/phase3_claim_permissions_test.sql` | `YES` | `PASS` | `26` | `26` | `0` | `All tests successful`; `Files=1, Tests=26`; `Result: PASS`. |
+| 16 | `MANDATORY` | `npx supabase test db .\supabase\tests\phase3_claim_security_test.sql` | `supabase/tests/phase3_claim_security_test.sql` | `YES` | `PASS` | `29` | `29` | `0` | `All tests successful`; `Files=1, Tests=29`; `Result: PASS`. |
+| 17 | `MANDATORY` | `npx supabase test db .\supabase\tests\phase3_claim_tenant_isolation_test.sql` | `supabase/tests/phase3_claim_tenant_isolation_test.sql` | `YES` | `PASS` | `43` | `43` | `0` | `All tests successful`; `Files=1, Tests=43`; `Result: PASS`. |
+| 18 | `MANDATORY` | `npx supabase test db .\supabase\tests\phase3_claim_self_scope_test.sql` | `supabase/tests/phase3_claim_self_scope_test.sql` | `YES` | `PASS` | `45` | `45` | `0` | `All tests successful`; `Files=1, Tests=45`; `Result: PASS`. |
+| 19 | `MANDATORY` | `npx supabase test db .\supabase\tests\phase3_claim_audit_test.sql` | `supabase/tests/phase3_claim_audit_test.sql` | `YES` | `PASS` | `38` | `38` | `0` | `All tests successful`; `Files=1, Tests=38`; `Result: PASS`. |
+
+### 44.3 Requirement-to-Test Evidence Mapping
+
+| Requirement area | Runtime evidence |
+| --- | --- |
+| Refund eligibility and lifecycle | `phase4_claim_refund_mutation_test.sql` validates the approved `public.record_claim_refund(...)` signature, return contract, original settled payment validation, partial/full refund summary states, and existing payment authority reuse. |
+| Partial and full refund behavior | `phase4_claim_refund_mutation_test.sql` validates `partially_refunded` and `refunded` summary behavior and returned gross/refunded/net totals. |
+| Amount, currency, and cumulative refund integrity | `phase4_claim_refund_mutation_test.sql` validates exact refund amount handling, same-currency original payment requirements, and refund ceiling enforcement. |
+| Organization and clinic isolation | `phase4_claim_refund_security_test.sql` validates trusted tenant/clinic authorization and original payment tenant, clinic, and Claim ownership checks; Phase 3 tenant and self-scope regressions passed. |
+| Actor authorization and least privilege | `phase4_claim_refund_security_test.sql` validates `claim.payment.refund`, non-authoritative clinical/intake/reviewer roles, `PUBLIC`/`anon` execute denial, and restricted `authenticated`/`service_role` execution. |
+| Protected direct-write denial | `phase4_claim_refund_security_test.sql` validates direct Claim summary and payment/refund evidence write denial; payment, workflow, decision, appeal, and Phase 3 security regressions passed. |
+| Optimistic locking | `phase4_claim_refund_mutation_test.sql` validates `p_expected_version` conflict behavior and single version increment on successful non-replay refund. |
+| Contract-defined replay behavior | `phase4_claim_refund_mutation_test.sql` validates idempotent external replay behavior, including equivalent replay without duplicate evidence or version increment. |
+| Immutable history and audit evidence | `phase4_claim_refund_mutation_test.sql` validates original payment preservation and audit evidence insertion responsibility; Phase 3 audit regression passed. |
+| Atomic rollback | `phase4_claim_refund_mutation_test.sql` validates failed refund mutation no-write behavior for over-ceiling, stale-version, and invalid original payment cases. |
+| Preservation of workflow, decision, payment, and appeal authority | `phase4_claim_refund_mutation_test.sql`, `phase4_claim_schema_test.sql`, and Batch 1-6 regressions validate refund scope isolation from workflow, decision, appeal, legacy status, and separate payment settlement authority. |
+| Batch 1-6 regression compatibility | The required schema, workflow, decision, payment, appeal, and Phase 3 security/audit regression files all executed successfully. |
+
+No contract-required Batch 7 coverage area remained untested by the executed mandatory suites.
+
+### 44.4 Validation Summary
+
+| Evidence Area | Result |
+| --- | --- |
+| Database reset | `PASS` |
+| Database lint | `PASS` |
+| Schema regression | `PASS` |
+| Batch 7 functional refund tests | `PASS` |
+| Batch 7 refund security tests | `PASS` |
+| Required Batch 1-6 regressions | `PASS` |
+| Required SQL test files modified during validation | `NO` |
+| Required migrations modified during validation | `NO` |
+| Batch 7 semantic contract changed | `NO` |
+| Batch 8 work started | `NO` |
+
+Total executed pgTAP test assertions recorded by CLI output: `434` planned, `434` passed, `0` failed.
+
+### 44.5 Warnings and Advisories
+
+- `npx supabase db reset` emitted NOTICE diagnostics for idempotent setup and cleanup, including existing extensions and missing policies/triggers skipped during migration setup.
+- `npx supabase db lint` returned no schema errors.
+- No failing TAP assertions, failed commands, unexecuted mandatory commands, or unresolved Batch 7 contract evidence gaps remain.
+
+### 44.6 Batch 8 Analysis Gate
+
+`Batch 7 Validation Gate for Batch 8 Analysis: SATISFIED`
+
+This satisfies only the Batch 8 analysis prerequisite. It does not define, approve, authorize, implement, commit, or push Batch 8.
