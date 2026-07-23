@@ -40,9 +40,11 @@ export type Database = {
           action_type: Database["public"]["Enums"]["audit_action_type"]
           actor_auth_user_id: string | null
           actor_profile_id: string | null
+          actor_role: string | null
           actor_user_id: string | null
           after_state: Json | null
           before_state: Json | null
+          changed_fields: string[] | null
           clinic_id: string | null
           correlation_id: string | null
           created_at: string
@@ -56,6 +58,7 @@ export type Database = {
           organization_id: string | null
           outcome: string
           reason: string | null
+          request_id: string | null
           resource_id: string | null
           resource_type: string
           target_record_id: string | null
@@ -67,9 +70,11 @@ export type Database = {
           action_type: Database["public"]["Enums"]["audit_action_type"]
           actor_auth_user_id?: string | null
           actor_profile_id?: string | null
+          actor_role?: string | null
           actor_user_id?: string | null
           after_state?: Json | null
           before_state?: Json | null
+          changed_fields?: string[] | null
           clinic_id?: string | null
           correlation_id?: string | null
           created_at?: string
@@ -83,6 +88,7 @@ export type Database = {
           organization_id?: string | null
           outcome?: string
           reason?: string | null
+          request_id?: string | null
           resource_id?: string | null
           resource_type: string
           target_record_id?: string | null
@@ -94,9 +100,11 @@ export type Database = {
           action_type?: Database["public"]["Enums"]["audit_action_type"]
           actor_auth_user_id?: string | null
           actor_profile_id?: string | null
+          actor_role?: string | null
           actor_user_id?: string | null
           after_state?: Json | null
           before_state?: Json | null
+          changed_fields?: string[] | null
           clinic_id?: string | null
           correlation_id?: string | null
           created_at?: string
@@ -110,6 +118,7 @@ export type Database = {
           organization_id?: string | null
           outcome?: string
           reason?: string | null
+          request_id?: string | null
           resource_id?: string | null
           resource_type?: string
           target_record_id?: string | null
@@ -622,6 +631,143 @@ export type Database = {
           },
         ]
       }
+      claim_appeals: {
+        Row: {
+          appeal_reason_code: string
+          appeal_reason_text: string | null
+          appeal_sequence: number
+          appeal_status: string
+          claim_id: string
+          clinic_id: string
+          correlation_id: string | null
+          created_at: string
+          created_by: string
+          deadline_at: string | null
+          deleted_at: string | null
+          evidence_package_id: string | null
+          external_event_id: string | null
+          id: string
+          metadata: Json
+          organization_id: string
+          outcome_decision_id: string | null
+          owner_user_id: string | null
+          payer_reference: string | null
+          resolved_at: string | null
+          source_system: string
+          submitted_at: string
+          submitted_by: string
+          updated_at: string
+          updated_by: string
+        }
+        Insert: {
+          appeal_reason_code: string
+          appeal_reason_text?: string | null
+          appeal_sequence: number
+          appeal_status?: string
+          claim_id: string
+          clinic_id: string
+          correlation_id?: string | null
+          created_at?: string
+          created_by: string
+          deadline_at?: string | null
+          deleted_at?: string | null
+          evidence_package_id?: string | null
+          external_event_id?: string | null
+          id?: string
+          metadata?: Json
+          organization_id: string
+          outcome_decision_id?: string | null
+          owner_user_id?: string | null
+          payer_reference?: string | null
+          resolved_at?: string | null
+          source_system?: string
+          submitted_at?: string
+          submitted_by: string
+          updated_at?: string
+          updated_by: string
+        }
+        Update: {
+          appeal_reason_code?: string
+          appeal_reason_text?: string | null
+          appeal_sequence?: number
+          appeal_status?: string
+          claim_id?: string
+          clinic_id?: string
+          correlation_id?: string | null
+          created_at?: string
+          created_by?: string
+          deadline_at?: string | null
+          deleted_at?: string | null
+          evidence_package_id?: string | null
+          external_event_id?: string | null
+          id?: string
+          metadata?: Json
+          organization_id?: string
+          outcome_decision_id?: string | null
+          owner_user_id?: string | null
+          payer_reference?: string | null
+          resolved_at?: string | null
+          source_system?: string
+          submitted_at?: string
+          submitted_by?: string
+          updated_at?: string
+          updated_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_appeals_claim_tenant_fk"
+            columns: ["organization_id", "clinic_id", "claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["organization_id", "clinic_id", "id"]
+          },
+          {
+            foreignKeyName: "claim_appeals_created_by_fk"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_appeals_outcome_decision_tenant_fk"
+            columns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "outcome_decision_id",
+            ]
+            isOneToOne: false
+            referencedRelation: "claim_decisions"
+            referencedColumns: [
+              "organization_id",
+              "clinic_id",
+              "claim_id",
+              "id",
+            ]
+          },
+          {
+            foreignKeyName: "claim_appeals_owner_user_fk"
+            columns: ["owner_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_appeals_submitted_by_fk"
+            columns: ["submitted_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_appeals_updated_by_fk"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       claim_benefit_limit_results: {
         Row: {
           benefit_code: string
@@ -874,6 +1020,7 @@ export type Database = {
           claim_id: string
           claim_review_id: string
           clinic_id: string
+          correlation_id: string | null
           created_at: string
           created_by: string
           currency_code: string
@@ -886,12 +1033,15 @@ export type Database = {
           decision_status: string
           decision_summary: string | null
           decision_version: number
+          external_event_id: string | null
           id: string
           metadata: Json
           organization_id: string
           patient_responsibility_amount: number | null
+          payer_reference: string | null
           payer_responsibility_amount: number | null
           rejected_amount: number | null
+          source_system: string
           submitted_amount: number
           supersedes_decision_id: string | null
           updated_at: string
@@ -902,6 +1052,7 @@ export type Database = {
           claim_id: string
           claim_review_id: string
           clinic_id: string
+          correlation_id?: string | null
           created_at?: string
           created_by: string
           currency_code: string
@@ -914,12 +1065,15 @@ export type Database = {
           decision_status?: string
           decision_summary?: string | null
           decision_version: number
+          external_event_id?: string | null
           id?: string
           metadata?: Json
           organization_id: string
           patient_responsibility_amount?: number | null
+          payer_reference?: string | null
           payer_responsibility_amount?: number | null
           rejected_amount?: number | null
+          source_system?: string
           submitted_amount: number
           supersedes_decision_id?: string | null
           updated_at?: string
@@ -930,6 +1084,7 @@ export type Database = {
           claim_id?: string
           claim_review_id?: string
           clinic_id?: string
+          correlation_id?: string | null
           created_at?: string
           created_by?: string
           currency_code?: string
@@ -942,12 +1097,15 @@ export type Database = {
           decision_status?: string
           decision_summary?: string | null
           decision_version?: number
+          external_event_id?: string | null
           id?: string
           metadata?: Json
           organization_id?: string
           patient_responsibility_amount?: number | null
+          payer_reference?: string | null
           payer_responsibility_amount?: number | null
           rejected_amount?: number | null
+          source_system?: string
           submitted_amount?: number
           supersedes_decision_id?: string | null
           updated_at?: string
@@ -3727,6 +3885,112 @@ export type Database = {
           },
         ]
       }
+      claim_workflow_events: {
+        Row: {
+          actor_reference: string | null
+          actor_type: string
+          actor_user_id: string | null
+          claim_id: string
+          claim_version_after: number
+          claim_version_before: number
+          clinic_id: string
+          correlation_id: string | null
+          created_at: string
+          external_event_id: string | null
+          from_workflow_status:
+            | Database["public"]["Enums"]["claim_workflow_state"]
+            | null
+          id: string
+          metadata: Json
+          occurred_at: string
+          organization_id: string
+          reason_code: string | null
+          reason_text: string | null
+          received_at: string | null
+          recorded_at: string
+          sequence_number: number
+          source_system: string
+          supersedes_event_id: string | null
+          to_workflow_status: Database["public"]["Enums"]["claim_workflow_state"]
+        }
+        Insert: {
+          actor_reference?: string | null
+          actor_type: string
+          actor_user_id?: string | null
+          claim_id: string
+          claim_version_after: number
+          claim_version_before: number
+          clinic_id: string
+          correlation_id?: string | null
+          created_at?: string
+          external_event_id?: string | null
+          from_workflow_status?:
+            | Database["public"]["Enums"]["claim_workflow_state"]
+            | null
+          id?: string
+          metadata?: Json
+          occurred_at: string
+          organization_id: string
+          reason_code?: string | null
+          reason_text?: string | null
+          received_at?: string | null
+          recorded_at?: string
+          sequence_number: number
+          source_system: string
+          supersedes_event_id?: string | null
+          to_workflow_status: Database["public"]["Enums"]["claim_workflow_state"]
+        }
+        Update: {
+          actor_reference?: string | null
+          actor_type?: string
+          actor_user_id?: string | null
+          claim_id?: string
+          claim_version_after?: number
+          claim_version_before?: number
+          clinic_id?: string
+          correlation_id?: string | null
+          created_at?: string
+          external_event_id?: string | null
+          from_workflow_status?:
+            | Database["public"]["Enums"]["claim_workflow_state"]
+            | null
+          id?: string
+          metadata?: Json
+          occurred_at?: string
+          organization_id?: string
+          reason_code?: string | null
+          reason_text?: string | null
+          received_at?: string | null
+          recorded_at?: string
+          sequence_number?: number
+          source_system?: string
+          supersedes_event_id?: string | null
+          to_workflow_status?: Database["public"]["Enums"]["claim_workflow_state"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_workflow_events_actor_user_fk"
+            columns: ["actor_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_workflow_events_claim_tenant_fk"
+            columns: ["organization_id", "clinic_id", "claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["organization_id", "clinic_id", "id"]
+          },
+          {
+            foreignKeyName: "claim_workflow_events_supersedes_event_fk"
+            columns: ["supersedes_event_id"]
+            isOneToOne: false
+            referencedRelation: "claim_workflow_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       claims: {
         Row: {
           claim_number: string
@@ -3738,18 +4002,27 @@ export type Database = {
           currency_code: string
           current_ai_assessment_id: string | null
           current_decision_id: string | null
+          decision_status:
+            | Database["public"]["Enums"]["claim_decision_state"]
+            | null
           deleted_at: string | null
           deleted_by: string | null
           id: string
+          legacy_status_migration_state: string | null
           member_reference: string | null
           organization_id: string
           patient_id: string
           payer_id: string | null
           payer_reference: string | null
+          payment_status:
+            | Database["public"]["Enums"]["claim_payment_state"]
+            | null
           policy_reference: string | null
           risk_level: string | null
           service_end_date: string | null
           service_start_date: string
+          state_updated_at: string | null
+          state_updated_by: string | null
           status: string
           submitted_at: string | null
           total_approved_amount: number | null
@@ -3760,6 +4033,9 @@ export type Database = {
           updated_by: string
           version: number
           visit_id: string | null
+          workflow_status:
+            | Database["public"]["Enums"]["claim_workflow_state"]
+            | null
         }
         Insert: {
           claim_number: string
@@ -3771,18 +4047,27 @@ export type Database = {
           currency_code?: string
           current_ai_assessment_id?: string | null
           current_decision_id?: string | null
+          decision_status?:
+            | Database["public"]["Enums"]["claim_decision_state"]
+            | null
           deleted_at?: string | null
           deleted_by?: string | null
           id?: string
+          legacy_status_migration_state?: string | null
           member_reference?: string | null
           organization_id: string
           patient_id: string
           payer_id?: string | null
           payer_reference?: string | null
+          payment_status?:
+            | Database["public"]["Enums"]["claim_payment_state"]
+            | null
           policy_reference?: string | null
           risk_level?: string | null
           service_end_date?: string | null
           service_start_date: string
+          state_updated_at?: string | null
+          state_updated_by?: string | null
           status?: string
           submitted_at?: string | null
           total_approved_amount?: number | null
@@ -3793,6 +4078,9 @@ export type Database = {
           updated_by: string
           version?: number
           visit_id?: string | null
+          workflow_status?:
+            | Database["public"]["Enums"]["claim_workflow_state"]
+            | null
         }
         Update: {
           claim_number?: string
@@ -3804,18 +4092,27 @@ export type Database = {
           currency_code?: string
           current_ai_assessment_id?: string | null
           current_decision_id?: string | null
+          decision_status?:
+            | Database["public"]["Enums"]["claim_decision_state"]
+            | null
           deleted_at?: string | null
           deleted_by?: string | null
           id?: string
+          legacy_status_migration_state?: string | null
           member_reference?: string | null
           organization_id?: string
           patient_id?: string
           payer_id?: string | null
           payer_reference?: string | null
+          payment_status?:
+            | Database["public"]["Enums"]["claim_payment_state"]
+            | null
           policy_reference?: string | null
           risk_level?: string | null
           service_end_date?: string | null
           service_start_date?: string
+          state_updated_at?: string | null
+          state_updated_by?: string | null
           status?: string
           submitted_at?: string | null
           total_approved_amount?: number | null
@@ -3826,6 +4123,9 @@ export type Database = {
           updated_by?: string
           version?: number
           visit_id?: string | null
+          workflow_status?:
+            | Database["public"]["Enums"]["claim_workflow_state"]
+            | null
         }
         Relationships: [
           {
@@ -3886,6 +4186,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "patients"
             referencedColumns: ["organization_id", "id"]
+          },
+          {
+            foreignKeyName: "claims_state_updated_by_fk"
+            columns: ["state_updated_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "claims_updated_by_fk"
@@ -8123,6 +8430,7 @@ export type Database = {
           claim_id: string
           claim_review_id: string
           clinic_id: string
+          correlation_id: string | null
           created_at: string
           created_by: string
           currency_code: string
@@ -8135,12 +8443,15 @@ export type Database = {
           decision_status: string
           decision_summary: string | null
           decision_version: number
+          external_event_id: string | null
           id: string
           metadata: Json
           organization_id: string
           patient_responsibility_amount: number | null
+          payer_reference: string | null
           payer_responsibility_amount: number | null
           rejected_amount: number | null
+          source_system: string
           submitted_amount: number
           supersedes_decision_id: string | null
           updated_at: string
@@ -8242,6 +8553,33 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      record_claim_decision: {
+        Args: {
+          p_approved_amount?: number
+          p_claim_id: string
+          p_correlation_id?: string
+          p_decision_at?: string
+          p_expected_version: number
+          p_external_event_id?: string
+          p_metadata?: Json
+          p_payer_reference?: string
+          p_reason_code: string
+          p_reason_text: string
+          p_rejected_amount?: number
+          p_source_system?: string
+          p_target_decision_status: unknown
+        }
+        Returns: {
+          claim_id: string
+          current_decision_id: string
+          decision_id: string
+          decision_status: unknown
+          idempotent_replay: boolean
+          previous_decision_status: unknown
+          state_updated_at: string
+          version: number
+        }[]
+      }
       record_claim_payment: {
         Args: {
           p_actor_id: string
@@ -8308,6 +8646,86 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      record_claim_payment_settlement: {
+        Args: {
+          p_claim_id: string
+          p_correlation_id?: string
+          p_expected_version: number
+          p_external_event_id?: string
+          p_metadata?: Json
+          p_payer_reference?: string
+          p_payment_amount: number
+          p_payment_reference?: string
+          p_payment_status?: string
+          p_reason_code?: string
+          p_reason_text?: string
+          p_received_at?: string
+          p_source_system?: string
+          p_value_date?: string
+        }
+        Returns: {
+          claim_id: string
+          idempotent_replay: boolean
+          payment_id: string
+          payment_status: unknown
+          previous_payment_status: unknown
+          state_updated_at: string
+          total_paid_amount: number
+          version: number
+        }[]
+      }
+      record_claim_refund: {
+        Args: {
+          p_claim_id: string
+          p_correlation_id?: string
+          p_expected_version: number
+          p_external_event_id?: string
+          p_metadata?: Json
+          p_original_payment_id: string
+          p_reason_code: string
+          p_reason_text: string
+          p_refund_amount: number
+          p_refunded_at?: string
+          p_source_system?: string
+        }
+        Returns: {
+          claim_id: string
+          idempotent_replay: boolean
+          net_paid_amount: number
+          original_payment_id: string
+          payment_status: unknown
+          previous_payment_status: unknown
+          refund_payment_id: string
+          refunded_amount: number
+          state_updated_at: string
+          total_paid_amount: number
+          version: number
+        }[]
+      }
+      resolve_claim_appeal: {
+        Args: {
+          p_appeal_id: string
+          p_correlation_id?: string
+          p_expected_version: number
+          p_external_event_id?: string
+          p_metadata?: Json
+          p_outcome_decision_id?: string
+          p_reason_code: string
+          p_reason_text?: string
+          p_resolved_at?: string
+          p_source_system?: string
+          p_target_appeal_status: string
+        }
+        Returns: {
+          appeal_id: string
+          appeal_status: string
+          claim_id: string
+          idempotent_replay: boolean
+          state_updated_at: string
+          version: number
+          workflow_status: unknown
+        }[]
+      }
       revoke_role_assignment: {
         Args: { p_assignment_id: string; p_reason: string }
         Returns: string
@@ -8319,6 +8737,34 @@ export type Database = {
       role_assignment_role_scope: {
         Args: { p_role_name: string }
         Returns: string
+      }
+      safe_uuid: { Args: { p_value: string }; Returns: string }
+      submit_claim_appeal: {
+        Args: {
+          p_appeal_reason_code: string
+          p_appeal_reason_text?: string
+          p_claim_id: string
+          p_correlation_id?: string
+          p_deadline_at?: string
+          p_evidence_package_id?: string
+          p_expected_version: number
+          p_external_event_id?: string
+          p_metadata?: Json
+          p_owner_user_id?: string
+          p_payer_reference?: string
+          p_source_system?: string
+        }
+        Returns: {
+          appeal_id: string
+          appeal_sequence: number
+          claim_id: string
+          idempotent_replay: boolean
+          previous_workflow_status: unknown
+          state_updated_at: string
+          version: number
+          workflow_event_id: string
+          workflow_status: unknown
+        }[]
       }
       supersede_claim_decision: {
         Args: {
@@ -8333,6 +8779,7 @@ export type Database = {
           claim_id: string
           claim_review_id: string
           clinic_id: string
+          correlation_id: string | null
           created_at: string
           created_by: string
           currency_code: string
@@ -8345,12 +8792,15 @@ export type Database = {
           decision_status: string
           decision_summary: string | null
           decision_version: number
+          external_event_id: string | null
           id: string
           metadata: Json
           organization_id: string
           patient_responsibility_amount: number | null
+          payer_reference: string | null
           payer_responsibility_amount: number | null
           rejected_amount: number | null
+          source_system: string
           submitted_amount: number
           supersedes_decision_id: string | null
           updated_at: string
@@ -8362,6 +8812,28 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      transition_claim_workflow: {
+        Args: {
+          p_claim_id: string
+          p_correlation_id?: string
+          p_expected_version: number
+          p_external_event_id?: string
+          p_occurred_at?: string
+          p_reason_code: string
+          p_reason_text?: string
+          p_source_system?: string
+          p_target_status: unknown
+        }
+        Returns: {
+          claim_id: string
+          idempotent_replay: boolean
+          previous_workflow_status: unknown
+          state_updated_at: string
+          version: number
+          workflow_event_id: string
+          workflow_status: unknown
+        }[]
       }
       transition_clinic_lifecycle: {
         Args: { p_clinic_id: string; p_reason: string; p_target_status: string }
@@ -8403,6 +8875,22 @@ export type Database = {
         | "evidence_change"
         | "dashboard_viewed"
         | "filters_applied"
+      claim_decision_state:
+        | "not_decided"
+        | "approved"
+        | "partially_approved"
+        | "rejected"
+        | "request_information"
+        | "voided"
+      claim_payment_state:
+        | "not_paid"
+        | "payment_pending"
+        | "partially_paid"
+        | "paid"
+        | "payment_failed"
+        | "partially_refunded"
+        | "refunded"
+        | "reversed"
       claim_status:
         | "not_started"
         | "documentation_pending"
@@ -8410,6 +8898,17 @@ export type Database = {
         | "needs_review"
         | "blocked"
         | "submitted"
+      claim_workflow_state:
+        | "draft"
+        | "collecting_data"
+        | "validation_pending"
+        | "needs_review"
+        | "ready_to_submit"
+        | "submitted"
+        | "under_review"
+        | "appealed"
+        | "closed"
+        | "cancelled"
       prescription_status:
         | "draft"
         | "pending_review"
@@ -8577,6 +9076,24 @@ export const Constants = {
         "dashboard_viewed",
         "filters_applied",
       ],
+      claim_decision_state: [
+        "not_decided",
+        "approved",
+        "partially_approved",
+        "rejected",
+        "request_information",
+        "voided",
+      ],
+      claim_payment_state: [
+        "not_paid",
+        "payment_pending",
+        "partially_paid",
+        "paid",
+        "payment_failed",
+        "partially_refunded",
+        "refunded",
+        "reversed",
+      ],
       claim_status: [
         "not_started",
         "documentation_pending",
@@ -8584,6 +9101,18 @@ export const Constants = {
         "needs_review",
         "blocked",
         "submitted",
+      ],
+      claim_workflow_state: [
+        "draft",
+        "collecting_data",
+        "validation_pending",
+        "needs_review",
+        "ready_to_submit",
+        "submitted",
+        "under_review",
+        "appealed",
+        "closed",
+        "cancelled",
       ],
       prescription_status: [
         "draft",

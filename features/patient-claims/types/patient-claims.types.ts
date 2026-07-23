@@ -1,13 +1,15 @@
+import type { Database } from "@/lib/database.types";
+
 export type ClaimStatus = "draft" | "not_ready" | "needs_review" | "submitted" | "pending" | "approved" | "rejected";
+export type ClaimWorkflowStatus = Database["public"]["Enums"]["claim_workflow_state"];
+export type ClaimDecisionStatus = Database["public"]["Enums"]["claim_decision_state"];
+export type ClaimPaymentStatus = Database["public"]["Enums"]["claim_payment_state"];
+export type CanonicalClaimStateValue<T extends string> = T | "unknown";
 
 export type ClaimRiskLevel = "low" | "medium" | "high" | "critical";
-
 export type EvidenceStatus = "complete" | "missing" | "needs_review" | "not_applicable";
-
 export type EvidenceSeverity = "low" | "medium" | "high" | "critical";
-
 export type MissingEvidenceActionType = "upload" | "assign" | "review";
-
 export type ReadinessCategory = "soap" | "diagnosis_icd" | "treatment" | "documents" | "payer_rules" | "economic_review";
 
 export interface PatientClaim {
@@ -27,12 +29,34 @@ export interface PatientClaim {
   expectedAmountMax?: number;
   approvedAmount?: number;
   readinessScore: number;
+  /** Non-authoritative compatibility adapter for existing presentation and filters. */
   claimStatus: ClaimStatus;
   riskLevel: ClaimRiskLevel;
   tatDays?: number;
   tatTargetDays?: number;
   claimType?: string;
   economicStatus?: string;
+}
+
+export interface CanonicalPatientClaim extends PatientClaim {
+  organizationId: string;
+  clinicId: string;
+  workflowStatus: CanonicalClaimStateValue<ClaimWorkflowStatus>;
+  decisionStatus: CanonicalClaimStateValue<ClaimDecisionStatus>;
+  paymentStatus: CanonicalClaimStateValue<ClaimPaymentStatus>;
+  version: number;
+  stateUpdatedAt: string | null;
+  currentDecisionId: string | null;
+  totalEligibleAmount: number | null;
+  totalPaidAmount: number;
+  currencyCode: string;
+  legacyStatus: string | null;
+  canonicalStateSupported: boolean;
+  authoritativeActionsEnabled: boolean;
+}
+
+export function isCanonicalPatientClaim(claim: PatientClaim): claim is CanonicalPatientClaim {
+  return "workflowStatus" in claim && "decisionStatus" in claim && "paymentStatus" in claim && "version" in claim;
 }
 
 export interface ClaimReadinessBreakdown {
@@ -123,6 +147,8 @@ export interface ClaimDetail extends PatientClaim {
   aiRecommendation: string;
 }
 
+export interface CanonicalClaimDetail extends CanonicalPatientClaim, ClaimDetail {}
+
 export interface ClaimActivity {
   id: string;
   eventType: string;
@@ -150,11 +176,17 @@ export interface PrimaryPayerRules {
 export interface PatientClaimsDashboardData {
   patient: PatientClaimsPatientContext;
   claims: PatientClaim[];
+  claimDetails?: ClaimDetail[];
   summary: PatientClaimsSummary;
   readiness: ClaimReadinessOverview;
   missingEvidence: MissingEvidenceItem[];
   activities: ClaimActivity[];
   payerRules: PrimaryPayerRules | null;
+}
+
+export interface CanonicalPatientClaimsDashboardData extends PatientClaimsDashboardData {
+  claims: CanonicalPatientClaim[];
+  claimDetails: CanonicalClaimDetail[];
 }
 
 export interface RecalculateReadinessResult {

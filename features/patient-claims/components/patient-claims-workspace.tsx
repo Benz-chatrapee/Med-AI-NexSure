@@ -29,13 +29,13 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
-import { CLAIM_RISK_CONFIG, CLAIM_STATUS_CONFIG, EVIDENCE_SEVERITY_CONFIG, initialPatientClaimsFilters } from "../constants/patient-claims.constants";
-import { getClaimDetail, recalculateClaimReadiness } from "../services/patient-claims-service";
-import type { ClaimDetail, ClaimRiskLevel, ClaimStatus, MissingEvidenceActionType, PatientClaim, PatientClaimsDashboardData, PatientClaimsFilters } from "../types/patient-claims.types";
+import { CLAIM_DECISION_STATUS_CONFIG, CLAIM_PAYMENT_STATUS_CONFIG, CLAIM_RISK_CONFIG, CLAIM_STATUS_CONFIG, CLAIM_WORKFLOW_STATUS_CONFIG, EVIDENCE_SEVERITY_CONFIG, initialPatientClaimsFilters } from "../constants/patient-claims.constants";
+import { recalculateClaimReadiness } from "../services/patient-claims-service";
+import { isCanonicalPatientClaim, type CanonicalPatientClaimsDashboardData, type ClaimDetail, type ClaimRiskLevel, type ClaimStatus, type MissingEvidenceActionType, type PatientClaim, type PatientClaimsDashboardData, type PatientClaimsFilters } from "../types/patient-claims.types";
 import { claimStatusForKpi, filterPatientClaims, formatClaimCurrency, formatClaimDate, formatCompactClaimCurrency, getReadinessStatus, maskPolicyNumber, paginatePatientClaims } from "../utils/patient-claims-utils";
 
 type Props = {
-  initialData: PatientClaimsDashboardData;
+  initialData: CanonicalPatientClaimsDashboardData;
 };
 
 type KpiCard = {
@@ -92,22 +92,15 @@ export function PatientClaimsWorkspace({ initialData }: Props) {
     }));
   }
 
-  async function openClaimDetail(claim: PatientClaim, trigger: HTMLButtonElement) {
+  function openClaimDetail(claim: PatientClaim, trigger: HTMLButtonElement) {
     detailTriggerRef.current = trigger;
     setDetailError("");
-    setDetailLoading(true);
-    setSelectedClaim(null);
-    try {
-      const detail = await getClaimDetail(claim.id);
-      if (!detail) {
-        setDetailError("Claim detail was not found.");
-      }
-      setSelectedClaim(detail);
-    } catch {
-      setDetailError("Claim detail could not be loaded. กรุณาลองใหม่อีกครั้ง");
-    } finally {
-      setDetailLoading(false);
+    setDetailLoading(false);
+    const detail = initialData.claimDetails.find((item) => item.id === claim.id) ?? null;
+    if (!detail) {
+      setDetailError("Claim detail was not found.");
     }
+    setSelectedClaim(detail);
   }
 
   function closeClaimDetail() {
@@ -278,7 +271,45 @@ function FilterSelect({ label, icon: Icon, value, options, onChange }: { label: 
 }
 
 function ClaimTable({ claims, onOpen }: { claims: PatientClaim[]; onOpen: (claim: PatientClaim, trigger: HTMLButtonElement) => void }) {
-  return <div className="overflow-x-auto"><table className="w-full min-w-[1180px] text-left text-sm"><thead className="bg-slate-50 text-[10px] uppercase tracking-wide text-slate-500"><tr><th className="p-3">Claim / Visit</th><th>Service Date</th><th>Payer / Plan</th><th>Diagnosis</th><th>Claim Amount</th><th>Readiness</th><th>Status</th><th>Risk</th><th>TAT</th><th>Actions</th></tr></thead><tbody>{claims.map((claim) => <tr key={claim.id} className="border-t border-slate-100 hover:bg-slate-50"><td className="p-3"><b className="text-blue-900">{claim.claimNumber}</b><p className="text-xs text-slate-500">{claim.visitNumber} · OPD</p></td><td>{formatClaimDate(claim.serviceDate)}<p className="text-xs text-slate-500">{claim.department}</p></td><td><b>{claim.payerName}</b><p className="text-xs text-slate-500">{claim.planName}</p></td><td>{claim.diagnosisName}<p className="text-xs text-slate-500">{claim.icdCode}</p></td><td><b>{formatClaimCurrency(claim.claimedAmount)}</b><p className="text-xs text-slate-500">{claim.approvedAmount ? `Approved ${formatClaimCurrency(claim.approvedAmount)}` : claim.expectedAmountMin ? `Expected ${formatClaimCurrency(claim.expectedAmountMin)}-${formatClaimCurrency(claim.expectedAmountMax ?? claim.expectedAmountMin)}` : "Within benchmark"}</p></td><td><ProgressBar label={`${claim.claimNumber} readiness`} value={claim.readinessScore} suffix={String(claim.readinessScore)} /></td><td><StatusBadge status={claim.claimStatus} /></td><td><RiskBadge risk={claim.riskLevel} /></td><td>{claim.tatDays ? `${claim.tatDays} days` : "-"}<p className={`text-xs ${claim.tatDays && claim.tatTargetDays && claim.tatDays > claim.tatTargetDays ? "text-red-700" : "text-slate-500"}`}>{claim.tatTargetDays ? `Target ${claim.tatTargetDays} days` : "Not submitted"}</p></td><td><button className="rounded-lg border border-slate-200 p-2 text-blue-800" aria-label={`View claim detail ${claim.claimNumber}`} onClick={(event) => onOpen(claim, event.currentTarget)}><Eye size={16} /></button></td></tr>)}</tbody></table></div>;
+  return <div className="overflow-x-auto"><table className="w-full min-w-[1180px] text-left text-sm"><thead className="bg-slate-50 text-[10px] uppercase tracking-wide text-slate-500"><tr><th className="p-3">Claim / Visit</th><th>Service Date</th><th>Payer / Plan</th><th>Diagnosis</th><th>Claim Amount</th><th>Readiness</th><th>Status</th><th>Risk</th><th>TAT</th><th>Actions</th></tr></thead><tbody>{claims.map((claim) => <tr key={claim.id} className="border-t border-slate-100 hover:bg-slate-50"><td className="p-3"><b className="text-blue-900">{claim.claimNumber}</b><p className="text-xs text-slate-500">{claim.visitNumber} · OPD</p></td><td>{formatClaimDate(claim.serviceDate)}<p className="text-xs text-slate-500">{claim.department}</p></td><td><b>{claim.payerName}</b><p className="text-xs text-slate-500">{claim.planName}</p></td><td>{claim.diagnosisName}<p className="text-xs text-slate-500">{claim.icdCode}</p></td><td><b>{formatClaimCurrency(claim.claimedAmount)}</b><p className="text-xs text-slate-500">{claim.approvedAmount ? `Approved ${formatClaimCurrency(claim.approvedAmount)}` : claim.expectedAmountMin ? `Expected ${formatClaimCurrency(claim.expectedAmountMin)}-${formatClaimCurrency(claim.expectedAmountMax ?? claim.expectedAmountMin)}` : "Within benchmark"}</p></td><td><ProgressBar label={`${claim.claimNumber} readiness`} value={claim.readinessScore} suffix={String(claim.readinessScore)} /></td><td><ClaimStateBadges claim={claim} /></td><td><RiskBadge risk={claim.riskLevel} /></td><td>{claim.tatDays ? `${claim.tatDays} days` : "-"}<p className={`text-xs ${claim.tatDays && claim.tatTargetDays && claim.tatDays > claim.tatTargetDays ? "text-red-700" : "text-slate-500"}`}>{claim.tatTargetDays ? `Target ${claim.tatTargetDays} days` : "Not submitted"}</p></td><td><button className="rounded-lg border border-slate-200 p-2 text-blue-800" aria-label={`View claim detail ${claim.claimNumber}`} onClick={(event) => onOpen(claim, event.currentTarget)}><Eye size={16} /></button></td></tr>)}</tbody></table></div>;
+}
+
+function ClaimStateBadges({ claim }: { claim: PatientClaim }) {
+  if (!isCanonicalPatientClaim(claim)) {
+    return <StatusBadge status={claim.claimStatus} />;
+  }
+
+  if (!claim.canonicalStateSupported) {
+    return <Badge tone="danger" icon={AlertTriangle}>Unsupported state · Refresh required</Badge>;
+  }
+
+  const unknownStatusConfig = {
+    label: "Unknown",
+    tone: "neutral",
+  } as const;
+
+  const workflow =
+    claim.workflowStatus === "unknown"
+      ? unknownStatusConfig
+      : CLAIM_WORKFLOW_STATUS_CONFIG[claim.workflowStatus];
+
+  const decision =
+    claim.decisionStatus === "unknown"
+      ? unknownStatusConfig
+      : CLAIM_DECISION_STATUS_CONFIG[claim.decisionStatus];
+
+  const payment =
+    claim.paymentStatus === "unknown"
+      ? unknownStatusConfig
+      : CLAIM_PAYMENT_STATUS_CONFIG[claim.paymentStatus];
+
+  return (
+    <div className="flex min-w-44 flex-col items-start gap-1">
+      <Badge tone={workflow.tone} icon={History}>Workflow · {workflow.label}</Badge>
+      <Badge tone={decision.tone} icon={ShieldCheck}>Decision · {decision.label}</Badge>
+      <Badge tone={payment.tone} icon={Landmark}>Payment · {payment.label}</Badge>
+    </div>
+  );
 }
 
 function StatusBadge({ status }: { status: ClaimStatus }) {
@@ -305,7 +336,7 @@ function PayerRulesCard({ data }: { data: PatientClaimsDashboardData }) {
 }
 
 function ClaimDetailSheet({ claim, loading, error, onClose, onToast }: { claim: ClaimDetail | null; loading: boolean; error: string; onClose: () => void; onToast: (message: string) => void }) {
-  return <div className="fixed inset-0 z-50 flex justify-end bg-slate-950/45" role="dialog" aria-modal="true" aria-labelledby="claim-detail-title" onKeyDown={(event) => { if (event.key === "Escape") onClose(); }}><button className="absolute inset-0 cursor-default" aria-label="Close claim detail overlay" onClick={onClose} /><aside className="relative flex h-full w-full max-w-3xl flex-col bg-white shadow-2xl"><div className="flex items-start gap-3 border-b border-slate-200 p-4"><FilePlus2 className="text-blue-700" /><div className="min-w-0 flex-1"><h2 id="claim-detail-title" className="text-lg font-black">{claim?.claimNumber ?? "Claim Detail"}</h2><p className="text-xs text-slate-500">Patient claim review and evidence summary</p></div><button className="rounded-lg border border-slate-200 p-2" aria-label="Close claim detail" onClick={onClose}><X size={18} /></button></div><div className="min-h-0 flex-1 overflow-auto p-4">{loading ? <EmptyState title="Loading claim detail" text="กำลังโหลดรายละเอียดเคลม" /> : error ? <EmptyState title="Claim detail unavailable" text={error} /> : claim ? <><div className="rounded-lg bg-blue-950 p-5 text-white"><span className="text-xs text-blue-200">Claimed Amount</span><div className="mt-1 text-3xl font-black">{formatClaimCurrency(claim.claimedAmount)}</div><div className="mt-3"><StatusBadge status={claim.claimStatus} /></div></div><div className="mt-4 grid gap-3 md:grid-cols-2">{[["Related Visit", claim.visitNumber], ["Service Date", formatClaimDate(claim.serviceDate)], ["Payer", claim.payerName], ["Claim Type", claim.claimType ?? "OPD Reimbursement"], ["Diagnosis", `${claim.icdCode} · ${claim.diagnosisName}`], ["Economic Status", claim.economicStatus ?? "Review Needed"]].map(([key, value]) => <div key={key} className="rounded-lg border border-slate-200 p-3"><div className="text-xs font-black text-slate-500">{key}</div><b>{value}</b></div>)}</div><h3 className="mt-5 font-black">Evidence Checklist</h3><div className="mt-2 space-y-2">{claim.evidenceChecklist.map((item) => <div key={item.id} className="flex items-center gap-2 rounded-lg border border-slate-200 p-3 text-sm"><span className={item.status === "complete" ? "text-emerald-700" : item.status === "missing" ? "text-red-700" : "text-amber-700"}>{item.status === "complete" ? <CheckCircle2 size={16} /> : <AlertTriangle size={16} />}</span><span>{item.label}</span><span className="ml-auto text-xs font-bold text-slate-500">{item.status.replace("_", " ")}</span></div>)}</div><div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm leading-6 text-blue-950"><Sparkles className="mr-1 inline h-4 w-4" /><b>AI Recommendation:</b> {claim.aiRecommendation}</div></> : <EmptyState title="Claim detail unavailable" text="ไม่พบรายละเอียดเคลม" />}</div><div className="flex flex-wrap justify-end gap-2 border-t border-slate-200 p-4"><button className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-black" onClick={() => onToast("Evidence package opened for human review.")}>Open Evidence Package</button><button className="rounded-lg bg-blue-900 px-3 py-2 text-sm font-black text-white" onClick={() => onToast("Claim review workflow started. No decision has been made automatically.")}>Review Claim</button></div></aside></div>;
+  return <div className="fixed inset-0 z-50 flex justify-end bg-slate-950/45" role="dialog" aria-modal="true" aria-labelledby="claim-detail-title" onKeyDown={(event) => { if (event.key === "Escape") onClose(); }}><button className="absolute inset-0 cursor-default" aria-label="Close claim detail overlay" onClick={onClose} /><aside className="relative flex h-full w-full max-w-3xl flex-col bg-white shadow-2xl"><div className="flex items-start gap-3 border-b border-slate-200 p-4"><FilePlus2 className="text-blue-700" /><div className="min-w-0 flex-1"><h2 id="claim-detail-title" className="text-lg font-black">{claim?.claimNumber ?? "Claim Detail"}</h2><p className="text-xs text-slate-500">Patient claim review and evidence summary</p></div><button className="rounded-lg border border-slate-200 p-2" aria-label="Close claim detail" onClick={onClose}><X size={18} /></button></div><div className="min-h-0 flex-1 overflow-auto p-4">{loading ? <EmptyState title="Loading claim detail" text="กำลังโหลดรายละเอียดเคลม" /> : error ? <EmptyState title="Claim detail unavailable" text={error} /> : claim ? <><div className="rounded-lg bg-blue-950 p-5 text-white"><span className="text-xs text-blue-200">Claimed Amount</span><div className="mt-1 text-3xl font-black">{formatClaimCurrency(claim.claimedAmount)}</div><div className="mt-3"><ClaimStateBadges claim={claim} /></div></div><div className="mt-4 grid gap-3 md:grid-cols-2">{[["Related Visit", claim.visitNumber], ["Service Date", formatClaimDate(claim.serviceDate)], ["Payer", claim.payerName], ["Claim Type", claim.claimType ?? "OPD Reimbursement"], ["Diagnosis", `${claim.icdCode} · ${claim.diagnosisName}`], ["Economic Status", claim.economicStatus ?? "Review Needed"]].map(([key, value]) => <div key={key} className="rounded-lg border border-slate-200 p-3"><div className="text-xs font-black text-slate-500">{key}</div><b>{value}</b></div>)}</div><h3 className="mt-5 font-black">Evidence Checklist</h3><div className="mt-2 space-y-2">{claim.evidenceChecklist.map((item) => <div key={item.id} className="flex items-center gap-2 rounded-lg border border-slate-200 p-3 text-sm"><span className={item.status === "complete" ? "text-emerald-700" : item.status === "missing" ? "text-red-700" : "text-amber-700"}>{item.status === "complete" ? <CheckCircle2 size={16} /> : <AlertTriangle size={16} />}</span><span>{item.label}</span><span className="ml-auto text-xs font-bold text-slate-500">{item.status.replace("_", " ")}</span></div>)}</div><div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm leading-6 text-blue-950"><Sparkles className="mr-1 inline h-4 w-4" /><b>AI Recommendation:</b> {claim.aiRecommendation}</div></> : <EmptyState title="Claim detail unavailable" text="ไม่พบรายละเอียดเคลม" />}</div><div className="flex flex-wrap justify-end gap-2 border-t border-slate-200 p-4"><button className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-black" onClick={() => onToast("Evidence package opened for human review.")}>Open Evidence Package</button><button className="rounded-lg bg-blue-900 px-3 py-2 text-sm font-black text-white" onClick={() => onToast("Claim review workflow started. No decision has been made automatically.")}>Review Claim</button></div></aside></div>;
 }
 
 function EmptyState({ title, text, action }: { title: string; text: string; action?: React.ReactNode }) {
