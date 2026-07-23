@@ -1,1078 +1,697 @@
-# Phase 4 Claim Migration Plan
+---
+document_id: PHASE-4-INTEGRATION-BATCH-B-CONTRACT-DEFINITION
+project: Med AI NexSure
+phase: 4
+batch_id: B
+batch_title: Controlled Workflow Mutation Integration
+batch_type: CONTROLLED_MUTATION
+record_state: APPROVED_CONTRACT
+contract_status: APPROVED
+implementation_authorization: YES
+parent_contract: docs/application/PHASE-4-CLAIM-INTEGRATION-CONTRACT.md
+required_prior_closure: PHASE-4-INTEGRATION-BATCH-A-VALIDATION-CLOSURE
+contract_profile: CONTROLLED_MUTATION_V1
+approval_date: 2026-07-23
+---
 
-> **For agentic workers:** Implement this plan task-by-task. Use test-first validation, review each migration independently, and do not proceed past an approval or validation gate that has not passed.
+# PHASE 4 — INTEGRATION BATCH B CONTRACT DEFINITION
 
 ## 1. Document Control
 
 | Field | Value |
-| --- | --- |
-| Project | Med AI NexSure |
-| Document | Phase 4 Claim Migration Plan |
-| File | `docs/database/PHASE-4-CLAIM-MIGRATION-PLAN.md` |
-| Phase | Phase 4 - Claim Architecture |
-| Version | 0.1 |
-| Plan status | Ready for Review |
-| Implementation status | Not Started |
-| Created date | 2026-07-22 |
-| Last updated | 2026-07-22 |
-| Repository branch | `main` |
-| Approval basis | ADR-001 through ADR-008 |
-| Required reviewers | Product Owner, Claim Domain Owner, Database Architect, Security Lead, Finance Owner, Integration Owner, Backend Lead, QA Lead |
-| Execution gate | Do not execute migrations until ADR approval evidence and all P1 dependencies are recorded |
+|---|---|
+| Project | Med AI NexSure — Enterprise Healthcare & Insurance Intelligence Platform |
+| Batch | Integration Batch B |
+| Title | Controlled Workflow Mutation Integration |
+| Batch Type | `CONTROLLED_MUTATION` |
+| Contract Status | `APPROVED` |
+| Implementation Authorization | `YES` |
+| Parent Contract | `docs/application/PHASE-4-CLAIM-INTEGRATION-CONTRACT.md` |
+| Required Prior Closure | Phase 4 Integration Batch A Validation Closure |
+| Application Owner | `features/patient-claims/server` |
+| Execution Boundary | `SERVER_ONLY_AUTHENTICATED_REST_RPC` |
+| Database Capability | `public.transition_claim_workflow(...)` |
+| Contract Profile | `CONTROLLED_MUTATION_V1` |
+| Approval Date | `2026-07-23` |
 
-## 2. Goal
+> This document authorizes only Integration Batch B application implementation. It does not authorize SQL changes, database semantic changes, Batch C or later work, production deployment, or release approval.
 
-Migrate the current overloaded Claim status model into independent workflow, payer-decision, and payment state domains without losing tenant isolation, auditability, financial integrity, backward compatibility, or existing Claim history.
+---
 
-## 3. Architecture Summary
+## 2. Objective
 
-Phase 4 uses additive, forward-only PostgreSQL migrations. The existing `claims.status` column remains temporarily for compatibility while new state snapshots and authoritative domain records are introduced or strengthened.
+Implement the first protected application command boundary for Phase 4 Claim workflow transitions.
 
-The target model separates:
+The application must submit an authenticated workflow-transition intent to the existing database-controlled mutation function. The database remains authoritative for:
 
-- `claims.workflow_status`
-- `claims.decision_status`
-- `claims.payment_status`
-- Claim readiness and evidence status
-- Authoritative `claim_decisions`
-- Authoritative payment, allocation, and reconciliation records
-- Dedicated formal Appeal records
-- Controlled workflow, decision, payment, refund, reversal, reopen, and appeal operations
+- current Claim workflow state;
+- transition eligibility;
+- organization and clinic scope;
+- permission checks;
+- optimistic concurrency;
+- version increments;
+- immutable workflow-event creation;
+- idempotent replay;
+- canonical mutation results.
 
-No generic Claim update path may authoritatively mutate payer decisions, payments, refunds, reversals, formal appeals, or terminal-state reopen transitions.
+The application must not duplicate, weaken, or bypass these controls.
 
-## 4. Approved ADR Direction
+---
 
-| ADR | Approved Direction Applied by This Plan |
-| --- | --- |
-| ADR-001 | `closed` means operational completion. Payment state remains independent. |
-| ADR-002 | Every formal appeal requires a dedicated Appeal record. `workflow_status = appealed` is a summary only. |
-| ADR-003 | Payment transactions are authoritative. Payment failure is in MVP. Refund and reversal must be distinguishable and supported before production. |
-| ADR-004 | Phase 4 MVP uses `claim_decisions` plus existing item adjustments. Dedicated `claim_line_decisions` is deferred to a separately approved work package. |
-| ADR-005 | Terminal Claims cannot be reopened by generic update. Reopen requires a dedicated elevated operation. Post-submission correction prefers linked revision or resubmission. |
-| ADR-006 | Trusted payer integration is the primary decision authority. Authorized human adjudication is a controlled fallback. AI remains recommendation only. |
-| ADR-007 | Payment/reconciliation integration is the primary financial authority. Authorized Finance is a controlled fallback. |
-| ADR-008 | Legacy `claims.status` retirement is staged. Immediate removal and indefinite dual-write are prohibited. |
+## 3. Scope
 
-## 5. Global Constraints
+### 3.1 In Scope
 
-1. PostgreSQL and Supabase migrations must be forward-only.
-2. Use UUID primary keys with `gen_random_uuid()`.
-3. Preserve `organization_id` and `clinic_id` on all Claim-domain records.
-4. Use tenant-safe composite foreign keys where the current repository pattern requires them.
-5. Use exact numeric types for financial amounts.
-6. One Claim uses one approved currency in Phase 4 MVP.
-7. AI is Decision Support only.
-8. Do not bypass RLS for authenticated application workflows.
-9. Service-role functions must be contained behind secure domain operations.
-10. Every material mutation must preserve actor, source, reason, timestamp, version, and audit evidence.
-11. Duplicate or out-of-order external events must not corrupt current state.
-12. Do not remove `claims.status` in the initial Phase 4 migration.
-13. Do not introduce `claim_line_decisions` in the initial Phase 4 migration.
-14. Do not create a second payment source of truth.
-15. No production deployment until database tests, TypeScript generation, application validation, and rollback-forward checks pass.
+- server-only Claim workflow command service;
+- authenticated REST RPC invocation;
+- exact input/result mapping;
+- safe application error normalization;
+- optimistic-lock conflict handling;
+- idempotent replay handling;
+- unit tests for the command boundary;
+- preservation of existing canonical Claim reads;
+- TypeScript, lint, build, and regression validation.
 
-## 6. Preconditions and Entry Gate
+### 3.2 Out of Scope
 
-The implementation lead must verify and record all items below before creating the first migration.
+- SQL migrations or database functions;
+- SQL tests;
+- workflow-state additions or transition-matrix changes;
+- direct updates to `claims.workflow_status`;
+- decision, payment, appeal, or refund command integration;
+- client-side privileged secrets;
+- unrelated Claim UI redesign;
+- Batch C or later integration;
+- production deployment.
 
-| ID | Required Evidence | Pass Condition |
-| --- | --- | --- |
-| GATE-001 | ADR approval evidence | ADR-001 through ADR-008 are marked `Approved`, with approvers and approval date |
-| GATE-002 | Payment source of truth | Existing `claim_payments`, allocations, and reconciliations are confirmed authoritative |
-| GATE-003 | Decision authority | Payer integration and manual fallback authority are approved |
-| GATE-004 | Payment authority | Payment integration and Finance fallback authority are approved |
-| GATE-005 | External event strategy | Stable external event ID, idempotency key, source timestamp, and ordering rules are documented |
-| GATE-006 | Currency rules | Claim currency, numeric scale, rounding, reconciliation tolerance, and refund ceiling are approved |
-| GATE-007 | Appeal scope | Formal Appeal minimum fields and permissions are approved |
-| GATE-008 | Reopen rules | Allowed source/target states, time limits, and revision rules are approved |
-| GATE-009 | Repository baseline | Local Supabase starts successfully and Phase 3 regression tests pass |
-| GATE-010 | Working tree | `git status --short` is clean before migration work begins |
+---
 
-Recommended validation commands:
+## 4. Repository Evidence Matrix
 
-```powershell
-git status --short
-npx supabase status
-npx supabase db lint
-npx tsc --noEmit
-npm run lint
-```
+| Requirement | Classification | Confirmed State | Repository Evidence |
+|---|---|---|---|
+| Parent integration contract | `CONFIRMED` | Phase 4 application integration contract exists | `docs/application/PHASE-4-CLAIM-INTEGRATION-CONTRACT.md` |
+| Batch A prior closure | `CONFIRMED` | Batch A application integration was closed before Batch B approval | `docs/application/PHASE-4-INTEGRATION-BATCH-A-VALIDATION.md`; repository commit `473e596` |
+| Phase 4 database closure | `CONFIRMED` | Database contract validated and closed | `docs/database/PHASE-4-VALIDATION-AND-CLOSURE-RECORD.md` |
+| Database regression | `CONFIRMED` | 26 files and 663 tests passed | Supabase database test execution dated `2026-07-23` |
+| Database lint | `CONFIRMED` | No schema errors found | Supabase database lint execution dated `2026-07-23` |
+| Workflow mutation RPC | `CONFIRMED` | Existing controlled mutation function | `supabase/migrations/20260722160000_phase4_claim_workflow_mutation.sql` |
+| Workflow mutation tests | `CONFIRMED` | Functional behavior covered | `supabase/tests/phase4_claim_workflow_mutation_test.sql` |
+| Workflow security tests | `CONFIRMED` | Grants, protected writes, and security boundary covered | `supabase/tests/phase4_claim_workflow_security_test.sql` |
+| Generated RPC types | `CONFIRMED` | `transition_claim_workflow` exists in generated types | `lib/database.types.ts` |
+| Existing canonical read owner | `CONFIRMED` | Server-only Claim read integration exists | `features/patient-claims/server/claim-query-service.ts` |
+| Existing mapping owner | `CONFIRMED` | Canonical split-state mapping exists | `features/patient-claims/server/claim-mappers.ts` |
+| Existing error boundary | `CONFIRMED` | Server-only Claim integration errors exist | `features/patient-claims/server/claim-integration-errors.ts` |
+| Server REST pattern | `CONFIRMED` | Authenticated server REST integration pattern exists | `lib/database/supabase-rest.ts`; `lib/database/env.ts` |
+| Browser RPC pattern | `CONFIRMED BUT NOT SELECTED` | Browser RPC exists for Core Foundation, but is not the approved Claim mutation boundary | `features/core-foundation/services/core-foundation-service.ts` |
+| Exact Batch B owner | `CONFIRMED` | `features/patient-claims/server` | Repository structure and current Claim integration ownership |
+| Exact implementation allowlist | `CONFIRMED` | Defined in Section 10 | This contract |
+| Mandatory application test | `CONFIRMED` | Command-service unit test | Section 11 |
 
-Expected entry result:
+Evidence priority:
 
 ```text
-No schema errors found
-TypeScript validation passes
-Existing Phase 3 database tests pass
-Working tree clean
+validated database contract
+> approved application integration contract
+> generated database types
+> current server integration patterns
+> proposed implementation
 ```
 
-## 7. Current-to-Target State Model
+---
 
-### 7.1 Workflow Status
+## 5. Capability and Authority Model
 
-Target values:
+### 5.1 Capability
 
 ```text
-draft
-collecting_data
-validation_pending
-needs_review
-ready_to_submit
-submitted
-under_review
-appealed
-closed
-cancelled
+CONTROLLED CLAIM WORKFLOW TRANSITION
 ```
 
-Rules:
+The application submits an intent. The database decides whether that intent becomes a canonical transition.
 
-- `closed` is operational completion only.
-- `appealed` requires a dedicated formal Appeal record.
-- `cancelled` does not automatically void a payer decision.
-- Generic Claim update cannot reopen `closed` or `cancelled`.
-- Workflow changes do not write payment status.
-- Workflow changes do not create or overwrite payer decisions.
+| Responsibility | Database | Server Command Boundary | UI/Caller |
+|---|---:|---:|---:|
+| Canonical current state | Owns | Reads | Displays |
+| Transition validity | Owns | Does not duplicate | Requests |
+| Tenant and clinic scope | Owns and enforces | Uses authenticated context | Must not fabricate |
+| Permission decision | Owns via database permission controls | Does not override | Must not infer authority |
+| Expected version | Compares | Supplies canonical version | Must not increment |
+| Version increment | Owns | Consumes result | Must not set |
+| Workflow event | Inserts atomically | Consumes event ID | Must not insert |
+| Replay decision | Owns | Maps canonical result | Must not infer |
+| Human confirmation | N/A | Coordinates command | Owns interaction |
+| Error presentation | Emits safe signal | Normalizes | Displays safely |
 
-### 7.2 Decision Status
-
-Target values:
+### 5.2 Source of Truth
 
 ```text
-not_decided
-approved
-partially_approved
-rejected
-request_information
-voided
+claims.workflow_status
+claims.version
+claim_workflow_events
 ```
 
-Rules:
+The application must not introduce a parallel workflow source of truth.
 
-- `claim_decisions` remains authoritative.
-- `claims.current_decision_id` points to the effective decision.
-- `claims.decision_status` is a synchronized current snapshot.
-- Decision lifecycle status such as `draft`, `final`, `superseded`, and `cancelled` remains separate from decision outcome.
-- AI cannot authoritatively set decision status.
-- Generic Claim update cannot authoritatively set decision status.
+---
 
-### 7.3 Payment Status
+## 6. Exact RPC Contract
 
-Target values:
+### 6.1 Operation Identity
 
-```text
-not_paid
-payment_pending
-partially_paid
-paid
-payment_failed
-partially_refunded
-refunded
-reversed
-```
+| Field | Confirmed Value |
+|---|---|
+| Schema/function | `public.transition_claim_workflow` |
+| Language | `plpgsql` |
+| Security | `SECURITY DEFINER` |
+| Fixed search path | `public, private, auth, pg_temp` |
+| Execute grants | `authenticated`, `service_role` |
+| Execute revoked from | `PUBLIC`, `anon` |
+| Application transport | Authenticated Supabase REST RPC |
+| REST endpoint | `POST /rest/v1/rpc/transition_claim_workflow` |
 
-Rules:
-
-- Payment tables and reconciliation records are authoritative.
-- Claim payment status is derived or transactionally synchronized.
-- A refund never overwrites the original successful payment.
-- A reversal preserves the original transaction and reversal reason.
-- Duplicate external events cannot double-count.
-- Payment mutation requires approved currency and amount validation.
-- AI and generic Claim update cannot set financial state.
-
-## 8. Legacy Status Mapping
-
-The backfill must use explicit deterministic mapping. Unmapped values must fail validation and must not be silently coerced.
-
-| Legacy `claims.status` | Target Workflow | Target Decision | Target Payment | Mapping Notes |
-| --- | --- | --- | --- | --- |
-| `draft` | `draft` | `not_decided` | derive from payment records | No payer decision implied |
-| `collecting_evidence` | `collecting_data` | `not_decided` | derive | Evidence collection remains separate |
-| `pending_validation` | `validation_pending` | `not_decided` | derive | No payer decision implied |
-| `validation_failed` | `needs_review` | `not_decided` | derive | Preserve validation evidence |
-| `needs_information` | `needs_review` | `request_information` only when authoritative final decision exists; otherwise `not_decided` | derive | Do not fabricate payer outcome |
-| `ready_for_submission` | `ready_to_submit` | `not_decided` | derive | Submission readiness only |
-| `submitted` | `submitted` | `not_decided` | derive | Submission does not imply review |
-| `submission_failed` | `needs_review` | `not_decided` | derive | Preserve submission error |
-| `under_review` | `under_review` | `not_decided` | derive | Payer review in progress |
-| `pending_medical_review` | `under_review` | `not_decided` | derive | Preserve review reason separately |
-| `pending_claim_assessor` | `under_review` | `not_decided` | derive | Preserve queue/owner separately |
-| `approved` | derive workflow from history; default `under_review` until verified | `approved` only when final authoritative decision exists | derive | Never infer from legacy value alone without decision evidence |
-| `partially_approved` | derive workflow from history; default `under_review` until verified | `partially_approved` only when final authoritative decision exists | derive | Amount validation required |
-| `rejected` | derive workflow from history; default `under_review` until verified | `rejected` only when final authoritative decision exists | derive | Preserve reason codes |
-| `payment_pending` | derive workflow | derive from current decision | `payment_pending` only when transaction/reconciliation evidence supports it | No decision inference |
-| `partially_paid` | derive workflow | derive | `partially_paid` from authoritative payment totals | Validate amount consistency |
-| `paid` | derive workflow | derive | `paid` from authoritative payment totals | Never trust legacy value alone |
-| `cancelled` | `cancelled` | derive from decision history | derive from payment records | Cancellation does not imply void/refund |
-| `closed` | `closed` | derive | derive | Operational closure only |
-
-Backfill policy:
-
-1. Prefer authoritative domain records over legacy status.
-2. Use current final `claim_decisions` for decision snapshot.
-3. Use payment transactions, allocations, and reconciliations for payment snapshot.
-4. Use verified workflow history where authority is confirmed.
-5. Place ambiguous rows in a migration exception report.
-6. Do not invent `approved`, `paid`, `refunded`, `reversed`, or `voided`.
-7. Block cutover while any unmapped or contradictory Claim remains unresolved.
-
-## 9. Proposed Migration Files
-
-Create migrations in this order.
-
-| Sequence | File | Responsibility |
-| --- | --- | --- |
-| 1 | `supabase/migrations/20260722140000_phase4_claim_state_types.sql` | Create new workflow, decision, payment, event-source, refund/reversal, and appeal enums or validated domains |
-| 2 | `supabase/migrations/20260722140100_phase4_claim_state_columns.sql` | Add new Claim snapshot columns, versioning metadata, currency rules, and required indexes |
-| 3 | `supabase/migrations/20260722140200_phase4_claim_workflow_events.sql` | Create or normalize authoritative workflow-event history and transition constraints |
-| 4 | `supabase/migrations/20260722140300_phase4_claim_appeals.sql` | Add dedicated formal Appeal records, tenant-safe foreign keys, indexes, RLS, and audit support |
-| 5 | `supabase/migrations/20260722140400_phase4_claim_payment_extensions.sql` | Extend existing payment model for failure, refund, reversal, event identity, currency consistency, and reconciliation integrity |
-| 6 | `supabase/migrations/20260722140500_phase4_claim_controlled_operations.sql` | Add controlled workflow, close, reopen, appeal, payer-decision, payment, refund, and reversal operations |
-| 7 | `supabase/migrations/20260722140600_phase4_claim_rbac_rls.sql` | Add permissions, grants, policy changes, protected-column controls, and service-role containment |
-| 8 | `supabase/migrations/20260722140700_phase4_claim_state_backfill.sql` | Backfill new snapshots using authoritative records and record migration exceptions |
-| 9 | `supabase/migrations/20260722140800_phase4_claim_legacy_compatibility.sql` | Add compatibility views/functions and prohibit uncontrolled legacy writes after cutover |
-| 10 | `supabase/migrations/20260722140900_phase4_claim_validation_guards.sql` | Add consistency assertions, invariant checks, and post-backfill validation functions |
-
-Do not create the legacy-column removal migration during the initial Phase 4 delivery.
-
-## 10. Target Schema Changes
-
-### 10.1 `claims`
-
-Add:
+### 6.2 Exact Signature
 
 ```sql
-workflow_status
-decision_status
-payment_status
-state_version
-state_updated_at
-state_updated_by
-currency_code
-legacy_status_migration_state
+public.transition_claim_workflow(
+  p_claim_id uuid,
+  p_target_status public.claim_workflow_state_domain,
+  p_expected_version integer,
+  p_reason_code text,
+  p_reason_text text default null,
+  p_source_system text default 'internal',
+  p_external_event_id text default null,
+  p_correlation_id uuid default null,
+  p_occurred_at timestamptz default null
+)
 ```
 
-Required properties:
+### 6.3 Inputs
 
-- `workflow_status` is not null after backfill.
-- `decision_status` is not null after backfill.
-- `payment_status` is not null after backfill.
-- `state_version` starts at `1` and increments on controlled state changes.
-- `currency_code` follows approved MVP currency rules.
-- Existing `version` behavior must be reconciled with `state_version`; do not create conflicting optimistic-lock semantics.
-- Add selective indexes for tenant queues and state filtering.
-- Do not allow generic authenticated updates to protected state columns.
+| Parameter | Type | Application Rule |
+|---|---|---|
+| `p_claim_id` | `uuid` | Required; canonical Claim ID |
+| `p_target_status` | `claim_workflow_state_domain` | Required; approved target action |
+| `p_expected_version` | `integer` | Required; obtained from canonical Claim snapshot |
+| `p_reason_code` | `text` | Required function argument; must be normalized and non-empty where required |
+| `p_reason_text` | `text` | Optional generally; required for reason-required transitions |
+| `p_source_system` | `text` | Use `internal` for authenticated human application action |
+| `p_external_event_id` | `text` | Optional for internal action; required for external source |
+| `p_correlation_id` | `uuid` | Optional but recommended for observability |
+| `p_occurred_at` | `timestamptz` | Optional trusted event timestamp |
 
-Recommended indexes:
+The application must not submit organization ID, clinic ID, actor authority, permission result, event sequence, version-after, or current workflow status as authoritative mutation values.
+
+### 6.4 Canonical Result
+
+```sql
+returns table (
+  claim_id uuid,
+  previous_workflow_status public.claim_workflow_state_domain,
+  workflow_status public.claim_workflow_state_domain,
+  version integer,
+  workflow_event_id uuid,
+  state_updated_at timestamptz,
+  idempotent_replay boolean
+)
+```
+
+Required application result model:
+
+```ts
+export type ClaimWorkflowTransitionResult = {
+  claimId: string;
+  previousWorkflowStatus: ClaimWorkflowStatus;
+  workflowStatus: ClaimWorkflowStatus;
+  version: number;
+  workflowEventId: string;
+  stateUpdatedAt: string;
+  idempotentReplay: boolean;
+};
+```
+
+The service must return the database result as the canonical outcome. It must not synthesize a successful state transition when the RPC response is unavailable or invalid.
+
+---
+
+## 7. Trust and Execution Boundary
+
+### 7.1 Approved Boundary
 
 ```text
-(organization_id, workflow_status, deleted_at)
-(organization_id, clinic_id, workflow_status, deleted_at)
-(organization_id, decision_status, deleted_at)
-(organization_id, payment_status, deleted_at)
-(organization_id, submitted_at)
-(current_decision_id)
+SERVER_ONLY_AUTHENTICATED_REST_RPC
 ```
 
-### 10.2 Workflow Events
+Approved implementation behavior:
 
-Use an existing authoritative Claim workflow-history table if repository verification proves it is complete. Otherwise create a dedicated successor.
+1. Execute from `features/patient-claims/server`.
+2. Use an authenticated user access token.
+3. Use the Supabase URL and anon key through the existing server environment pattern.
+4. Send:
+   - `apikey: NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `Authorization: Bearer <authenticated access token>`
+   - `Content-Type: application/json`
+5. Call only the controlled RPC endpoint.
+6. Do not expose service-role credentials to client code.
+7. Do not accept organization, clinic, actor, or permission assertions from the UI.
 
-Minimum fields:
+### 7.2 Database Trust Controls
+
+| Control | Confirmed Behavior |
+|---|---|
+| Actor identity | Derived from `auth.uid()` |
+| Claim ownership | Loaded from the locked Claim row |
+| Tenant scope | Enforced from Claim organization and clinic |
+| Authorization | Enforced by database permission checks |
+| Row lock | Claim selected `FOR UPDATE` |
+| Soft delete | Deleted Claims excluded |
+| State mutation | Performed inside controlled function |
+| Event mutation | Performed inside controlled function |
+| Direct bypass | Protected direct updates/inserts denied |
+
+### 7.3 Prohibited Boundary
+
+Do not implement Batch B using:
+
+- direct browser table updates;
+- service-role keys in browser code;
+- direct inserts to `claim_workflow_events`;
+- direct updates to workflow/version audit columns;
+- UI-generated tenant or permission authority;
+- local-only state changes presented as committed success.
+
+---
+
+## 8. Version, Replay, and Atomicity
+
+| Field | Contract |
+|---|---|
+| Version owner | Database |
+| Version field | `claims.version` |
+| Expected version | Required as `p_expected_version` |
+| Successful mutation | Version increments exactly once |
+| Version conflict | SQLSTATE `40001` |
+| Replay identity | Organization + source system + external event ID |
+| Matching replay | Return existing canonical result with `idempotent_replay = true` |
+| Conflicting replay | Reject with SQLSTATE `23505` |
+| Atomicity | Claim snapshot update and event insertion occur in one function transaction |
+
+Application retry rules:
+
+- `VERSION_CONFLICT`: reload canonical Claim; do not silently retry with a guessed version.
+- Matching replay: accept returned canonical result as success.
+- Replay identity conflict: do not treat as success.
+- Network/transport failure: retry only through an operation identity that preserves idempotency.
+- Unknown result: never display a fabricated successful transition.
+
+---
+
+## 9. Error Contract
+
+### 9.1 Required Error Codes
+
+Extend `ClaimIntegrationErrorCode` to include:
+
+```ts
+export type ClaimIntegrationErrorCode =
+  | "configuration_error"
+  | "invalid_claim_state"
+  | "invalid_input"
+  | "patient_not_found"
+  | "permission_denied"
+  | "query_failed"
+  | "resource_not_found"
+  | "tenant_scope_mismatch"
+  | "transport_error"
+  | "version_conflict"
+  | "idempotency_conflict";
+```
+
+Existing codes may remain where required by the read service.
+
+### 9.2 Database-to-Application Mapping
+
+| Database Signal | Application Code | User-Safe Behavior |
+|---|---|---|
+| `22023` | `invalid_input` | Ask user to correct input |
+| `42501` | `permission_denied` | Safe unavailable/access-denied message |
+| `23514` | `invalid_claim_state` | Refresh state or correct transition/reason |
+| `40001` | `version_conflict` | Reload canonical Claim |
+| `23505` | `idempotency_conflict` | Stop automatic success/retry |
+| HTTP `404` or empty valid result | `resource_not_found` | Safe not-found message |
+| Network/non-2xx transport failure | `transport_error` | Controlled retry guidance |
+| Missing environment/token | `configuration_error` | Server configuration message |
+| Unmapped failure | `query_failed` | Generic safe failure |
+
+The application must not expose SQL text, RLS internals, permission internals, secrets, access tokens, or PHI.
+
+---
+
+## 10. Exact File Allowlist
+
+### 10.1 Create
 
 ```text
-id
-organization_id
-clinic_id
-claim_id
-from_workflow_status
-to_workflow_status
-event_type
-event_source
-external_event_id
-idempotency_key
-reason_code
-reason_text
-actor_user_id
-occurred_at
-received_at
-expected_version
-resulting_version
-metadata
-created_at
+features/patient-claims/server/claim-workflow-command-service.ts
+features/patient-claims/server/claim-workflow-command-service.test.ts
 ```
 
-Constraints:
-
-- Tenant-safe Claim reference.
-- Unique external event identity per integration source where supplied.
-- Unique idempotency key per operation scope.
-- No PHI/PII in unrestricted metadata.
-- `from_workflow_status` may be null only for initial state creation.
-- Event records are append-only for authenticated users.
-
-### 10.3 Formal Appeals
-
-Create `claim_appeals` with minimum fields:
+### 10.2 Modify
 
 ```text
-id
-organization_id
-clinic_id
-claim_id
-appeal_sequence
-appeal_status
-appeal_reason_code
-appeal_reason_text
-submitted_by
-submitted_at
-deadline_at
-owner_user_id
-payer_reference
-external_event_id
-evidence_package_id
-outcome_decision_id
-resolved_at
-created_at
-created_by
-updated_at
-updated_by
-deleted_at
+features/patient-claims/server/claim-integration-errors.ts
 ```
 
-Minimum appeal statuses:
+### 10.3 Reuse Without Modification
 
 ```text
-draft
-submitted
-under_review
-request_information
-approved
-partially_approved
-rejected
-withdrawn
-closed
+features/patient-claims/server/claim-query-service.ts
+features/patient-claims/server/claim-mappers.ts
+lib/database/env.ts
+lib/database/supabase-rest.ts
+lib/database.types.ts
 ```
 
-Rules:
+`lib/database.types.ts` already contains `transition_claim_workflow`; regeneration is not required for this batch unless implementation proves the checked-in type is stale. Any required regeneration must stop the batch and trigger contract reconciliation before modification.
 
-- Every formal appeal has one record.
-- `(claim_id, appeal_sequence)` is unique within tenant scope.
-- Appeal outcome references an authoritative Claim decision when applicable.
-- Multi-level automated appeals remain deferred.
-- Cross-tenant and unauthorized cross-clinic access is denied.
-
-### 10.4 Payment Extensions
-
-Reuse existing payment tables.
-
-Add or verify:
+### 10.4 Prohibited Files
 
 ```text
-transaction_type
-transaction_status
-original_payment_id
-external_event_id
-idempotency_key
-source_system
-source_occurred_at
-failure_code
-failure_message
-reversal_reason_code
-refund_reason_code
-currency_code
-effective_at
+supabase/migrations/**
+supabase/tests/**
+docs/database/PHASE-4-CLAIM-WORKFLOW-SPEC.md
+docs/database/PHASE-4-CLAIM-ARCHITECTURE-DECISIONS.md
+docs/database/PHASE-4-VALIDATION-AND-CLOSURE-RECORD.md
+unrelated feature modules
+Batch C+ files
 ```
 
-Recommended transaction types:
+No file outside the exact allowlist may be modified without stopping implementation and reconciling this contract.
+
+---
+
+## 11. Implementation Contract
+
+### 11.1 Command Service
+
+Create a server-only module:
+
+```ts
+import "server-only";
+```
+
+Required service responsibilities:
+
+- validate required input;
+- obtain authenticated server Claim context;
+- construct the exact RPC payload;
+- call `POST /rest/v1/rpc/transition_claim_workflow`;
+- map the one-row canonical result;
+- normalize database and transport errors;
+- preserve `idempotentReplay`;
+- never update Claim tables directly;
+- support dependency injection for unit testing.
+
+Recommended public input:
+
+```ts
+export type TransitionClaimWorkflowInput = {
+  claimId: string;
+  targetStatus: ClaimWorkflowStatus;
+  expectedVersion: number;
+  reasonCode: string;
+  reasonText?: string;
+  correlationId?: string;
+  occurredAt?: string;
+};
+```
+
+Recommended service API:
+
+```ts
+export interface ClaimWorkflowCommandGateway {
+  transition(
+    input: TransitionClaimWorkflowInput,
+    accessToken: string,
+  ): Promise<ClaimWorkflowTransitionResult>;
+}
+
+export function createClaimWorkflowCommandService(
+  options?: CreateClaimWorkflowCommandServiceOptions,
+): {
+  transitionClaimWorkflow(
+    input: TransitionClaimWorkflowInput,
+  ): Promise<ClaimWorkflowTransitionResult>;
+}
+```
+
+Exact internal names may follow current repository conventions, but exported behavior and file scope must remain equivalent.
+
+### 11.2 RPC Payload
+
+For internal authenticated human action:
+
+```json
+{
+  "p_claim_id": "<claim uuid>",
+  "p_target_status": "<approved workflow status>",
+  "p_expected_version": 1,
+  "p_reason_code": "<reason code>",
+  "p_reason_text": "<optional reason text>",
+  "p_source_system": "internal",
+  "p_external_event_id": null,
+  "p_correlation_id": null,
+  "p_occurred_at": null
+}
+```
+
+The implementation must use actual typed values and must not include placeholder strings.
+
+### 11.3 Context
+
+The command service must use an authenticated server context equivalent to the existing Claim read context pattern:
 
 ```text
-payment
-refund
-reversal
-adjustment
+organizationId
+clinicId
+actorId
+accessToken
 ```
 
-Recommended transaction statuses:
+Only `accessToken` is sent as transport authentication. Organization, clinic, and actor fields may be used for application consistency checks but must not be presented to the RPC as authoritative permission inputs.
+
+---
+
+## 12. Mandatory Test Traceability
+
+Create:
 
 ```text
-pending
-succeeded
-failed
-reversed
-cancelled
+features/patient-claims/server/claim-workflow-command-service.test.ts
 ```
 
-Financial rules:
+The test must mock `server-only` and inject the gateway/context.
 
-- Amounts use exact numeric types.
-- Refund amount cannot exceed refundable settled amount.
-- Reversal must reference the original transaction.
-- Claim, payment, allocation, refund, reversal, and reconciliation currency must match.
-- Duplicate event processing returns the existing result or performs a no-op.
-- Financial totals are reproducible from authoritative transactions.
+| ID | Required Test | Expected Result |
+|---|---|---|
+| `B-T01` | Valid transition payload | Exact RPC arguments are sent |
+| `B-T02` | Canonical result mapping | Snake-case RPC row maps to application result |
+| `B-T03` | Expected version preservation | Version is sent unchanged; service does not increment |
+| `B-T04` | Internal source enforcement | `p_source_system = internal` |
+| `B-T05` | Missing Claim ID | `invalid_input` |
+| `B-T06` | Missing reason code | `invalid_input` |
+| `B-T07` | SQLSTATE `42501` | `permission_denied` |
+| `B-T08` | SQLSTATE `23514` | `invalid_claim_state` |
+| `B-T09` | SQLSTATE `40001` | `version_conflict` |
+| `B-T10` | SQLSTATE `23505` | `idempotency_conflict` |
+| `B-T11` | Transport failure | `transport_error` or approved generic integration error |
+| `B-T12` | Matching replay result | Returns `idempotentReplay = true` |
+| `B-T13` | Empty/invalid RPC result | Must not report success |
+| `B-T14` | Existing read-service regression | Existing Claim query tests remain passing |
+| `B-T15` | Server-only boundary | Module remains server-only and test mock is configured |
 
-## 11. Controlled Operations
+No database test modification is authorized.
 
-The exact function names may follow existing repository conventions, but the implementation must provide one controlled operation for each authority boundary.
+---
 
-| Operation | Required Permission | Core Behavior |
-| --- | --- | --- |
-| Transition workflow | `claim.transition` or approved equivalent | Validate transition, tenant, clinic, version, reason, actor, event identity |
-| Close Claim | `claim.close` | Set workflow only; never set decision or payment |
-| Reopen Claim | `claim.reopen` | Elevated action; preserve decision/payment history; enforce reason and approved target |
-| Submit formal Appeal | `claim.appeal.submit` | Create Appeal record and workflow event atomically |
-| Resolve Appeal | `claim.appeal.decide` | Link authoritative decision and update Appeal summary |
-| Record payer decision | `claim.decide` | Create/finalize decision, update pointer and snapshot atomically |
-| Supersede decision | `claim.decision.supersede` | Preserve prior decision; update current pointer safely |
-| Record payment | `claim.payment.record` | Insert authoritative transaction; update summary atomically |
-| Record refund | `claim.payment.refund` | Reference original payment; enforce refund ceiling |
-| Record reversal | `claim.payment.reverse` | Preserve original transaction; record reason and source |
-| Reconcile payment | `claim.payment.reconcile` | Validate allocation, currency, variance, and reconciliation evidence |
-
-Every controlled operation must:
-
-1. Resolve actor from authenticated context or approved integration context.
-2. Validate organization and clinic scope.
-3. Validate explicit permission.
-4. Validate expected version.
-5. Validate idempotency and external event identity.
-6. Reject unsupported transitions.
-7. Write authoritative records first.
-8. Synchronize current snapshots in the same transaction.
-9. Write audit and workflow evidence.
-10. Return sanitized errors without leaking cross-tenant existence.
-
-## 12. RBAC and RLS Plan
-
-### 12.1 Permission Inventory
-
-Add only permissions not already present:
+## 13. Acceptance Criteria
 
 ```text
-claim.transition
-claim.close
-claim.reopen
-claim.appeal.view
-claim.appeal.create
-claim.appeal.submit
-claim.appeal.decide
-claim.decide
-claim.decision.supersede
-claim.payment.view
-claim.payment.record
-claim.payment.refund
-claim.payment.reverse
-claim.payment.reconcile
+B-CTR-01 Exact RPC signature, grants, inputs, outputs, and authority are documented. PASS.
+B-DEP-01 Batch A prior closure is confirmed. PASS.
+B-TYPE-01 Generated RPC type exists. PASS.
+B-OWN-01 Application owner is features/patient-claims/server. PASS.
+B-BND-01 Execution boundary is SERVER_ONLY_AUTHENTICATED_REST_RPC. PASS.
+B-SCOPE-01 Exact implementation allowlist is defined. PASS.
+B-MUT-01 Application workflow transitions use only public.transition_claim_workflow. REQUIRED.
+B-AUTH-01 Database remains authoritative for authorization and transition rules. REQUIRED.
+B-CTX-01 UI cannot assert tenant, clinic, actor, or permission authority. REQUIRED.
+B-CON-01 Canonical expected version is supplied unchanged. REQUIRED.
+B-ATM-01 Application relies on database atomic state/event mutation. REQUIRED.
+B-ERR-01 Errors are normalized without exposing internals. REQUIRED.
+B-AUD-01 Canonical workflow event ID is preserved. REQUIRED.
+B-HUM-01 Authoritative transition requires approved human action. REQUIRED.
+B-AI-01 AI cannot independently invoke or authorize mutation. REQUIRED.
+B-REF-01 Caller refreshes canonical Claim/timeline state after success. REQUIRED AT CALL-SITE INTEGRATION.
+B-TEST-01 Mandatory command-service tests pass. REQUIRED.
+B-REG-01 Existing Claim read integration tests remain passing. REQUIRED.
+B-DB-01 Database schema, functions, grants, and SQL tests remain unchanged. REQUIRED.
 ```
 
-Before insertion, inspect existing permission codes and reuse exact existing names where equivalent.
+---
 
-### 12.2 RLS Requirements
+## 14. Validation Commands
 
-For every new table:
-
-- Enable RLS.
-- Enforce active organization membership.
-- Enforce clinic access where `clinic_id` is populated.
-- Exclude soft-deleted rows from normal access.
-- Separate read permission from write permission.
-- Prevent generic Claim editors from mutating protected columns.
-- Restrict formal Appeal and financial records to least-privilege roles.
-- Deny cross-tenant references through both policy and foreign-key design.
-- Add `WITH CHECK` rules for every authenticated insert/update.
-- Keep service-role-only functions non-executable by authenticated users unless wrapped securely.
-
-### 12.3 Protected Claim Columns
-
-Authenticated generic update paths must not directly change:
-
-```text
-workflow_status
-decision_status
-payment_status
-current_decision_id
-total_paid_amount
-submitted_at
-closed_at
-state_version
-state_updated_at
-state_updated_by
-currency_code
-```
-
-Authorized changes must occur through controlled operations.
-
-## 13. Backfill Procedure
-
-### Stage 1: Snapshot
-
-- Export row counts by organization and legacy status.
-- Record counts of final Claim decisions.
-- Record counts and totals of payments, allocations, and reconciliations.
-- Record Claims with missing tenant or clinic consistency.
-- Record Claims with conflicting decision pointers.
-- Record Claims with currency inconsistency.
-
-### Stage 2: Decision Backfill
-
-For each active Claim:
-
-1. Resolve effective final decision through `current_decision_id` and final decision records.
-2. Validate tenant-safe pointer.
-3. Map decision outcome to target snapshot.
-4. Set `not_decided` when no authoritative final decision exists.
-5. Record conflicting or multiple-effective decisions as exceptions.
-
-### Stage 3: Payment Backfill
-
-For each active Claim:
-
-1. Aggregate successful authoritative payments.
-2. Subtract valid refunds and reversals only when implemented and evidenced.
-3. Compare against allocation and reconciliation data.
-4. Derive payment snapshot.
-5. Reject negative impossible totals.
-6. Record duplicate references, currency mismatch, or reconciliation variance as exceptions.
-
-### Stage 4: Workflow Backfill
-
-1. Use verified authoritative workflow history where available.
-2. Otherwise map from legacy status using the approved mapping.
-3. Use decision/payment records only to detect contradictions, not to fabricate workflow state.
-4. Preserve `closed` as operational closure.
-5. Require a formal Appeal record before finalizing `appealed`.
-
-### Stage 5: Validation
-
-The migration must produce a machine-queryable exception report containing:
-
-```text
-organization_id
-clinic_id
-claim_id
-legacy_status
-proposed_workflow_status
-proposed_decision_status
-proposed_payment_status
-exception_code
-exception_detail
-detected_at
-resolved_at
-resolved_by
-```
-
-Cutover is blocked while unresolved P0/P1 exceptions remain.
-
-## 14. Compatibility and Cutover Strategy
-
-### Release A: Additive Database Model
-
-- Add enums/domains, columns, tables, indexes, and operations.
-- Keep existing application reads and writes unchanged.
-- Backfill in a controlled environment.
-- Validate invariants.
-
-### Release B: Compatible Reads
-
-- Generate updated TypeScript database types.
-- Add backend DTOs exposing separate workflow, decision, and payment state.
-- Preserve legacy status in compatibility response where required.
-- Update internal dashboards to read the new fields behind a controlled rollout.
-
-### Release C: Controlled Writes
-
-- Switch workflow writes to controlled transition operations.
-- Switch decision writes to decision operations.
-- Switch payment writes to payment/reconciliation operations.
-- Block protected-column updates from generic Claim update.
-- Stop application writes to legacy `claims.status`.
-
-### Release D: Frontend and Reporting Cutover
-
-- Display workflow, decision, and payment separately.
-- Rename readiness fields that are incorrectly presented as Claim status.
-- Split mixed filters such as Draft/Approved/Paid into domain-specific filters.
-- Update exports, dashboards, queue metrics, and audit screens.
-- Monitor mismatch reports.
-
-### Release E: Legacy Deprecation
-
-- Mark `claims.status` deprecated and read-only.
-- Remove backend/frontend dependencies.
-- Validate zero legacy writes over an approved observation window.
-- Create a later separately approved migration to remove the column and obsolete enum.
-
-## 15. Application Impact Plan
-
-Expected application areas to inspect and update:
-
-```text
-generated database types
-Claim repository/service layer
-Claim API routes or server actions
-Claim workflow commands
-Claim decision commands
-Payment and reconciliation services
-Claim list filters
-Payer detail filters
-Claim readiness UI
-Claim detail UI
-Executive and operational dashboards
-Audit and compliance views
-Test fixtures and mocks
-```
-
-Rules:
-
-- Do not replace readiness status with workflow status.
-- Do not show `approved` as a workflow stage.
-- Do not show `paid` as a workflow stage.
-- UI must label each domain explicitly.
-- API contracts must not expose one ambiguous `status` as the only state.
-- Compatibility DTOs must have a retirement date and owner.
-
-## 16. Test Strategy
-
-A separate `docs/database/PHASE-4-CLAIM-TEST-PLAN.md` must provide detailed test cases. At minimum, implementation must cover:
-
-### Schema and Migration
-
-- New migrations apply from a clean local database.
-- New migrations apply over the current Phase 3 schema.
-- Backfill is deterministic and idempotent.
-- No unmapped legacy status remains.
-- No invalid enum value is introduced.
-- Generated database types compile.
-
-### Workflow
-
-- Valid transitions pass.
-- Invalid transitions fail.
-- Closure does not set payment.
-- Closure does not create a payer decision.
-- Reopen requires elevated permission, reason, and expected version.
-- Generic update cannot reopen terminal Claims.
-- Formal appeal creates an Appeal record and workflow event atomically.
-
-### Decision
-
-- Only trusted integration or authorized adjudicator can finalize decisions.
-- Generic editor and AI cannot finalize decisions.
-- Duplicate payer events do not duplicate decisions.
-- Out-of-order decisions cannot replace a newer effective decision.
-- Supersession preserves prior history.
-- Current pointer and snapshot match the authoritative decision.
-
-### Payment
-
-- Duplicate payment event does not double-count.
-- Failed payment does not increase paid total.
-- Refund preserves original payment.
-- Refund ceiling is enforced.
-- Reversal preserves original transaction.
-- Currency mismatch fails.
-- Reconciliation variance follows approved tolerance.
-- Claim payment summary equals authoritative records.
-
-### Security
-
-- Cross-organization access fails.
-- Unauthorized cross-clinic access fails.
-- Self-scoped roles cannot use elevated operations.
-- `WITH CHECK` prevents tenant reassignment.
-- Protected Claim columns cannot be updated directly.
-- Service-role-only functions are not executable by authenticated users.
-
-### Application
-
-- TypeScript passes.
-- Build passes.
-- Existing Claim pages render.
-- Workflow, decision, payment, readiness, and evidence labels remain separate.
-- Legacy compatibility response is tested until retirement.
-
-## 17. Validation Commands
-
-Run from:
+Run from repository root:
 
 ```powershell
-cd D:\med-ai-nexsure-platform
-```
-
-Recommended sequence:
-
-```powershell
+git diff --check
 git status --short
-npx supabase start
-npx supabase db reset
-npx supabase db lint
-npx supabase test db
-npx supabase gen types typescript --local > lib/database.types.ts
 npx tsc --noEmit
 npm run lint
 npm run build
+```
+
+Run the exact application tests using the repository test runner, including:
+
+```powershell
+npx vitest run features/patient-claims/server/claim-workflow-command-service.test.ts
+npx vitest run features/patient-claims/server/claim-query-service.test.ts
+npx vitest run features/patient-claims/server/claim-mappers.test.ts
+```
+
+If the repository uses an equivalent test command, use the established package script and record the exact command and result.
+
+Database regression is not required to be changed by this application-only batch. If implementation unexpectedly requires database modification, stop and invalidate the authorization.
+
+Final repository checks:
+
+```powershell
 git diff --check
 git status --short
+git diff --stat
 ```
 
-Expected result:
+Stage only exact approved files:
+
+```powershell
+git add .\features\patient-claims\server\claim-workflow-command-service.ts
+git add .\features\patient-claims\server\claim-workflow-command-service.test.ts
+git add .\features\patient-claims\server\claim-integration-errors.ts
+```
+
+Do not use `git add .`.
+
+---
+
+## 15. Stop Conditions
+
+Stop implementation and return to contract reconciliation if:
+
+- an SQL migration or SQL test must change;
+- `lib/database.types.ts` must be regenerated or modified;
+- another feature module must be modified;
+- a client-side privileged key is required;
+- the authenticated server context cannot be obtained safely;
+- the RPC signature differs from this contract;
+- error behavior differs materially from the documented SQLSTATE mapping;
+- a new workflow state or transition rule is required;
+- direct Claim workflow table writes appear necessary;
+- Batch C or later scope is required;
+- a P0 security, PHI, tenant-isolation, or audit issue is found.
+
+---
+
+## 16. Human-in-the-Loop and AI Governance
+
+- The mutation represents an authoritative operational Claim action.
+- The user must explicitly confirm the action at the application interaction layer.
+- AI may summarize, explain, or recommend a transition.
+- AI must not autonomously invoke the transition.
+- AI must not impersonate a Claim reviewer or authorized actor.
+- AI must not supply fabricated reason codes, versions, tenant scope, or permissions.
+- High-risk or ambiguous transitions must remain subject to human review.
+- The canonical database result and workflow event are the audit evidence.
+
+---
+
+## 17. Approval Decision
+
+| Area | Status |
+|---|---|
+| Phase 4 database readiness | `CONFIRMED` |
+| Batch A prior closure | `CONFIRMED` |
+| Exact RPC and signature | `CONFIRMED` |
+| Database trust boundary | `CONFIRMED` |
+| Generated RPC types | `CONFIRMED` |
+| Version ownership | `CONFIRMED` |
+| Replay behavior | `CONFIRMED` |
+| Application owner | `CONFIRMED` |
+| Server execution boundary | `CONFIRMED` |
+| Exact file allowlist | `CONFIRMED` |
+| Mandatory test target | `CONFIRMED` |
+| Blocking decisions | `0` |
+| P0 findings | `0` |
+| Contract Status | `APPROVED` |
+| Implementation Authorization | `YES` |
+
+Approval is limited to the exact scope and file allowlist in this document.
+
+---
+
+## 18. Invalidation and Future Reuse
+
+Reconciliation is required when changes affect:
+
+- RPC name, signature, grants, or result;
+- generated database types;
+- workflow semantics;
+- tenant, actor, or permission authority;
+- version or replay behavior;
+- authenticated server context;
+- execution transport;
+- application owner;
+- file allowlist;
+- test scope;
+- Batch A closure;
+- acceptance criteria.
+
+Reusable contract profile:
 
 ```text
-All database tests successful
-No schema errors found
-TypeScript validation passes
-Lint contains no new blocking errors
-Production build passes
-Only intended files are modified
+CONTROLLED_MUTATION_V1
 ```
 
-If the repository uses a different database test command, record the exact command and output in the Phase 4 validation report.
+---
 
-## 18. Rollback-Forward Strategy
+## 19. Final Contract Summary
 
-Supabase/PostgreSQL migrations are treated as forward-only.
-
-Do not rely on destructive rollback scripts in production. Correct failed or partially applied migrations with a new repair migration.
-
-Required protections:
-
-- Additive schema changes before constraints become mandatory.
-- Backfill before setting `NOT NULL`.
-- Validate data before adding strict constraints.
-- Create indexes with deployment-safe strategy where supported.
-- Preserve legacy status until all cutover gates pass.
-- Preserve authoritative decision and payment history.
-- Make backfill idempotent.
-- Make external event handling idempotent.
-- Store exception records for unresolved rows.
-- Do not delete or rewrite financial transactions to repair summaries.
-
-## 19. Migration Execution Tasks
-
-### Task 1: Baseline and Approval Verification
-
-**Files:**
-- Modify: `docs/database/PHASE-4-CLAIM-MIGRATION-PLAN.md`
-- Read: `docs/database/PHASE-4-CLAIM-ARCHITECTURE-DECISIONS.md`
-- Read: `docs/database/PHASE-4-CLAIM-IMPACT-ANALYSIS.md`
-- Read: `docs/database/PHASE-3-VALIDATION-REPORT.md`
-
-- [ ] Confirm ADR-001 through ADR-008 are approved.
-- [ ] Record role-specific approval evidence.
-- [ ] Confirm all P1 dependencies.
-- [ ] Run Phase 3 regression baseline.
-- [ ] Record baseline row counts and financial totals.
-- [ ] Commit documentation evidence.
-
-Suggested commit:
-
-```powershell
-git add docs/database/PHASE-4-CLAIM-MIGRATION-PLAN.md
-git commit -m "docs(database): approve phase 4 claim migration baseline"
+```text
+Integration Batch: B
+Batch Title: Controlled Workflow Mutation Integration
+Batch Type: CONTROLLED_MUTATION
+Contract Status: APPROVED
+Implementation Authorization: YES
+Required Prior Closure: Batch A Validation Closure — CONFIRMED
+Exact RPC/Function: public.transition_claim_workflow — CONFIRMED
+Execution Boundary: SERVER_ONLY_AUTHENTICATED_REST_RPC
+Application Owner: features/patient-claims/server
+Version Owner: DATABASE (claims.version)
+Replay Behavior: IDEMPOTENT MATCH / CONFLICT REJECT
+Create Files:
+- features/patient-claims/server/claim-workflow-command-service.ts
+- features/patient-claims/server/claim-workflow-command-service.test.ts
+Modify Files:
+- features/patient-claims/server/claim-integration-errors.ts
+Database Changes: NOT AUTHORIZED
+Blocking Open Decisions: 0
+P0 Findings: 0
+Implementation Ready: YES
+Recommended Next Task: PHASE 4 — INTEGRATION BATCH B IMPLEMENTATION
 ```
 
-### Task 2: State Types and Claim Columns
+Final status:
 
-**Files:**
-- Create: `supabase/migrations/20260722140000_phase4_claim_state_types.sql`
-- Create: `supabase/migrations/20260722140100_phase4_claim_state_columns.sql`
-- Create: `supabase/tests/phase4_claim_state_schema_test.sql`
-
-- [ ] Write failing schema tests.
-- [ ] Create state types/domains.
-- [ ] Add nullable snapshot columns and indexes.
-- [ ] Add version and currency fields.
-- [ ] Run schema tests.
-- [ ] Run `npx supabase db lint`.
-- [ ] Commit.
-
-Suggested commit:
-
-```powershell
-git add supabase/migrations/20260722140000_phase4_claim_state_types.sql `
-        supabase/migrations/20260722140100_phase4_claim_state_columns.sql `
-        supabase/tests/phase4_claim_state_schema_test.sql
-git commit -m "feat(claims): add phase 4 split state schema"
+```text
+APPROVED — Integration Batch B application implementation may proceed only within the exact server-only controlled-mutation contract and file allowlist defined above.
 ```
-
-### Task 3: Workflow Events and Appeals
-
-**Files:**
-- Create: `supabase/migrations/20260722140200_phase4_claim_workflow_events.sql`
-- Create: `supabase/migrations/20260722140300_phase4_claim_appeals.sql`
-- Create: `supabase/tests/phase4_claim_workflow_test.sql`
-- Create: `supabase/tests/phase4_claim_appeal_test.sql`
-
-- [ ] Verify whether existing workflow history is authoritative.
-- [ ] Extend or create one authoritative workflow-event structure.
-- [ ] Add formal Appeal table.
-- [ ] Add tenant-safe foreign keys and indexes.
-- [ ] Add append-only and RLS tests.
-- [ ] Verify every formal appeal produces a record.
-- [ ] Commit.
-
-Suggested commit:
-
-```powershell
-git add supabase/migrations/20260722140200_phase4_claim_workflow_events.sql `
-        supabase/migrations/20260722140300_phase4_claim_appeals.sql `
-        supabase/tests/phase4_claim_workflow_test.sql `
-        supabase/tests/phase4_claim_appeal_test.sql
-git commit -m "feat(claims): add workflow events and formal appeals"
-```
-
-### Task 4: Payment, Refund, and Reversal Extensions
-
-**Files:**
-- Create: `supabase/migrations/20260722140400_phase4_claim_payment_extensions.sql`
-- Create: `supabase/tests/phase4_claim_payment_test.sql`
-- Create: `supabase/tests/phase4_claim_payment_idempotency_test.sql`
-
-- [ ] Write failing payment authority tests.
-- [ ] Add or refine transaction type/status fields.
-- [ ] Add original-payment reference.
-- [ ] Add external event and idempotency constraints.
-- [ ] Add currency consistency and refund ceiling rules.
-- [ ] Test payment failure, partial payment, refund, and reversal.
-- [ ] Test duplicate and out-of-order events.
-- [ ] Commit.
-
-Suggested commit:
-
-```powershell
-git add supabase/migrations/20260722140400_phase4_claim_payment_extensions.sql `
-        supabase/tests/phase4_claim_payment_test.sql `
-        supabase/tests/phase4_claim_payment_idempotency_test.sql
-git commit -m "feat(claims): extend payment refund and reversal model"
-```
-
-### Task 5: Controlled Domain Operations
-
-**Files:**
-- Create: `supabase/migrations/20260722140500_phase4_claim_controlled_operations.sql`
-- Create: `supabase/tests/phase4_claim_operations_test.sql`
-- Create: `supabase/tests/phase4_claim_reopen_test.sql`
-- Create: `supabase/tests/phase4_claim_decision_authority_test.sql`
-
-- [ ] Write failing authority and transition tests.
-- [ ] Add workflow transition operation.
-- [ ] Add close and elevated reopen operations.
-- [ ] Add secure payer-decision wrapper.
-- [ ] Add payment/refund/reversal wrappers.
-- [ ] Add appeal submit/resolve operations.
-- [ ] Add expected-version and idempotency behavior.
-- [ ] Run tests and commit.
-
-Suggested commit:
-
-```powershell
-git add supabase/migrations/20260722140500_phase4_claim_controlled_operations.sql `
-        supabase/tests/phase4_claim_operations_test.sql `
-        supabase/tests/phase4_claim_reopen_test.sql `
-        supabase/tests/phase4_claim_decision_authority_test.sql
-git commit -m "feat(claims): add controlled claim state operations"
-```
-
-### Task 6: RBAC and RLS
-
-**Files:**
-- Create: `supabase/migrations/20260722140600_phase4_claim_rbac_rls.sql`
-- Create: `supabase/tests/phase4_claim_permissions_test.sql`
-- Create: `supabase/tests/phase4_claim_tenant_isolation_test.sql`
-- Create: `supabase/tests/phase4_claim_protected_fields_test.sql`
-
-- [ ] Inventory existing permission codes.
-- [ ] Add only missing permissions.
-- [ ] Add or update role mappings.
-- [ ] Add RLS for workflow events and appeals.
-- [ ] Protect Claim state and financial columns.
-- [ ] Test tenant isolation and self scope.
-- [ ] Test service-role containment.
-- [ ] Commit.
-
-Suggested commit:
-
-```powershell
-git add supabase/migrations/20260722140600_phase4_claim_rbac_rls.sql `
-        supabase/tests/phase4_claim_permissions_test.sql `
-        supabase/tests/phase4_claim_tenant_isolation_test.sql `
-        supabase/tests/phase4_claim_protected_fields_test.sql
-git commit -m "security(claims): enforce phase 4 authority and isolation"
-```
-
-### Task 7: Backfill and Validation Guards
-
-**Files:**
-- Create: `supabase/migrations/20260722140700_phase4_claim_state_backfill.sql`
-- Create: `supabase/migrations/20260722140900_phase4_claim_validation_guards.sql`
-- Create: `supabase/tests/phase4_claim_backfill_test.sql`
-- Create: `supabase/tests/phase4_claim_consistency_test.sql`
-
-- [ ] Create deterministic mapping tests.
-- [ ] Create migration exception reporting.
-- [ ] Backfill decision snapshot.
-- [ ] Backfill payment snapshot.
-- [ ] Backfill workflow snapshot.
-- [ ] Add consistency validation functions.
-- [ ] Validate zero unresolved blocking exceptions.
-- [ ] Add `NOT NULL` constraints only after validation.
-- [ ] Commit.
-
-Suggested commit:
-
-```powershell
-git add supabase/migrations/20260722140700_phase4_claim_state_backfill.sql `
-        supabase/migrations/20260722140900_phase4_claim_validation_guards.sql `
-        supabase/tests/phase4_claim_backfill_test.sql `
-        supabase/tests/phase4_claim_consistency_test.sql
-git commit -m "feat(claims): backfill and validate split claim state"
-```
-
-### Task 8: Legacy Compatibility and Write Cutover
-
-**Files:**
-- Create: `supabase/migrations/20260722140800_phase4_claim_legacy_compatibility.sql`
-- Modify: exact backend/API files discovered in the approved impact inventory
-- Modify: `lib/database.types.ts`
-- Create or modify: application tests discovered in the repository inventory
-
-- [ ] Add temporary compatibility read behavior.
-- [ ] Generate database types.
-- [ ] Switch backend reads to split states.
-- [ ] Switch backend writes to controlled operations.
-- [ ] Stop application writes to legacy status.
-- [ ] Keep legacy field readable only where approved.
-- [ ] Run TypeScript, lint, build, and integration tests.
-- [ ] Commit.
-
-Suggested commit:
-
-```powershell
-git add supabase/migrations/20260722140800_phase4_claim_legacy_compatibility.sql `
-        lib/database.types.ts
-git add <approved-backend-and-test-files>
-git commit -m "refactor(claims): cut over application claim state handling"
-```
-
-The exact backend and test file list must come from the repository impact inventory before this task begins. Do not guess or broaden scope during implementation.
-
-### Task 9: Frontend and Dashboard Cutover
-
-**Files:**
-- Modify: exact frontend files identified in the approved impact inventory
-- Modify: related frontend tests
-
-- [ ] Separate workflow, decision, and payment labels.
-- [ ] Preserve Claim readiness as a separate domain.
-- [ ] Split mixed filters.
-- [ ] Update dashboards and exports.
-- [ ] Add compatibility handling for staged rollout.
-- [ ] Run UI tests and production build.
-- [ ] Commit.
-
-Suggested commit:
-
-```powershell
-git add <approved-frontend-and-test-files>
-git commit -m "refactor(claims): separate workflow decision and payment UI"
-```
-
-### Task 10: Phase 4 Validation Report
-
-**Files:**
-- Create: `docs/database/PHASE-4-VALIDATION-REPORT.md`
-
-- [ ] Record migration list and checksums.
-- [ ] Record database test results.
-- [ ] Record tenant isolation results.
-- [ ] Record financial integrity results.
-- [ ] Record TypeScript, lint, and build results.
-- [ ] Record known limitations and deferred items.
-- [ ] Confirm legacy writes are stopped.
-- [ ] Confirm implementation readiness.
-- [ ] Commit and push.
-
-Suggested commit:
-
-```powershell
-git add docs/database/PHASE-4-VALIDATION-REPORT.md
-git commit -m "docs(database): finalize phase 4 claim validation report"
-git push origin main
-```
-
-## 20. Exit Criteria
-
-Phase 4 database migration is complete only when all conditions pass:
-
-- ADR-001 through ADR-008 have approval evidence.
-- All migrations apply successfully from clean local state.
-- All migrations apply successfully over the Phase 3 baseline.
-- No schema lint error exists.
-- All Phase 3 and Phase 4 database tests pass.
-- Tenant and clinic isolation pass.
-- Protected state/financial fields cannot be updated generically.
-- Decision and payment authority tests pass.
-- Duplicate/out-of-order event tests pass.
-- Backfill has zero unresolved P0/P1 exceptions.
-- New Claim state snapshots match authoritative records.
-- Generated TypeScript types compile.
-- Frontend and backend read separate state domains.
-- Application no longer writes legacy `claims.status`.
-- Production build passes.
-- Validation report is complete.
-- Working tree is clean and commit is pushed.
-
-## 21. Deferred Work
-
-The following are explicitly outside the initial Phase 4 migration:
-
-- Dedicated `claim_line_decisions`
-- Multi-currency settlement
-- Overpayment recovery workflow
-- Chargeback workflow
-- Multi-level appeal automation
-- Automated AI adjudication
-- Production webhook execution
-- Complex recovery and subrogation
-- Full accounting ledger
-- Physical removal of legacy `claims.status`
-
-Each deferred item requires a separate approved ADR or implementation phase.
-
-## 22. Risks and Mitigations
-
-| Risk | Priority | Mitigation |
-| --- | --- | --- |
-| Legacy status maps incorrectly | P0 if data corruption occurs | Authoritative-record-first backfill, exception table, no silent coercion |
-| Generic update changes protected state | P0 | Controlled operations, protected columns, RLS/RBAC tests |
-| Duplicate payment or payer event | P0 | External event identity, idempotency constraint, atomic operation |
-| Cross-tenant mutation | P0 | Tenant-safe FK, RLS `USING` and `WITH CHECK`, isolation tests |
-| Payment summary drifts | P0 | Transaction authority, reconciliation validation, consistency tests |
-| Decision pointer conflicts | P1 | Supersession rules, current-pointer validation, expected version |
-| Workflow closure implies paid | P1 | Independent fields, operation tests, UI separation |
-| Appeal exists only as workflow state | P1 | Dedicated formal Appeal record requirement |
-| Indefinite legacy dual-write | P1 | Explicit write cutoff and later removal gate |
-| Application cutover misses a reader/writer | P1 | Approved impact inventory, search verification, build/test gate |
-| Migration partially succeeds | P1 | Forward-only repair migration, idempotent backfill, staged constraints |
-
-## 23. Required Summary
-
-**Approved architecture direction:** Split workflow, decision, and payment state; formal appeals use dedicated records; payments remain transaction-authoritative; Phase 4 MVP retains header decision plus item adjustments; terminal reopen is controlled; payer and payment authorities are distinct; legacy status retirement is staged.
-
-**Implementation gate:** Blocked until explicit ADR approval evidence and all P1 dependencies are recorded.
-
-**Migration approach:** Additive schema → authoritative event/domain records → controlled operations → RBAC/RLS → deterministic backfill → validation guards → compatible reads → controlled writes → UI/API cutover → staged legacy retirement.
-
-**P0 safeguards:** Tenant isolation, protected state columns, payment integrity, event idempotency, deterministic backfill, and authoritative decision/payment records.
-
-**Deferred:** Dedicated line adjudication, multi-currency, advanced recovery, multi-level appeals, automated AI adjudication, production webhooks, full ledger, and physical legacy-column removal.
-
-## 24. Change Log
-
-| Date | Version | Change | Author |
-| --- | --- | --- | --- |
-| 2026-07-22 | 0.1 | Created Phase 4 Claim migration plan from ADR-001 through ADR-008, including gates, migration sequence, state mapping, controlled operations, security, backfill, cutover, validation, and exit criteria | AI-assisted Database Architecture Lead |
