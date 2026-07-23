@@ -1331,3 +1331,49 @@ supabase/tests/phase3_claim_audit_test.sql
 ```
 
 No test is marked executed or passed by this plan.
+
+---
+
+## 41. Batch 6 Regression Schema Assertion Reconciliation Authorization
+
+**Authorization ID:** P4-B6-SCHEMA-ASSERT-50-51-RECON-20260723
+**Status:** Approved for later SQL test-only reconciliation
+**Approval Evidence:** Phase 4 Batch 6 Contract Approval Closure and static repository evidence from `supabase/migrations/20260722163000_phase4_claim_appeals.sql`, `supabase/tests/phase4_claim_appeal_test.sql`, and `supabase/tests/phase4_claim_appeal_security_test.sql`.
+**Runtime Failure Evidence:** `supabase/tests/phase4_claim_schema_test.sql` reported 51 tests with failed assertions 50-51. TAP diagnostics supplied assertion numbers only; exact runtime values for individual objects are not provided and must not be inferred as runtime-confirmed.
+
+This authorization is limited to `supabase/tests/phase4_claim_schema_test.sql` assertions 50 and 51 and only their directly dependent query blocks.
+
+### 41.1 Assertion 50 - `no Batch 2 claim tables are introduced`
+
+| Review Item | Evidence |
+| --- | --- |
+| Classification | STALE |
+| Obsolete assumption | The assertion treats `claim_appeals`, `claim_line_decisions`, and `claim_payment_transactions` as a permanently closed out-of-scope table set. Batch 6 now explicitly approves and implements `public.claim_appeals`; the other two objects remain deferred or out of scope. |
+| Approved Batch 6 evidence | Batch 6 scope requires `public.claim_appeals` as the formal appeal source of truth with tenant ownership, RLS, sequence, controlled submit/resolve behavior, evidence linkage, and audit fields. |
+| Permitted test-only change pattern | Split the closed-list absence check so `public.claim_appeals` is asserted present with its approved Batch 6 contract while `claim_line_decisions` and any unapproved payment-transaction table remain absent unless later separately approved. |
+| Replacement coverage required | Keep or add assertion-specific coverage for `claim_appeals` table existence, tenant-safe Claim FK, status constraint, sequence uniqueness, RLS, grants, and direct-write protection. Preserve explicit absence checks for `claim_line_decisions` and unapproved payment transaction objects. |
+
+### 41.2 Assertion 51 - `no out-of-scope claim mutation functions are introduced`
+
+| Review Item | Evidence |
+| --- | --- |
+| Classification | STALE |
+| Obsolete assumption | The assertion treats `submit_claim_appeal`, `record_claim_refund`, and `record_claim_reversal` as a permanently closed out-of-scope function set. Batch 6 now explicitly approves and implements `public.submit_claim_appeal`; refund and reversal functions remain unapproved in Batch 6. |
+| Approved Batch 6 evidence | Batch 6 scope requires controlled `public.submit_claim_appeal(...)` and `public.resolve_claim_appeal(...)` functions that derive actor and tenant scope from trusted context, use optimistic locking, preserve decision and payment boundaries, and restrict execution to approved roles. |
+| Permitted test-only change pattern | Split the closed-list absence check so approved appeal mutation functions are asserted by signature and security contract while `record_claim_refund` and `record_claim_reversal` remain absent unless later separately approved. |
+| Replacement coverage required | Keep or add assertion-specific coverage for appeal function signatures, `SECURITY DEFINER`, fixed safe `search_path`, no `PUBLIC` or `anon` execute, `authenticated` and `service_role` execute only where approved, permission checks through `public.has_permission(...)`, version conflict behavior, idempotency identity, and decision/payment preservation. |
+
+### 41.3 Invariants to Preserve
+
+- All valid Batch 1-5 assertions and regression coverage remain in force.
+- Tenant isolation, Auth, RBAC, RLS, least privilege, and direct protected-column restrictions remain unchanged.
+- Workflow, decision, payment, appeal, evidence, and audit authority boundaries remain separate.
+- Controlled mutations continue to use optimistic locking, atomic rollback, immutable evidence, sanitized authorization failures, and audit-preserving behavior.
+- Original decision, workflow, payment, and audit history must not be weakened or rewritten.
+
+### 41.4 Prohibited Changes
+
+- No migration, database object, RLS, grant, function, constraint, generated type, application, fixture, seed, or Batch 7+ change is authorized by this record.
+- No full-file rewrite, wildcard scope, generic acceptance of future objects, or broad removal of out-of-scope assertions is authorized.
+- No authorization is granted for `claim_line_decisions`, `record_claim_refund`, `record_claim_reversal`, refund lifecycle, reversal lifecycle, legacy `claims.status` removal, or Batch 7+ reconciliation.
+- No weakened security assertion, tenant-scope assertion, direct-write protection assertion, or Batch 1-5 invariant is authorized.
