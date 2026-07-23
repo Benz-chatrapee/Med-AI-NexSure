@@ -1365,3 +1365,62 @@ Approved ADR alignment:
 | Multi-round appeal depth | Bound MVP scope | Single appeal; sequenced appeals; full multi-level automation | Sequenced appeal records, no multi-level automation | Product Owner | NO |
 
 Batch 6 readiness recommendation: `READY FOR BATCH 6`.
+
+---
+
+## 21. Phase 4 Batch 7 Controlled Refund Lifecycle Contract Closure
+
+**Status:** Approved
+**Decision Date:** 2026-07-23
+**Approval Date:** 2026-07-23
+**Approver Role:** Project Owner
+**Approval Source:** Explicit Project Owner instruction
+**Approval Reference:** Phase 4 Batch 7 Owner Approval Recording
+**Approval Impact:** This section does not change ADR-001 through ADR-008 text, approval status, rationale, or implementation status.
+
+### 21.1 Review Decision
+
+The proposed Batch 7 responsibility is confirmed as:
+
+```text
+Controlled Claim Refund Lifecycle
+```
+
+Contract Completeness Status: `COMPLETE`
+
+Contract Approval Status: `APPROVED`
+
+Implementation Gate Status: `READY`
+
+Migration Implementation Authorized: `YES`
+
+Semantic Contract Changed During Approval: `NO`
+
+The contract is complete and internally consistent for owner approval. Explicit Project Owner approval was recorded on 2026-07-23. Implementation is authorized only for the approved Batch 7 refund lifecycle migration and SQL-test scope.
+
+### 21.2 Decision Closure Matrix
+
+| Decision | Classification | Evidence |
+| --- | --- | --- |
+| Single Batch 7 responsibility is controlled refund lifecycle only | READY FOR OWNER APPROVAL | Migration plan Section 30 selects refund lifecycle mutation only and excludes reversal automation, chargebacks, ledger, reconciliation redesign, appeal, workflow, decision, application, generated type, migration, and SQL test changes from the contract task. |
+| Refund is distinct from void, cancellation, reversal, clawback, chargeback, payment correction, claim appeal, payer-decision change, and accounting adjustment | READY FOR OWNER APPROVAL | ADR-003 and Migration Plan Section 30 define refund as returning funds after successful payment and explicitly defer or exclude the other domains. |
+| Refund source of truth reuses existing payment evidence | READY FOR OWNER APPROVAL | Batch 7 contract reuses `public.claim_payments` and related allocation/reconciliation records unless implementation hits a documented stop condition. |
+| Refund eligibility and ceiling | READY FOR OWNER APPROVAL | Contract defines eligible source settlement as successful settled payment evidence and ceiling as successful settled payments minus prior successful refunds for the same Claim and currency. |
+| Partial and full refund summaries | READY FOR OWNER APPROVAL | Contract maps successful partial refund to `partially_refunded` and full remaining refund to `refunded`. |
+| Pending, failed, or cancelled refund balance effect | READY FOR OWNER APPROVAL | Contract states successful refund contributes to summary; failed attempts must not change settled totals. Pending/cancelled handling must be enforced by future SQL from this success-only invariant. |
+| Authority and RBAC boundary | READY FOR OWNER APPROVAL | Refund authority is limited to authorized Finance or trusted payment integration and recommended permission `claim.payment.refund`; AI and generic Claim update are excluded. |
+| Tenant, clinic, and RLS behavior | READY FOR OWNER APPROVAL | Contract requires locked Claim/payment tenant resolution, organization and clinic validation, controlled function execution, no caller-trusted tenant/actor fields, and direct-write denial. |
+| Amount and currency integrity | READY FOR OWNER APPROVAL | Contract requires exact numeric amount, positive refund, approved scale rounding, original payment currency match, reason code/text, and over-refund rejection. |
+| Optimistic locking, replay, and idempotency | READY FOR OWNER APPROVAL | Contract requires `claims.version`, row lock, external identity by `organization_id + source_system + external_event_id`, equivalent replay no-op return, and conflicting replay failure. |
+| Atomic rollback | READY FOR OWNER APPROVAL | Contract requires refund evidence, Claim summary, version, and audit evidence to commit together or roll back together. |
+| Immutable history and audit evidence | READY FOR OWNER APPROVAL | Original payment, decision, workflow, appeal, and audit history must not be destructively rewritten; refund evidence records actor, authority, reason, source, request identity, timestamps, amount, and currency. |
+| Migration and test responsibilities | READY FOR OWNER APPROVAL | Migration Plan Section 30 and Test Plan Section 43 define exact proposed implementation and SQL test files, prohibited contract-task files, stop conditions, and required regression coverage. |
+| Recorded approval | APPROVED | Explicit Project Owner instruction recorded approval on 2026-07-23 with approval reference `Phase 4 Batch 7 Owner Approval Recording`. |
+
+Blocking Open Decisions: `0`
+
+### 21.3 Implementation Gate
+
+Batch 7 implementation is authorized because the complete contract received recorded Project Owner approval on 2026-07-23. Blocking contract decisions are zero.
+
+Implementation authorization after approval is limited to the Batch 7 refund lifecycle scope and does not authorize Batch 8, reversal automation, chargeback, clawback, ledger redesign, payment gateway integration, workflow/decision/appeal mutation changes, legacy status removal, generated types, or application code.

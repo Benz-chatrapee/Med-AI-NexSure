@@ -2006,3 +2006,195 @@ Approval date: `2026-07-23`.
 Approval reference: `Phase 4 Batch 6 Contract Approval Closure`.
 
 Migration implementation authorization: `YES`.
+
+---
+
+## 30. Proposed Batch 7 Contract - Controlled Claim Refund Lifecycle Mutations
+
+**Batch name:** Phase 4 Batch 7 - Controlled Claim Refund Lifecycle Mutations
+**Status:** Ready for Owner Approval
+**Objective:** Define the smallest independently deployable financial-exception contract after Batch 1-6 by adding controlled refund evidence and Claim payment summary synchronization without changing workflow, payer decision, appeal, legacy status, application code, generated types, migrations, or tests in this contract task.
+**Contract completeness:** COMPLETE
+**Contract approval:** APPROVED
+**Approval date:** 2026-07-23
+**Approver role:** Project Owner
+**Approval source:** Explicit Project Owner instruction
+**Approval reference:** Phase 4 Batch 7 Owner Approval Recording
+**Implementation gate:** READY
+**Implementation authorization:** YES
+**Semantic contract changed during approval:** NO
+
+### 30.1 Repository Evidence and Candidate Selection
+
+| Candidate | Evidence strength | Dependency readiness | Open-decision count | Duplication risk | Selection |
+| --- | --- | --- | --- | --- | --- |
+| Controlled Claim Refund Lifecycle Mutations | Strong. ADR-003 states partial and full refund are required before production; Batch 1 already defines `partially_refunded` and `refunded`; Batch 5 explicitly excludes refund lifecycle; static search found no `record_claim_refund` function. | Ready after Batch 1-6 validation; relies on split payment status, payment settlement authority, and independent appeal boundary. | 0 blocking when scope is limited to refund only and refund ceiling is defined as settled-paid minus prior successful refunds. | Low; reuses `claim_payments` instead of creating a duplicate payment source of truth. | Selected |
+| Broader reversal lifecycle | Medium. Reversal fields and `claim.payment.reverse` exist, and Batch 5 can record reversed settlement evidence; no standalone `record_claim_reversal` function exists. | Partially ready, but broad event ordering and reversal automation remain separate concerns. | Non-blocking for refund-only Batch 7. | Medium if it duplicates Batch 5 reversal handling. | Deferred |
+| Legacy split-state backfill and cutover | Strong as a Phase 4 responsibility, but ADR-008 requires staged retirement and application/type integration inventory. | Not ready until refund exception state is stable and cutover inventory is accepted. | Blocking for cutover, not for Batch 7 refund contract. | Medium/high because readers and writers may diverge. | Deferred |
+
+Confirmed Finding: Batch 6 runtime validation is recorded as `PASS` in the Phase 4 test plan with Batch 7 analysis prerequisite `SATISFIED`. Repository migrations and tests exist through Batch 6, including `20260722163000_phase4_claim_appeals.sql`, `phase4_claim_appeal_test.sql`, and `phase4_claim_appeal_security_test.sql`.
+
+Recommendation: Select exactly one Batch 7 responsibility: controlled refund lifecycle mutation. The selected scope closes the remaining production-required refund gap from ADR-003 while preserving the already implemented Batch 5 settlement and reversal evidence boundary.
+
+### 30.2 Identity and Scope
+
+| Contract Field | Value |
+| --- | --- |
+| Proposed title | Phase 4 Batch 7 - Controlled Claim Refund Lifecycle Mutations |
+| Business objective | Preserve partial and full refunds as auditable financial exception evidence and synchronize `claims.payment_status` without overwriting original payment, decision, workflow, or appeal history. |
+| Single primary responsibility | Controlled refund recording and refund-derived Claim payment summary synchronization. |
+| In scope | Refund evidence in existing payment authority model; `partially_refunded` and `refunded` summary states; refund ceiling; idempotency; tenant/clinic/RBAC/RLS contract; direct-write protection; functional/security regression contract. |
+| Out of scope | New payment gateway integration, broad standalone reversal automation, overpayment recovery, chargebacks, accounting ledger, payment allocation redesign, reconciliation redesign, workflow mutation, decision mutation, appeal mutation, legacy `claims.status` removal, backend/API/frontend/generated type changes, seed data, fixtures, database reset, SQL tests, and implementation. |
+| Dependencies | Validated Batch 1 split payment status; Batch 3 controlled workflow independence; Batch 4 decision independence; Batch 5 `record_claim_payment_settlement`; Batch 6 appeal independence; Phase 3 `claim_payments`, allocations, reconciliations, payment references, exact numeric amounts, tenant-safe keys, audit, RBAC/RLS helpers, and `public.has_permission(text, uuid, uuid)`. |
+| Entry criteria | Batch 1-6 migrations/tests present; Batch 6 runtime validation recorded PASS; `claims.payment_status` supports `partially_refunded` and `refunded`; at least one successful settled payment exists for the Claim; refund actor has approved finance authority; refund amount, currency, reason, expected version, and idempotency identity are supplied where required. |
+| Exit criteria | Future implementation provides exactly one controlled refund path; original payment evidence remains unchanged; refund ceiling is enforced; Claim payment summary and totals are transactionally synchronized; unauthorized, stale, cross-tenant, duplicate, over-refund, currency-mismatch, and AI-authority cases write nothing; blocking Open Decisions equal zero. |
+
+### 30.3 Domain Ownership
+
+| Concept | Business Meaning | Existing Source of Truth | Tenant Ownership | Authority Owner | Lifecycle | Relationship to Batch 1-6 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Original payment | Settled payment evidence received from payer or authorized finance fallback. | `public.claim_payments` and related allocation/reconciliation records. | Inherited from locked Claim and payment row. | Payment/reconciliation integration or authorized Finance. | Preserved immutable financial evidence after settlement. | Batch 5 records payment settlement and may record minimal reversal evidence. |
+| Refund | Funds returned after a successful payment, represented as distinct negative financial evidence. | Reuse `public.claim_payments` as transaction evidence unless implementation proves a materially separate refund object is required for lifecycle, authority, or immutability. | Derived from locked parent Claim and original payment; caller-supplied tenant values are not trusted. | Authorized Finance or trusted payment integration only. | Requested/recorded as refund evidence; successful refund contributes to `partially_refunded` or `refunded`; failed attempts must not change settled totals. | Extends Batch 5 payment authority without mutating workflow, decision, or appeal state. |
+| Refund ceiling | Maximum refundable amount for a Claim. | Derived from successful settled payments minus prior successful refunds for the same Claim and currency. | Same Claim tenant scope. | Database-controlled financial invariant. | Recomputed inside locked transaction before insert/update. | Uses Batch 5 payment summary and exact numeric model. |
+| Claim payment summary | Current operational payment state for queues and dashboards. | `claims.payment_status` and `claims.total_paid_amount` as synchronized summary; payment rows remain authoritative. | Locked Claim organization/clinic. | Controlled payment/refund functions only. | Updated atomically after authoritative refund evidence. | Preserves split-state model from Batch 1 and controlled payment boundary from Batch 5. |
+
+Canonical state and immutable evidence:
+
+- Original successful payment rows must not be overwritten by refund recording.
+- Refund rows or refund evidence are financial history, not payer decision history.
+- `claims.workflow_status`, `claims.decision_status`, `claims.current_decision_id`, `claim_decisions`, and `claim_appeals` must remain unchanged by the refund mutation.
+
+### 30.4 Proposed Objects and Mutations
+
+Proposed mutation:
+
+```text
+public.record_claim_refund(
+  p_claim_id uuid,
+  p_original_payment_id uuid,
+  p_expected_version integer,
+  p_refund_amount numeric,
+  p_reason_code text,
+  p_reason_text text,
+  p_refunded_at timestamptz default null,
+  p_source_system text default 'internal',
+  p_external_event_id text default null,
+  p_correlation_id uuid default null,
+  p_metadata jsonb default '{}'::jsonb
+)
+```
+
+Return contract:
+
+```text
+claim_id uuid
+refund_payment_id uuid
+original_payment_id uuid
+previous_payment_status public.claim_payment_state_domain
+payment_status public.claim_payment_state_domain
+version integer
+total_paid_amount numeric
+refunded_amount numeric
+net_paid_amount numeric
+state_updated_at timestamptz
+idempotent_replay boolean
+```
+
+Required behavior:
+
+1. Resolve actor from `auth.uid()` or approved integration context.
+2. Lock the Claim by `p_claim_id` and `deleted_at is null`.
+3. Validate organization and clinic from the locked Claim and original payment.
+4. Validate approved refund permission, recommended as `claim.payment.refund` unless an exact existing equivalent is found.
+5. Validate `p_expected_version = claims.version`.
+6. Validate original payment belongs to the same tenant, clinic, Claim, currency, and successful settled payment evidence.
+7. Validate `p_refund_amount > 0`, rounded to approved scale, and not greater than refundable settled amount.
+8. Validate `p_reason_code` and nonblank `p_reason_text`.
+9. Validate idempotency for external events using `organization_id + source_system + external_event_id` when supplied.
+10. Insert or record authoritative refund evidence before updating the Claim summary.
+11. Set `claims.payment_status` to `partially_refunded` when net settled amount remains above zero and below prior settled amount.
+12. Set `claims.payment_status` to `refunded` when refundable settled amount is fully refunded.
+13. Update `claims.total_paid_amount` only according to the approved repository meaning: if it represents gross received amount, preserve gross and return net separately; if it represents current net settlement, update it to net settled amount. The implementation must stop if this semantic cannot be verified.
+14. Increment `claims.version` exactly once on successful non-replay refund.
+15. Commit refund evidence, summary update, version update, and audit evidence together or roll all back.
+
+Replay behavior:
+
+- Equivalent external retry returns the prior refund result with `idempotent_replay = true`, no new refund evidence, and no version increment.
+- Conflicting retry with the same external identity fails with no data change.
+- Internal human duplicate without external identity relies on optimistic locking and the refund ceiling.
+
+### 30.5 Security and Tenant Contract
+
+- Preserve Supabase Auth, organization isolation, clinic isolation, RBAC, RLS, least privilege, optimistic locking, atomicity, immutable evidence, sanitized errors, AI non-authority, and Human-in-the-Loop accountability.
+- Refund execution must be limited to `authenticated` and `service_role` where repository convention supports it; no EXECUTE to `PUBLIC` or `anon`.
+- Use `SECURITY DEFINER` only with fixed safe `search_path = public, private, auth, pg_temp`, schema-qualified objects, and no caller-trusted organization, clinic, actor, or role values.
+- Ordinary users must not directly insert refund evidence, update original settled payment rows into refunds, delete financial evidence, or directly update `claims.payment_status`, `claims.total_paid_amount`, `claims.version`, `state_updated_at`, or `state_updated_by`.
+- Cross-tenant, cross-clinic, missing-permission, stale-version, missing-original-payment, over-refund, currency mismatch, and idempotency-conflict errors must not reveal PHI, tenant existence, internal policy names, or raw SQL diagnostics.
+- AI/system recommendation context may flag refund review needs but must not record, approve, or finalize refunds.
+
+### 30.6 Migration Contract
+
+| Item | Contract |
+| --- | --- |
+| Migration responsibility | Add the controlled refund mutation and only the minimal supporting permission, constraints, indexes, grants, or comments required to preserve the existing payment source of truth and summary synchronization. |
+| Proposed file path | `supabase/migrations/20260722164000_phase4_claim_refund_mutation.sql` |
+| Dependency order | Must run after `20260722163000_phase4_claim_appeals.sql` and must not modify Batch 1-6 migration history. |
+| Allowed files for future implementation | `supabase/migrations/20260722164000_phase4_claim_refund_mutation.sql`; `supabase/tests/phase4_claim_refund_mutation_test.sql`; `supabase/tests/phase4_claim_refund_security_test.sql`; tightly scoped updates to existing Phase 4 schema/payment regression tests only when existing assertions must recognize approved refund behavior. |
+| Prohibited files in this contract task | All SQL migrations, SQL tests, database objects, generated types, application code, fixtures, seed files, commits, and pushes. |
+| Forward-only correction strategy | Any implementation mistake is corrected by a later migration; applied Batch 1-6 migrations are never rewritten. |
+| Implementation stop conditions | `claims.total_paid_amount` semantic cannot be verified; existing payment table cannot safely represent refund evidence; refund ceiling cannot be calculated from authoritative rows; tenant-safe original payment linkage is missing; required permission model cannot be enforced without weakening existing RLS; refund behavior requires payment allocation/reconciliation redesign. |
+| Validation gates | `git diff --check`; Supabase reset/lint/test for refund files and Batch 1-6 regressions; direct-write denial tests; no workflow/decision/appeal mutation from refund; no legacy status removal. |
+
+### 30.7 Acceptance Criteria and Open Decisions
+
+| Acceptance Criterion | Status |
+| --- | --- |
+| One responsibility selected | Satisfied - controlled refund lifecycle mutation only. |
+| Scope and exclusions explicit | Satisfied. |
+| Source of truth and authority boundaries defined | Satisfied - reuse payment evidence; no duplicate financial table unless implementation stop condition is hit. |
+| Tenant and security behavior complete | Satisfied for contract. |
+| Mutation and rollback behavior defined | Satisfied. |
+| Migration and test responsibilities explicit | Satisfied. |
+| Blocking Open Decisions | 0 |
+
+Open Decisions:
+
+| Issue | Options | Recommendation | Owner | Blocking |
+| --- | --- | --- | --- | --- |
+| Broader reversal automation after Batch 5 minimal reversed settlement evidence | Keep Batch 5-only reversal evidence; add standalone reversal orchestration; combine with refund | Defer standalone reversal orchestration until repository evidence shows Batch 5 reversal handling is insufficient. | Finance Owner / Database Architect | NO |
+| Whether `claims.total_paid_amount` remains gross received or becomes net settled after refund | Gross received; net settled; separate generated/read model | Verify implementation semantics before SQL; stop if not verifiable. | Finance Owner / Database Architect | NO for contract, YES for implementation if unresolved |
+
+Blocking Open Decisions: `0`
+
+Contract readiness: `APPROVED - Batch 7 contract is complete and owner-approved`.
+
+### 30.8 Contract Approval Closure
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Business purpose and non-goals | COMPLETE | Section 30.2 defines refund lifecycle purpose and excludes gateway integration, reversal automation, chargeback, accounting ledger, reconciliation redesign, workflow, decision, appeal, legacy status removal, app code, generated types, migrations, and tests from this contract task. |
+| Refund eligibility and authority | COMPLETE | Sections 30.2-30.5 require a successful settled original payment, Finance or trusted payment integration authority, and `claim.payment.refund` or exact equivalent permission. |
+| Refund lifecycle and transitions | COMPLETE | Section 30.4 defines a single controlled refund mutation with partial/full summary effects and replay behavior. No unapproved states are added. |
+| Source payment and refund sources of truth | COMPLETE | Section 30.3 reuses `public.claim_payments` and related records; no duplicate payment truth is approved. |
+| Tenant, RBAC, and RLS behavior | COMPLETE | Section 30.5 requires locked tenant/clinic derivation, controlled function-only mutation, restricted grants, direct-write denial, and sanitized errors. |
+| Amount and currency integrity | COMPLETE | Section 30.4 requires positive exact numeric refund amount, approved rounding, same-currency original payment validation, and refund ceiling enforcement. |
+| Controlled mutation boundaries | COMPLETE | Refund mutation cannot change workflow, decision, appeal, original settlement history, legacy status, or unrelated Batch 1-6 behavior. |
+| Optimistic locking and concurrency | COMPLETE | `claims.version`, Claim row lock, stale-version rejection, and single success increment are required. |
+| Replay and idempotency | COMPLETE | External retry identity and equivalent/conflicting replay behavior are defined per refund mutation. |
+| Immutable history and audit evidence | COMPLETE | Original payment evidence is preserved; refund evidence, summary update, version update, and audit evidence are atomic. |
+| Atomic rollback behavior | COMPLETE | Failed mutation must write no partial refund evidence, summary change, version increment, or audit side effect. |
+| Migration and test responsibilities | COMPLETE | Section 30.6 defines future migration/test files, allowed files, prohibited files, dependency order, stop conditions, and validation gates. |
+| Recorded approval evidence | APPROVED | Explicit Project Owner instruction recorded approval on 2026-07-23 with approval reference `Phase 4 Batch 7 Owner Approval Recording`. |
+
+Contract Completeness Status: `COMPLETE`
+
+Contract Approval Status: `APPROVED`
+
+Implementation Gate Status: `READY`
+
+Migration Implementation Authorized: `YES`
+
+Semantic Contract Changed During Approval: `NO`
+
+Implementation gate decision: Batch 7 migration and SQL-test implementation is authorized only for the approved refund lifecycle scope.

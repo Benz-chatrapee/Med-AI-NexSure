@@ -1464,3 +1464,147 @@ Total executed pgTAP test assertions recorded by CLI output: `400` planned, `400
 `Batch 6 Validation Prerequisite for Batch 7 Analysis: SATISFIED`
 
 This satisfies the analysis prerequisite only. It does not authorize Batch 7 implementation.
+
+---
+
+## 43. Proposed Batch 7 Controlled Refund Lifecycle Test Scope
+
+**Status:** Approved, not implemented, not executed
+**Decision Date:** 2026-07-23
+**Approval Date:** 2026-07-23
+**Approver Role:** Project Owner
+**Approval Source:** Explicit Project Owner instruction
+**Approval Reference:** Phase 4 Batch 7 Owner Approval Recording
+**Contract completeness:** COMPLETE
+**Contract approval:** APPROVED
+**Implementation authorization:** YES
+**Semantic contract changed during approval:** NO
+
+This section defines future coverage only for the approved Batch 7 contract. It does not create tests, run tests, reset the database, modify SQL/RLS/application code, generate types, execute implementation, commit, or push.
+
+### 43.1 Exact Proposed Batch 7 Test Files
+
+| Test file | Purpose | Status |
+| --- | --- | --- |
+| `supabase/tests/phase4_claim_refund_mutation_test.sql` | Functional tests for controlled refund evidence, refund ceiling, partial/full refund summary, idempotency, versioning, rollback, and workflow/decision/appeal preservation. | Proposed |
+| `supabase/tests/phase4_claim_refund_security_test.sql` | Security tests for refund authorization, tenant/clinic denial, direct-write protection, EXECUTE grants, AI non-authority, and sanitized errors. | Proposed |
+
+Tightly scoped updates to existing schema or payment regression tests are allowed in a future implementation only when already-approved refund behavior must be recognized. No existing Batch 1-6 security or tenant assertion may be weakened.
+
+### 43.2 Functional Coverage
+
+| Coverage | Expected assertion |
+| --- | --- |
+| Function contract | `public.record_claim_refund(...)` exists with the approved Batch 7 signature and return columns after implementation. |
+| Existing source of truth reuse | Refund evidence reuses existing payment authority unless implementation documents a stop condition requiring approval for a separate object. |
+| Valid partial refund | A refund less than refundable settled amount records refund evidence, preserves original payment evidence, sets `claims.payment_status = partially_refunded`, increments `claims.version` once, and returns gross/refunded/net totals. |
+| Valid full refund | A refund equal to remaining refundable settled amount records refund evidence, preserves original payment evidence, sets `claims.payment_status = refunded`, increments `claims.version` once, and returns gross/refunded/net totals. |
+| Refund ceiling | Refund greater than successful settled amount minus prior successful refunds fails with no refund evidence, Claim summary update, version increment, or audit side effect. |
+| Original payment validation | Missing, failed, reversed, cancelled, cross-tenant, cross-clinic, wrong-Claim, wrong-currency, or already fully refunded original payment evidence is rejected. |
+| Amount validation | Zero, negative, over-scale, non-finite, or currency-inconsistent refund amounts fail according to exact numeric rules. |
+| Required reason | Missing reason code or blank reason text fails with no data change. |
+| Version conflict | Wrong `p_expected_version` fails with no refund evidence, summary update, version increment, or audit side effect. |
+| Equivalent replay | Same external refund identity plus equivalent typed payload returns the prior result with `idempotent_replay = true`, no new row/evidence, and no version increment. |
+| Conflicting replay | Same external refund identity plus conflicting typed payload fails with no data change. |
+| Atomic rollback | Simulated insert/update failure leaves refund evidence, original payment, Claim payment summary, Claim version, and audit evidence unchanged. |
+| Workflow preservation | Refund mutation does not change `claims.workflow_status` or create workflow events. |
+| Decision preservation | Refund mutation does not change `claims.decision_status`, `claims.current_decision_id`, or `claim_decisions`. |
+| Appeal preservation | Refund mutation does not change `claim_appeals` or appeal lifecycle state. |
+| Legacy preservation | Batch 7 does not remove or authoritatively write legacy `claims.status`. |
+
+### 43.3 Security Coverage
+
+| Coverage | Expected assertion |
+| --- | --- |
+| Authorized refund | Same-tenant actor with approved finance refund permission succeeds through the controlled function. |
+| Missing authentication | Anonymous/no `auth.uid()` actor cannot execute or mutate. |
+| Missing membership | Authenticated non-member receives sanitized denial and no write. |
+| Missing permission | Actor without refund authority is denied. |
+| Cross-organization denial | Known Claim or payment UUID from another organization is not disclosed or mutated. |
+| Cross-clinic denial | Actor lacking clinic access cannot mutate or discover the Claim or payment evidence. |
+| Direct refund evidence denial | Ordinary authenticated users cannot directly insert refund evidence, transform original payments into refunds, update settled payment evidence, or delete payment/refund rows. |
+| Direct Claim-state bypass denial | Refund permission does not authorize ordinary direct updates to protected Claim workflow, decision, payment, version, state metadata, or financial summary columns. |
+| AI non-authority | AI/system actor without explicit refund permission cannot record, approve, finalize, reverse, or delete refunds. |
+| Restricted SECURITY DEFINER execution | Function is `SECURITY DEFINER`, fixed search path, no EXECUTE for `PUBLIC` or `anon`, and EXECUTE only for approved `authenticated` and `service_role`. |
+| Tenant-safe errors | Not found, unauthorized, stale, over-refund, invalid amount, currency mismatch, missing-original-payment, and idempotency-conflict errors do not expose PHI, tenant existence, internal policy names, raw SQL diagnostics, or unrestricted metadata. |
+
+### 43.4 Required Regression Coverage
+
+Batch 7 must retain relevant existing coverage:
+
+```text
+supabase/tests/phase4_claim_schema_test.sql
+supabase/tests/phase4_claim_workflow_history_test.sql
+supabase/tests/phase4_claim_workflow_mutation_test.sql
+supabase/tests/phase4_claim_workflow_security_test.sql
+supabase/tests/phase4_claim_decision_mutation_test.sql
+supabase/tests/phase4_claim_decision_security_test.sql
+supabase/tests/phase4_claim_payment_mutation_test.sql
+supabase/tests/phase4_claim_payment_security_test.sql
+supabase/tests/phase4_claim_appeal_test.sql
+supabase/tests/phase4_claim_appeal_security_test.sql
+supabase/tests/phase3_claim_permissions_test.sql
+supabase/tests/phase3_claim_security_test.sql
+supabase/tests/phase3_claim_tenant_isolation_test.sql
+supabase/tests/phase3_claim_self_scope_test.sql
+supabase/tests/phase3_claim_audit_test.sql
+```
+
+No test is marked executed or passed by this proposed Batch 7 plan.
+
+### 43.5 Batch 7 Test Acceptance
+
+| Acceptance item | Required result |
+| --- | --- |
+| Requirement traceability | Every proposed refund mutation requirement maps to at least one functional or security assertion. |
+| Security completeness | Authorization, tenant isolation, clinic isolation, direct-write denial, restricted grants, AI non-authority, and sanitized errors are covered. |
+| Financial integrity | Refund ceiling, exact numeric handling, idempotency, duplicate prevention, rollback, and original-payment preservation are covered. |
+| Domain separation | Workflow, decision, appeal, legacy status, and payment refund responsibilities remain separate. |
+| Contract status | Approved by explicit Project Owner instruction dated 2026-07-23. |
+| Blocking Open Decisions | 0 for contract approval; implementation must stop if `claims.total_paid_amount` semantics or refund evidence storage cannot be verified. |
+
+Recommended future validation command sequence:
+
+```powershell
+git diff --check
+npx supabase db reset
+npx supabase db lint
+npx supabase test db .\supabase\tests\phase4_claim_refund_mutation_test.sql
+npx supabase test db .\supabase\tests\phase4_claim_refund_security_test.sql
+npx supabase test db .\supabase\tests\phase4_claim_payment_mutation_test.sql
+npx supabase test db .\supabase\tests\phase4_claim_payment_security_test.sql
+npx supabase test db .\supabase\tests\phase4_claim_appeal_test.sql
+npx supabase test db .\supabase\tests\phase4_claim_appeal_security_test.sql
+```
+
+Batch 7 test contract readiness: `APPROVED - Proposed Batch 7 test scope is complete and owner-approved`.
+
+### 43.6 Contract Review Closure
+
+| Review Area | Result |
+| --- | --- |
+| Functional coverage maps to refund contract | COMPLETE |
+| Security coverage maps to tenant, RBAC, RLS, direct-write, AI non-authority, and sanitized-error requirements | COMPLETE |
+| Regression coverage preserves Batch 1-6 workflow, decision, payment, appeal, and Phase 3 security behavior | COMPLETE |
+| SQL test files created by this closure | NO |
+| SQL test execution claimed by this closure | NO |
+| Recorded Batch 7 approval evidence | APPROVED |
+
+Required future Batch 7 test responsibilities:
+
+```text
+supabase/tests/phase4_claim_refund_mutation_test.sql
+supabase/tests/phase4_claim_refund_security_test.sql
+```
+
+Tightly scoped updates to existing Phase 4 schema/payment regression tests are allowed only when needed to recognize approved refund behavior. Existing Batch 1-6 security, tenant, RLS, direct-write, workflow, decision, payment, and appeal protections must not be weakened.
+
+Contract Completeness Status: `COMPLETE`
+
+Contract Approval Status: `APPROVED`
+
+Implementation Gate Status: `READY`
+
+Migration Implementation Authorized: `YES`
+
+Semantic Contract Changed During Approval: `NO`
