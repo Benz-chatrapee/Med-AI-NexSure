@@ -13,6 +13,7 @@ export type ClaimQueryContext = {
   actorId: string;
   organizationId: string;
   clinicId: string;
+  accessToken?: string;
 };
 
 type TenantScopedPatientInput = {
@@ -32,32 +33,44 @@ type CreateClaimQueryServiceOptions = {
 };
 
 export function createClaimQueryService(options: CreateClaimQueryServiceOptions = {}) {
-  const gateway = options.gateway ?? createSupabaseRestClaimGateway();
   const getContext = options.getContext ?? getDemoClaimReadContext;
 
   return {
-    async getPatientClaimsDashboard(patientId: string): Promise<CanonicalPatientClaimsDashboardData> {
+    async getPatientClaimsDashboard(
+      patientId: string,
+    ): Promise<CanonicalPatientClaimsDashboardData> {
       if (!patientId.trim()) {
-        throw new ClaimIntegrationError("patient_not_found", "Patient identifier is required.");
+        throw new ClaimIntegrationError(
+          "patient_not_found",
+          "Patient identifier is required.",
+        );
       }
 
       try {
         const context = await getContext();
+        const gateway =
+          options.gateway ?? createSupabaseRestClaimGateway(context.accessToken);
         const scope = {
           patientId,
           organizationId: context.organizationId,
           clinicId: context.clinicId,
         };
+
         const patient = await gateway.getPatient(scope);
         if (!patient) {
-          throw new ClaimIntegrationError("patient_not_found", "Patient was not found in the authorized scope.");
+          throw new ClaimIntegrationError(
+            "patient_not_found",
+            "Patient was not found in the authorized scope.",
+          );
         }
+
         assertTenantScope(patient, context);
 
         const rows = await gateway.listClaims(scope);
         rows.forEach((row) => assertTenantScope(row, context));
 
         const claims = rows.map(mapClaimRow);
+
         return {
           ...patientClaimsDashboard,
           patient: mapPatientRow(patient),
@@ -68,13 +81,18 @@ export function createClaimQueryService(options: CreateClaimQueryServiceOptions 
             ...patientClaimsDashboard.readiness,
             source: "Canonical Phase 4 Claim snapshots",
             lastCalculatedAt:
-              claims.find((claim) => claim.stateUpdatedAt)?.stateUpdatedAt ?? patient.updated_at,
+              claims.find((claim) => claim.stateUpdatedAt)?.stateUpdatedAt ??
+              patient.updated_at,
           },
           missingEvidence: patientClaimsDashboard.missingEvidence.filter((item) =>
-            item.claimId ? claims.some((claim) => claim.id === item.claimId) : true,
+            item.claimId
+              ? claims.some((claim) => claim.id === item.claimId)
+              : true,
           ),
           activities: patientClaimsDashboard.activities.filter((item) =>
-            item.relatedClaim ? claims.some((claim) => claim.claimNumber === item.relatedClaim) : true,
+            item.relatedClaim
+              ? claims.some((claim) => claim.claimNumber === item.relatedClaim)
+              : true,
           ),
           payerRules: patientClaimsDashboard.payerRules,
         };
@@ -89,9 +107,12 @@ export const claimQueryService = createClaimQueryService();
 
 function assertTenantScope(
   row: { organization_id: string; clinic_id: string },
-  context: ClaimQueryContext,
+  context: Pick<ClaimQueryContext, "organizationId" | "clinicId">,
 ): void {
-  if (row.organization_id !== context.organizationId || row.clinic_id !== context.clinicId) {
+  if (
+    row.organization_id !== context.organizationId ||
+    row.clinic_id !== context.clinicId
+  ) {
     throw new ClaimIntegrationError(
       "tenant_scope_mismatch",
       "Claim information is outside the authorized organization or clinic scope.",
@@ -103,35 +124,36 @@ async function getDemoClaimReadContext(): Promise<ClaimQueryContext> {
   const organizationId = process.env.MED_AI_DEMO_ORGANIZATION_ID;
   const clinicId = process.env.MED_AI_DEMO_CLINIC_ID;
   const actorId = process.env.MED_AI_DEMO_ACTOR_ID;
+  const accessToken = process.env.MED_AI_DEMO_ACCESS_TOKEN;
 
-  if (!organizationId || !clinicId || !actorId) {
+  if (!organizationId || !clinicId || !actorId || !accessToken) {
     throw new ClaimIntegrationError(
       "configuration_error",
-      "Server-side Claim read context is not configured.",
+      "Authenticated server-side claim read context is not configured.",
     );
   }
 
-  return { organizationId, clinicId, actorId };
+  return {
+    organizationId,
+    clinicId,
+    actorId,
+    accessToken,
+  };
 }
 
-function createSupabaseRestClaimGateway(): ClaimQueryGateway {
+function createSupabaseRestClaimGateway(
+  accessToken: string | undefined,
+): ClaimQueryGateway {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  if (!url || !key) {
-    return {
-      async getPatient() {
-        throw new ClaimIntegrationError("configuration_error", "Supabase server configuration is missing.");
-      },
-      async listClaims() {
-        throw new ClaimIntegrationError("configuration_error", "Supabase server configuration is missing.");
-      },
-    };
+  if (!url || !anonKey || !accessToken) {
+    return createConfigurationErrorGateway();
   }
 
   const headers = {
-    apikey: key,
-    Authorization: `Bearer ${key}`,
+    apikey: anonKey,
+    Authorization: `Bearer ${accessToken}`,
   };
 
   return {
@@ -145,7 +167,12 @@ function createSupabaseRestClaimGateway(): ClaimQueryGateway {
         deleted_at: "is.null",
         limit: "1",
       });
-      const rows = await fetchRows<PatientRow>(`${url}/rest/v1/patients?${query}`, headers);
+
+      const rows = await fetchRows<PatientRow>(
+        `${url}/rest/v1/patients?${query}`,
+        headers,
+      );
+
       return rows[0] ?? null;
     },
 
@@ -159,18 +186,44 @@ function createSupabaseRestClaimGateway(): ClaimQueryGateway {
         deleted_at: "is.null",
         order: "service_start_date.desc",
       });
+
       return fetchRows<ClaimRow>(`${url}/rest/v1/claims?${query}`, headers);
     },
   };
 }
 
-async function fetchRows<T>(url: string, headers: Record<string, string>): Promise<T[]> {
-  const response = await fetch(url, { headers, cache: "no-store" });
+function createConfigurationErrorGateway(): ClaimQueryGateway {
+  return {
+    async getPatient() {
+      throw new ClaimIntegrationError(
+        "configuration_error",
+        "Supabase authenticated server configuration is missing.",
+      );
+    },
+    async listClaims() {
+      throw new ClaimIntegrationError(
+        "configuration_error",
+        "Supabase authenticated server configuration is missing.",
+      );
+    },
+  };
+}
+
+async function fetchRows<T>(
+  url: string,
+  headers: Record<string, string>,
+): Promise<T[]> {
+  const response = await fetch(url, {
+    headers,
+    cache: "no-store",
+  });
+
   if (!response.ok) {
     throw new ClaimIntegrationError(
       "query_failed",
       `Claim query failed with status ${response.status}.`,
     );
   }
+
   return (await response.json()) as T[];
 }
