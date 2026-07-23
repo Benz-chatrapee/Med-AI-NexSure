@@ -2198,3 +2198,72 @@ Migration Implementation Authorized: `YES`
 Semantic Contract Changed During Approval: `NO`
 
 Implementation gate decision: Batch 7 migration and SQL-test implementation is authorized only for the approved refund lifecycle scope.
+
+---
+
+## 31. Phase 4 Completion-Readiness Decision
+
+| Field | Value |
+| --- | --- |
+| Phase | Phase 4 |
+| Decision | READY |
+| Decision date | 2026-07-23 |
+| Analyzed commit | `9785951e6d457a59a034d2622cad41e28c2fad23` |
+| Branch | `main` |
+| Validated target | `ab84c83fb781df4336d50964d93012df0af92fde` |
+| Active required batches | 7/7 complete |
+| Completion evidence reference | `docs/database/PHASE-4-CLAIM-TEST-PLAN.md` Section 44, Batch 7 Runtime Validation Closure |
+| Required validation status | PASS |
+| Blocking open decisions | 0 |
+| Blocking technical issues | 0 |
+| Blocking security issues | 0 |
+| Material contract contradictions | 0 |
+| Formal closure task readiness | YES |
+| Record action | RECORDED |
+| Recommended next action | Create the separate formal Phase 4 closure record. |
+
+### 31.1 Evidence Basis
+
+The active Phase 4 required batch set is Batch 1 through Batch 7:
+
+| Batch | Required scope | Completion evidence | Required validation |
+| --- | --- | --- | --- |
+| Batch 1 | Split-state schema | Runtime validation closure in `PHASE-4-CLAIM-TEST-PLAN.md` Section 44 | PASS |
+| Batch 2 | Workflow history | Runtime validation closure in `PHASE-4-CLAIM-TEST-PLAN.md` Section 44 | PASS |
+| Batch 3 | Controlled workflow mutation | Runtime validation closure in `PHASE-4-CLAIM-TEST-PLAN.md` Section 44 | PASS |
+| Batch 4 | Controlled decision mutation | Runtime validation closure in `PHASE-4-CLAIM-TEST-PLAN.md` Section 44 | PASS |
+| Batch 5 | Controlled payment settlement mutation | Runtime validation closure in `PHASE-4-CLAIM-TEST-PLAN.md` Section 44 | PASS |
+| Batch 6 | Formal claim appeal entity and controlled appeal mutations | Runtime validation closure in `PHASE-4-CLAIM-TEST-PLAN.md` Section 44 | PASS |
+| Batch 7 | Controlled claim refund lifecycle mutation | Runtime validation closure in `PHASE-4-CLAIM-TEST-PLAN.md` Section 44 | PASS |
+
+The validated target is `ab84c83fb781df4336d50964d93012df0af92fde`. The analyzed commit is later only because the Batch 7 validation closure documentation was recorded in `docs/database/PHASE-4-CLAIM-TEST-PLAN.md`; no post-validation migration, SQL test, database object, application implementation, Phase 4 contract, or required validation-scope change was identified.
+
+Material advisories and deferred scope remain as approved exclusions or separate future work: dedicated `claim_line_decisions`, full accounting ledger, multi-currency settlement, overpayment recovery, chargeback workflow, multi-level appeal automation, physical removal of legacy `claims.status`, production deployment, Phase 5 authorization, and any Batch 8 scope definition.
+
+### 31.2 Readiness Boundary
+
+This decision means only:
+
+```text
+Formal Closure Task Readiness: YES
+```
+
+It does not create business approval, owner sign-off, release approval, Batch 8 authorization, Phase 5 authorization, deployment approval, or production readiness.
+
+### 31.3 Repository Scope
+
+| Scope item | Result |
+| --- | --- |
+| Initial changed files | NONE |
+| Pre-existing changes | NONE |
+| Migrations modified by this decision task | NO |
+| SQL tests modified by this decision task | NO |
+| Implementation modified by this decision task | NO |
+| Semantic contract changed | NO |
+| Formal closure record created | NO |
+| Later-phase scope defined | NO |
+| Pre-existing changes discarded | NO |
+
+Phase 4 Completion-Readiness Decision: `READY`
+
+Formal Closure Task Readiness: `YES`
