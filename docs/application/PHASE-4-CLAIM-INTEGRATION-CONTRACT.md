@@ -7,12 +7,18 @@
 | Project | Med AI NexSure |
 | Document | Phase 4 Claim Integration Contract |
 | File | `docs/application/PHASE-4-CLAIM-INTEGRATION-CONTRACT.md` |
-| Contract Status | PROPOSED |
-| Owner Approval | PENDING |
-| Implementation Authorization | NO |
+| Contract Status | APPROVED — INITIAL BATCH ONLY |
+| Technical Integration Approval | APPROVED |
+| Named Owner Sign-off | NOT RECORDED |
+| Approval Date | 2026-07-23 |
+| Implementation Gate | OPEN |
+| Implementation Authorization | INITIAL BATCH ONLY |
+| Authorized Initial Batch | Integration Batch A — Canonical Split-State Read Integration |
+
 | Contract Task Type | APPLICATION CONTRACT DEFINITION AND READ-ONLY REPOSITORY ANALYSIS |
 | Created Date | 2026-07-23 |
-| Analyzed Commit | `aaf31aab8a7535fc93ccc1ed54ecba0e607d2c8d` |
+| Application Commit | `aaf31aab8a7535fc93ccc1ed54ecba0e607d2c8d` (recorded baseline; ZIP contains no `.git`) |
+| Phase 4 Validated Target | `ab84c83fb781df4336d50964d93012df0af92fde` |
 | Branch | `main` |
 | Pre-existing Changes | `lib/database.types.ts` modified before this task |
 | Writable Allowlist | `docs/application/PHASE-4-CLAIM-INTEGRATION-CONTRACT.md` only |
@@ -240,84 +246,370 @@ Recommendation: Production should include focused tests for read model mapping, 
 
 Recommendation: Deferred backlog items include dedicated `claim_line_decisions`, full accounting ledger, multi-currency settlement, overpayment recovery, chargeback workflow, multi-level appeal automation, physical removal of legacy `claims.status`, broad reversal orchestration, and production deployment approval.
 
-## 15. Existing and Proposed Files
+## 15. Scope Inventory Baseline
 
-### CONFIRMED EXISTING FILES
+Confirmed Finding: Repository inventory traced each database capability to the current execution point, canonical owner, caller/consumer, and test owner where present. The uploaded inventory ZIP does not contain `.git`; commit and branch values therefore use the active contract and Phase 4 closure records rather than a fresh Git command.
 
 ```text
-docs/database/PHASE-4-VALIDATION-AND-CLOSURE-RECORD.md
-docs/database/PHASE-4-CLAIM-WORKFLOW-SPEC.md
-docs/database/PHASE-4-CLAIM-MIGRATION-PLAN.md
-lib/database.types.ts
-features/payer-rules/components/payer-detail-page.tsx
-features/visit-list/types.ts
-features/visit-list/visit-list-page.tsx
+Application Commit: aaf31aab8a7535fc93ccc1ed54ecba0e607d2c8d
+Phase 4 Validated Target: ab84c83fb781df4336d50964d93012df0af92fde
+Branch: main
+Writable Allowlist: docs/application/PHASE-4-CLAIM-INTEGRATION-CONTRACT.md
+```
+
+Confirmed Finding: No application call to any Phase 4 controlled RPC was found. No direct application update to protected Claim state columns was found.
+
+Confirmed Finding: Current Claim-facing application paths are mock-backed. The primary Demo surfaces are `features/claim-dashboard/**`, `features/patient-claims/**`, and `features/claim-readiness/**`.
+
+## 16. Read Ownership Matrix
+
+| Capability | Canonical Owner | Owner Role | Data Source | Boundary | Callers/Consumers | Gap | Demo | Confidence | Evidence |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Claim list/read worklist | `features/claim-dashboard/services/claim-dashboard-service.ts` | CANONICAL OWNER | `claimWorklistMock` | CLIENT | `features/claim-dashboard/hooks/use-claim-dashboard.ts` → dashboard component | EXTENSION REQUIRED | YES | HIGH | Service returns mock rows; hook calls it in a client component. |
+| Patient Claim list | `features/patient-claims/services/patient-claims-service.ts` | CANONICAL OWNER | `patientClaimsDashboard` mock | MIXED | `app/patients/[patientId]/claims/page.tsx`; client workspace | EXTENSION REQUIRED | YES | HIGH | Server page loads dashboard; client workspace also imports service for detail/recalculation. |
+| Claim detail | `features/patient-claims/services/patient-claims-service.ts` | CANONICAL OWNER | `patientClaimDetails` mock | CLIENT | `features/patient-claims/components/patient-claims-workspace.tsx` | BOUNDARY CONFLICT | YES | HIGH | Client component invokes `getClaimDetail`; a database-backed implementation cannot remain an unrestricted client service. |
+| Claim readiness | `features/claim-readiness/server/service.ts` | CANONICAL OWNER | `features/claim-readiness/server/mock-repository.ts` | SERVER | readiness pages and `app/claim-readiness/actions.ts` | EXTENSION REQUIRED | YES | HIGH | Existing server-only service, identity, capability, audit, and action pattern is established. |
+| Workflow history | Proposed `features/patient-claims/server/claim-query-service.ts` | PROPOSED NEW FILE | `claim_workflow_events` | SERVER | Claim detail page/workspace | OWNER MISSING | YES | HIGH | Database source exists; no current application query owner exists. |
+| Audit timeline | `features/core-foundation/services/core-foundation-service.ts` for generic audit reads; proposed Claim composition owner below | COMPATIBILITY ADAPTER | `audit_logs` plus domain histories | SERVER | Claim detail timeline | EXTENSION REQUIRED | YES | MEDIUM | Generic audit service exists, but Claim-specific combined history composition does not. |
+| Decision read | Proposed `features/patient-claims/server/claim-query-service.ts` | PROPOSED NEW FILE | `claims.current_decision_id`, `claim_decisions` | SERVER | Claim detail/workspace | OWNER MISSING | YES | HIGH | No application match for `claim_decisions` or `decision_status`. |
+| Payment read | Proposed `features/patient-claims/server/claim-query-service.ts` | PROPOSED NEW FILE | `claims.payment_status`, `claim_payments` | SERVER | Claim detail/workspace | OWNER MISSING | YES | HIGH | No application match for payment settlement state. |
+| Appeal read | Proposed `features/patient-claims/server/claim-query-service.ts` | PROPOSED NEW FILE | `claim_appeals` | SERVER | Claim detail/workspace | OWNER MISSING | NO | HIGH | Database source exists; no application owner exists. |
+| Refund read | Proposed `features/patient-claims/server/claim-query-service.ts` | PROPOSED NEW FILE | refund rows in `claim_payments` and Claim totals | SERVER | Claim detail/workspace | OWNER MISSING | NO | HIGH | Database source exists; no application owner exists. |
+
+Required Contract: `features/patient-claims/types/patient-claims.types.ts` becomes the canonical application read-model owner for the patient Claim surface, but its legacy `ClaimStatus` must be retained only as a temporary compatibility adapter. It must add explicit split-state fields and `version` before any controlled mutation UI is enabled.
+
+Required Contract: `features/claim-dashboard/types/claim-dashboard.types.ts` remains the Claim worklist presentation owner, but `ClaimWorkflowStatus` must map from the generated workflow enum rather than remain an independent authoritative status vocabulary.
+
+## 17. Mutation Ownership Matrix
+
+| Operation | RPC | Database | Current Execution Point | Canonical Application Owner | Caller | Trust Boundary | Version Provider | Context Providers | Refresh Owner | Status | Confidence |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Workflow transition | `transition_claim_workflow` | AVAILABLE | None | Proposed `features/patient-claims/server/claim-command-service.ts` | Proposed `app/patients/[patientId]/claims/actions.ts` → workspace | SERVER BOUNDARY REQUIRED | Claim detail `version` | Server-authenticated actor; database-derived tenant/clinic | Server action revalidation + returned snapshot | RESOLVED | HIGH |
+| Claim decision | `record_claim_decision` | AVAILABLE | None | Proposed `features/patient-claims/server/claim-command-service.ts` | Same server action owner | SERVER BOUNDARY REQUIRED | Claim detail `version` | Same | Claim detail, decision history, audit | RESOLVED | HIGH |
+| Payment settlement | `record_claim_payment_settlement` | AVAILABLE | None | Proposed `features/patient-claims/server/claim-command-service.ts` | Trusted Finance/server integration through same action/service boundary | SERVER BOUNDARY REQUIRED | Claim detail `version` | Same; payer event identity server-validated | Claim detail, payment history, audit | RESOLVED | HIGH |
+| Appeal submit/resolve | `submit_claim_appeal` / `resolve_claim_appeal` | AVAILABLE | None | Proposed `features/patient-claims/server/claim-command-service.ts` | Same server action owner | SERVER BOUNDARY REQUIRED | Claim detail `version` | Same | Claim detail, appeal history, workflow history, audit | RESOLVED | HIGH |
+| Refund | `record_claim_refund` | AVAILABLE | None | Proposed `features/patient-claims/server/claim-command-service.ts` | Trusted Finance/server integration through same action/service boundary | SERVER BOUNDARY REQUIRED | Claim detail `version` | Same; original payment selected from authorized server read | Claim detail, payment/refund history, audit | RESOLVED | HIGH |
+
+Required Contract: Although database grants may permit `authenticated` execution, the current repository has no approved browser Supabase mutation pattern and no safe client authority/context provider. All Demo-critical controlled mutations therefore use the established Next.js server boundary pattern: `app/**/actions.ts` → `features/**/server/service.ts` → database RPC.
+
+Required Contract: Client input may supply business form values and the last-read `expectedVersion`; it must not be authoritative for actor ID, organization ID, clinic ID, role, permissions, source-system authority, or original payment ownership.
+
+## 18. Layer and File Ownership
+
+| Responsibility | Existing Owner | Proposed Owner | Status | Role | Callers | Tests | Demo | Confidence |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Canonical read model | `features/patient-claims/types/patient-claims.types.ts` | Same file | EXISTING FILE NEEDS EXTENSION | CANONICAL OWNER | patient page/workspace | `features/patient-claims/utils/patient-claims-utils.test.ts` plus proposed mapper test | YES | HIGH |
+| Worklist presentation model | `features/claim-dashboard/types/claim-dashboard.types.ts` | Same file | EXISTING FILE NEEDS EXTENSION | COMPATIBILITY ADAPTER | dashboard hook/component | existing selector tests | YES | HIGH |
+| Status presentation mapping | patient-claims constants/utils and claim-dashboard mock config | Same files | EXISTING FILE NEEDS EXTENSION | COMPATIBILITY ADAPTER | Claim UI | existing utility/selector tests | YES | HIGH |
+| Claim query execution | Mock patient service | `features/patient-claims/server/claim-query-service.ts` | PROPOSED NEW FILE | CANONICAL OWNER | server page and actions | `features/patient-claims/server/claim-query-service.test.ts` | YES | HIGH |
+| Database row → domain mapping | None | `features/patient-claims/server/claim-mappers.ts` | PROPOSED NEW FILE | CANONICAL OWNER | query service | `features/patient-claims/server/claim-mappers.test.ts` | YES | HIGH |
+| Controlled command execution | None | `features/patient-claims/server/claim-command-service.ts` | PROPOSED NEW FILE | CANONICAL OWNER | server actions | `features/patient-claims/server/claim-command-service.test.ts` | YES | HIGH |
+| Server transport boundary | Existing nearby pattern `app/claim-readiness/actions.ts` | `app/patients/[patientId]/claims/actions.ts` | PROPOSED NEW FILE | CANONICAL OWNER | patient Claim workspace | `app/patients/[patientId]/claims/actions.test.ts` if repository test tooling supports action tests | YES | HIGH |
+| Error normalization | Existing Claim readiness error pattern | `features/patient-claims/server/claim-integration-errors.ts` | PROPOSED NEW FILE | CANONICAL OWNER | query/command service and actions | command/action tests | YES | HIGH |
+| UI orchestration | `features/patient-claims/components/patient-claims-workspace.tsx` | Same file | EXISTING FILE NEEDS EXTENSION | CONSUMER | Patient Claim route | component test owner NOT VERIFIED | YES | HIGH |
+| Initial route query | `app/patients/[patientId]/claims/page.tsx` | Same file | EXISTING FILE NEEDS EXTENSION | CALLER | query service | query service tests | YES | HIGH |
+| Claim dashboard | `features/claim-dashboard/**` | Existing service/types/hook/component | EXISTING FILE NEEDS EXTENSION | CONSUMER / ADAPTER | dashboard route | selector tests | YES | HIGH |
+| Post-mutation refresh | None for Claims | `app/patients/[patientId]/claims/actions.ts` | PROPOSED NEW FILE | CANONICAL OWNER | workspace | action/service tests | YES | HIGH |
+
+### Confirmed Existing Files
+
+```text
+app/patients/[patientId]/claims/page.tsx
+app/claim-readiness/actions.ts
+features/patient-claims/components/patient-claims-workspace.tsx
+features/patient-claims/services/patient-claims-service.ts
+features/patient-claims/types/patient-claims.types.ts
+features/patient-claims/constants/patient-claims.constants.ts
 features/patient-claims/utils/patient-claims-utils.ts
+features/patient-claims/utils/patient-claims-utils.test.ts
+features/claim-dashboard/components/claim-dashboard-page.tsx
+features/claim-dashboard/hooks/use-claim-dashboard.ts
+features/claim-dashboard/services/claim-dashboard-service.ts
+features/claim-dashboard/types/claim-dashboard.types.ts
+features/claim-dashboard/utils/claim-dashboard-selectors.test.ts
+features/claim-readiness/server/service.ts
+features/claim-readiness/server/identity.ts
+features/claim-readiness/server/capabilities.ts
+features/core-foundation/services/core-foundation-service.ts
+lib/database.types.ts
+lib/auth/supabase-browser.ts
 ```
 
-### PROPOSED NEW FILES
-
-Open Decision (BLOCKING): No new implementation file is proposed by this contract because ownership is not verified.
-
-### UNRESOLVED FILE OWNERSHIP
-
-Open Decision (BLOCKING): The application owner for domain model, repository/service, server action/API boundary, query integration, mutation integration, and error mapping is unresolved.
-
-## 16. Implementation Allowlist
-
-Required Contract: This contract authorizes no implementation.
-
-Required Contract: The exact Demo-critical implementation allowlist for a future task must be recorded before edits and must not use broad directory wildcards when exact files are known.
-
-Current contract-task writable allowlist:
+### Proposed New Files
 
 ```text
-docs/application/PHASE-4-CLAIM-INTEGRATION-CONTRACT.md
+features/patient-claims/server/claim-query-service.ts
+features/patient-claims/server/claim-query-service.test.ts
+features/patient-claims/server/claim-mappers.ts
+features/patient-claims/server/claim-mappers.test.ts
+features/patient-claims/server/claim-command-service.ts
+features/patient-claims/server/claim-command-service.test.ts
+features/patient-claims/server/claim-integration-errors.ts
+app/patients/[patientId]/claims/actions.ts
 ```
 
-## 17. Acceptance Criteria
+Recommendation: Do not create separate service trees for workflow, decision, payment, appeal, and refund. One Claim command owner preserves a single protected-write boundary while each exported operation remains independently typed and tested.
 
-| ID | Criteria |
-| --- | --- |
-| AC-READ-001 | Claim read model exposes `workflowStatus`, `decisionStatus`, and `paymentStatus` as separate canonical fields. |
-| AC-READ-002 | Legacy `claims.status` and `claimStatus` adapters are explicitly non-authoritative. |
-| AC-READ-003 | Unknown split states fail safely, remain observable, and disable authoritative mutation actions. |
-| AC-MUT-001 | Workflow changes call `transition_claim_workflow` and do not directly update protected columns. |
-| AC-MUT-002 | Decision changes call `record_claim_decision` and do not modify payment state. |
-| AC-MUT-003 | Payment settlement calls `record_claim_payment_settlement` and does not modify workflow or decision state. |
-| AC-MUT-004 | Appeal submit/resolve uses `submit_claim_appeal` or `resolve_claim_appeal` only. |
-| AC-MUT-005 | Refunds use `record_claim_refund` and preserve original payment evidence. |
-| AC-SEC-001 | Tenant, clinic, actor, role, and permission are never trusted from client-provided values. |
-| AC-SEC-002 | Capability flags are UI hints and never replace database authorization. |
-| AC-SEC-003 | AI cannot execute authoritative claim, decision, payment, appeal, refund, reversal, or closure actions. |
-| AC-HIST-001 | Mutation success refreshes affected history/audit evidence. |
-| AC-HIST-002 | Failed or unauthorized mutation does not create authoritative history evidence. |
-| AC-LEGACY-001 | Single-status UI filters are one-way adapters from split state or readiness only. |
-| AC-LEGACY-002 | Legacy adapters include explicit retirement conditions. |
-| AC-TEST-001 | Required application tests pass in the later implementation task. |
-| AC-DB-001 | Database semantics, migrations, SQL tests, and generated types remain unchanged unless separately authorized. |
+## 19. Ownership Conflicts and Unsafe Patterns
 
-## 18. Open Decisions
+| Path | Capability | Pattern | Risk | Severity | Owner Impact | Required Resolution |
+| --- | --- | --- | --- | --- | --- | --- |
+| `features/patient-claims/services/patient-claims-service.ts` | Claim list/detail/readiness | Mock service is imported by both server route and client workspace | A real DB implementation could accidentally expose server/database access to the browser | P1 | BOUNDARY CONFLICT | Retain as temporary mock adapter or retire after server query/actions own execution. |
+| `features/patient-claims/types/patient-claims.types.ts` | Claim status | Single `ClaimStatus` collapses workflow, readiness, decision outcomes | Incorrect filters/actions and loss of Phase 4 semantics | P1 | LEGACY ASSUMPTION | Add split states; keep `claimStatus` display adapter only. |
+| `features/claim-dashboard/types/claim-dashboard.types.ts` | Worklist status | Independent uppercase workflow vocabulary includes values not equal to canonical enum | Mapping drift and unsupported mutations | P1 | LEGACY ASSUMPTION | Explicit one-way presentation mapping from canonical workflow/readiness states. |
+| `features/claim-dashboard/services/claim-dashboard-service.ts` | Claim worklist/actions | Mock-only operations are callable from client | False success and no audit/authorization | P1 | OWNER MISSING | Demo implementation must replace authoritative actions with server action → command service. |
+| `features/claim-readiness/server/identity.ts` | Actor/tenant context | Hard-coded mock actor | Cannot be reused as production authority | P1 | CONTEXT GAP | Claim integration must resolve authenticated actor from the real server auth/session source; mock identity may remain Demo fixture only when explicitly gated. |
+| `features/claim-readiness/server/audit.ts` | Audit | In-memory manual audit events | Not authoritative Phase 4 audit evidence | P2 | COMPATIBILITY ADAPTER | Claim mutations rely on database-created audit/history; UI only reads it. |
+| `features/patient-claims/components/patient-claims-workspace.tsx` | Claim detail/recalculate | Client directly imports mock service | Prevents server-only query ownership and consistent refresh | P1 | CALLER BOUNDARY | Replace with initial server data and server actions. |
 
-| Classification | Decision | Evidence | Affected Contract Area | Minimum Safe Resolution | Owner |
-| --- | --- | --- | --- | --- | --- |
-| BLOCKING | Exact application owner files for read model, mutation integration, and error mapping are unresolved. | No existing repository/service/server action owner was confirmed by exact-match inspection. | Demo-critical scope; Existing and Proposed Files; Implementation Allowlist | Inspect current app architecture and record exact future file allowlist before implementation. | Solution Architect / Backend Lead / Frontend Lead |
-| BLOCKING | Approved caller boundary is not tied to a confirmed application implementation layer. | Database RPCs are confirmed; app boundary owner is not verified. | Controlled Mutation Contracts; Authorization | Select existing server action/API/repository boundary or record why direct authenticated RPC is approved and safe. | Security Reviewer / Backend Lead |
-| NON-BLOCKING | Exact cache/query keys are not defined. | Current repository conventions for affected claim consumers were not confirmed. | Consistency and Refresh Rules | Define only after inspecting actual query integration in implementation task. | Frontend Lead / QA Lead |
-| NON-BLOCKING | Full claim route inventory beyond exact-match consumers is incomplete. | Exact search found mock/readiness consumers and no protected writes, but not every possible route was manually read. | Legacy Compatibility | Perform broader implementation inventory before production integration. | QA Lead |
+Confirmed Finding: No P0 issue was found in the inspected scope. No direct protected Claim write or privileged browser RPC exists today.
 
-## 19. Stop Conditions
+## 20. Implementation Batch Inventory
 
-Required Contract: Implementation must stop when an RPC or return contract is unresolved, version ownership is unclear, trust boundary is contradictory, tenant or actor authority is unclear, status mapping requires a new business decision, database semantic changes are required, an unauthorized file is needed, a P0 security issue is found, generated types contradict the active database contract, or a direct protected write is required.
+### Integration Batch A — Canonical Split-State Read Integration
 
-## 20. Approval Status
+- Objective: Replace mock Claim list/detail ownership for the patient Claim Demo surface with a server-owned, tenant-scoped canonical read model.
+- Dependencies: Phase 4 generated types and validated database contract.
+- Exact existing files: `app/patients/[patientId]/claims/page.tsx`, `features/patient-claims/components/patient-claims-workspace.tsx`, `features/patient-claims/services/patient-claims-service.ts`, `features/patient-claims/types/patient-claims.types.ts`, `features/patient-claims/constants/patient-claims.constants.ts`, `features/patient-claims/utils/patient-claims-utils.ts`, `features/patient-claims/utils/patient-claims-utils.test.ts`.
+- Exact proposed files: `features/patient-claims/server/claim-query-service.ts`, `features/patient-claims/server/claim-query-service.test.ts`, `features/patient-claims/server/claim-mappers.ts`, `features/patient-claims/server/claim-mappers.test.ts`, `features/patient-claims/server/claim-integration-errors.ts`.
+- Tests: mapper split-state/version tests; query tenant/clinic filter tests; legacy adapter tests; unknown-state safe failure tests.
+- Acceptance: `INV-READ-01`, `INV-CTX-01`, no direct DB row coupling in UI, no authoritative legacy status.
+- Exclusions: controlled writes, dashboard-wide migration, appeal/refund UI.
+- Demo-critical: YES.
 
-Contract Status: PROPOSED
+### Integration Batch B — Workflow Controlled Mutation
 
+- Objective: Add the first protected Claim command boundary using `transition_claim_workflow`.
+- Dependencies: Batch A read model supplies `version` and canonical Claim identity.
+- Exact existing files: `features/patient-claims/components/patient-claims-workspace.tsx`, `app/patients/[patientId]/claims/page.tsx`.
+- Exact proposed files: `features/patient-claims/server/claim-command-service.ts`, `features/patient-claims/server/claim-command-service.test.ts`, `app/patients/[patientId]/claims/actions.ts`.
+- Tests: successful transition; invalid transition; stale version; unauthorized; cross-tenant/clinic; error normalization; refresh behavior.
+- Acceptance: exact RPC only, server-owned actor/context, protected columns never directly updated, history refreshed.
+- Exclusions: decision, payment, appeal, refund.
+- Demo-critical: YES.
+
+### Integration Batch C — Decision Controlled Mutation
+
+- Objective: Extend the existing command owner with `record_claim_decision`.
+- Dependencies: A and B.
+- Exact existing files: command service, action file, workspace, read model/mapper/query files created in A/B.
+- Exact proposed files: none.
+- Tests: approved/partial/rejected paths, stale version, unauthorized, replay, decision/history refresh.
+- Exclusions: payment and downstream financial mutation.
+- Demo-critical: YES for reviewer Demo.
+
+### Integration Batch D — Payment Settlement Controlled Mutation
+
+- Objective: Extend the trusted command boundary with `record_claim_payment_settlement`.
+- Dependencies: A–C and Finance capability/context resolution.
+- Exact existing files: command service, action file, workspace, read/query files.
+- Exact proposed files: none unless a dedicated trusted integration route is separately approved.
+- Tests: settlement, idempotent replay, conflicting replay, over/invalid amount contract errors, stale version, authorization, refresh.
+- Exclusions: refund, gateway integration, reconciliation redesign.
+- Demo-critical: NO unless settlement is part of the judged Demo scenario.
+
+### Integration Batch E — Appeal and Refund Controlled Mutations
+
+- Objective: Extend the same command boundary with appeal submit/resolve and refund lifecycle calls.
+- Dependencies: A–D; original payment and appeal reads available.
+- Exact existing files: command service, action file, workspace, read/query files.
+- Exact proposed files: none.
+- Tests: appeal submit/resolve, refund partial/full, original-payment validation, over-refund rejection, replay, stale version, authorization, refresh.
+- Exclusions: chargebacks, reversal automation, ledger redesign.
+- Demo-critical: NO; production-required for complete Phase 4 application coverage.
+
+## 21. Demo-Critical Allowlist
+
+Required Contract: The exact Demo-critical implementation scope is limited to Integration Batches A–C and these paths:
+
+```text
+app/patients/[patientId]/claims/page.tsx
+app/patients/[patientId]/claims/actions.ts
+features/patient-claims/components/patient-claims-workspace.tsx
+features/patient-claims/services/patient-claims-service.ts
+features/patient-claims/types/patient-claims.types.ts
+features/patient-claims/constants/patient-claims.constants.ts
+features/patient-claims/utils/patient-claims-utils.ts
+features/patient-claims/utils/patient-claims-utils.test.ts
+features/patient-claims/server/claim-query-service.ts
+features/patient-claims/server/claim-query-service.test.ts
+features/patient-claims/server/claim-mappers.ts
+features/patient-claims/server/claim-mappers.test.ts
+features/patient-claims/server/claim-command-service.ts
+features/patient-claims/server/claim-command-service.test.ts
+features/patient-claims/server/claim-integration-errors.ts
+```
+
+Required Contract: Batch A should be approved and implemented separately from Batch B/C. This inventory does not authorize edits.
+
+## 22. Production Scope
+
+| Scope | Classification | Blocks Demo |
+| --- | --- | --- |
+| Payment settlement UI/integration | PRODUCTION-REQUIRED unless selected for Demo | NO |
+| Appeal and refund UI/integration | PRODUCTION-REQUIRED | NO |
+| Claim dashboard migration from mocks | PRODUCTION-REQUIRED; Demo enhancement | NO |
+| Real authenticated actor/capability provider | PRODUCTION-REQUIRED; required before any non-fixture deployment | NO for explicitly isolated mock Demo, otherwise YES |
+| Cache/query library introduction | DEFERRED BACKLOG; current repository has no confirmed TanStack Claim owner | NO |
+| Removal of legacy status types | DEFERRED BACKLOG after consumers migrate | NO |
+| Reference/config RLS advisories | SECURITY BACKLOG owned outside this application inventory | NO for Phase 4 closure; review before production |
+
+## 23. Inventory Acceptance Criteria
+
+```text
+INV-OWN-01 — every Demo-critical responsibility has one canonical owner: SATISFIED
+INV-READ-01 — every Demo-critical read path has an exact source and owner: SATISFIED
+INV-MUT-01 — every Demo-critical mutation has an exact caller and trust boundary: SATISFIED
+INV-CTX-01 — version, tenant, clinic, and actor providers are identified: SATISFIED; real auth implementation remains an implementation prerequisite
+INV-FILE-01 — Demo implementation uses an exact file allowlist: SATISFIED
+INV-DUP-01 — no unresolved duplicate authoritative owner remains: SATISFIED; mock adapters have explicit retirement/extension path
+INV-TEST-01 — each implementation batch has an identified test owner and scope: SATISFIED
+```
+
+## 24. Remaining Decisions
+
+| Decision | Blocking | Evidence | Minimum Safe Resolution |
+| --- | --- | --- | --- |
+| Exact real authenticated actor/session implementation used by Claim command service | NO for contract approval; YES before production implementation | Current inspected Claim readiness identity is mock-only; no Claim auth owner was found | Integration Batch A/B implementation must bind to the repository's actual server auth helper or stop. |
+| Whether payment settlement is part of the judged Demo | NO | Current Demo scope is not explicit in inspected files | Product Owner selects before Batch D; does not block A–C. |
+| Component-level test harness for patient Claim workspace | NO | Repository contains utility/service tests but no confirmed component test convention in uploaded scope | Use service/action tests; add component test only if project tooling supports it. |
+
+Blocking Ownership Decisions: 0
+
+Blocking Caller-Boundary Decisions: 0
+
+## 25. Inventory Approval Gate
+
+```text
+Read Ownership: RESOLVED
+Mutation Ownership: RESOLVED
+Trust Boundaries: RESOLVED
+Demo File Scope: COMPLETE
+Inventory Status: COMPLETE
+Inventory Approval Gate: SATISFIED
+Ready for Contract Approval: YES
 Owner Approval: PENDING
-
 Implementation Authorization: NO
+```
 
-Blocking Open Decisions: 2
+Required Contract: This inventory does not approve the contract and does not authorize application implementation.
 
-Non-blocking Open Decisions: 2
+## 26. Technical Integration Approval
+
+### Approval Decision
+
+```text
+Decision: APPROVED
+Record Action: UPDATED
+Contract Status: APPROVED
+Technical Integration Approval: APPROVED
+Named Owner Sign-off: NOT RECORDED
+Implementation Gate: OPEN
+Implementation Authorization: INITIAL BATCH ONLY
+Approval Date: 2026-07-23
+Application Commit Reviewed: 48f2ec7
+Phase 4 Validated Target: ab84c83fb781df4336d50964d93012df0af92fde
+```
+
+Required Contract: This is a technical integration approval only. It is not business, clinical, compliance, security-certification, release, production-deployment, or Phase 5 approval.
+
+### Gate Results
+
+```text
+Contract Gate: PASS
+Inventory Gate: PASS
+Security Gate: PASS
+Scope Gate: PASS
+Initial Batch Gate: PASS
+Blocking Open Decisions: 0
+Blocking Ownership Decisions: 0
+Blocking Caller-Boundary Decisions: 0
+P0 Security Findings: 0
+```
+
+### Authorized Initial Scope
+
+```text
+Authorized Initial Batch: Integration Batch A — Canonical Split-State Read Integration
+Authorized Scope Reference: Section 20, Integration Batch A
+Approved File Allowlist Reference: Section 21, limited to Batch A files only
+Acceptance Criteria Reference: Sections 20 and 23
+```
+
+Authorized existing files:
+
+```text
+app/patients/[patientId]/claims/page.tsx
+features/patient-claims/components/patient-claims-workspace.tsx
+features/patient-claims/services/patient-claims-service.ts
+features/patient-claims/types/patient-claims.types.ts
+features/patient-claims/constants/patient-claims.constants.ts
+features/patient-claims/utils/patient-claims-utils.ts
+features/patient-claims/utils/patient-claims-utils.test.ts
+```
+
+Authorized proposed files:
+
+```text
+features/patient-claims/server/claim-query-service.ts
+features/patient-claims/server/claim-query-service.test.ts
+features/patient-claims/server/claim-mappers.ts
+features/patient-claims/server/claim-mappers.test.ts
+features/patient-claims/server/claim-integration-errors.ts
+```
+
+Required test scope:
+
+```text
+canonical split-state mapping
+tenant and clinic filtering
+version propagation
+legacy adapter one-way behavior
+unknown-state safe failure
+server-owned read execution
+no UI coupling to authoritative database row status
+```
+
+Explicit exclusions:
+
+```text
+Integration Batches B–E
+controlled mutations
+application writes to protected Claim state
+database migrations or SQL-test changes
+generated database type changes
+Phase 5
+deployment or production release
+```
+
+Stop conditions:
+
+- Stop if the active application state materially changes read ownership, generated types, database RPC signatures, tenant/actor authority, or the Batch A allowlist.
+- Stop if the actual server authentication or tenant/clinic context provider cannot be traced during implementation.
+- Stop if Batch A requires a file outside its approved allowlist or any database semantic change.
+
+### Approval Evidence Set
+
+```text
+Contract Path: docs/application/PHASE-4-CLAIM-INTEGRATION-CONTRACT.md
+Application Commit Reviewed: 48f2ec7
+Phase 4 Validated Target: ab84c83fb781df4336d50964d93012df0af92fde
+Inventory Gate Reference: Section 25
+Authorized Initial Batch: Section 20, Integration Batch A
+Approved File Allowlist Reference: Section 21, limited to Batch A
+Acceptance Criteria Reference: Sections 20 and 23
+```
+
+### Approval Invalidation Rule
+
+Approval review is required again when a later change affects database RPC signatures or grants, generated database types, read-model ownership, mutation callers or trust boundaries, version ownership, tenant or actor authority, authorized batch scope, approved file allowlist, required tests, acceptance criteria, or blocking-decision status. Documentation-only changes do not invalidate approval unless they change scope, meaning, authority, evidence ownership, or approval status.
+
+### Remaining Non-blocking Items
+
+| Item | Classification | Evidence | Future Review Point |
+| --- | --- | --- | --- |
+| Real authenticated actor/session binding | Production prerequisite | Section 24; no Claim-specific auth owner was confirmed in the inventory snapshot | Re-verify during Batch A/B implementation; stop before authoritative mutation work if unresolved |
+| Payment settlement in judged Demo | Product scope decision | Section 24 | Decide before Integration Batch D |
+| Component-level patient Claim test harness | Test-tooling decision | Section 24 | Revisit during UI implementation if repository tooling supports it |
+
+Required Contract: Approval is idempotent for the same contract, reviewed application state, validated target, authorized initial batch, allowlist, and approval decision. An equivalent active approval requires no duplicate record.
