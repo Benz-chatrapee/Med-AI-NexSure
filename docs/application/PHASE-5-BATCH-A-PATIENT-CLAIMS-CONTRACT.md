@@ -4,19 +4,20 @@ project: Med AI NexSure
 phase: 5
 batch: A
 contract_type: APPLICATION_INTEGRATION
-record_state: READY_FOR_REVIEW
-contract_status: PROPOSED
+record_state: APPROVED_CONTRACT
+contract_status: APPROVED
 implementation_status: NOT_STARTED
-implementation_authorization: NO
+implementation_authorization: YES
 created_date: 2026-07-24
+approval_date: 2026-07-24
 branch: main
 parent_contract: docs/application/PHASE-5-CLAIM-APPLICATION-INTEGRATION-CONTRACT.md
-application_changes_authorized: NO
+application_changes_authorized: YES
 database_changes_authorized: NO
 migration_changes_authorized: NO
 generated_type_regeneration_authorized: NO
 generated_type_manual_edit_authorized: NO
-blocking_decisions: 3
+blocking_decisions: 0
 ---
 
 # Phase 5 — Batch A Patient Claims Canonical Cutover Contract
@@ -24,12 +25,12 @@ blocking_decisions: 3
 ## 1. Contract Decision
 
 ```text
-Record State: READY FOR REVIEW
-Contract Status: PROPOSED
+Record State: APPROVED CONTRACT
+Contract Status: APPROVED
 Implementation Status: NOT STARTED
-Implementation Authorization: NO
+Implementation Authorization: YES
 
-Application Changes: NOT AUTHORIZED
+Application Changes: AUTHORIZED — APPROVED BATCH A ALLOWLIST ONLY
 Database Changes: NOT AUTHORIZED
 Migration Changes: NOT AUTHORIZED
 Generated-Type Regeneration: NOT AUTHORIZED
@@ -38,7 +39,7 @@ Manual Generated-Type Editing: NOT AUTHORIZED
 
 This document defines the evidence-based implementation boundary for Phase 5 Batch A only.
 
-No Agent may implement Batch A until this contract is explicitly approved and `Implementation Authorization` is changed to `YES` by the required reviewers.
+Batch A implementation is authorized only within the exact allowlist, decisions, tests, security boundaries, and stop conditions defined in this approved contract. This approval does not authorize deployment, database changes, generated-type changes, or work outside Batch A.
 
 ## 2. Objective
 
@@ -159,12 +160,16 @@ Application code must not duplicate canonical database enum unions manually.
 
 Readiness must be represented separately from lifecycle state.
 
-The current workflow-derived `readinessScore` is not accepted as an authoritative readiness calculation. Batch A must either:
+The current workflow-derived `readinessScore` is not accepted as an authoritative readiness calculation.
 
-1. map readiness from an existing verified readiness source, or
-2. retain it as explicitly named presentation-only fallback data with tests and a removal condition.
+**Approved decision — BA-DEC-03**
 
-It must not imply that `submitted`, `under_review`, `appealed`, or `closed` automatically means evidence readiness is 100%.
+1. Use verified Claim Readiness assessment data as the authoritative readiness source whenever it is available through the existing approved read boundary.
+2. Until that source is available to the Patient Claims read model, retain readiness only as explicitly named presentation fallback data.
+3. The fallback must be non-authoritative, must not control writes, permissions, decisions, payments, submission eligibility, or financial behavior, and must be covered by tests.
+4. The fallback must be reviewed for removal when the verified readiness assessment is integrated into Patient Claims.
+
+It must not imply that `submitted`, `payer_processing`, `decision_received`, `appealed`, or `closed` automatically means evidence readiness is 100%.
 
 ### 6.3 Unsupported Values
 
@@ -198,12 +203,31 @@ KPI authority: prohibited
 
 The existing generic name `claimStatus` must not remain authoritative.
 
-Before implementation approval, reviewers must choose one direction:
+**Approved decision — BA-DEC-01: Isolate**
 
-* **Option A — Remove:** remove compatibility status from production DTOs and migrate all Patient Claims consumers.
-* **Option B — Isolate:** rename and isolate it as an explicitly non-authoritative presentation adapter.
+The temporary compatibility value must be renamed and isolated as:
 
-Any retained adapter must record owner, affected consumers, tests, review condition, and target removal Batch or phase.
+```text
+legacyClaimPresentationStatus
+```
+
+Governance record:
+
+| Field | Approved value |
+| --- | --- |
+| Owner | Product Owner / Application Architect |
+| Purpose | Temporary display and legacy URL/filter translation only |
+| Affected consumers | Patient Claims DTO mapping, filters, mock fixtures, tests, and legacy badge presentation |
+| Authoritative writes | Prohibited |
+| Permission or security decisions | Prohibited |
+| KPI authority | Prohibited |
+| Claim or payer decisions | Prohibited |
+| Payment or financial behavior | Prohibited |
+| Required tests | One-way mapping, legacy URL translation, unsupported values, no KPI/write authority |
+| Review condition | Review after all Patient Claims consumers use canonical dimensions |
+| Removal target | Remove by Batch A completion when feasible; otherwise record an explicit follow-up cleanup item before Phase 5 closure |
+
+No compatibility value may be persisted back to the database or used to infer workflow, decision, payment, or readiness authority.
 
 ## 8. Filter Contract
 
@@ -239,8 +263,8 @@ Required KPI semantics:
 | --- | --- |
 | Total Claims | Claim count |
 | Approved Claims | `decisionStatus in (approved, partially_approved)` with labels distinguishing partial approval where shown |
-| Submitted Claims | Approved workflow states explicitly defined by Product/Domain Owner |
-| Pending Claims | Exact workflow or decision definition approved before implementation |
+| Submitted Claims | `workflowStatus in (submitted, payer_processing, decision_received, appealed, closed)`; this KPI represents claims that have entered or completed payer submission flow and does not imply readiness, approval, or payment |
+| Pending Claims | `workflowStatus in (draft, collecting_data, validation_pending, needs_review, ready_to_submit, submitted, payer_processing, decision_received, appealed)`; excludes `closed` and `cancelled` |
 | Not Ready Claims | Readiness status only |
 | Total Claimed Amount | Claim financial field |
 | Total Approved Amount | Approved amount field; must not imply payment |
@@ -254,6 +278,31 @@ partially approved and partially paid
 closed but unpaid
 rejected and unpaid
 submitted but not readiness-complete
+```
+
+**Approved decision — BA-DEC-02**
+
+`pendingClaims` is a workflow-only operational KPI. It must not be calculated from `decisionStatus`, `paymentStatus`, `legacyClaimPresentationStatus`, or readiness.
+
+Approved pending workflow set:
+
+```text
+draft
+collecting_data
+validation_pending
+needs_review
+ready_to_submit
+submitted
+payer_processing
+decision_received
+appealed
+```
+
+Excluded workflow states:
+
+```text
+closed
+cancelled
 ```
 
 ## 10. UI Presentation Contract
@@ -296,9 +345,9 @@ Mandatory rules:
 * No PHI or sensitive Claim payload in logs or user-facing errors
 * Existing workflow command service authorization and optimistic-lock behavior must not regress
 
-## 12. Proposed Exact File Allowlist
+## 12. Approved Exact File Allowlist
 
-### Approved Existing Files to Modify — Pending Contract Approval
+### Approved Existing Files to Modify
 
 ```text
 features/patient-claims/types/patient-claims.types.ts
@@ -315,12 +364,14 @@ features/patient-claims/data/patient-claims.mock.ts
 
 ### Conditional Existing Files
 
-The following may be modified only when repository evidence proves compilation or contract alignment requires it, without changing controlled mutation behavior:
+The following files are not part of the default change set. They may be modified only when implementation evidence proves that compilation or approved contract alignment requires a non-behavioral adjustment:
 
 ```text
 features/patient-claims/services/patient-claims-service.ts
 features/patient-claims/server/claim-workflow-command-service.test.ts
 ```
+
+Before changing either file, the implementation report must record the exact reason. Any required behavioral change, new dependency, trust-boundary change, or controlled-mutation change invalidates this approval and requires contract amendment.
 
 ### Read-Only Verification Files
 
@@ -422,15 +473,15 @@ Do not claim PASS for commands that were not executed successfully.
 
 Database reset, lint, or database tests are not required because Batch A prohibits database and generated-type changes. If such changes appear in the diff, stop the Batch as a scope violation.
 
-## 15. Approval Decisions Required
+## 15. Closed Approval Decisions
 
-| ID | Decision | Required owner | Blocking |
+| ID | Approved decision | Owner | Status |
 | --- | --- | --- | --- |
-| BA-DEC-01 | Remove `claimStatus` or retain renamed presentation-only adapter | Product Owner / Application Architect | Yes |
-| BA-DEC-02 | Exact business definition of `pendingClaims` KPI | Product Owner / Claim Domain Owner | Yes |
-| BA-DEC-03 | Verified readiness source or approved presentation-only fallback | Product Owner / Claim Domain Owner | Yes |
+| BA-DEC-01 | Retain a renamed, non-authoritative `legacyClaimPresentationStatus` adapter for temporary display and legacy URL/filter translation only | Product Owner / Application Architect | CLOSED |
+| BA-DEC-02 | Define `pendingClaims` from the approved workflow-only pending set; exclude `closed` and `cancelled` | Product Owner / Claim Domain Owner | CLOSED |
+| BA-DEC-03 | Use verified Claim Readiness assessment data when available; otherwise use an explicitly non-authoritative presentation fallback with tests and a removal review condition | Product Owner / Claim Domain Owner | CLOSED |
 
-Implementation must remain blocked until all three decisions are closed in this document.
+Blocking Decisions: `0`
 
 ## 16. Approval Gate
 
@@ -442,18 +493,33 @@ Required reviewers:
 * Security Reviewer
 * QA Lead
 
-Approval may be granted only when:
+Approval evidence:
 
 1. BA-DEC-01 through BA-DEC-03 are closed.
-2. The exact allowlist is confirmed.
-3. Tests are approved and executable.
-4. No P0/P1 security or domain-semantic blocker remains.
-5. Working tree is clean.
-6. Implementation authorization is explicitly changed to `YES`.
+2. The exact Batch A allowlist is confirmed.
+3. Required tests and repository-supported commands are approved.
+4. No unresolved P0/P1 security or domain-semantic blocker remains in this contract.
+5. Implementation may start only from a clean working tree.
+6. Implementation authorization is explicitly `YES`.
+7. Approval is limited to Batch A and does not authorize deployment or release.
 
-No conditional approval is permitted.
+Approval Decision: `APPROVED`
 
-## 17. Completion Gate
+Implementation Authorization: `YES`
+
+## 17. Implementation Stop Conditions
+
+Stop implementation and return the contract to review when any of the following occurs:
+
+* A required change falls outside the approved or explicitly conditional allowlist.
+* Database schema, enum, RPC, RLS, grant, migration, or generated-type changes become necessary.
+* The verified readiness source cannot be integrated without changing an unapproved feature or database boundary.
+* Compatibility behavior must control authoritative writes, permissions, KPIs, decisions, payments, or financial calculations.
+* Controlled workflow command behavior, tenant verification, actor authority, optimistic locking, or error normalization would change.
+* Required tests cannot be executed or a required validation command fails.
+* The working tree contains unrelated changes that cannot be isolated.
+
+## 18. Completion Gate
 
 An authorized Batch A implementation is complete only when:
 
@@ -466,21 +532,31 @@ An authorized Batch A implementation is complete only when:
 * Final diff contains no database, migration, generated-type, or unrelated feature changes.
 * Completion evidence is recorded before Batch B begins.
 
-## 18. Final Record
+## 19. Approval Record
+
+| Field | Value |
+| --- | --- |
+| Document | `PHASE-5-BATCH-A-PATIENT-CLAIMS-CONTRACT` |
+| Record State | `APPROVED CONTRACT` |
+| Contract Status | `APPROVED` |
+| Implementation Status | `NOT STARTED` |
+| Implementation Authorization | `YES` |
+| Application Changes | `AUTHORIZED — EXACT BATCH A ALLOWLIST ONLY` |
+| Database Changes | `NOT AUTHORIZED` |
+| Migration Changes | `NOT AUTHORIZED` |
+| Generated-Type Changes | `NOT AUTHORIZED` |
+| Blocking Decisions | `0` |
+| Approval Date | `2026-07-24` |
+| Required Review Roles | Product Owner; Claim Domain Owner; Application Architect; Security Reviewer; QA Lead |
+| Deployment Authorization | `NO` |
 
 ```text
-Document: PHASE-5-BATCH-A-PATIENT-CLAIMS-CONTRACT
-Record State: READY FOR REVIEW
-Contract Status: PROPOSED
+Approval Decision: APPROVED
+Implementation Authorized: YES
 Implementation Status: NOT STARTED
-Implementation Authorization: NO
-Blocking Decisions: 3
-
-Approval Decision: PENDING
-Implementation Authorized: NO
 
 Recommended Next Task:
-PHASE 5 — BATCH A DECISION CLOSURE AND APPROVAL
+PHASE 5 — BATCH A IMPLEMENTATION
 ```
 
-No Agent may begin Batch A implementation from this document.
+Implementation must remain within this exact contract. Batch B, Batch C, deployment, production release, database changes, and generated-type changes require separate approval.
