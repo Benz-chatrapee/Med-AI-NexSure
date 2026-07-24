@@ -1,41 +1,26 @@
-import type { ClaimStatus, PatientClaim, PatientClaimsFilters, PatientClaimsPage, PatientClaimsPagination } from "../types/patient-claims.types";
+import type { CanonicalPatientClaim, PatientClaim, PatientClaimsFilters, PatientClaimsPage, PatientClaimsPagination } from "../types/patient-claims.types";
+import { isCanonicalPatientClaim } from "../types/patient-claims.types";
 import { readinessThresholds } from "../constants/patient-claims.constants";
 
-const currencyFormatter = new Intl.NumberFormat("th-TH", {
-  style: "currency",
-  currency: "THB",
-  maximumFractionDigits: 0,
-});
-
-const dateFormatter = new Intl.DateTimeFormat("en-GB", {
-  day: "2-digit",
-  month: "short",
-  year: "numeric",
-});
+const currencyFormatter = new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB", maximumFractionDigits: 0 });
+const dateFormatter = new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "short", year: "numeric" });
 
 export function filterPatientClaims(claims: PatientClaim[], filters: PatientClaimsFilters): PatientClaim[] {
   const query = filters.query.trim().toLowerCase();
-
   return claims.filter((claim) => {
-    const queryText = [
-      claim.claimNumber,
-      claim.visitNumber,
-      claim.diagnosisName,
-      claim.icdCode,
-      claim.payerName,
-      claim.planName,
-      claim.department,
-    ]
-      .join(" ")
-      .toLowerCase();
+    const queryText = [claim.claimNumber, claim.visitNumber, claim.diagnosisName, claim.icdCode, claim.payerName, claim.planName, claim.department].join(" ").toLowerCase();
     const matchesQuery = query.length === 0 || queryText.includes(query);
-    const matchesStatus = filters.status === "all" || claim.claimStatus === filters.status;
+    const canonical = isCanonicalPatientClaim(claim) ? claim : null;
+    const matchesWorkflow = filters.workflowStatus === "all" || canonical?.workflowStatus === filters.workflowStatus;
+    const matchesWorkflowGroup = filters.workflowGroup === "all" || (canonical !== null && matchesWorkflowGroupFilter(canonical, filters.workflowGroup));
+    const matchesDecision = filters.decisionStatus === "all" || canonical?.decisionStatus === filters.decisionStatus;
+    const matchesPayment = filters.paymentStatus === "all" || canonical?.paymentStatus === filters.paymentStatus;
+    const matchesReadiness = filters.readinessStatus === "all" || getReadinessStatus(claim.readinessScore) === filters.readinessStatus;
     const matchesRisk = filters.risk === "all" || claim.riskLevel === filters.risk;
     const matchesPayer = filters.payer === "all" || claim.payerName === filters.payer;
     const matchesDateFrom = !filters.dateFrom || claim.serviceDate >= filters.dateFrom;
     const matchesDateTo = !filters.dateTo || claim.serviceDate <= filters.dateTo;
-
-    return matchesQuery && matchesStatus && matchesRisk && matchesPayer && matchesDateFrom && matchesDateTo;
+    return matchesQuery && matchesWorkflow && matchesWorkflowGroup && matchesDecision && matchesPayment && matchesReadiness && matchesRisk && matchesPayer && matchesDateFrom && matchesDateTo;
   });
 }
 
@@ -47,49 +32,35 @@ export function paginatePatientClaims<T>(items: T[], pagination: PatientClaimsPa
   const pageItems = items.slice(start, start + pageSize);
   const rangeStart = items.length === 0 ? 0 : start + 1;
   const rangeEnd = start + pageItems.length;
-
-  return {
-    items: pageItems,
-    total: items.length,
-    page,
-    pageSize,
-    pageCount,
-    rangeLabel: items.length === 0 ? "Showing 0 claims" : `Showing ${rangeStart}-${rangeEnd} of ${items.length} claims`,
-  };
+  return { items: pageItems, total: items.length, page, pageSize, pageCount, rangeLabel: items.length === 0 ? "Showing 0 claims" : `Showing ${rangeStart}-${rangeEnd} of ${items.length} claims` };
 }
 
-export function formatClaimCurrency(value: number): string {
-  return currencyFormatter.format(value);
-}
-
+export function formatClaimCurrency(value: number): string { return currencyFormatter.format(value); }
 export function formatCompactClaimCurrency(value: number): string {
-  if (value >= 1000) {
-    return `฿${(value / 1000).toFixed(value % 1000 === 0 ? 0 : 1)}K`;
-  }
-
+  if (value >= 1000) return `฿${(value / 1000).toFixed(value % 1000 === 0 ? 0 : 1)}K`;
   return formatClaimCurrency(value);
 }
-
-export function formatClaimDate(value?: string): string {
-  if (!value) return "-";
-  return dateFormatter.format(new Date(`${value}T00:00:00+07:00`));
-}
-
+export function formatClaimDate(value?: string): string { return value ? dateFormatter.format(new Date(`${value}T00:00:00+07:00`)) : "-"; }
 export function getReadinessStatus(score: number): "ready" | "needs_review" | "not_ready" {
   if (score >= readinessThresholds.ready) return "ready";
   if (score >= readinessThresholds.needsReview) return "needs_review";
   return "not_ready";
 }
+export function maskPolicyNumber(policyNumber: string): string { return policyNumber.length <= 4 ? policyNumber : `•••• ${policyNumber.slice(-4)}`; }
 
-export function maskPolicyNumber(policyNumber: string): string {
-  if (policyNumber.length <= 4) return policyNumber;
-  return `•••• ${policyNumber.slice(-4)}`;
+export function claimFiltersForKpi(id: string): Partial<PatientClaimsFilters> {
+  if (id === "approved") return { decisionStatus: "approved" };
+  if (id === "pending") return { workflowGroup: "pending" };
+  if (id === "not_ready") return { readinessStatus: "not_ready" };
+  if (id === "submitted") return { workflowGroup: "submitted_lifecycle" };
+  return {};
 }
 
-export function claimStatusForKpi(id: string): ClaimStatus | "all" {
-  if (id === "approved") return "approved";
-  if (id === "pending") return "pending";
-  if (id === "not_ready") return "not_ready";
-  if (id === "submitted") return "submitted";
-  return "all";
+function matchesWorkflowGroupFilter(claim: CanonicalPatientClaim, group: "pending" | "submitted_lifecycle"): boolean {
+  if (group === "pending") return isPendingWorkflow(claim);
+  return ["submitted", "under_review", "appealed", "closed"].includes(claim.workflowStatus);
+}
+
+export function isPendingWorkflow(claim: CanonicalPatientClaim): boolean {
+  return ["draft", "collecting_data", "validation_pending", "needs_review", "ready_to_submit", "submitted", "under_review", "appealed"].includes(claim.workflowStatus);
 }

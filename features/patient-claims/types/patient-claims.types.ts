@@ -1,6 +1,6 @@
 import type { Database } from "@/lib/database.types";
 
-export type ClaimStatus = "draft" | "not_ready" | "needs_review" | "submitted" | "pending" | "approved" | "rejected";
+export type LegacyClaimPresentationStatus = "draft" | "not_ready" | "needs_review" | "submitted" | "pending" | "approved" | "rejected";
 export type ClaimWorkflowStatus = Database["public"]["Enums"]["claim_workflow_state"];
 export type ClaimDecisionStatus = Database["public"]["Enums"]["claim_decision_state"];
 export type ClaimPaymentStatus = Database["public"]["Enums"]["claim_payment_state"];
@@ -29,8 +29,10 @@ export interface PatientClaim {
   expectedAmountMax?: number;
   approvedAmount?: number;
   readinessScore: number;
-  /** Non-authoritative compatibility adapter for existing presentation and filters. */
-  claimStatus: ClaimStatus;
+  /** Non-authoritative compatibility adapter for display and legacy URL translation only. */
+  legacyClaimPresentationStatus: LegacyClaimPresentationStatus;
+  readinessSource: "verified_assessment" | "presentation_fallback";
+  readinessAuthoritative: boolean;
   riskLevel: ClaimRiskLevel;
   tatDays?: number;
   tatTargetDays?: number;
@@ -95,9 +97,16 @@ export interface PatientClaimsSummary {
   totalApprovedAmount: number;
 }
 
+export type ClaimReadinessStatus = "ready" | "needs_review" | "not_ready";
+export type ClaimWorkflowGroup = "pending" | "submitted_lifecycle";
+
 export interface PatientClaimsFilters {
   query: string;
-  status: ClaimStatus | "all";
+  workflowStatus: ClaimWorkflowStatus | "all";
+  workflowGroup: ClaimWorkflowGroup | "all";
+  decisionStatus: ClaimDecisionStatus | "all";
+  paymentStatus: ClaimPaymentStatus | "all";
+  readinessStatus: ClaimReadinessStatus | "all";
   payer: string | "all";
   risk: ClaimRiskLevel | "all";
   dateFrom?: string;

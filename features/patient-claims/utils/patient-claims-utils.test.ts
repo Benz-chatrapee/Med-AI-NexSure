@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import type { PatientClaim, PatientClaimsFilters } from "../types/patient-claims.types";
+import type { CanonicalPatientClaim, PatientClaimsFilters } from "../types/patient-claims.types";
 import { filterPatientClaims, formatClaimCurrency, paginatePatientClaims } from "./patient-claims-utils";
 
-const claims: PatientClaim[] = [
+const claims: CanonicalPatientClaim[] = [
   {
     id: "claim-1",
     claimNumber: "CLM-2026-00481",
@@ -16,8 +16,8 @@ const claims: PatientClaim[] = [
     diagnosisName: "Lower back pain",
     icdCode: "M54.5",
     claimedAmount: 12480,
-    readinessScore: 62,
-    claimStatus: "not_ready",
+    readinessScore: 59,
+    legacyClaimPresentationStatus: "not_ready", readinessSource: "presentation_fallback", readinessAuthoritative: false, organizationId: "org-1", clinicId: "clinic-1", workflowStatus: "collecting_data", decisionStatus: "not_decided", paymentStatus: "not_paid", version: 1, stateUpdatedAt: null, currentDecisionId: null, totalEligibleAmount: null, totalPaidAmount: 0, currencyCode: "THB", legacyStatus: null, canonicalStateSupported: true, authoritativeActionsEnabled: true,
     riskLevel: "high",
   },
   {
@@ -34,7 +34,7 @@ const claims: PatientClaim[] = [
     icdCode: "J20.9",
     claimedAmount: 6820,
     readinessScore: 96,
-    claimStatus: "submitted",
+    legacyClaimPresentationStatus: "submitted", readinessSource: "verified_assessment", readinessAuthoritative: true, organizationId: "org-1", clinicId: "clinic-1", workflowStatus: "submitted", decisionStatus: "not_decided", paymentStatus: "payment_pending", version: 1, stateUpdatedAt: null, currentDecisionId: null, totalEligibleAmount: null, totalPaidAmount: 0, currencyCode: "THB", legacyStatus: null, canonicalStateSupported: true, authoritativeActionsEnabled: true,
     riskLevel: "low",
   },
   {
@@ -51,7 +51,7 @@ const claims: PatientClaim[] = [
     icdCode: "K29.7",
     claimedAmount: 7230,
     readinessScore: 100,
-    claimStatus: "approved",
+    legacyClaimPresentationStatus: "approved", readinessSource: "verified_assessment", readinessAuthoritative: true, organizationId: "org-1", clinicId: "clinic-1", workflowStatus: "closed", decisionStatus: "approved", paymentStatus: "paid", version: 1, stateUpdatedAt: null, currentDecisionId: null, totalEligibleAmount: null, totalPaidAmount: 7230, currencyCode: "THB", legacyStatus: null, canonicalStateSupported: true, authoritativeActionsEnabled: true,
     riskLevel: "low",
   },
 ];
@@ -59,7 +59,11 @@ const claims: PatientClaim[] = [
 function filters(overrides: Partial<PatientClaimsFilters>): PatientClaimsFilters {
   return {
     query: "",
-    status: "all",
+    workflowStatus: "all",
+    workflowGroup: "all",
+    decisionStatus: "all",
+    paymentStatus: "all",
+    readinessStatus: "all",
     payer: "all",
     risk: "all",
     page: 1,
@@ -79,7 +83,8 @@ describe("patient claims utilities", () => {
     const result = filterPatientClaims(
       claims,
       filters({
-        status: "submitted",
+        workflowStatus: "submitted",
+        paymentStatus: "payment_pending",
         risk: "low",
         payer: "Allianz Ayudhya",
         dateFrom: "2026-06-01",
@@ -88,6 +93,13 @@ describe("patient claims utilities", () => {
     );
 
     expect(result.map((claim) => claim.claimNumber)).toEqual(["CLM-2026-00462"]);
+  });
+
+  it("filters workflow, decision, payment, and readiness independently", () => {
+    expect(filterPatientClaims(claims, filters({ decisionStatus: "approved" })).map((claim) => claim.id)).toEqual(["claim-3"]);
+    expect(filterPatientClaims(claims, filters({ paymentStatus: "not_paid" })).map((claim) => claim.id)).toEqual(["claim-1"]);
+    expect(filterPatientClaims(claims, filters({ readinessStatus: "not_ready" })).map((claim) => claim.id)).toEqual(["claim-1"]);
+    expect(filterPatientClaims(claims, filters({ workflowGroup: "pending" })).map((claim) => claim.id)).toEqual(["claim-1", "claim-2"]);
   });
 
   it("paginates claims with a stable item range", () => {
@@ -103,3 +115,5 @@ describe("patient claims utilities", () => {
     expect(formatClaimCurrency(96400)).toBe("฿96,400");
   });
 });
+
+

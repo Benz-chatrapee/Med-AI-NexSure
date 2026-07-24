@@ -29,10 +29,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
-import { CLAIM_DECISION_STATUS_CONFIG, CLAIM_PAYMENT_STATUS_CONFIG, CLAIM_RISK_CONFIG, CLAIM_STATUS_CONFIG, CLAIM_WORKFLOW_STATUS_CONFIG, EVIDENCE_SEVERITY_CONFIG, initialPatientClaimsFilters } from "../constants/patient-claims.constants";
+import { CLAIM_DECISION_STATUS_CONFIG, CLAIM_PAYMENT_STATUS_CONFIG, CLAIM_RISK_CONFIG, LEGACY_CLAIM_PRESENTATION_STATUS_CONFIG, CLAIM_WORKFLOW_STATUS_CONFIG, EVIDENCE_SEVERITY_CONFIG, initialPatientClaimsFilters } from "../constants/patient-claims.constants";
 import { recalculateClaimReadiness } from "../services/patient-claims-service";
-import { isCanonicalPatientClaim, type CanonicalPatientClaimsDashboardData, type ClaimDetail, type ClaimRiskLevel, type ClaimStatus, type MissingEvidenceActionType, type PatientClaim, type PatientClaimsDashboardData, type PatientClaimsFilters } from "../types/patient-claims.types";
-import { claimStatusForKpi, filterPatientClaims, formatClaimCurrency, formatClaimDate, formatCompactClaimCurrency, getReadinessStatus, maskPolicyNumber, paginatePatientClaims } from "../utils/patient-claims-utils";
+import { isCanonicalPatientClaim, type CanonicalPatientClaimsDashboardData, type ClaimDetail, type ClaimRiskLevel, type MissingEvidenceActionType, type PatientClaim, type PatientClaimsDashboardData, type PatientClaimsFilters } from "../types/patient-claims.types";
+import { claimFiltersForKpi, filterPatientClaims, formatClaimCurrency, formatClaimDate, formatCompactClaimCurrency, getReadinessStatus, maskPolicyNumber, paginatePatientClaims } from "../utils/patient-claims-utils";
 
 type Props = {
   initialData: CanonicalPatientClaimsDashboardData;
@@ -44,7 +44,7 @@ type KpiCard = {
   value: string;
   helper: string;
   icon: typeof Files;
-  status: ClaimStatus | "all";
+  filters: Partial<PatientClaimsFilters>;
 };
 
 const toneClass = {
@@ -123,12 +123,12 @@ export function PatientClaimsWorkspace({ initialData }: Props) {
   }
 
   const kpis: KpiCard[] = [
-    { id: "total", label: "Total Claims", value: String(initialData.summary.totalClaims), helper: "Across 9 visits", icon: Files, status: "all" },
-    { id: "approved", label: "Approved", value: String(initialData.summary.approvedClaims), helper: `${formatClaimCurrency(initialData.summary.totalApprovedAmount)} reimbursed`, icon: CheckCircle2, status: "approved" },
-    { id: "pending", label: "Pending Review", value: String(initialData.summary.pendingClaims), helper: "1 exceeds target TAT", icon: History, status: "pending" },
-    { id: "not_ready", label: "Not Ready", value: String(initialData.summary.notReadyClaims), helper: "3 missing evidence items", icon: AlertTriangle, status: "not_ready" },
-    { id: "submitted", label: "Submitted", value: String(initialData.summary.submittedClaims), helper: "Waiting payer decision", icon: PackageCheck, status: "submitted" },
-    { id: "claimed", label: "Total Claimed", value: formatCompactClaimCurrency(initialData.summary.totalClaimedAmount), helper: "67.2% approved value", icon: Landmark, status: "all" },
+    { id: "total", label: "Total Claims", value: String(initialData.summary.totalClaims), helper: "Across 9 visits", icon: Files, filters: {} },
+    { id: "approved", label: "Approved", value: String(initialData.summary.approvedClaims), helper: `${formatClaimCurrency(initialData.summary.totalApprovedAmount)} reimbursed`, icon: CheckCircle2, filters: { decisionStatus: "approved" } },
+    { id: "pending", label: "Pending Review", value: String(initialData.summary.pendingClaims), helper: "1 exceeds target TAT", icon: History, filters: { workflowGroup: "pending" } },
+    { id: "not_ready", label: "Not Ready", value: String(initialData.summary.notReadyClaims), helper: "3 missing evidence items", icon: AlertTriangle, filters: { readinessStatus: "not_ready" } },
+    { id: "submitted", label: "Submitted", value: String(initialData.summary.submittedClaims), helper: "Waiting payer decision", icon: PackageCheck, filters: { workflowGroup: "submitted_lifecycle" } },
+    { id: "claimed", label: "Total Claimed", value: formatCompactClaimCurrency(initialData.summary.totalClaimedAmount), helper: "67.2% approved value", icon: Landmark, filters: {} },
   ];
 
   return (
@@ -158,9 +158,9 @@ export function PatientClaimsWorkspace({ initialData }: Props) {
               {kpis.map((card) => (
                 <button
                   key={card.id}
-                  className={`rounded-lg border bg-white p-4 text-left shadow-sm transition hover:border-blue-300 focus:ring-4 focus:ring-blue-100 ${filters.status === card.status ? "border-blue-400 ring-2 ring-blue-100" : "border-slate-200"}`}
-                  onClick={() => applyFilters({ status: claimStatusForKpi(card.id) })}
-                  aria-pressed={filters.status === card.status}
+                  className={`rounded-lg border bg-white p-4 text-left shadow-sm transition hover:border-blue-300 focus:ring-4 focus:ring-blue-100 ${Object.entries(card.filters).every(([key, value]) => filters[key as keyof PatientClaimsFilters] === value) && Object.keys(card.filters).length > 0 ? "border-blue-400 ring-2 ring-blue-100" : "border-slate-200"}`}
+                  onClick={() => applyFilters(claimFiltersForKpi(card.id))}
+                  aria-pressed={Object.entries(card.filters).every(([key, value]) => filters[key as keyof PatientClaimsFilters] === value) && Object.keys(card.filters).length > 0}
                 >
                   <card.icon className="h-6 w-6 text-blue-700" aria-hidden="true" />
                   <div className="mt-3 text-2xl font-black text-blue-950">{card.value}</div>
@@ -263,7 +263,7 @@ function ProgressBar({ label, value, suffix }: { label: string; value: number; s
 }
 
 function ClaimToolbar({ filters, payers, onChange, onClear }: { filters: PatientClaimsFilters; payers: string[]; onChange: (next: Partial<PatientClaimsFilters>) => void; onClear: () => void }) {
-  return <div className="flex flex-wrap items-end gap-2 p-4"><label className="grid min-w-64 flex-1 gap-1 text-xs font-black text-slate-600">Search claims<div className="relative"><Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" /><input className="h-10 w-full rounded-lg border border-slate-200 pl-9 pr-3 text-sm outline-none focus:border-blue-400" value={filters.query} onChange={(event) => onChange({ query: event.target.value })} placeholder="Claim, visit, diagnosis, ICD, payer..." /></div></label><FilterSelect label="Status" icon={SlidersHorizontal} value={filters.status} onChange={(value) => onChange({ status: value as PatientClaimsFilters["status"] })} options={[["all", "All Status"], ...Object.entries(CLAIM_STATUS_CONFIG).map(([key, config]) => [key, config.label] satisfies [string, string])]} /><FilterSelect label="Payer" icon={Landmark} value={filters.payer} onChange={(value) => onChange({ payer: value })} options={[["all", "All Payers"], ...payers.map((payer) => [payer, payer] satisfies [string, string])]} /><FilterSelect label="Risk" icon={ShieldAlert} value={filters.risk} onChange={(value) => onChange({ risk: value as ClaimRiskLevel | "all" })} options={[["all", "All Risk"], ...Object.entries(CLAIM_RISK_CONFIG).map(([key, config]) => [key, config.label] satisfies [string, string])]} /><label className="grid gap-1 text-xs font-black text-slate-600">From<input type="date" className="h-10 rounded-lg border border-slate-200 px-3 text-sm" value={filters.dateFrom ?? ""} onChange={(event) => onChange({ dateFrom: event.target.value || undefined })} /></label><label className="grid gap-1 text-xs font-black text-slate-600">To<input type="date" className="h-10 rounded-lg border border-slate-200 px-3 text-sm" value={filters.dateTo ?? ""} onChange={(event) => onChange({ dateTo: event.target.value || undefined })} /></label><button className="h-10 rounded-lg border border-slate-200 px-3 text-sm font-black" onClick={onClear}>Clear</button><button className="h-10 rounded-lg border border-slate-200 px-3 text-sm font-black" onClick={() => undefined} aria-label="Table view"><List size={16} /></button></div>;
+  return <div className="flex flex-wrap items-end gap-2 p-4"><label className="grid min-w-64 flex-1 gap-1 text-xs font-black text-slate-600">Search claims<div className="relative"><Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" /><input className="h-10 w-full rounded-lg border border-slate-200 pl-9 pr-3 text-sm outline-none focus:border-blue-400" value={filters.query} onChange={(event) => onChange({ query: event.target.value })} placeholder="Claim, visit, diagnosis, ICD, payer..." /></div></label><FilterSelect label="Workflow" icon={SlidersHorizontal} value={filters.workflowStatus} onChange={(value) => onChange({ workflowStatus: value as PatientClaimsFilters["workflowStatus"] })} options={[["all", "All Workflow"], ...Object.entries(CLAIM_WORKFLOW_STATUS_CONFIG).map(([key, config]) => [key, config.label] satisfies [string, string])]} /><FilterSelect label="Decision" icon={ShieldCheck} value={filters.decisionStatus} onChange={(value) => onChange({ decisionStatus: value as PatientClaimsFilters["decisionStatus"] })} options={[["all", "All Decisions"], ...Object.entries(CLAIM_DECISION_STATUS_CONFIG).map(([key, config]) => [key, config.label] satisfies [string, string])]} /><FilterSelect label="Payment" icon={Landmark} value={filters.paymentStatus} onChange={(value) => onChange({ paymentStatus: value as PatientClaimsFilters["paymentStatus"] })} options={[["all", "All Payments"], ...Object.entries(CLAIM_PAYMENT_STATUS_CONFIG).map(([key, config]) => [key, config.label] satisfies [string, string])]} /><FilterSelect label="Readiness" icon={PackageCheck} value={filters.readinessStatus} onChange={(value) => onChange({ readinessStatus: value as PatientClaimsFilters["readinessStatus"] })} options={[["all", "All Readiness"], ["ready", "Ready"], ["needs_review", "Needs Review"], ["not_ready", "Not Ready"]]} /><FilterSelect label="Payer" icon={Landmark} value={filters.payer} onChange={(value) => onChange({ payer: value })} options={[["all", "All Payers"], ...payers.map((payer) => [payer, payer] satisfies [string, string])]} /><FilterSelect label="Risk" icon={ShieldAlert} value={filters.risk} onChange={(value) => onChange({ risk: value as ClaimRiskLevel | "all" })} options={[["all", "All Risk"], ...Object.entries(CLAIM_RISK_CONFIG).map(([key, config]) => [key, config.label] satisfies [string, string])]} /><label className="grid gap-1 text-xs font-black text-slate-600">From<input type="date" className="h-10 rounded-lg border border-slate-200 px-3 text-sm" value={filters.dateFrom ?? ""} onChange={(event) => onChange({ dateFrom: event.target.value || undefined })} /></label><label className="grid gap-1 text-xs font-black text-slate-600">To<input type="date" className="h-10 rounded-lg border border-slate-200 px-3 text-sm" value={filters.dateTo ?? ""} onChange={(event) => onChange({ dateTo: event.target.value || undefined })} /></label><button className="h-10 rounded-lg border border-slate-200 px-3 text-sm font-black" onClick={onClear}>Clear</button><button className="h-10 rounded-lg border border-slate-200 px-3 text-sm font-black" onClick={() => undefined} aria-label="Table view"><List size={16} /></button></div>;
 }
 
 function FilterSelect({ label, icon: Icon, value, options, onChange }: { label: string; icon: typeof Search; value: string; options: [string, string][]; onChange: (value: string) => void }) {
@@ -271,12 +271,12 @@ function FilterSelect({ label, icon: Icon, value, options, onChange }: { label: 
 }
 
 function ClaimTable({ claims, onOpen }: { claims: PatientClaim[]; onOpen: (claim: PatientClaim, trigger: HTMLButtonElement) => void }) {
-  return <div className="overflow-x-auto"><table className="w-full min-w-[1180px] text-left text-sm"><thead className="bg-slate-50 text-[10px] uppercase tracking-wide text-slate-500"><tr><th className="p-3">Claim / Visit</th><th>Service Date</th><th>Payer / Plan</th><th>Diagnosis</th><th>Claim Amount</th><th>Readiness</th><th>Status</th><th>Risk</th><th>TAT</th><th>Actions</th></tr></thead><tbody>{claims.map((claim) => <tr key={claim.id} className="border-t border-slate-100 hover:bg-slate-50"><td className="p-3"><b className="text-blue-900">{claim.claimNumber}</b><p className="text-xs text-slate-500">{claim.visitNumber} · OPD</p></td><td>{formatClaimDate(claim.serviceDate)}<p className="text-xs text-slate-500">{claim.department}</p></td><td><b>{claim.payerName}</b><p className="text-xs text-slate-500">{claim.planName}</p></td><td>{claim.diagnosisName}<p className="text-xs text-slate-500">{claim.icdCode}</p></td><td><b>{formatClaimCurrency(claim.claimedAmount)}</b><p className="text-xs text-slate-500">{claim.approvedAmount ? `Approved ${formatClaimCurrency(claim.approvedAmount)}` : claim.expectedAmountMin ? `Expected ${formatClaimCurrency(claim.expectedAmountMin)}-${formatClaimCurrency(claim.expectedAmountMax ?? claim.expectedAmountMin)}` : "Within benchmark"}</p></td><td><ProgressBar label={`${claim.claimNumber} readiness`} value={claim.readinessScore} suffix={String(claim.readinessScore)} /></td><td><ClaimStateBadges claim={claim} /></td><td><RiskBadge risk={claim.riskLevel} /></td><td>{claim.tatDays ? `${claim.tatDays} days` : "-"}<p className={`text-xs ${claim.tatDays && claim.tatTargetDays && claim.tatDays > claim.tatTargetDays ? "text-red-700" : "text-slate-500"}`}>{claim.tatTargetDays ? `Target ${claim.tatTargetDays} days` : "Not submitted"}</p></td><td><button className="rounded-lg border border-slate-200 p-2 text-blue-800" aria-label={`View claim detail ${claim.claimNumber}`} onClick={(event) => onOpen(claim, event.currentTarget)}><Eye size={16} /></button></td></tr>)}</tbody></table></div>;
+  return <div className="overflow-x-auto"><table className="w-full min-w-[1180px] text-left text-sm"><thead className="bg-slate-50 text-[10px] uppercase tracking-wide text-slate-500"><tr><th className="p-3">Claim / Visit</th><th>Service Date</th><th>Payer / Plan</th><th>Diagnosis</th><th>Claim Amount</th><th>Readiness</th><th>Status</th><th>Risk</th><th>TAT</th><th>Actions</th></tr></thead><tbody>{claims.map((claim) => <tr key={claim.id} className="border-t border-slate-100 hover:bg-slate-50"><td className="p-3"><b className="text-blue-900">{claim.claimNumber}</b><p className="text-xs text-slate-500">{claim.visitNumber} · OPD</p></td><td>{formatClaimDate(claim.serviceDate)}<p className="text-xs text-slate-500">{claim.department}</p></td><td><b>{claim.payerName}</b><p className="text-xs text-slate-500">{claim.planName}</p></td><td>{claim.diagnosisName}<p className="text-xs text-slate-500">{claim.icdCode}</p></td><td><b>{formatClaimCurrency(claim.claimedAmount)}</b><p className="text-xs text-slate-500">{claim.approvedAmount ? `Approved ${formatClaimCurrency(claim.approvedAmount)}` : claim.expectedAmountMin ? `Expected ${formatClaimCurrency(claim.expectedAmountMin)}-${formatClaimCurrency(claim.expectedAmountMax ?? claim.expectedAmountMin)}` : "Within benchmark"}</p></td><td><ProgressBar label={`${claim.claimNumber} readiness`} value={claim.readinessAuthoritative ? claim.readinessScore : 0} suffix={claim.readinessAuthoritative ? String(claim.readinessScore) : "Unavailable"} /></td><td><ClaimStateBadges claim={claim} /></td><td><RiskBadge risk={claim.riskLevel} /></td><td>{claim.tatDays ? `${claim.tatDays} days` : "-"}<p className={`text-xs ${claim.tatDays && claim.tatTargetDays && claim.tatDays > claim.tatTargetDays ? "text-red-700" : "text-slate-500"}`}>{claim.tatTargetDays ? `Target ${claim.tatTargetDays} days` : "Not submitted"}</p></td><td><button className="rounded-lg border border-slate-200 p-2 text-blue-800" aria-label={`View claim detail ${claim.claimNumber}`} onClick={(event) => onOpen(claim, event.currentTarget)}><Eye size={16} /></button></td></tr>)}</tbody></table></div>;
 }
 
 function ClaimStateBadges({ claim }: { claim: PatientClaim }) {
   if (!isCanonicalPatientClaim(claim)) {
-    return <StatusBadge status={claim.claimStatus} />;
+    return <StatusBadge status={claim.legacyClaimPresentationStatus} />;
   }
 
   if (!claim.canonicalStateSupported) {
@@ -312,8 +312,8 @@ function ClaimStateBadges({ claim }: { claim: PatientClaim }) {
   );
 }
 
-function StatusBadge({ status }: { status: ClaimStatus }) {
-  const config = CLAIM_STATUS_CONFIG[status];
+function StatusBadge({ status }: { status: PatientClaim["legacyClaimPresentationStatus"] }) {
+  const config = LEGACY_CLAIM_PRESENTATION_STATUS_CONFIG[status];
   return <Badge tone={config.tone} icon={config.icon}>{config.label}</Badge>;
 }
 
@@ -346,7 +346,11 @@ function EmptyState({ title, text, action }: { title: string; text: string; acti
 function buildChips(filters: PatientClaimsFilters): { key: keyof PatientClaimsFilters; label: string }[] {
   const chips: { key: keyof PatientClaimsFilters; label: string }[] = [];
   if (filters.query) chips.push({ key: "query", label: `Search: ${filters.query}` });
-  if (filters.status !== "all") chips.push({ key: "status", label: CLAIM_STATUS_CONFIG[filters.status].label });
+  if (filters.workflowStatus !== "all") chips.push({ key: "workflowStatus", label: `Workflow: ${CLAIM_WORKFLOW_STATUS_CONFIG[filters.workflowStatus].label}` });
+  if (filters.workflowGroup !== "all") chips.push({ key: "workflowGroup", label: filters.workflowGroup === "pending" ? "Workflow: Pending set" : "Workflow: Submitted lifecycle" });
+  if (filters.decisionStatus !== "all") chips.push({ key: "decisionStatus", label: `Decision: ${CLAIM_DECISION_STATUS_CONFIG[filters.decisionStatus].label}` });
+  if (filters.paymentStatus !== "all") chips.push({ key: "paymentStatus", label: `Payment: ${CLAIM_PAYMENT_STATUS_CONFIG[filters.paymentStatus].label}` });
+  if (filters.readinessStatus !== "all") chips.push({ key: "readinessStatus", label: `Readiness: ${filters.readinessStatus.replace("_", " ")}` });
   if (filters.payer !== "all") chips.push({ key: "payer", label: `Payer: ${filters.payer}` });
   if (filters.risk !== "all") chips.push({ key: "risk", label: CLAIM_RISK_CONFIG[filters.risk].label });
   if (filters.dateFrom) chips.push({ key: "dateFrom", label: `From: ${filters.dateFrom}` });

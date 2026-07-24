@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
 
 import type { Database } from "@/lib/database.types";
-import { mapClaimRow, mapPatientRow } from "./claim-mappers";
+import { mapClaimRow, mapPatientRow, summarizeClaims } from "./claim-mappers";
 
 type ClaimRow = Database["public"]["Tables"]["claims"]["Row"];
 type PatientRow = Database["public"]["Tables"]["patients"]["Row"];
@@ -56,7 +56,9 @@ describe("claim mappers", () => {
     expect(claim.decisionStatus).toBe("approved");
     expect(claim.paymentStatus).toBe("partially_paid");
     expect(claim.version).toBe(7);
-    expect(claim.claimStatus).toBe("approved");
+    expect(claim.legacyClaimPresentationStatus).toBe("approved");
+    expect(claim.readinessSource).toBe("presentation_fallback");
+    expect(claim.readinessAuthoritative).toBe(false);
     expect(claim.canonicalStateSupported).toBe(true);
   });
 
@@ -65,8 +67,24 @@ describe("claim mappers", () => {
 
     expect(claim.workflowStatus).toBe("unknown");
     expect(claim.canonicalStateSupported).toBe(false);
-    expect(claim.claimStatus).toBe("needs_review");
+    expect(claim.legacyClaimPresentationStatus).toBe("needs_review");
     expect(claim.authoritativeActionsEnabled).toBe(false);
+  });
+
+  it("calculates KPIs from their owning canonical dimensions", () => {
+    const claims = [
+      mapClaimRow({ ...baseClaim, id: "approved-unpaid", workflow_status: "closed", decision_status: "approved", payment_status: "not_paid" }),
+      mapClaimRow({ ...baseClaim, id: "pending", workflow_status: "needs_review", decision_status: "not_decided", payment_status: "not_paid" }),
+      mapClaimRow({ ...baseClaim, id: "submitted", workflow_status: "submitted", decision_status: "not_decided", payment_status: "not_paid" }),
+    ];
+    claims[1].readinessScore = 40;
+    claims[1].readinessAuthoritative = true;
+    claims[1].readinessSource = "verified_assessment";
+    const summary = summarizeClaims(claims);
+    expect(summary.approvedClaims).toBe(1);
+    expect(summary.pendingClaims).toBe(2);
+    expect(summary.submittedClaims).toBe(2);
+    expect(summary.notReadyClaims).toBe(1);
   });
 
   it("maps patient ownership and identity from the canonical patient row", () => {

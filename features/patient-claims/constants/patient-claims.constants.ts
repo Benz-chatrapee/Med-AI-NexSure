@@ -1,7 +1,7 @@
 import { AlertCircle, BadgeCheck, Ban, CheckCircle2, Clock3, FileText, HelpCircle, Send, ShieldAlert, TriangleAlert } from "lucide-react";
-import type { ClaimDecisionStatus, ClaimPaymentStatus, ClaimRiskLevel, ClaimStatus, ClaimWorkflowStatus, EvidenceSeverity } from "../types/patient-claims.types";
+import type { ClaimDecisionStatus, ClaimPaymentStatus, ClaimRiskLevel, ClaimWorkflowStatus, EvidenceSeverity, LegacyClaimPresentationStatus } from "../types/patient-claims.types";
 
-export const CLAIM_STATUS_CONFIG: Record<ClaimStatus, { label: string; thaiLabel: string; tone: string; icon: typeof HelpCircle }> = {
+export const LEGACY_CLAIM_PRESENTATION_STATUS_CONFIG: Record<LegacyClaimPresentationStatus, { label: string; thaiLabel: string; tone: string; icon: typeof HelpCircle }> = {
   draft: { label: "Draft", thaiLabel: "ฉบับร่าง", tone: "neutral", icon: FileText },
   not_ready: { label: "Not Ready", thaiLabel: "ยังไม่พร้อม", tone: "danger", icon: TriangleAlert },
   needs_review: { label: "Needs Review", thaiLabel: "ต้องตรวจสอบ", tone: "warning", icon: AlertCircle },
@@ -60,7 +60,11 @@ export const EVIDENCE_SEVERITY_CONFIG: Record<EvidenceSeverity, { label: string;
 
 export const initialPatientClaimsFilters = {
   query: "",
-  status: "all",
+  workflowStatus: "all",
+  workflowGroup: "all",
+  decisionStatus: "all",
+  paymentStatus: "all",
+  readinessStatus: "all",
   payer: "all",
   risk: "all",
   page: 1,

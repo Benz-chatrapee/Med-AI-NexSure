@@ -7,7 +7,7 @@ import type {
   ClaimDecisionStatus,
   ClaimPaymentStatus,
   ClaimRiskLevel,
-  ClaimStatus,
+  LegacyClaimPresentationStatus,
   ClaimWorkflowStatus,
   PatientClaimsPatientContext,
   PatientClaimsSummary,
@@ -70,9 +70,11 @@ export function mapClaimRow(row: ClaimRow): CanonicalPatientClaim {
     icdCode: "-",
     claimedAmount: row.total_claimed_amount,
     approvedAmount: row.total_approved_amount ?? undefined,
-    readinessScore: mapReadinessScore(workflowStatus),
-    claimStatus: canonicalStateSupported
-      ? mapLegacyClaimStatus(workflowStatus, decisionStatus)
+    readinessScore: 0,
+    readinessSource: "presentation_fallback",
+    readinessAuthoritative: false,
+    legacyClaimPresentationStatus: canonicalStateSupported
+      ? mapLegacyClaimPresentationStatus(workflowStatus, decisionStatus)
       : "needs_review",
     riskLevel: isState(row.risk_level, riskStates) ? row.risk_level : "medium",
     claimType: row.claim_type_code,
@@ -126,9 +128,9 @@ export function summarizeClaims(claims: CanonicalPatientClaim[]): PatientClaimsS
       summary.totalClaimedAmount += claim.claimedAmount;
       summary.totalApprovedAmount += claim.approvedAmount ?? 0;
       if (claim.decisionStatus === "approved" || claim.decisionStatus === "partially_approved") summary.approvedClaims += 1;
-      if (claim.workflowStatus === "submitted" || claim.workflowStatus === "under_review") summary.submittedClaims += 1;
-      if (claim.claimStatus === "pending") summary.pendingClaims += 1;
-      if (claim.claimStatus === "not_ready" || claim.claimStatus === "needs_review") summary.notReadyClaims += 1;
+      if (["submitted", "under_review", "appealed", "closed"].includes(claim.workflowStatus)) summary.submittedClaims += 1;
+      if (["draft", "collecting_data", "validation_pending", "needs_review", "ready_to_submit", "submitted", "under_review", "appealed"].includes(claim.workflowStatus)) summary.pendingClaims += 1;
+      if (claim.readinessAuthoritative && claim.readinessScore < 60) summary.notReadyClaims += 1;
       return summary;
     },
     {
@@ -147,7 +149,7 @@ function isState<T extends string>(value: string | null, supported: Set<T>): val
   return value !== null && supported.has(value as T);
 }
 
-function mapLegacyClaimStatus(workflow: ClaimWorkflowStatus, decision: ClaimDecisionStatus): ClaimStatus {
+function mapLegacyClaimPresentationStatus(workflow: ClaimWorkflowStatus, decision: ClaimDecisionStatus): LegacyClaimPresentationStatus {
   if (decision === "approved" || decision === "partially_approved") return "approved";
   if (decision === "rejected" || decision === "voided") return "rejected";
   if (decision === "request_information") return "needs_review";
@@ -156,14 +158,6 @@ function mapLegacyClaimStatus(workflow: ClaimWorkflowStatus, decision: ClaimDeci
   if (workflow === "ready_to_submit" || workflow === "needs_review" || workflow === "validation_pending") return "needs_review";
   if (workflow === "collecting_data") return "not_ready";
   return "draft";
-}
-
-function mapReadinessScore(workflow: ClaimWorkflowStatus | "unknown"): number {
-  if (workflow === "ready_to_submit" || workflow === "submitted" || workflow === "under_review" || workflow === "appealed" || workflow === "closed") return 100;
-  if (workflow === "validation_pending" || workflow === "needs_review") return 70;
-  if (workflow === "collecting_data") return 40;
-  if (workflow === "draft") return 20;
-  return 0;
 }
 
 function initials(value: string): string {

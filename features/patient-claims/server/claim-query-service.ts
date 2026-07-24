@@ -79,7 +79,7 @@ export function createClaimQueryService(options: CreateClaimQueryServiceOptions 
           summary: summarizeClaims(claims),
           readiness: {
             ...patientClaimsDashboard.readiness,
-            source: "Canonical Phase 4 Claim snapshots",
+            source: "Presentation fallback — verified Claim Readiness assessment not integrated",
             lastCalculatedAt:
               claims.find((claim) => claim.stateUpdatedAt)?.stateUpdatedAt ??
               patient.updated_at,
