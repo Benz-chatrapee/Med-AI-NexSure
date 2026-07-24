@@ -1,0 +1,87 @@
+---
+description: Core engineering and governance rules for Med AI NexSure
+globs:
+alwaysApply: true
+---
+
+# Med AI NexSure — Core Project Rules
+
+## 1. Project Context
+
+Med AI NexSure is an enterprise healthcare and insurance intelligence platform covering:
+
+- clinical documentation
+- healthcare claim processing
+- claim readiness
+- payer and coverage rules
+- evidence management
+- AI-assisted clinical and claim analysis
+- audit and compliance
+- fraud and cost intelligence
+
+All implementations must preserve:
+
+- tenant isolation
+- healthcare data confidentiality
+- auditability
+- explainability
+- human decision authority
+- backward compatibility unless explicitly approved
+
+## 2. Source of Truth
+
+Before changing code, inspect the relevant repository evidence:
+
+1. approved contract or specification
+2. architecture decision records
+3. migration plan
+4. test plan
+5. existing implementation
+6. related migrations and tests
+7. current Git status and recent commits
+
+Use repository evidence as the source of truth.
+
+Never invent:
+
+- schemas
+- tables or columns
+- permissions
+- roles
+- workflow transitions
+- claim statuses
+- decision semantics
+- payment semantics
+- RLS behavior
+- API contracts
+- business rules
+
+When evidence is missing or conflicting, stop implementation and report the exact gap.
+
+## 3. Scope Control
+
+Modify only files explicitly allowed by the task or approved contract.
+
+Do not modify:
+
+- approved contracts
+- architecture decisions
+- unrelated migrations
+- unrelated tests
+- generated files
+- application code outside scope
+- configuration files
+
+unless the task explicitly authorizes them.
+
+Do not perform opportunistic refactoring.
+
+Do not rename, move, delete, or format unrelated files.
+
+## 4. Mandatory Pre-Change Checks
+
+Before editing, run:
+
+```powershell
+git status --short
+git log --oneline --decorate -5
