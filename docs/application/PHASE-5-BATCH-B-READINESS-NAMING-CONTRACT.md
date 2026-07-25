@@ -17,7 +17,7 @@ database_changes_authorized: NO
 migration_changes_authorized: NO
 generated_type_regeneration_authorized: NO
 generated_type_manual_edit_authorized: NO
-blocking_decisions: 2
+blocking_decisions: 1
 ---
 
 # Phase 5 — Batch B Claim Readiness Naming Reconciliation Contract
@@ -469,19 +469,19 @@ Select-String -Pattern '\bclaimStatus\b'
 
 Do not claim PASS for a command not executed successfully.
 
-## 14. Approval Decisions Required
+## 14. Approval Decisions
 
 ### BB-DEC-01 — Department replacement name
 
-Choose one:
+Approved decision:
 
-**Option A — `readinessStatus`**
+```text
+Use submissionReadinessStatus.
+```
 
-Use when the field is strictly derived from the Med AI NexSure readiness thresholds.
+Approved domain meaning:
 
-**Option B — `submissionReadinessStatus`**
-
-Use when the field intentionally preserves preparation/submission presentation values such as:
+`submissionReadinessStatus` represents Department-level preparation and submission presentation only. It may contain values such as:
 
 ```text
 draft
@@ -490,15 +490,35 @@ ready_for_submission
 submitted
 ```
 
-Recommended direction:
+It must not be treated as:
 
 ```text
-Option B — submissionReadinessStatus
+workflowStatus
+decisionStatus
+paymentStatus
+canonical readinessStatus
+generic claimStatus
+```
+
+Approved UI label:
+
+```text
+Submission Readiness
 ```
 
 Rationale:
 
-The current Department field contains `ready_for_submission` and `submitted`, which are broader than the standard three-value readiness classification. The explicit `submissionReadinessStatus` name avoids falsely presenting these values as the canonical Claim workflow.
+The current Department field includes preparation and submission presentation values that are broader than the canonical three-level readiness classification. The explicit `submissionReadinessStatus` name prevents these values from being misrepresented as canonical Claim workflow, payer adjudication, payment, or generic Claim status.
+
+Implementation requirements:
+
+* Rename the Department presentation field from `claimStatus` to `submissionReadinessStatus`.
+* Preserve the existing values and behavior.
+* Preserve `readinessScore` and the separate canonical readiness filter.
+* Preserve queue status as an independent concern.
+* Do not map `submitted` or `ready_for_submission` to Phase 4 workflow authority.
+* Rename the UI column from `Claim Status` to `Submission Readiness`.
+* Do not introduce a compatibility alias unless a contract amendment is approved.
 
 Owner:
 
@@ -506,7 +526,19 @@ Owner:
 Product Owner / Claim Domain Owner
 ```
 
+Status:
+
+```text
+CLOSED
+```
+
 ### BB-DEC-02 — New test files
+
+Decision status:
+
+```text
+OPEN
+```
 
 Confirm whether Batch B may create the proposed tests:
 
@@ -533,10 +565,17 @@ Owner:
 Application Architect / QA Lead
 ```
 
+Decision summary:
+
+| ID | Decision | Owner | Status |
+| --- | --- | --- | --- |
+| BB-DEC-01 | Rename the Department presentation field to `submissionReadinessStatus` | Product Owner / Claim Domain Owner | CLOSED |
+| BB-DEC-02 | Approve the proposed Visit List and Executive Dashboard test files | Application Architect / QA Lead | OPEN |
+
 Blocking Decisions:
 
 ```text
-2
+1
 ```
 
 ## 15. Security and Architecture Constraints
@@ -630,7 +669,10 @@ Record State: READY FOR REVIEW
 Contract Status: PROPOSED
 Implementation Status: NOT STARTED
 Implementation Authorization: NO
-Blocking Decisions: 2
+Blocking Decisions: 1
+
+BB-DEC-01: CLOSED
+BB-DEC-02: OPEN
 
 Application Changes Authorized: NO
 Database Changes Authorized: NO
@@ -638,7 +680,7 @@ Migration Changes Authorized: NO
 Generated-Type Changes Authorized: NO
 
 Recommended Next Task:
-PHASE 5 — BATCH B DECISION CLOSURE AND APPROVAL
+PHASE 5 — BATCH B BB-DEC-02 CLOSURE AND APPROVAL
 ```
 
 No Agent may begin Phase 5 Batch B implementation from this proposed contract.
