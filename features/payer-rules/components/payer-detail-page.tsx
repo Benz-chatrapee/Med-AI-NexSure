@@ -19,16 +19,32 @@ type Tone = "success" | "warning" | "danger" | "blue" | "neutral" | "purple";
 type PayerDetailTab = "overview" | "rules" | "cases" | "economics" | "contract" | "integration" | "documents" | "audit";
 type CaseFilter = "all" | "ready" | "review" | "notReady" | "pending" | "cost" | "sla";
 type DashboardFilters = { period: string; clinic: string; department: string; claimType: string };
-type CaseSelectFilters = { claimStatus: string; readiness: string; cost: string; sla: string };
+export type CaseWorkflowStatus = "Draft" | "Submitted";
+export type CaseDecisionStatus = "Pending" | "Approved";
+export type CasePaymentStatus = "Not Paid" | "Paid";
+export type PayerRuleReviewStatus = "Not Under Review" | "Under Review";
+export type CaseSelectFilters = {
+  workflowStatus: string;
+  decisionStatus: string;
+  paymentStatus: string;
+  readinessStatus: string;
+  payerRuleReviewStatus: string;
+  cost: string;
+  sla: string;
+};
 type AuditFilter = "All Events" | "Rule Changes" | "Publications" | "Exports" | "Integration Failures" | "Contract Updates";
 
-type DetailCase = AffectedCase & {
+export type DetailCase = Omit<AffectedCase, "status"> & {
   caseId: string;
   clinic: string;
   department: string;
   visitDate: string;
   claimType: "OPD" | "IPD";
-  claimStatus: "Submitted" | "Pending Evidence" | "Under Review" | "Draft" | "Approved" | "Paid";
+  workflowStatus: CaseWorkflowStatus;
+  decisionStatus: CaseDecisionStatus;
+  paymentStatus: CasePaymentStatus;
+  readinessStatus: ReadinessStatus;
+  payerRuleReviewStatus: PayerRuleReviewStatus;
   claimAmount: number;
   slaStatus: "Within SLA" | "At Risk" | "Breached";
 };
@@ -71,14 +87,17 @@ const defaultDashboardFilters: DashboardFilters = {
   claimType: "All Claim Types",
 };
 
-const defaultCaseSelectFilters: CaseSelectFilters = {
-  claimStatus: "All Claim Statuses",
-  readiness: "All Readiness Statuses",
+export const defaultCaseSelectFilters: CaseSelectFilters = {
+  workflowStatus: "All Workflow Statuses",
+  decisionStatus: "All Decision Statuses",
+  paymentStatus: "All Payment Statuses",
+  readinessStatus: "All Readiness Statuses",
+  payerRuleReviewStatus: "All Review Statuses",
   cost: "All Cost Statuses",
   sla: "All SLA Statuses",
 };
 
-const detailCases: DetailCase[] = [
+export const detailCases: DetailCase[] = [
   {
     ...affectedCases[0],
     caseId: "CLM-260710-0148",
@@ -89,9 +108,12 @@ const detailCases: DetailCase[] = [
     department: "Internal Medicine",
     visitDate: "10 Jul 2026",
     claimType: "OPD",
-    claimStatus: "Submitted",
+    workflowStatus: "Submitted",
+    decisionStatus: "Pending",
+    paymentStatus: "Not Paid",
+    readinessStatus: "ready",
+    payerRuleReviewStatus: "Not Under Review",
     claimAmount: 8450,
-    status: "ready",
     readinessScore: 96,
     missingEvidence: [],
     costStatus: "normal",
@@ -107,9 +129,12 @@ const detailCases: DetailCase[] = [
     department: "Orthopedics",
     visitDate: "10 Jul 2026",
     claimType: "OPD",
-    claimStatus: "Pending Evidence",
+    workflowStatus: "Draft",
+    decisionStatus: "Pending",
+    paymentStatus: "Not Paid",
+    readinessStatus: "pending_evidence",
+    payerRuleReviewStatus: "Not Under Review",
     claimAmount: 12680,
-    status: "needs_review",
     readinessScore: 78,
     missingEvidence: ["SOAP Incomplete", "ICD-10 Missing"],
     costStatus: "alert",
@@ -125,9 +150,12 @@ const detailCases: DetailCase[] = [
     department: "Cardiology",
     visitDate: "09 Jul 2026",
     claimType: "IPD",
-    claimStatus: "Under Review",
+    workflowStatus: "Submitted",
+    decisionStatus: "Pending",
+    paymentStatus: "Not Paid",
+    readinessStatus: "ready",
+    payerRuleReviewStatus: "Under Review",
     claimAmount: 64200,
-    status: "ready",
     readinessScore: 91,
     missingEvidence: [],
     costStatus: "normal",
@@ -143,9 +171,12 @@ const detailCases: DetailCase[] = [
     department: "Internal Medicine",
     visitDate: "09 Jul 2026",
     claimType: "OPD",
-    claimStatus: "Draft",
+    workflowStatus: "Draft",
+    decisionStatus: "Pending",
+    paymentStatus: "Not Paid",
+    readinessStatus: "not_ready",
+    payerRuleReviewStatus: "Not Under Review",
     claimAmount: 6980,
-    status: "not_ready",
     readinessScore: 54,
     missingEvidence: ["ICD-10 Missing", "SOAP Incomplete", "Medical certificate", "Cost justification"],
     costStatus: "normal",
@@ -162,9 +193,12 @@ const detailCases: DetailCase[] = [
     department: "General Surgery",
     visitDate: "08 Jul 2026",
     claimType: "IPD",
-    claimStatus: "Approved",
+    workflowStatus: "Submitted",
+    decisionStatus: "Approved",
+    paymentStatus: "Not Paid",
+    readinessStatus: "ready",
+    payerRuleReviewStatus: "Not Under Review",
     claimAmount: 128450,
-    status: "ready",
     readinessScore: 88,
     missingEvidence: [],
     costStatus: "blocked",
@@ -181,9 +215,12 @@ const detailCases: DetailCase[] = [
     department: "Neurology",
     visitDate: "08 Jul 2026",
     claimType: "OPD",
-    claimStatus: "Pending Evidence",
+    workflowStatus: "Draft",
+    decisionStatus: "Pending",
+    paymentStatus: "Not Paid",
+    readinessStatus: "pending_evidence",
+    payerRuleReviewStatus: "Not Under Review",
     claimAmount: 17900,
-    status: "needs_review",
     readinessScore: 82,
     missingEvidence: ["Medical certificate"],
     costStatus: "alert",
@@ -200,9 +237,12 @@ const detailCases: DetailCase[] = [
     department: "ENT",
     visitDate: "07 Jul 2026",
     claimType: "OPD",
-    claimStatus: "Paid",
+    workflowStatus: "Submitted",
+    decisionStatus: "Approved",
+    paymentStatus: "Paid",
+    readinessStatus: "ready",
+    payerRuleReviewStatus: "Not Under Review",
     claimAmount: 5840,
-    status: "ready",
     readinessScore: 94,
     missingEvidence: [],
     costStatus: "normal",
@@ -219,9 +259,12 @@ const detailCases: DetailCase[] = [
     department: "Dermatology",
     visitDate: "07 Jul 2026",
     claimType: "OPD",
-    claimStatus: "Draft",
+    workflowStatus: "Draft",
+    decisionStatus: "Pending",
+    paymentStatus: "Not Paid",
+    readinessStatus: "needs_review",
+    payerRuleReviewStatus: "Not Under Review",
     claimAmount: 9720,
-    status: "needs_review",
     readinessScore: 67,
     missingEvidence: ["Pre-authorization", "SOAP note", "ICD-10 code"],
     costStatus: "normal",
@@ -236,6 +279,18 @@ const ruleDomains = [
   { name: "Cost Rules", active: 11, blocking: 2, warning: 8, draft: 1, updated: "10 Jul 2026" },
   { name: "Risk Rules", active: 8, blocking: 1, warning: 2, draft: 3, updated: "08 Jul 2026" },
 ];
+
+export function matchesCaseSelectFilters(item: DetailCase, filters: CaseSelectFilters): boolean {
+  return (
+    (filters.workflowStatus === "All Workflow Statuses" || item.workflowStatus === filters.workflowStatus) &&
+    (filters.decisionStatus === "All Decision Statuses" || item.decisionStatus === filters.decisionStatus) &&
+    (filters.paymentStatus === "All Payment Statuses" || item.paymentStatus === filters.paymentStatus) &&
+    (filters.readinessStatus === "All Readiness Statuses" || readinessLabel(item.readinessStatus) === filters.readinessStatus) &&
+    (filters.payerRuleReviewStatus === "All Review Statuses" || item.payerRuleReviewStatus === filters.payerRuleReviewStatus) &&
+    (filters.cost === "All Cost Statuses" || costStatusLabel(item.costStatus) === filters.cost) &&
+    (filters.sla === "All SLA Statuses" || item.slaStatus === filters.sla)
+  );
+}
 
 export function PayerDetailPage({ payerId }: { payerId: string }) {
   const [activeTab, setActiveTab] = useState<PayerDetailTab>("overview");
@@ -270,17 +325,13 @@ export function PayerDetailPage({ payerId }: { payerId: string }) {
         (dashboardFilters.clinic === "All Clinics" || item.clinic === dashboardFilters.clinic) &&
         (dashboardFilters.department === "All Departments" || item.department === dashboardFilters.department) &&
         (dashboardFilters.claimType === "All Claim Types" || item.claimType === dashboardFilters.claimType);
-      const matchesSelects =
-        (caseSelectFilters.claimStatus === "All Claim Statuses" || item.claimStatus === caseSelectFilters.claimStatus) &&
-        (caseSelectFilters.readiness === "All Readiness Statuses" || readinessLabel(item.status) === caseSelectFilters.readiness) &&
-        (caseSelectFilters.cost === "All Cost Statuses" || costStatusLabel(item.costStatus) === caseSelectFilters.cost) &&
-        (caseSelectFilters.sla === "All SLA Statuses" || item.slaStatus === caseSelectFilters.sla);
+      const matchesSelects = matchesCaseSelectFilters(item, caseSelectFilters);
       const matchesFilter =
         caseFilter === "all" ||
-        (caseFilter === "ready" && item.status === "ready") ||
-        (caseFilter === "review" && item.status === "needs_review") ||
-        (caseFilter === "notReady" && item.status === "not_ready") ||
-        (caseFilter === "pending" && item.status === "pending_evidence") ||
+        (caseFilter === "ready" && item.readinessStatus === "ready") ||
+        (caseFilter === "review" && item.readinessStatus === "needs_review") ||
+        (caseFilter === "notReady" && item.readinessStatus === "not_ready") ||
+        (caseFilter === "pending" && item.readinessStatus === "pending_evidence") ||
         (caseFilter === "cost" && item.costStatus !== "normal") ||
         (caseFilter === "sla" && item.slaStatus === "Breached");
       return matchesSearch && matchesDashboard && matchesSelects && matchesFilter;
@@ -598,7 +649,7 @@ function OverviewTab({ onFilter, onOpenTab, onNotify }: { onFilter: (filter: Cas
         </Card>
       </div>
       <div className="grid gap-4 xl:grid-cols-[7fr_5fr]">
-        <Card title="Claim Status Distribution" helper="Current case volume across the payer claim workflow">
+        <Card title="Claim State Distribution" helper="Current case volume across workflow, readiness, decision, and payment states">
           <div className="h-[330px]">
             <HorizontalBars rows={[["Draft", 84, "blue"], ["Pending Evidence", 72, "warning"], ["Ready", 188, "blue"], ["Submitted", 241, "blue"], ["Under Review", 137, "warning"], ["Approved", 326, "success"], ["Rejected", 29, "danger"], ["Paid", 171, "success"]]} />
           </div>
@@ -937,8 +988,11 @@ function CasesTab({
       <QuickFilters active={filter} onChange={onFilter} />
       <div className="flex flex-wrap gap-2 border-b border-slate-200 bg-slate-50 p-3">
         <div className="min-w-[250px] flex-1"><input className="h-10 w-full rounded-xl border border-slate-200 px-3 text-xs outline-none focus:ring-2 focus:ring-blue-500" value={search} onChange={(event) => onSearch(event.target.value)} placeholder="Search Case ID, Visit ID, HN, patient, clinic..." aria-label="Search cases" /></div>
-        <SelectBox label="Claim status" value={selectFilters.claimStatus} options={["All Claim Statuses", "Submitted", "Pending Evidence", "Under Review", "Draft", "Approved", "Paid"]} onChange={(value) => onSelectFilters({ ...selectFilters, claimStatus: value })} />
-        <SelectBox label="Readiness status" value={selectFilters.readiness} options={["All Readiness Statuses", "Ready", "Needs Review", "Pending Evidence", "Not Ready"]} onChange={(value) => onSelectFilters({ ...selectFilters, readiness: value })} />
+        <SelectBox label="Workflow status" value={selectFilters.workflowStatus} options={["All Workflow Statuses", "Draft", "Submitted"]} onChange={(value) => onSelectFilters({ ...selectFilters, workflowStatus: value })} />
+        <SelectBox label="Decision status" value={selectFilters.decisionStatus} options={["All Decision Statuses", "Pending", "Approved"]} onChange={(value) => onSelectFilters({ ...selectFilters, decisionStatus: value })} />
+        <SelectBox label="Payment status" value={selectFilters.paymentStatus} options={["All Payment Statuses", "Not Paid", "Paid"]} onChange={(value) => onSelectFilters({ ...selectFilters, paymentStatus: value })} />
+        <SelectBox label="Readiness status" value={selectFilters.readinessStatus} options={["All Readiness Statuses", "Ready", "Needs Review", "Pending Evidence", "Not Ready"]} onChange={(value) => onSelectFilters({ ...selectFilters, readinessStatus: value })} />
+        <SelectBox label="Payer rule review" value={selectFilters.payerRuleReviewStatus} options={["All Review Statuses", "Not Under Review", "Under Review"]} onChange={(value) => onSelectFilters({ ...selectFilters, payerRuleReviewStatus: value })} />
         <SelectBox label="Cost status" value={selectFilters.cost} options={["All Cost Statuses", "Normal", "Warning", "Critical"]} onChange={(value) => onSelectFilters({ ...selectFilters, cost: value })} />
         <SelectBox label="SLA status" value={selectFilters.sla} options={["All SLA Statuses", "Within SLA", "At Risk", "Breached"]} onChange={(value) => onSelectFilters({ ...selectFilters, sla: value })} />
       </div>
@@ -953,9 +1007,9 @@ function CaseTable({ rows, compact, onNotify }: { rows: DetailCase[]; compact?: 
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[1450px] border-collapse text-left text-xs">
-        <thead><tr className="bg-slate-100 text-slate-600">{["Case ID", "Visit ID", "Patient", "Clinic", "Department", "Visit Date", "Claim Type", "Score", "Readiness", "Claim Status", "Missing", "Claim Amount", "Cost Status", "SLA Status", "Action"].map((head) => <th key={head} className="border-b p-3 font-black uppercase">{head}</th>)}</tr></thead>
+        <thead><tr className="bg-slate-100 text-slate-600">{["Case ID", "Visit ID", "Patient", "Clinic", "Department", "Visit Date", "Claim Type", "Score", "Readiness", "Workflow", "Decision", "Payment", "Payer Rule Review", "Missing", "Claim Amount", "Cost Status", "SLA Status", "Action"].map((head) => <th key={head} className="border-b p-3 font-black uppercase">{head}</th>)}</tr></thead>
         <tbody>
-          {displayedRows.length === 0 ? <tr><td colSpan={15} className="p-8 text-center font-semibold text-slate-500">ไม่พบเคสที่ตรงกับตัวกรอง กรุณาปรับเงื่อนไขการค้นหา</td></tr> : null}
+          {displayedRows.length === 0 ? <tr><td colSpan={18} className="p-8 text-center font-semibold text-slate-500">ไม่พบเคสที่ตรงกับตัวกรอง กรุณาปรับเงื่อนไขการค้นหา</td></tr> : null}
           {displayedRows.map((item) => <CaseRow key={item.id} item={item} onNotify={onNotify ?? (() => undefined)} />)}
         </tbody>
       </table>
@@ -989,8 +1043,11 @@ function CaseRow({ item, onNotify }: { item: DetailCase; onNotify: (message: str
       <td className="border-b p-3">{item.visitDate}</td>
       <td className="border-b p-3"><StatusBadge tone="blue">{item.claimType}</StatusBadge></td>
       <td className="border-b p-3"><Score value={item.readinessScore} /></td>
-      <td className="border-b p-3"><StatusBadge tone={readinessTone(item.status)}>{readinessLabel(item.status)}</StatusBadge></td>
-      <td className="border-b p-3"><StatusBadge tone={claimStatusTone(item.claimStatus)}>{item.claimStatus}</StatusBadge></td>
+      <td className="border-b p-3"><StatusBadge tone={readinessTone(item.readinessStatus)}>{readinessLabel(item.readinessStatus)}</StatusBadge></td>
+      <td className="border-b p-3"><StatusBadge tone={workflowStatusTone(item.workflowStatus)}>{item.workflowStatus}</StatusBadge></td>
+      <td className="border-b p-3"><StatusBadge tone={decisionStatusTone(item.decisionStatus)}>{item.decisionStatus}</StatusBadge></td>
+      <td className="border-b p-3"><StatusBadge tone={paymentStatusTone(item.paymentStatus)}>{item.paymentStatus}</StatusBadge></td>
+      <td className="border-b p-3"><StatusBadge tone={payerRuleReviewStatusTone(item.payerRuleReviewStatus)}>{item.payerRuleReviewStatus}</StatusBadge></td>
       <td className="border-b p-3">{item.missingEvidence.length}</td>
       <td className="border-b p-3 font-bold">{money(item.claimAmount)}</td>
       <td className="border-b p-3"><StatusBadge tone={item.costStatus === "normal" ? "success" : item.costStatus === "alert" ? "warning" : "danger"}>{costStatusLabel(item.costStatus)}</StatusBadge></td>
@@ -1321,10 +1378,20 @@ function riskTone(risk: RiskLevel): Tone {
   return risk === "low" ? "success" : risk === "medium" ? "warning" : risk === "high" ? "danger" : "purple";
 }
 
-function claimStatusTone(status: DetailCase["claimStatus"]): Tone {
-  if (status === "Approved" || status === "Paid" || status === "Submitted") return "success";
-  if (status === "Pending Evidence" || status === "Under Review" || status === "Draft") return "warning";
-  return "blue";
+function workflowStatusTone(status: CaseWorkflowStatus): Tone {
+  return status === "Submitted" ? "blue" : "neutral";
+}
+
+function decisionStatusTone(status: CaseDecisionStatus): Tone {
+  return status === "Approved" ? "success" : "neutral";
+}
+
+function paymentStatusTone(status: CasePaymentStatus): Tone {
+  return status === "Paid" ? "success" : "neutral";
+}
+
+function payerRuleReviewStatusTone(status: PayerRuleReviewStatus): Tone {
+  return status === "Under Review" ? "warning" : "neutral";
 }
 
 function auditTone(outcome: "success" | "warning" | "blocked"): Tone {
@@ -1342,3 +1409,5 @@ function barTone(tone: Tone) {
   if (tone === "purple") return "bg-violet-600";
   return "bg-blue-600";
 }
+
+
