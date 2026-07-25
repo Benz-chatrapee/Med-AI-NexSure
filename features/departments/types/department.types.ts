@@ -32,7 +32,7 @@ export interface DepartmentCaseWorklistParams {
 export interface DepartmentCase {
   id: string; visitId: string; patientMasked: string; departmentId: string; departmentName: string; visitDate: string; provider: string;
   queueStatus: QueueStatus; aiAssisted: boolean; readinessScore: number; readinessStatus: ClaimReadinessStatus;
-  claimStatus: "draft" | "needs_review" | "ready_for_submission" | "submitted"; missingEvidence: string[];
+  submissionReadinessStatus: "draft" | "needs_review" | "ready_for_submission" | "submitted"; missingEvidence: string[];
   evidenceAgingHours: number; costStatus: CostStatus; costBucket: string; slaStatus: SlaStatus; lastUpdated: string;
 }
 export interface DepartmentKpi {

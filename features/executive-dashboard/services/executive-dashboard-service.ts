@@ -86,7 +86,7 @@ export function filterCases(
       (!filters.clinicId || item.clinicId === filters.clinicId) &&
       (!filters.departmentId || item.departmentId === filters.departmentId) &&
       (!filters.payerId || item.payerId === filters.payerId) &&
-      (!filters.claimStatus || item.readinessStatus === filters.claimStatus) &&
+      (!filters.readinessStatus || item.readinessStatus === filters.readinessStatus) &&
       (!filters.riskLevel || item.riskLevel === filters.riskLevel) &&
       (!filters.missingEvidenceCategory ||
         item.missingEvidence.includes(filters.missingEvidenceCategory))

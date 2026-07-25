@@ -43,8 +43,8 @@ export interface VisitRecord {
   totalSteps: number;
   aiState: "Reviewed" | "Suggested" | "Processing" | "None";
   aiSummary: string;
-  claimScore: number | null;
-  claimStatus: ClaimReadinessStatus;
+  readinessScore: number | null;
+  readinessStatus: ClaimReadinessStatus;
   evidenceSummary: string;
   risk: RiskLevel;
   clinicalAlertPriority: number;

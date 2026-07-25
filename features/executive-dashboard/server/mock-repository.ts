@@ -112,7 +112,7 @@ function filterCases(
       (filters.department === "all" || item.department === filters.department) &&
       (filters.payer === "all" || item.payer === filters.payer) &&
       (filters.riskLevel === "all" || item.riskLevel === filters.riskLevel) &&
-      (filters.claimStatus === "all" || item.claimStatus === filters.claimStatus) &&
+      (filters.readinessStatus === "all" || item.readinessStatus === filters.readinessStatus) &&
       updated >= filters.dateFrom &&
       updated <= filters.dateTo
     );
@@ -124,8 +124,8 @@ function buildQueueSnapshot(scopedCases: CaseWorklistItem[]): QueueSnapshot {
     waiting: Math.max(1, Math.floor(scopedCases.length * 0.2)),
     in_consultation: Math.max(1, Math.floor(scopedCases.length * 0.2)),
     pending_evidence: scopedCases.filter((item) => item.missingEvidence > 0).length,
-    claim_review: scopedCases.filter((item) => item.claimStatus !== "ready").length,
-    completed: scopedCases.filter((item) => item.claimStatus === "ready").length,
+    claim_review: scopedCases.filter((item) => item.readinessStatus !== "ready").length,
+    completed: scopedCases.filter((item) => item.readinessStatus === "ready").length,
   };
 }
 
@@ -157,7 +157,7 @@ function buildRiskComplianceSummary(
 
   return {
     complianceAlerts: missingConsent + highRiskClaims,
-    auditAlerts: scopedCases.filter((item) => item.claimStatus === "not_ready").length,
+    auditAlerts: scopedCases.filter((item) => item.readinessStatus === "not_ready").length,
     policyViolations: scopedCases.filter((item) => item.payer === "BlueCare Plus").length,
     missingConsent,
     highRiskClaims,
@@ -196,7 +196,7 @@ function worklist(
   organizationId: string,
   payer: string,
   department: string,
-  claimStatus: CaseWorklistItem["claimStatus"],
+  readinessStatus: CaseWorklistItem["readinessStatus"],
   readinessScore: number,
   missingEvidence: number,
   riskLevel: CaseWorklistItem["riskLevel"],
@@ -210,7 +210,7 @@ function worklist(
     organizationId,
     payer,
     department,
-    claimStatus,
+    readinessStatus,
     readinessScore,
     missingEvidence,
     riskLevel,

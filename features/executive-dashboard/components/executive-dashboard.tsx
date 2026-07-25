@@ -240,7 +240,7 @@ export function ExecutiveDashboard() {
             <FilterSelect label="Clinic" value={draftFilters.clinicId ?? ""} onChange={(value) => updateFilter("clinicId", value || null)} options={[["", "All Clinics"], ...dashboard.filters.clinics.map((item) => [item.id, item.name] as [string, string])]} />
             <FilterSelect label="Department" value={draftFilters.departmentId ?? ""} onChange={(value) => updateFilter("departmentId", value || null)} options={[["", "All Departments"], ...dashboard.filters.departments.map((item) => [item.id, item.name] as [string, string])]} />
             <FilterSelect label="Payer" value={draftFilters.payerId ?? ""} onChange={(value) => updateFilter("payerId", value || null)} options={[["", "All Payers"], ...dashboard.filters.payers.map((item) => [item.id, item.name] as [string, string])]} />
-            <FilterSelect label="Claim Status" value={draftFilters.claimStatus ?? ""} onChange={(value) => updateFilter("claimStatus", (value || null) as ClaimReadinessStatus | null)} options={[["", "All Statuses"], ["ready", "Ready"], ["needs_review", "Needs Review"], ["not_ready", "Not Ready"]]} />
+            <FilterSelect label="Claim Readiness" value={draftFilters.readinessStatus ?? ""} onChange={(value) => updateFilter("readinessStatus", (value || null) as ClaimReadinessStatus | null)} options={[["", "All Readiness"], ["ready", "Ready"], ["needs_review", "Needs Review"], ["not_ready", "Not Ready"]]} />
             <FilterSelect label="Risk Level" value={draftFilters.riskLevel ?? ""} onChange={(value) => updateFilter("riskLevel", (value || null) as RiskLevel | null)} options={[["", "All Risk Levels"], ["critical", "Critical"], ["high", "High"], ["medium", "Medium"], ["low", "Low"]]} />
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
@@ -279,7 +279,7 @@ export function ExecutiveDashboard() {
         <ChartCard title="Claim Readiness Overview" subtitle="สัดส่วนความพร้อมของเคสทั้งหมด" className="xl:col-span-4" summary="Claim readiness is 72 percent. Ninety-two cases are ready, twenty-seven need review, and nine are not ready.">
           <ResponsiveContainer width="100%" height={280}>
             <PieChart>
-              <Pie data={dashboard.readinessComposition} dataKey="value" nameKey="label" innerRadius={70} outerRadius={100} onClick={(data) => drillDown({ claimStatus: (data as unknown as { status: ClaimReadinessStatus }).status })}>
+              <Pie data={dashboard.readinessComposition} dataKey="value" nameKey="label" innerRadius={70} outerRadius={100} onClick={(data) => drillDown({ readinessStatus: (data as unknown as { status: ClaimReadinessStatus }).status })}>
                 {dashboard.readinessComposition.map((item) => <Cell key={item.status} fill={item.status === "ready" ? chartColors.success : item.status === "needs_review" ? chartColors.warning : chartColors.danger} />)}
               </Pie>
               <Tooltip />

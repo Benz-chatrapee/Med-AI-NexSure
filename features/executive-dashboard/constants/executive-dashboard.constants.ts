@@ -5,7 +5,7 @@ export const defaultDashboardFilters = {
   clinicId: null,
   departmentId: null,
   payerId: null,
-  claimStatus: null,
+  readinessStatus: null,
   riskLevel: null,
   missingEvidenceCategory: null,
 } as const;

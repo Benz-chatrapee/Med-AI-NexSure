@@ -20,7 +20,7 @@ export function buildExecutiveKpis({
   economic: EconomicSummary;
   riskCompliance: RiskComplianceSummary;
 }): ExecutiveKPI[] {
-  const readyCount = cases.filter((item) => item.claimStatus === "ready").length;
+  const readyCount = cases.filter((item) => item.readinessStatus === "ready").length;
   const claimReadyPercent =
     cases.length === 0 ? 0 : Math.round((readyCount / cases.length) * 100);
   const averageReadiness = average(cases.map((item) => item.readinessScore));
@@ -61,9 +61,9 @@ export function buildClaimReadinessSummary(
   const score = average(cases.map((item) => item.readinessScore));
 
   return {
-    ready: cases.filter((item) => item.claimStatus === "ready").length,
-    needsReview: cases.filter((item) => item.claimStatus === "needs_review").length,
-    notReady: cases.filter((item) => item.claimStatus === "not_ready").length,
+    ready: cases.filter((item) => item.readinessStatus === "ready").length,
+    needsReview: cases.filter((item) => item.readinessStatus === "needs_review").length,
+    notReady: cases.filter((item) => item.readinessStatus === "not_ready").length,
     score,
     trend: score >= 75 ? "improving" : score >= 60 ? "stable" : "declining",
   };

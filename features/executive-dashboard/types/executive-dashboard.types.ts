@@ -11,7 +11,7 @@ export interface DashboardFilters {
   clinicId: string | null;
   departmentId: string | null;
   payerId: string | null;
-  claimStatus: ClaimReadinessStatus | null;
+  readinessStatus: ClaimReadinessStatus | null;
   riskLevel: RiskLevel | null;
   missingEvidenceCategory: string | null;
 }

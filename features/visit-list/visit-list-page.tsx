@@ -26,7 +26,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { currentVisitRole, queueSnapshots, visitKpis, visitRecords } from "./data";
+import { currentVisitRole, matchesVisitReadiness, queueSnapshots, visitKpis, visitRecords } from "./data";
 import type { ClaimReadinessStatus, RiskLevel, SortDirection, SortKey, VisitRecord, VisitStatus, VisitTab } from "./types";
 
 type IconComponent = ComponentType<{ className?: string }>;
@@ -68,7 +68,7 @@ export function VisitListPage() {
         const text = `${visit.patientName} ${visit.visitId} ${visit.hnMasked} ${visit.department} ${visit.clinician}`.toLowerCase();
         const tabMatch = tab === "all" || (tab === "today" && visit.isToday) || (tab === "mine" && visit.assignedToMe) || (tab === "high-risk" && visit.clinicalAlertPriority <= 1);
         const statusMatch = status === "All" || visit.status === status;
-        const readinessMatch = readiness === "All" || visit.claimStatus === readiness;
+        const readinessMatch = matchesVisitReadiness(visit, readiness);
         return (!normalized || text.includes(normalized)) && tabMatch && statusMatch && readinessMatch;
       })
       .sort((a, b) => compareVisits(a, b, sortKey, sortDirection));
@@ -136,7 +136,7 @@ function compareVisits(a: VisitRecord, b: VisitRecord, key: SortKey, direction: 
   const values: Record<SortKey, [string | number, string | number]> = {
     patient: [a.patientName, b.patientName],
     status: [a.status, b.status],
-    readiness: [a.claimScore ?? -1, b.claimScore ?? -1],
+    readiness: [a.readinessScore ?? -1, b.readinessScore ?? -1],
     risk: [a.clinicalAlertPriority, b.clinicalAlertPriority],
     cost: [a.economicAmount ?? -1, b.economicAmount ?? -1],
   };
@@ -262,7 +262,7 @@ function VisitWorkspace(props: {
         <div className="flex flex-wrap items-center gap-3">
           <label className="relative min-w-[240px] flex-1"><span className="sr-only">Search visit table</span><Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><Input className="w-full rounded border border-border bg-slate-50 py-2 pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-accent" placeholder="Search Visit ID, patient, HN, department..." value={props.query} onChange={(event) => props.onQueryChange(event.target.value)} /></label>
           <Select label="Clinical progress" value={props.status} options={["All", "Waiting", "In Consultation", "Pharmacy", "Completed"]} onChange={(value) => props.onStatusChange(value as VisitStatus | "All")} />
-          <Select label="Claim status" value={props.readiness} options={["All", "Ready", "Needs Review", "Not Ready", "Calculating"]} onChange={(value) => props.onReadinessChange(value as ClaimReadinessStatus | "All")} />
+          <Select label="Claim Readiness" value={props.readiness} options={["All", "Ready", "Needs Review", "Not Ready", "Calculating"]} onChange={(value) => props.onReadinessChange(value as ClaimReadinessStatus | "All")} />
           <Select label="Sort visits" value={props.sortKey} options={["risk", "patient", "status", "readiness", "cost"]} onChange={(value) => props.onSortChange(value as SortKey)} />
           <Button className="inline-flex min-h-10 items-center gap-2 rounded border border-border px-3 text-sm font-semibold text-primary hover:bg-soft-background" onClick={props.onClear}><Filter className="h-4 w-4" />Clear</Button>
           <Button className="min-h-10 rounded border border-border px-3 text-sm text-muted-foreground hover:bg-soft-background" onClick={props.onErrorToggle}>Error state</Button>
@@ -287,7 +287,7 @@ function Select({ label, value, options, onChange }: { label: string; value: str
 }
 
 function VisitTable({ rows, selected, sortDirection, sortKey, onSelect }: { rows: VisitRecord[]; selected: string; sortDirection: SortDirection; sortKey: SortKey; onSelect: (id: string) => void }) {
-  const headings = ["", "Visit / Patient", "Clinical Progress", "AI Assistance", "Claim Status", "Evidence / Risk", "Economic Signal", "Action"];
+  const headings = ["", "Visit / Patient", "Clinical Progress", "AI Assistance", "Claim Readiness", "Evidence / Risk", "Economic Signal", "Action"];
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[1120px] border-collapse text-left">
@@ -334,9 +334,9 @@ function AiCell({ visit }: { visit: VisitRecord }) {
 }
 
 function ClaimCell({ visit }: { visit: VisitRecord }) {
-  if (visit.claimScore === null) return <div className="flex items-center gap-3"><div className="h-11 w-11 animate-spin rounded-full border-4 border-slate-100 border-t-accent" /><span className="text-sm font-semibold text-muted-foreground">Calculating</span></div>;
-  const color = visit.claimStatus === "Ready" ? "text-success" : visit.claimStatus === "Needs Review" ? "text-warning" : "text-danger";
-  return <div className="flex items-center gap-3"><div className="grid h-12 w-12 place-items-center rounded-full border-4 border-blue-100 text-[10px] font-bold text-slate-950">{visit.claimScore}/100</div><div><p className={`text-sm font-bold ${color}`}>{visit.claimStatus}</p><p className="text-[10px] text-muted-foreground">Not claim approval</p></div></div>;
+  if (visit.readinessScore === null) return <div className="flex items-center gap-3"><div className="h-11 w-11 animate-spin rounded-full border-4 border-slate-100 border-t-accent" /><span className="text-sm font-semibold text-muted-foreground">Calculating</span></div>;
+  const color = visit.readinessStatus === "Ready" ? "text-success" : visit.readinessStatus === "Needs Review" ? "text-warning" : "text-danger";
+  return <div className="flex items-center gap-3"><div className="grid h-12 w-12 place-items-center rounded-full border-4 border-blue-100 text-[10px] font-bold text-slate-950">{visit.readinessScore}/100</div><div><p className={`text-sm font-bold ${color}`}>{visit.readinessStatus}</p><p className="text-[10px] text-muted-foreground">Not claim approval</p></div></div>;
 }
 
 function RiskCell({ visit }: { visit: VisitRecord }) {

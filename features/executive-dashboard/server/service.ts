@@ -76,7 +76,7 @@ function hasAppliedFilters(input: Record<string, string | string[] | undefined>)
       "department",
       "payer",
       "riskLevel",
-      "claimStatus",
+      "readinessStatus",
       "dateFrom",
       "dateTo",
     ].includes(key),

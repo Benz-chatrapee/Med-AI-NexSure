@@ -46,7 +46,7 @@ export type ExecutiveDashboardFilters = {
   department: string | "all";
   payer: string | "all";
   riskLevel: DashboardRiskLevel | "all";
-  claimStatus: ClaimReadinessStatus | "all";
+  readinessStatus: ClaimReadinessStatus | "all";
   dateFrom: string;
   dateTo: string;
 };
@@ -152,7 +152,7 @@ export type CaseWorklistItem = {
   organizationId: string;
   payer: string;
   department: string;
-  claimStatus: ClaimReadinessStatus;
+  readinessStatus: ClaimReadinessStatus;
   readinessScore: number;
   missingEvidence: number;
   riskLevel: DashboardRiskLevel;

@@ -22,7 +22,7 @@ const RISK_LEVELS: Array<DashboardRiskLevel | "all"> = [
   "high",
   "critical",
 ];
-const CLAIM_STATUSES: Array<ClaimReadinessStatus | "all"> = [
+const READINESS_STATUSES: Array<ClaimReadinessStatus | "all"> = [
   "all",
   "ready",
   "needs_review",
@@ -35,7 +35,7 @@ export const DEFAULT_DASHBOARD_FILTERS: ExecutiveDashboardFilters = {
   department: "all",
   payer: "all",
   riskLevel: "all",
-  claimStatus: "all",
+  readinessStatus: "all",
   dateFrom: "2026-07-01",
   dateTo: "2026-07-09",
 };
@@ -49,7 +49,7 @@ export function validateDashboardFilters(
     department: readString(input.department, DEFAULT_DASHBOARD_FILTERS.department),
     payer: readString(input.payer, DEFAULT_DASHBOARD_FILTERS.payer),
     riskLevel: readString(input.riskLevel, DEFAULT_DASHBOARD_FILTERS.riskLevel),
-    claimStatus: readString(input.claimStatus, DEFAULT_DASHBOARD_FILTERS.claimStatus),
+    readinessStatus: readString(input.readinessStatus, DEFAULT_DASHBOARD_FILTERS.readinessStatus),
     dateFrom: readString(input.dateFrom, DEFAULT_DASHBOARD_FILTERS.dateFrom),
     dateTo: readString(input.dateTo, DEFAULT_DASHBOARD_FILTERS.dateTo),
   };
@@ -69,8 +69,8 @@ export function validateDashboardFilters(
   if (!RISK_LEVELS.includes(filters.riskLevel as DashboardRiskLevel | "all")) {
     return { ok: false, error: "Invalid risk level filter." };
   }
-  if (!CLAIM_STATUSES.includes(filters.claimStatus as ClaimReadinessStatus | "all")) {
-    return { ok: false, error: "Invalid claim status filter." };
+  if (!READINESS_STATUSES.includes(filters.readinessStatus as ClaimReadinessStatus | "all")) {
+    return { ok: false, error: "Invalid readiness status filter." };
   }
   if (!isValidDate(filters.dateFrom) || !isValidDate(filters.dateTo)) {
     return { ok: false, error: "Date range must use YYYY-MM-DD dates." };

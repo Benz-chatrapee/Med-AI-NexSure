@@ -89,7 +89,7 @@ export const executiveDashboardMock: ExecutiveDashboardResponse = {
   ],
   claimQueue: [
     { id: "pending_evidence", label: "Pending Evidence", count: 42, percentage: 33, overdue: 9, oldestCase: "2.4h", supportedFilter: { missingEvidenceCategory: "SOAP Note" } },
-    { id: "needs_review", label: "Needs Review", count: 27, percentage: 21, overdue: 5, oldestCase: "1.8h", supportedFilter: { claimStatus: "needs_review" } },
+    { id: "needs_review", label: "Needs Review", count: 27, percentage: 21, overdue: 5, oldestCase: "1.8h", supportedFilter: { readinessStatus: "needs_review" } },
     { id: "payer", label: "Payer Rule Review", count: 18, percentage: 14, overdue: 2, oldestCase: "2.3h", supportedFilter: { missingEvidenceCategory: "Payer Required Document" } },
     { id: "high_risk", label: "High Risk", count: 12, percentage: 9, overdue: 4, oldestCase: "2.4h", supportedFilter: { riskLevel: "high" } },
   ],
