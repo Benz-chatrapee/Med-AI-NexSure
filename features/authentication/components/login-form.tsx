@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
   Building2,
@@ -27,9 +28,11 @@ export interface LoginFormProps {
 }
 
 export function LoginForm({
-  onSubmit = async () => undefined,
+  onSubmit,
   initialError,
 }: LoginFormProps) {
+  const router = useRouter();
+
   const [showPassword, setShowPassword] = useState(false);
   const [serverError, setServerError] = useState(initialError ?? "");
 
@@ -44,15 +47,30 @@ export function LoginForm({
 
   async function submit(values: LoginFormValues) {
     setServerError("");
+
     try {
-      await onSubmit(values);
+      if (onSubmit) {
+        await onSubmit(values);
+        return;
+      }
+
+      // Demo fallback:
+      // When no authentication handler is provided,
+      // allow the competition demo to enter the workspace.
+      router.push("/dashboard");
     } catch {
-      setServerError("ไม่สามารถเข้าสู่ระบบได้ กรุณาตรวจสอบอีเมลและรหัสผ่าน");
+      setServerError(
+        "ไม่สามารถเข้าสู่ระบบได้ กรุณาตรวจสอบอีเมลและรหัสผ่าน",
+      );
     }
   }
 
   return (
-    <form className={styles.form} onSubmit={handleSubmit(submit)} noValidate>
+    <form
+      className={styles.form}
+      onSubmit={handleSubmit(submit)}
+      noValidate
+    >
       {serverError ? (
         <div className={styles.formAlert} role="alert">
           {serverError}
@@ -134,11 +152,16 @@ export function LoginForm({
 
       <div className={styles.formOptions}>
         <label className={styles.remember}>
-          <input type="checkbox" {...register("rememberMe")} />
+          <input
+            type="checkbox"
+            {...register("rememberMe")}
+          />
           <span>Remember Device</span>
         </label>
 
-        <Link href="/forgot-password">Forgot Password?</Link>
+        <Link href="/forgot-password">
+          Forgot Password?
+        </Link>
       </div>
 
       <button
@@ -180,13 +203,25 @@ function Field({
 }) {
   return (
     <div className={styles.field}>
-      <label htmlFor={id}>{label}</label>
+      <label htmlFor={id}>
+        {label}
+      </label>
+
       <div className={styles.inputShell}>
-        <span className={styles.inputIcon}>{icon}</span>
+        <span className={styles.inputIcon}>
+          {icon}
+        </span>
+
         {children}
+
         {trailing}
       </div>
-      {helper ? <p className={styles.fieldError}>{helper}</p> : null}
+
+      {helper ? (
+        <p className={styles.fieldError}>
+          {helper}
+        </p>
+      ) : null}
     </div>
   );
 }

@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 import type { LoginFormValues } from "../schemas/login-schema";
 import { LoginForm } from "./login-form";
 import { LoginHero } from "./login-hero";
@@ -7,12 +9,16 @@ import { SecurityNotice } from "./security-notice";
 import styles from "./login.module.css";
 
 export function LoginPage() {
+  const router = useRouter();
+
   async function handleLogin(values: LoginFormValues) {
     await new Promise((resolve) => setTimeout(resolve, 600));
 
     if (!values.email || !values.password) {
       throw new Error("Invalid credentials");
     }
+
+    router.push("/dashboard");
   }
 
   return (
