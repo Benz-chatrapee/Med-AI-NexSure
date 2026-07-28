@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 
 import type { LoginFormValues } from "../schemas/login-schema";
+import { loginWithSupabase } from "../services/login-service";
 import { LoginForm } from "./login-form";
 import { LoginHero } from "./login-hero";
 import { SecurityNotice } from "./security-notice";
@@ -12,13 +13,7 @@ export function LoginPage() {
   const router = useRouter();
 
   async function handleLogin(values: LoginFormValues) {
-    await new Promise((resolve) => setTimeout(resolve, 600));
-
-    if (!values.email || !values.password) {
-      throw new Error("Invalid credentials");
-    }
-
-    router.push("/dashboard");
+    await loginWithSupabase(values, { router });
   }
 
   return (

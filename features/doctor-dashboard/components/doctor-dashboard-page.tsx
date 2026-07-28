@@ -34,10 +34,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useDoctorDashboardFilters } from "../hooks/use-doctor-dashboard-filters";
 import { manualOverrideSchema, type ManualOverrideFormValues } from "../schemas/manual-override.schema";
-import { doctorDashboardService } from "../services/doctor-dashboard-service";
 import type {
   DoctorDashboardData,
   DoctorDashboardFilters,
+  ExportResult,
   DoctorKpi,
   DoctorWorklistVisit,
   ReadinessStatus,
@@ -48,14 +48,33 @@ import type {
 } from "../types/doctor-dashboard.types";
 import {
   canSendToClaimReview,
+  buildClaimRiskMatrix,
+  buildCostVarianceBridge,
+  buildEconomicAlerts,
+  buildVisitCostTrend,
+  buildVisitVolumeHeatmap,
   clampScore,
   formatDuration,
   getKpiFilter,
   getPointsToReady,
   getReadinessTone,
   riskTone,
+  safePercent,
   toPercent,
+  type ClaimRiskCell,
+  type CostVarianceBridgeItem,
+  type EconomicAlertItem,
+  type VisitCostTrendPoint,
 } from "../utils/doctor-dashboard.utils";
+
+type DoctorDashboardActions = {
+  refreshDashboard: (filters: DoctorDashboardFilters) => Promise<DoctorDashboardData>;
+  getVisitReadiness: (
+    visitId: string,
+    filters: DoctorDashboardFilters,
+  ) => Promise<VisitReadinessDetail | null>;
+  exportSummary: (filters: DoctorDashboardFilters) => Promise<ExportResult>;
+};
 
 const statusColors: Record<StatusTone, string> = {
   success: "border-[color:color-mix(in_srgb,var(--doctor-success)_24%,white)] bg-[color:color-mix(in_srgb,var(--doctor-success)_10%,white)] text-[var(--doctor-success)]",
@@ -105,15 +124,19 @@ function formatBaht(value: number) {
   return `฿${value.toLocaleString("en-US")}`;
 }
 
-function riskScoreTone(score: number): StatusTone {
-  if (score >= 18) return "danger";
-  if (score >= 10) return "warning";
-  return score >= 5 ? "info" : "success";
+function formatReadinessScore(score: number | null) {
+  return score === null ? "Unavailable" : String(score);
 }
 
-export function DoctorDashboardPage({ initialData }: { initialData: DoctorDashboardData }) {
+export function DoctorDashboardPage({
+  initialData,
+  actions,
+}: {
+  initialData: DoctorDashboardData;
+  actions: DoctorDashboardActions;
+}) {
   const [data, setData] = useState(initialData);
-  const [selectedDetail, setSelectedDetail] = useState<VisitReadinessDetail>(initialData.selectedVisit);
+  const [selectedDetail, setSelectedDetail] = useState<VisitReadinessDetail | null>(initialData.selectedVisit);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isReevaluating, setIsReevaluating] = useState(false);
   const [isOverrideOpen, setIsOverrideOpen] = useState(false);
@@ -127,12 +150,19 @@ export function DoctorDashboardPage({ initialData }: { initialData: DoctorDashbo
     useDoctorDashboardFilters(data.visits);
 
   const visibleVisits = filteredVisits.slice(0, visibleCount);
-  const selectedVisit = selectedDetail.visit;
-  const handoffAllowed = canSendToClaimReview(selectedVisit);
-  const remainingActions = selectedVisit.blockingGapCount;
+  const selectedVisit = selectedDetail?.visit ?? null;
+  const selectedVisitIsIncluded = selectedVisit
+    ? filteredVisits.some((visit) => visit.id === selectedVisit.id)
+    : false;
+  const visibleSelectedDetail = selectedVisitIsIncluded ? selectedDetail : null;
+  const visibleSelectedVisit = selectedVisitIsIncluded ? selectedVisit : null;
+  const selectedVisitId = visibleSelectedVisit?.id ?? "";
+  const handoffAllowed = visibleSelectedVisit ? canSendToClaimReview(visibleSelectedVisit) : false;
+  const remainingActions = visibleSelectedVisit?.blockingGapCount ?? 0;
+  const hasAuthorizedCanonicalVisits = data.visits.length > 0;
 
   const trendData = useMemo(() => {
-    if (trendRange === 7) return data.readinessTrend;
+    if (trendRange === 7 || data.readinessTrend.length < 2) return data.readinessTrend;
     const prefix = data.readinessTrend.map((item, index) => ({
       ...item,
       date: `${index + 1} Jul`,
@@ -143,52 +173,16 @@ export function DoctorDashboardPage({ initialData }: { initialData: DoctorDashbo
   }, [data.readinessTrend, trendRange]);
 
   const visitVolumeHeatmap = useMemo(() => {
-    const base = data.workflow.reduce((total, item) => total + item.count, 0);
-    return dayLabels.flatMap((day, dayIndex) =>
-      hourLabels.map((hour, hourIndex) => {
-        const dayWeight = [0.9, 1.05, 1.18, 1.1, 0.96, 0.62, 0.48][dayIndex] ?? 1;
-        const hourWeight = [0.72, 1.18, 1.05, 0.88, 0.98, 0.56][hourIndex] ?? 1;
-        return {
-          day,
-          hour,
-          count: Math.max(1, Math.round((base / 16) * dayWeight * hourWeight)),
-        };
-      }),
-    );
+    return buildVisitVolumeHeatmap(data.workflow);
   }, [data.workflow]);
 
-  const visitCostTrend = useMemo(() => data.timeToReadiness.map((item, index) => ({
-    date: item.date,
-    actual: 2840 + Math.round((item.minutes - item.targetMinutes) * 5.5) + index * 18,
-    benchmark: 2820 + index * 10,
-  })), [data.timeToReadiness]);
+  const visitCostTrend = useMemo(() => buildVisitCostTrend(filteredVisits, data.timeToReadiness), [filteredVisits, data.timeToReadiness]);
 
-  const costVarianceBridge = useMemo(() => [
-    { label: "Benchmark", value: 2820, start: 0, end: 2820, tone: "base" },
-    { label: "Labs", value: 280, start: 2820, end: 3100, tone: "increase" },
-    { label: "Medication", value: 180, start: 3100, end: 3280, tone: "increase" },
-    { label: "Imaging", value: 120, start: 3280, end: 3400, tone: "increase" },
-    { label: "Discount", value: -90, start: 3310, end: 3400, tone: "decrease" },
-    { label: "Actual", value: 3310, start: 0, end: 3310, tone: "base" },
-  ], []);
+  const costVarianceBridge = useMemo(() => buildCostVarianceBridge(filteredVisits, data.timeToReadiness), [filteredVisits, data.timeToReadiness]);
 
-  const economicAlerts = useMemo(() => [
-    { label: "Cost justification missing", count: data.visits.filter((visit) => visit.primaryGap === "Cost Justification").length + 3, impact: 182000 },
-    { label: "High-cost imaging review", count: data.visits.filter((visit) => visit.primaryGap === "Imaging Report").length + 2, impact: 146000 },
-    { label: "Medication above benchmark", count: 4, impact: 121000 },
-    { label: "Payer exception exposure", count: data.visits.filter((visit) => visit.riskLevel === "High").length + 1, impact: 88000 },
-  ], [data.visits]);
+  const economicAlerts = useMemo(() => buildEconomicAlerts(filteredVisits), [filteredVisits]);
 
-  const riskMatrix = useMemo(() => impactLabels.flatMap((impact, impactIndex) =>
-    likelihoodLabels.map((likelihood, likelihoodIndex) => {
-      const score = (impactIndex + 1) * (likelihoodIndex + 1);
-      const cases = data.visits.filter((visit, visitIndex) => {
-        const riskWeight = visit.riskLevel === "Critical" ? 5 : visit.riskLevel === "High" ? 4 : visit.riskLevel === "Medium" ? 3 : 2;
-        return Math.abs(riskWeight - (impactIndex + 1)) <= 1 && (visitIndex + likelihoodIndex + impactIndex) % 3 === 0;
-      }).length;
-      return { impact, likelihood, score, cases, tone: riskScoreTone(score) };
-    }),
-  ), [data.visits]);
+  const riskMatrix = useMemo(() => buildClaimRiskMatrix(filteredVisits), [filteredVisits]);
 
   function showToast(message: string) {
     setToast(message);
@@ -198,9 +192,10 @@ export function DoctorDashboardPage({ initialData }: { initialData: DoctorDashbo
   async function refreshDashboard() {
     setIsRefreshing(true);
     try {
-      const refreshed = await doctorDashboardService.getDashboard(filters);
-      setData((current) => ({ ...current, lastUpdated: refreshed.lastUpdated }));
-      showToast("Dashboard refreshed using approved source projections.");
+      const refreshed = await actions.refreshDashboard(filters);
+      setData(refreshed);
+      setSelectedDetail(refreshed.selectedVisit);
+      showToast("Dashboard refreshed using canonical authorized records.");
     } catch {
       showToast("Refresh failed. กรุณาลองใหม่อีกครั้ง");
     } finally {
@@ -209,27 +204,19 @@ export function DoctorDashboardPage({ initialData }: { initialData: DoctorDashbo
   }
 
   async function selectVisit(visit: DoctorWorklistVisit) {
-    const detail = await doctorDashboardService.getVisitReadiness(visit.id);
+    const detail = await actions.getVisitReadiness(visit.id, filters);
     setSelectedDetail(detail);
     setActiveTab("gaps");
     document.getElementById("selected-visit-review")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   async function reevaluateVisit() {
-    setIsReevaluating(true);
-    try {
-      const detail = await doctorDashboardService.reevaluateVisit(selectedVisit.id);
-      setSelectedDetail(detail);
-      showToast("Readiness re-evaluated and audit activity recorded.");
-    } catch {
-      showToast("Re-evaluation failed. กรุณาตรวจสอบอีกครั้ง");
-    } finally {
-      setIsReevaluating(false);
-    }
+    setIsReevaluating(false);
+    showToast("Re-evaluation is deferred pending an approved mutation contract.");
   }
 
   async function exportSummary() {
-    const result = await doctorDashboardService.exportDashboard(filters);
+    const result = await actions.exportSummary(filters);
     const blob = new Blob([result.content], { type: result.mimeType });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
@@ -237,13 +224,12 @@ export function DoctorDashboardPage({ initialData }: { initialData: DoctorDashbo
     anchor.download = result.filename;
     anchor.click();
     URL.revokeObjectURL(url);
-    showToast("CSV summary exported from currently visible mock data.");
+    showToast("CSV summary exported from canonical authorized records.");
   }
 
   async function sendToClaimReview() {
-    if (!handoffAllowed) return;
-    await doctorDashboardService.sendToClaimReview(selectedVisit.id);
-    showToast("Visit sent to Claim Review Queue for authorized human verification.");
+    void handoffAllowed;
+    showToast("Claim review handoff is deferred pending an approved mutation contract.");
   }
 
   return (
@@ -296,13 +282,13 @@ export function DoctorDashboardPage({ initialData }: { initialData: DoctorDashbo
         </section>
 
         <section className="grid min-w-0 gap-4 xl:grid-cols-12">
-          <VisitVolumeHeatmap data={visitVolumeHeatmap} onReset={() => clearFilter("visitStatus")} />
+          <VisitVolumeHeatmap data={visitVolumeHeatmap} hasAuthorizedCanonicalVisits={hasAuthorizedCanonicalVisits} onReset={() => clearFilter("visitStatus")} />
           <ClaimReadinessDonut data={data.readinessMix} onSelect={(status) => updateFilters({ readinessStatus: status })} />
         </section>
 
         <section className="grid min-w-0 gap-4 xl:grid-cols-12">
-          <ReadinessTrendChart trendData={trendData} trendRange={trendRange} setTrendRange={setTrendRange} />
-          <MissingEvidencePareto data={data.missingEvidence} onSelect={(gapType) => updateFilters({ gapType })} />
+          <ReadinessTrendChart trendData={trendData} canonicalTrendData={data.readinessTrend} hasAuthorizedCanonicalVisits={hasAuthorizedCanonicalVisits} trendRange={trendRange} setTrendRange={setTrendRange} />
+          <MissingEvidencePareto data={data.missingEvidence} hasAuthorizedCanonicalVisits={hasAuthorizedCanonicalVisits} onSelect={(gapType) => updateFilters({ gapType })} />
         </section>
 
         <section className="grid min-w-0 gap-4 xl:grid-cols-12">
@@ -317,7 +303,7 @@ export function DoctorDashboardPage({ initialData }: { initialData: DoctorDashbo
 
         <CaseQueueCompact
           visits={visibleVisits}
-          selectedVisitId={selectedVisit.id}
+          selectedVisitId={selectedVisitId}
           total={filteredVisits.length}
           onSelectVisit={(visit) => void selectVisit(visit)}
         />
@@ -326,7 +312,7 @@ export function DoctorDashboardPage({ initialData }: { initialData: DoctorDashbo
           filters={filters}
           visits={visibleVisits}
           total={filteredVisits.length}
-          selectedVisitId={selectedVisit.id}
+          selectedVisitId={selectedVisitId}
           updateFilters={updateFilters}
           clearFilters={clearFilters}
           clearFilter={clearFilter}
@@ -335,58 +321,66 @@ export function DoctorDashboardPage({ initialData }: { initialData: DoctorDashbo
           canShowMore={filteredVisits.length > visibleCount}
         />
 
-        <section id="selected-visit-review" className="rounded-lg border border-[var(--doctor-border)] bg-[var(--doctor-card)] shadow-[var(--doctor-shadow)]">
-          <div className="flex flex-wrap items-center gap-3 border-b border-[var(--doctor-border)] bg-[var(--doctor-bg)] p-4">
-            <div className="min-w-64 flex-1">
-              <h2 className="text-xl font-black text-[var(--doctor-text)]">{selectedVisit.patientName}</h2>
-              <p className="text-sm text-[var(--doctor-muted)]">
-                HN {selectedVisit.hn} · {selectedVisit.gender} · {selectedVisit.age} years · {selectedVisit.encounterType} · Visit {selectedVisit.id} · {selectedVisit.doctor} · {selectedVisit.department}
-              </p>
+        {visibleSelectedDetail && visibleSelectedVisit ? (
+          <section id="selected-visit-review" className="rounded-lg border border-[var(--doctor-border)] bg-[var(--doctor-card)] shadow-[var(--doctor-shadow)]">
+            <div className="flex flex-wrap items-center gap-3 border-b border-[var(--doctor-border)] bg-[var(--doctor-bg)] p-4">
+              <div className="min-w-64 flex-1">
+                <h2 className="text-xl font-black text-[var(--doctor-text)]">{visibleSelectedVisit.patientName}</h2>
+                <p className="text-sm text-[var(--doctor-muted)]">
+                  HN {visibleSelectedVisit.hn} · {visibleSelectedVisit.gender} · {visibleSelectedVisit.age} years · {visibleSelectedVisit.encounterType} · Visit {visibleSelectedVisit.id} · {visibleSelectedVisit.doctor} · {visibleSelectedVisit.department}
+                </p>
+              </div>
+              <Badge tone="info">Payer: {visibleSelectedVisit.payerName}</Badge>
+              <Badge tone="info">Diagnosis: {visibleSelectedVisit.diagnosisCode}</Badge>
+              <Badge tone="success">Confidence: {visibleSelectedVisit.confidencePercent}%</Badge>
             </div>
-            <Badge tone="info">Payer: {selectedVisit.payerName}</Badge>
-            <Badge tone="info">Diagnosis: {selectedVisit.diagnosisCode}</Badge>
-            <Badge tone="success">Confidence: {selectedVisit.confidencePercent}%</Badge>
-          </div>
 
-          <div className="grid min-w-0 gap-4 p-4 xl:grid-cols-12">
-            <div className="min-w-0 space-y-4 xl:col-span-8">
-              <section className="grid gap-4 lg:grid-cols-[260px_1fr]">
-                <ReadinessScorePanel detail={selectedDetail} onReevaluate={reevaluateVisit} isPending={isReevaluating} />
-                <ReadinessBreakdown detail={selectedDetail} />
-              </section>
-              <ScoreChange detail={selectedDetail} />
-              <ReviewTabs detail={selectedDetail} activeTab={activeTab} setActiveTab={setActiveTab} />
+            <div className="grid min-w-0 gap-4 p-4 xl:grid-cols-12">
+              <div className="min-w-0 space-y-4 xl:col-span-8">
+                <section className="grid gap-4 lg:grid-cols-[260px_1fr]">
+                  <ReadinessScorePanel detail={visibleSelectedDetail} onReevaluate={reevaluateVisit} isPending={isReevaluating} />
+                  <ReadinessBreakdown detail={visibleSelectedDetail} />
+                </section>
+                <ScoreChange detail={visibleSelectedDetail} />
+                <ReviewTabs detail={visibleSelectedDetail} activeTab={activeTab} setActiveTab={setActiveTab} />
+              </div>
+              <aside className="space-y-4 xl:col-span-4">
+                <HumanReviewGate
+                  visit={visibleSelectedVisit}
+                  onOverride={() => setIsOverrideOpen(true)}
+                  onAssignReviewer={async () => {
+                    showToast("Reviewer assignment is deferred pending an approved mutation contract.");
+                  }}
+                  onSend={sendToClaimReview}
+                />
+                <Recommendation detail={visibleSelectedDetail} />
+                <AuditActivity events={visibleSelectedDetail.auditTrail} onExport={exportSummary} />
+              </aside>
             </div>
-            <aside className="space-y-4 xl:col-span-4">
-              <HumanReviewGate
-                visit={selectedVisit}
-                onOverride={() => setIsOverrideOpen(true)}
-                onAssignReviewer={async () => {
-                  await doctorDashboardService.assignReviewer(selectedVisit.id, "reviewer-001");
-                  showToast("Reviewer assignment workflow recorded.");
-                }}
-                onSend={sendToClaimReview}
-              />
-              <Recommendation detail={selectedDetail} />
-              <AuditActivity events={selectedDetail.auditTrail} onExport={exportSummary} />
-            </aside>
-          </div>
-        </section>
+          </section>
+        ) : (
+          <section id="selected-visit-review" className="rounded-lg border border-[var(--doctor-border)] bg-[var(--doctor-card)] p-10 text-center shadow-[var(--doctor-shadow)]">
+            <h2 className="text-xl font-black text-[var(--doctor-text)]">No authorized visit selected.</h2>
+            <p className="mt-2 text-sm text-[var(--doctor-muted)]">ไม่มี Visit ที่ได้รับอนุญาตให้แสดงรายละเอียดในขณะนี้</p>
+          </section>
+        )}
 
-        <div className="sticky bottom-3 z-20 rounded-lg border border-[var(--doctor-blue-border)] bg-[var(--doctor-card)] p-3 shadow-xl">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <strong>{remainingActions} readiness actions remain</strong>
-              <p className="text-sm text-[var(--doctor-muted)]">แก้ไขข้อมูลจากแหล่งจริงเท่านั้น ระบบจะบันทึกทุกการเปลี่ยนแปลง</p>
-              {!handoffAllowed && <p className="text-xs font-bold text-[var(--doctor-danger)]">Handoff blocked: required gaps remain or readiness status is not ready for human review.</p>}
-            </div>
-            <div className="grid gap-2 sm:grid-cols-3">
-              <Button onClick={() => showToast("Draft saved with audit context.")} className="rounded-lg border border-[var(--doctor-border)] bg-[var(--doctor-card)] px-4 py-2 font-black text-[var(--doctor-primary)]">Save Draft</Button>
-              <a href={`/visits/${selectedVisit.id}/prescription`} className="rounded-lg border border-[var(--doctor-border)] bg-[var(--doctor-card)] px-4 py-2 text-center font-black text-[var(--doctor-primary)]">Open Visit Detail</a>
-              <Button disabled={!handoffAllowed} onClick={sendToClaimReview} className="rounded-lg bg-[var(--doctor-primary)] px-4 py-2 font-black text-white disabled:opacity-50">Send to Claim Review Queue</Button>
+        {visibleSelectedDetail && visibleSelectedVisit && (
+          <div className="sticky bottom-3 z-20 rounded-lg border border-[var(--doctor-blue-border)] bg-[var(--doctor-card)] p-3 shadow-xl">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <strong>{remainingActions} readiness actions remain</strong>
+                <p className="text-sm text-[var(--doctor-muted)]">แก้ไขข้อมูลจากแหล่งจริงเท่านั้น ระบบจะบันทึกทุกการเปลี่ยนแปลง</p>
+                {!handoffAllowed && <p className="text-xs font-bold text-[var(--doctor-danger)]">Handoff blocked: required gaps remain or readiness status is not ready for human review.</p>}
+              </div>
+              <div className="grid gap-2 sm:grid-cols-3">
+                <Button onClick={() => showToast("Draft saved with audit context.")} className="rounded-lg border border-[var(--doctor-border)] bg-[var(--doctor-card)] px-4 py-2 font-black text-[var(--doctor-primary)]">Save Draft</Button>
+                <a href={`/visits/${visibleSelectedVisit.id}/prescription`} className="rounded-lg border border-[var(--doctor-border)] bg-[var(--doctor-card)] px-4 py-2 text-center font-black text-[var(--doctor-primary)]">Open Visit Detail</a>
+                <Button disabled onClick={sendToClaimReview} className="rounded-lg bg-[var(--doctor-primary)] px-4 py-2 font-black text-white disabled:opacity-50">Send to Claim Review Queue</Button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       {isOverrideOpen && (
@@ -396,8 +390,8 @@ export function DoctorDashboardPage({ initialData }: { initialData: DoctorDashbo
           onSubmit={async (input) => {
             setIsOverridePending(true);
             try {
-              await doctorDashboardService.submitManualOverride(selectedVisit.id, input);
-              showToast("Override request submitted and added to audit log.");
+              void input;
+              showToast("Manual override is deferred pending an approved mutation contract.");
               setIsOverrideOpen(false);
             } finally {
               setIsOverridePending(false);
@@ -433,16 +427,16 @@ function FilterBar({ filters, updateFilters }: { filters: DoctorDashboardFilters
   );
 }
 
-function ChartMeta({ insight, units, lastUpdated }: { insight: string; units: string; lastUpdated: string }) {
+function ChartMeta({ insight, units, lastUpdated, label = "Insight" }: { insight: string; units: string; lastUpdated: string; label?: "Insight" | "Guidance" | "Reference" }) {
   return (
     <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-[var(--doctor-border)] pt-3 text-xs text-[var(--doctor-muted)]">
-      <span><strong className="text-[var(--doctor-text)]">Insight:</strong> {insight}</span>
+      <span><strong className="text-[var(--doctor-text)]">{label}:</strong> {insight}</span>
       <span>{units} · Last updated {lastUpdated}</span>
     </div>
   );
 }
 
-function VisitVolumeHeatmap({ data, onReset }: { data: Array<{ day: string; hour: string; count: number }>; onReset: () => void }) {
+function VisitVolumeHeatmap({ data, hasAuthorizedCanonicalVisits, onReset }: { data: Array<{ day: string; hour: string; count: number }>; hasAuthorizedCanonicalVisits: boolean; onReset: () => void }) {
   const max = Math.max(...data.map((item) => item.count), 1);
   return (
     <ChartCard title="Visit Volume" subtitle="Day x hour demand heatmap based on current workflow volume." className="xl:col-span-7">
@@ -468,7 +462,7 @@ function VisitVolumeHeatmap({ data, onReset }: { data: Array<{ day: string; hour
         </div>
       </div>
       <div className="mt-3 flex items-center gap-2 text-xs text-[var(--doctor-muted)]"><span>Low</span><span className="h-2 w-16 rounded-full bg-[color-mix(in_srgb,var(--doctor-ai-blue)_22%,white)]" /><span className="h-2 w-16 rounded-full bg-[color-mix(in_srgb,var(--doctor-ai-blue)_52%,white)]" /><span>Peak</span></div>
-      <ChartMeta insight="Late morning demand is the likely staffing pressure window. ควรติดตามช่วง 10:00-12:00 เป็นพิเศษ" units="Visits" lastUpdated="10:24" />
+      <ChartMeta insight={hasAuthorizedCanonicalVisits ? "Late morning demand is the likely staffing pressure window. ควรติดตามช่วง 10:00-12:00 เป็นพิเศษ" : "No authorized canonical data is available for this insight. ยังไม่มีข้อมูล canonical ที่ได้รับอนุญาตสำหรับสรุปนี้"} units="Visits" lastUpdated="10:24" />
     </ChartCard>
   );
 }
@@ -494,13 +488,13 @@ function ClaimReadinessDonut({ data, onSelect }: { data: Array<{ status: Readine
             </PieChart>
           </ResponsiveContainer>
           <div className="pointer-events-none absolute inset-0 grid place-items-center text-center">
-            <div><strong className="block text-3xl text-[var(--doctor-primary)]">{Math.round((ready / total) * 100)}%</strong><span className="text-xs font-bold text-[var(--doctor-muted)]">Ready</span></div>
+            <div><strong className="block text-3xl text-[var(--doctor-primary)]">{safePercent(ready, total)}%</strong><span className="text-xs font-bold text-[var(--doctor-muted)]">Ready</span></div>
           </div>
         </div>
         <div className="space-y-2">
           {data.map((item) => (
             <button key={item.status} onClick={() => onSelect(item.status)} className="flex w-full justify-between rounded-lg border border-[var(--doctor-border)] bg-[var(--doctor-card)] p-2 text-left text-sm hover:bg-[var(--doctor-bg)]">
-              <span>{item.status}</span><strong>{item.count} · {Math.round((item.count / total) * 100)}%</strong>
+              <span>{item.status}</span><strong>{item.count} · {safePercent(item.count, total)}%</strong>
             </button>
           ))}
         </div>
@@ -510,9 +504,32 @@ function ClaimReadinessDonut({ data, onSelect }: { data: Array<{ status: Readine
   );
 }
 
-function ReadinessTrendChart({ trendData, trendRange, setTrendRange }: { trendData: DoctorDashboardData["readinessTrend"]; trendRange: 7 | 14; setTrendRange: (range: 7 | 14) => void }) {
+function buildReadinessTrendInsight(trendData: DoctorDashboardData["readinessTrend"], hasAuthorizedCanonicalVisits: boolean) {
+  if (!hasAuthorizedCanonicalVisits || trendData.length === 0) return "No authorized canonical data is available for this insight. ยังไม่มีข้อมูล canonical ที่ได้รับอนุญาตสำหรับสรุปนี้";
+  const latest = trendData[trendData.length - 1];
+  const target = latest.target;
+  const targetPosition = latest.actual >= target ? `at or above the ${target}% target threshold` : `below the ${target}% target threshold`;
+  if (trendData.length === 1) return `Current readiness is ${latest.actual}%, ${targetPosition}.`;
+
+  const first = trendData[0];
+  const direction = latest.actual > first.actual ? "improving" : latest.actual < first.actual ? "declining" : "stable";
+  return `Actual readiness is ${direction} and ${targetPosition}.`;
+}
+
+function buildMissingEvidenceInsight(data: DoctorDashboardData["missingEvidence"], hasAuthorizedCanonicalVisits: boolean) {
+  const canonicalGaps = data.filter((item) => item.count > 0);
+  if (!hasAuthorizedCanonicalVisits || canonicalGaps.length === 0) {
+    return "Canonical evidence-gap distribution is unavailable. ยังไม่มีข้อมูลสัดส่วน evidence gaps จาก canonical source";
+  }
+
+  const topGapCount = Math.min(2, canonicalGaps.length);
+  const contribution = canonicalGaps[topGapCount - 1]?.cumulativePercent ?? 0;
+  return `Top ${topGapCount === 1 ? "gap drives" : "two gaps drive"} ${contribution}% of current readiness blockers. ควรเร่งช่องว่างหลักจาก canonical data ก่อน`;
+}
+
+function ReadinessTrendChart({ trendData, canonicalTrendData, hasAuthorizedCanonicalVisits, trendRange, setTrendRange }: { trendData: DoctorDashboardData["readinessTrend"]; canonicalTrendData: DoctorDashboardData["readinessTrend"]; hasAuthorizedCanonicalVisits: boolean; trendRange: 7 | 14; setTrendRange: (range: 7 | 14) => void }) {
   return (
-    <ChartCard title="Readiness Trend" subtitle="Actual readiness vs target line chart with previous-period context." className="xl:col-span-7">
+    <ChartCard title="Readiness Trend" subtitle="Actual readiness vs target line chart." className="xl:col-span-7">
       <div className="mb-3 flex gap-2">
         {[7, 14].map((range) => (
           <button key={range} type="button" aria-pressed={trendRange === range} onClick={() => setTrendRange(range as 7 | 14)} className={`rounded-lg border px-3 py-2 text-sm font-black ${trendRange === range ? "border-[var(--doctor-blue-border)] bg-[var(--doctor-soft-blue)] text-[var(--doctor-primary)]" : "border-[var(--doctor-border)] bg-[var(--doctor-card)] text-[var(--doctor-muted)]"}`}>
@@ -534,15 +551,17 @@ function ReadinessTrendChart({ trendData, trendRange, setTrendRange }: { trendDa
           </LineChart>
         </ResponsiveContainer>
       </div>
-      <ChartMeta insight="Actual readiness is improving but still below the 85% target threshold." units="%" lastUpdated="10:24" />
+      <ChartMeta insight={buildReadinessTrendInsight(canonicalTrendData, hasAuthorizedCanonicalVisits)} units="%" lastUpdated="10:24" />
     </ChartCard>
   );
 }
 
-function MissingEvidencePareto({ data, onSelect }: { data: DoctorDashboardData["missingEvidence"]; onSelect: (gapType: string) => void }) {
+function MissingEvidencePareto({ data, hasAuthorizedCanonicalVisits, onSelect }: { data: DoctorDashboardData["missingEvidence"]; hasAuthorizedCanonicalVisits: boolean; onSelect: (gapType: string) => void }) {
   return (
     <ChartCard title="Missing Evidence" subtitle="Pareto chart ranking evidence gaps by case count and cumulative contribution." className="xl:col-span-5">
-      <p className="mb-3 rounded-lg border border-[color:color-mix(in_srgb,var(--doctor-warning)_28%,white)] bg-[color:color-mix(in_srgb,var(--doctor-warning)_10%,white)] p-3 text-sm text-[var(--doctor-warning)]">Top two gaps drive 54% of current readiness blockers. ควรเร่ง SOAP และ Imaging ก่อน</p>
+      <p className="mb-3 rounded-lg border border-[color:color-mix(in_srgb,var(--doctor-warning)_28%,white)] bg-[color:color-mix(in_srgb,var(--doctor-warning)_10%,white)] p-3 text-sm text-[var(--doctor-warning)]">
+        {buildMissingEvidenceInsight(data, hasAuthorizedCanonicalVisits)}
+      </p>
       <div className="h-[320px]">
         <ResponsiveContainer>
           <ComposedChart data={data} layout="vertical" margin={{ left: 62, right: 24 }}>
@@ -561,95 +580,115 @@ function MissingEvidencePareto({ data, onSelect }: { data: DoctorDashboardData["
           </ComposedChart>
         </ResponsiveContainer>
       </div>
-      <ChartMeta insight="80/20 reference clarifies which gaps should enter the next review sprint." units="Cases / cumulative %" lastUpdated="10:24" />
+      <ChartMeta insight={hasAuthorizedCanonicalVisits ? "80/20 reference clarifies which gaps should enter the next review sprint." : "80/20 reference is static guidance only; measured gap ranking requires authorized canonical data. ใช้เป็นแนวทางอ้างอิงเท่านั้น"} label="Reference" units="Cases / cumulative %" lastUpdated="10:24" />
     </ChartCard>
   );
 }
 
-function RiskMatrixHeatmap({ matrix }: { matrix: Array<{ impact: string; likelihood: string; score: number; cases: number; tone: StatusTone }> }) {
+function RiskMatrixHeatmap({ matrix }: { matrix: ClaimRiskCell[] }) {
+  const hasCases = matrix.some((cell) => cell.cases > 0);
   return (
     <ChartCard title="Claim Risk" subtitle="5x5 likelihood x impact heatmap for review prioritization." className="xl:col-span-5">
-      <div className="overflow-x-auto">
-        <div className="grid min-w-[640px] grid-cols-[100px_repeat(5,minmax(86px,1fr))] gap-2 text-center text-xs">
-          <div />
-          {likelihoodLabels.map((label) => <div key={label} className="font-black text-[var(--doctor-muted)]">{label}</div>)}
-          {[...impactLabels].reverse().map((impact) => (
-            <div key={impact} className="contents">
-              <div className="grid place-items-center rounded-lg bg-[var(--doctor-bg)] px-2 font-black text-[var(--doctor-muted)]">{impact}</div>
-              {likelihoodLabels.map((likelihood) => {
-                const cell = matrix.find((item) => item.impact === impact && item.likelihood === likelihood);
-                const score = cell?.score ?? 0;
-                const cases = cell?.cases ?? 0;
-                return <button key={`${impact}-${likelihood}`} className={`min-h-14 rounded-lg border px-2 py-2 font-black ${statusColors[cell?.tone ?? "info"]}`} aria-label={`${likelihood} likelihood and ${impact} impact: risk score ${score}, ${cases} cases`} type="button">{score}<span className="block text-[10px] font-bold">{cases} cases</span></button>;
-              })}
-            </div>
-          ))}
+      {hasCases ? (
+        <div className="overflow-x-auto">
+          <div className="grid min-w-[640px] grid-cols-[100px_repeat(5,minmax(86px,1fr))] gap-2 text-center text-xs">
+            <div />
+            {likelihoodLabels.map((label) => <div key={label} className="font-black text-[var(--doctor-muted)]">{label}</div>)}
+            {[...impactLabels].reverse().map((impact) => (
+              <div key={impact} className="contents">
+                <div className="grid place-items-center rounded-lg bg-[var(--doctor-bg)] px-2 font-black text-[var(--doctor-muted)]">{impact}</div>
+                {likelihoodLabels.map((likelihood) => {
+                  const cell = matrix.find((item) => item.impact === impact && item.likelihood === likelihood);
+                  const score = cell?.score ?? 0;
+                  const cases = cell?.cases ?? 0;
+                  return <button key={`${impact}-${likelihood}`} className={`min-h-14 rounded-lg border px-2 py-2 font-black ${statusColors[cell?.tone ?? "info"]}`} aria-label={`${likelihood} likelihood and ${impact} impact: risk score ${score}, ${cases} cases`} type="button">{score}<span className="block text-[10px] font-bold">{cases} cases</span></button>;
+                })}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-      <ChartMeta insight="Major and Severe impact cells are visually separated for mandatory human review." units="Risk score / cases" lastUpdated="10:24" />
+      ) : (
+        <ChartEmptyState message="No authorized canonical cases for claim risk analysis." />
+      )}
+      <ChartMeta insight={hasCases ? "Major and Severe impact cells are visually separated for mandatory human review." : "Risk counts remain empty until authorized canonical cases are available."} units="Risk score / cases" lastUpdated="10:24" />
     </ChartCard>
   );
 }
 
-function VisitCostTrend({ data }: { data: Array<{ date: string; actual: number; benchmark: number }> }) {
+function VisitCostTrend({ data }: { data: VisitCostTrendPoint[] }) {
+  const hasData = data.length > 0;
   return (
     <ChartCard title="Visit Cost" subtitle="Actual average visit cost compared with benchmark." className="xl:col-span-7">
-      <div className="h-[320px]">
-        <ResponsiveContainer>
-          <LineChart data={data}>
-            <CartesianGrid stroke={chartColors.border} />
-            <XAxis dataKey="date" />
-            <YAxis tickFormatter={(value) => `฿${value}`} />
-            <Tooltip formatter={(value) => formatBaht(Number(value))} />
-            <Legend />
-            <Line dataKey="actual" name="Actual Cost" stroke={chartColors.blue} strokeWidth={3} />
-            <Line dataKey="benchmark" name="Benchmark" stroke={chartColors.success} strokeDasharray="6 5" dot={false} />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-      <ChartMeta insight="Actual cost remains above benchmark on higher-readiness delay days." units="THB / visit" lastUpdated="10:24" />
+      {hasData ? (
+        <div className="h-[320px]">
+          <ResponsiveContainer>
+            <LineChart data={data}>
+              <CartesianGrid stroke={chartColors.border} />
+              <XAxis dataKey="date" />
+              <YAxis tickFormatter={(value) => `฿${value}`} />
+              <Tooltip formatter={(value) => formatBaht(Number(value))} />
+              <Legend />
+              <Line dataKey="actual" name="Actual Cost" stroke={chartColors.blue} strokeWidth={3} />
+              <Line dataKey="benchmark" name="Benchmark" stroke={chartColors.success} strokeDasharray="6 5" dot={false} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      ) : (
+        <ChartEmptyState message="No authorized canonical visit cost data available." />
+      )}
+      <ChartMeta insight={hasData ? "Actual cost is calculated only from canonical cost records." : "No actual, benchmark, or synthetic trend is shown without canonical cost data."} units="THB / visit" lastUpdated="10:24" />
     </ChartCard>
   );
 }
 
-function CostVarianceWaterfall({ data }: { data: Array<{ label: string; value: number; start: number; end: number; tone: string }> }) {
+function CostVarianceWaterfall({ data }: { data: CostVarianceBridgeItem[] }) {
+  const hasData = data.length > 0;
   return (
     <ChartCard title="Cost Variance" subtitle="Waterfall bridge from benchmark to actual average visit cost." className="xl:col-span-7">
-      <div className="h-[320px]">
-        <ResponsiveContainer>
-          <BarChart data={data}>
-            <CartesianGrid stroke={chartColors.border} />
-            <XAxis dataKey="label" />
-            <YAxis tickFormatter={(value) => `฿${value}`} />
-            <Tooltip formatter={(value) => Array.isArray(value) ? `${formatBaht(Number(value[0]))} to ${formatBaht(Number(value[1]))}` : formatBaht(Number(value))} />
-            <Bar dataKey={(item: { start: number; end: number }) => [item.start, item.end]} name="Variance bridge" radius={[7, 7, 0, 0]}>
-              {data.map((item) => <Cell key={item.label} fill={item.tone === "increase" ? chartColors.warning : item.tone === "decrease" ? chartColors.success : chartColors.navy} />)}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-      <ChartMeta insight="Labs and medication explain the largest positive variance; discounts partially offset cost." units="THB / visit" lastUpdated="10:24" />
+      {hasData ? (
+        <div className="h-[320px]">
+          <ResponsiveContainer>
+            <BarChart data={data}>
+              <CartesianGrid stroke={chartColors.border} />
+              <XAxis dataKey="label" />
+              <YAxis tickFormatter={(value) => `฿${value}`} />
+              <Tooltip formatter={(value) => Array.isArray(value) ? `${formatBaht(Number(value[0]))} to ${formatBaht(Number(value[1]))}` : formatBaht(Number(value))} />
+              <Bar dataKey={(item: { start: number; end: number }) => [item.start, item.end]} name="Variance bridge" radius={[7, 7, 0, 0]}>
+                {data.map((item) => <Cell key={item.label} fill={item.tone === "increase" ? chartColors.warning : item.tone === "decrease" ? chartColors.success : chartColors.navy} />)}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      ) : (
+        <ChartEmptyState message="No authorized canonical cost variance data available." />
+      )}
+      <ChartMeta insight={hasData ? "Variance bridge is calculated only from canonical cost records." : "Benchmark, labs, medication, imaging, discount, and actual bridge values are hidden until canonical cost data exists."} units="THB / visit" lastUpdated="10:24" />
     </ChartCard>
   );
 }
 
-function EconomicAlertsBar({ data }: { data: Array<{ label: string; count: number; impact: number }> }) {
+function EconomicAlertsBar({ data }: { data: EconomicAlertItem[] }) {
+  const hasData = data.length > 0;
   return (
     <ChartCard title="Economic Alerts" subtitle="Ranked alerts by case volume and estimated financial exposure." className="xl:col-span-5">
-      <div className="h-[320px]">
-        <ResponsiveContainer>
-          <BarChart data={data} layout="vertical" margin={{ left: 96, right: 20 }}>
-            <CartesianGrid stroke={chartColors.border} horizontal={false} />
-            <XAxis type="number" />
-            <YAxis dataKey="label" type="category" width={140} tick={{ fontSize: 11 }} />
-            <Tooltip formatter={(value, name) => [name === "Exposure" ? formatBaht(Number(value)) : `${value} cases`, name]} />
-            <Legend />
-            <Bar dataKey="count" name="Cases" fill={chartColors.blue} radius={[0, 7, 7, 0]} />
-            <Bar dataKey="impact" name="Exposure" fill={chartColors.warning} radius={[0, 7, 7, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-      <ChartMeta insight="Cost justification and imaging reviews should be handled first due to exposure." units="Cases / THB" lastUpdated="10:24" />
+      {hasData ? (
+        <div className="h-[320px]">
+          <ResponsiveContainer>
+            <BarChart data={data} layout="vertical" margin={{ left: 96, right: 20 }}>
+              <CartesianGrid stroke={chartColors.border} horizontal={false} />
+              <XAxis type="number" />
+              <YAxis dataKey="label" type="category" width={140} tick={{ fontSize: 11 }} />
+              <Tooltip formatter={(value, name) => [name === "Exposure" ? formatBaht(Number(value)) : `${value} cases`, name]} />
+              <Legend />
+              <Bar dataKey="count" name="Cases" fill={chartColors.blue} radius={[0, 7, 7, 0]} />
+              <Bar dataKey="impact" name="Exposure" fill={chartColors.warning} radius={[0, 7, 7, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      ) : (
+        <ChartEmptyState message="No authorized canonical economic alerts or case exposure available." />
+      )}
+      <ChartMeta insight={hasData ? "Alert counts are derived from authorized canonical visits; exposure remains zero without a cost contract." : "No synthetic exposure amounts are shown without canonical alert or case exposure data."} units="Cases / THB" lastUpdated="10:24" />
     </ChartCard>
   );
 }
@@ -673,7 +712,7 @@ function CaseQueueCompact({ visits, selectedVisitId, total, onSelectVisit }: { v
                 <td className="px-3 py-2"><Badge tone={visit.priority === "Critical" ? "danger" : visit.priority === "High" ? "warning" : "info"}>{visit.priority}</Badge></td>
                 <td className="px-3 py-2 font-black text-[var(--doctor-primary)]">{visit.id}</td>
                 <td className="px-3 py-2">{visit.patientName}<div className="text-xs text-[var(--doctor-muted)]">{visit.hn}</div></td>
-                <td className="px-3 py-2"><Badge tone={getReadinessTone(visit.readinessStatus)}>{visit.readinessScore} · {visit.readinessStatus}</Badge></td>
+                <td className="px-3 py-2"><Badge tone={getReadinessTone(visit.readinessStatus)}>{formatReadinessScore(visit.readinessScore)} · {visit.readinessStatus}</Badge></td>
                 <td className="px-3 py-2"><Badge tone={riskTone(visit.riskLevel)}>{visit.riskLevel}</Badge></td>
                 <td className="px-3 py-2">{formatDuration(visit.pendingMinutes)}</td>
                 <td className="px-3 py-2">{visit.primaryGap ?? "None"}</td>
@@ -710,6 +749,17 @@ function KpiCard({ kpi, onClick }: { kpi: DoctorKpi; onClick: () => void }) {
 
 function ChartCard({ id, title, subtitle, children, className = "" }: { id?: string; title: string; subtitle: string; children: ReactNode; className?: string }) {
   return <section id={id} className={`min-w-0 rounded-lg border border-[var(--doctor-border)] bg-[var(--doctor-card)] p-4 shadow-[var(--doctor-shadow)] ${className}`}><h2 className="text-lg font-black text-[var(--doctor-text)]">{title}</h2><p className="mb-3 text-sm text-[var(--doctor-muted)]">{subtitle}</p>{children}</section>;
+}
+
+function ChartEmptyState({ message }: { message: string }) {
+  return (
+    <div className="grid min-h-[320px] place-items-center rounded-lg border border-dashed border-[var(--doctor-blue-border)] bg-[var(--doctor-soft-blue)] p-6 text-center">
+      <div>
+        <strong className="block text-sm text-[var(--doctor-primary)]">No canonical chart data</strong>
+        <p className="mt-2 max-w-md text-sm leading-6 text-[var(--doctor-muted)]">{message} แสดงข้อมูลว่างเพื่อหลีกเลี่ยงค่าจำลองหรือข้อมูลที่ไม่ได้รับอนุญาต</p>
+      </div>
+    </div>
+  );
 }
 
 function Badge({ tone, children }: { tone: StatusTone; children: ReactNode }) {
@@ -758,7 +808,7 @@ function Worklist(props: {
                 <td className="p-3"><Badge tone={visit.priority === "Critical" ? "danger" : visit.priority === "High" ? "warning" : "info"}>{visit.priority}</Badge></td>
                 <td className="p-3 font-black">{visit.patientName}<div className="text-xs font-normal text-[var(--doctor-muted)]">{visit.diagnosisLabel}</div></td>
                 <td className="p-3">{visit.hn}</td><td className="p-3 font-bold text-[var(--doctor-primary)]">{visit.id}</td><td className="p-3">{visit.visitStatus}</td>
-                <td className="p-3 font-black">{visit.readinessScore}</td><td className="p-3"><Badge tone={getReadinessTone(visit.readinessStatus)}>{visit.readinessStatus}</Badge></td>
+                <td className="p-3 font-black">{formatReadinessScore(visit.readinessScore)}</td><td className="p-3"><Badge tone={getReadinessTone(visit.readinessStatus)}>{visit.readinessStatus}</Badge></td>
                 <td className="p-3">{visit.blockingGapCount} · {visit.primaryGap ?? "None"}</td><td className="p-3"><Badge tone={riskTone(visit.riskLevel)}>{visit.riskLevel}</Badge></td>
                 <td className="p-3">{formatDuration(visit.pendingMinutes)}</td><td className="p-3">{visit.payerName}</td><td className="p-3">{visit.nextAction}</td>
                 <td className="p-3"><Button onClick={() => props.onSelectVisit(visit)} className="rounded-lg border border-[var(--doctor-blue-border)] bg-[var(--doctor-card)] px-3 py-2 font-black text-[var(--doctor-primary)]">Review</Button></td>
@@ -779,7 +829,7 @@ function Select({ label, value, options, onChange }: { label: string; value: str
 
 function ReadinessScorePanel({ detail, onReevaluate, isPending }: { detail: VisitReadinessDetail; onReevaluate: () => void; isPending: boolean }) {
   const score = clampScore(detail.visit.readinessScore);
-  return <section className="rounded-lg border border-[var(--doctor-border)] bg-[var(--doctor-card)] p-4 text-center"><div className="mx-auto grid h-44 w-44 place-items-center rounded-full" style={{ background: `conic-gradient(${chartColors.blue} ${score}%, var(--doctor-blue-border) 0)` }}><div className="grid h-32 w-32 place-items-center rounded-full bg-[var(--doctor-card)]"><div><strong className="block text-4xl text-[var(--doctor-text)]">{score}</strong><span className="text-xs text-[var(--doctor-muted)]">Readiness Score</span></div></div></div><h3 className="mt-3 text-lg font-black text-[var(--doctor-text)]">{detail.visit.readinessStatus}</h3><Badge tone="info">Human Review Required</Badge><div className="mt-3 h-2 rounded-full bg-[linear-gradient(90deg,var(--doctor-danger),var(--doctor-warning),var(--doctor-success))]" /><div className="mt-3 grid grid-cols-3 gap-2 text-xs"><span>Points to Ready <b>{getPointsToReady(score)}</b></span><span>Blocking Gaps <b>{detail.visit.blockingGapCount}</b></span><span>Change <b>{detail.visit.scoreChange >= 0 ? "+" : ""}{detail.visit.scoreChange}</b></span></div><p className="mt-3 text-xs text-[var(--doctor-muted)]">Version {detail.version} · Evaluated {detail.evaluatedAt} · Source-linked: {detail.sourceLinked ? "Yes" : "No"}</p><Button onClick={onReevaluate} disabled={isPending} className="mt-3 rounded-lg bg-[var(--doctor-primary)] px-3 py-2 font-black text-white disabled:opacity-50">{isPending ? "Re-evaluating..." : "Re-evaluate"}</Button></section>;
+  return <section className="rounded-lg border border-[var(--doctor-border)] bg-[var(--doctor-card)] p-4 text-center"><div className="mx-auto grid h-44 w-44 place-items-center rounded-full" style={{ background: `conic-gradient(${chartColors.blue} ${score}%, var(--doctor-blue-border) 0)` }}><div className="grid h-32 w-32 place-items-center rounded-full bg-[var(--doctor-card)]"><div><strong className="block text-4xl text-[var(--doctor-text)]">{score}</strong><span className="text-xs text-[var(--doctor-muted)]">Readiness Score</span></div></div></div><h3 className="mt-3 text-lg font-black text-[var(--doctor-text)]">{detail.visit.readinessStatus}</h3><Badge tone="info">Human Review Required</Badge><div className="mt-3 h-2 rounded-full bg-[linear-gradient(90deg,var(--doctor-danger),var(--doctor-warning),var(--doctor-success))]" /><div className="mt-3 grid grid-cols-3 gap-2 text-xs"><span>Points to Ready <b>{getPointsToReady(score)}</b></span><span>Blocking Gaps <b>{detail.visit.blockingGapCount}</b></span><span>Change <b>{detail.visit.scoreChange >= 0 ? "+" : ""}{detail.visit.scoreChange}</b></span></div><p className="mt-3 text-xs text-[var(--doctor-muted)]">Version {detail.version} · Evaluated {detail.evaluatedAt} · Source-linked: {detail.sourceLinked ? "Yes" : "No"}</p><Button onClick={onReevaluate} disabled className="mt-3 rounded-lg bg-[var(--doctor-primary)] px-3 py-2 font-black text-white disabled:opacity-50">{isPending ? "Re-evaluating..." : "Re-evaluate"}</Button></section>;
 }
 
 function ReadinessBreakdown({ detail }: { detail: VisitReadinessDetail }) {
@@ -801,7 +851,7 @@ function Checklist({ items }: { items: string[] }) {
 
 function HumanReviewGate({ visit, onOverride, onAssignReviewer, onSend }: { visit: DoctorWorklistVisit; onOverride: () => void; onAssignReviewer: () => void; onSend: () => void }) {
   const allowed = canSendToClaimReview(visit);
-  return <section className="rounded-lg border border-[var(--doctor-border)] bg-[var(--doctor-card)] p-4"><h3 className="text-lg font-black">Human Review Gate</h3><div className="mt-3 space-y-2 text-sm"><p>1. Doctor resolves clinical gaps</p><p>2. Claim reviewer validates evidence</p><p>3. Authorized user decides next step</p></div><div className="mt-3 grid gap-2 text-sm"><Badge tone={allowed ? "success" : "warning"}>{allowed ? "Prepared" : "Pending"}</Badge><p>Owner: Doctor / Claim Reviewer · SLA: Today 16:00</p><p className={allowed ? "text-[var(--doctor-success)]" : "text-[var(--doctor-danger)]"}>{allowed ? "Clinical gaps resolved. Human review remains mandatory." : `${visit.blockingGapCount} blocking actions remain. AI cannot approve or submit a claim.`}</p></div><div className="mt-4 grid gap-2"><Button disabled={!allowed} onClick={onSend} className="rounded-lg bg-[var(--doctor-primary)] px-3 py-2 font-black text-white disabled:opacity-50">Mark Ready for Human Review</Button><Button onClick={onAssignReviewer} className="rounded-lg border border-[var(--doctor-border)] bg-[var(--doctor-card)] px-3 py-2 font-black text-[var(--doctor-primary)]"><UserCheck className="mr-2 inline h-4 w-4" />Assign Reviewer</Button><Button onClick={onOverride} className="rounded-lg border border-[color:color-mix(in_srgb,var(--doctor-warning)_28%,white)] bg-[color:color-mix(in_srgb,var(--doctor-warning)_10%,white)] px-3 py-2 font-black text-[var(--doctor-warning)]">Request Manual Override</Button><Button onClick={() => document.getElementById("selected-visit-review")?.scrollIntoView({ behavior: "smooth", block: "start" })} className="rounded-lg border border-[var(--doctor-border)] bg-[var(--doctor-card)] px-3 py-2 font-black text-[var(--doctor-primary)]">View Audit Trail</Button></div></section>;
+  return <section className="rounded-lg border border-[var(--doctor-border)] bg-[var(--doctor-card)] p-4"><h3 className="text-lg font-black">Human Review Gate</h3><div className="mt-3 space-y-2 text-sm"><p>1. Doctor resolves clinical gaps</p><p>2. Claim reviewer validates evidence</p><p>3. Authorized user decides next step</p></div><div className="mt-3 grid gap-2 text-sm"><Badge tone={allowed ? "success" : "warning"}>{allowed ? "Prepared" : "Pending"}</Badge><p>Owner: Doctor / Claim Reviewer · SLA: Today 16:00</p><p className={allowed ? "text-[var(--doctor-success)]" : "text-[var(--doctor-danger)]"}>{allowed ? "Clinical gaps resolved. Human review remains mandatory." : `${visit.blockingGapCount} blocking actions remain. AI cannot approve or submit a claim.`}</p></div><div className="mt-4 grid gap-2"><Button disabled onClick={onSend} className="rounded-lg bg-[var(--doctor-primary)] px-3 py-2 font-black text-white disabled:opacity-50">Mark Ready for Human Review</Button><Button disabled onClick={onAssignReviewer} className="rounded-lg border border-[var(--doctor-border)] bg-[var(--doctor-card)] px-3 py-2 font-black text-[var(--doctor-primary)] disabled:opacity-50"><UserCheck className="mr-2 inline h-4 w-4" />Assign Reviewer</Button><Button disabled onClick={onOverride} className="rounded-lg border border-[color:color-mix(in_srgb,var(--doctor-warning)_28%,white)] bg-[color:color-mix(in_srgb,var(--doctor-warning)_10%,white)] px-3 py-2 font-black text-[var(--doctor-warning)] disabled:opacity-50">Request Manual Override</Button><Button onClick={() => document.getElementById("selected-visit-review")?.scrollIntoView({ behavior: "smooth", block: "start" })} className="rounded-lg border border-[var(--doctor-border)] bg-[var(--doctor-card)] px-3 py-2 font-black text-[var(--doctor-primary)]">View Audit Trail</Button></div></section>;
 }
 
 function Recommendation({ detail }: { detail: VisitReadinessDetail }) {

@@ -1,14 +1,14 @@
 "use client";
 
 import { useMemo, useState, useDeferredValue } from "react";
-import { defaultDoctorDashboardFilters } from "../data/doctor-dashboard.mock";
+import { emptyDoctorDashboardFilters } from "../domain/validation";
 import type { DoctorDashboardFilters } from "../types/doctor-dashboard.types";
 import { filterWorklist } from "../utils/doctor-dashboard.utils";
 import type { DoctorWorklistVisit } from "../types/doctor-dashboard.types";
 
 export function useDoctorDashboardFilters(visits: DoctorWorklistVisit[]) {
   const [filters, setFilters] = useState<DoctorDashboardFilters>({
-    ...defaultDoctorDashboardFilters,
+    ...emptyDoctorDashboardFilters(),
   });
   const deferredSearch = useDeferredValue(filters.search);
   const effectiveFilters = useMemo(
@@ -25,7 +25,7 @@ export function useDoctorDashboardFilters(visits: DoctorWorklistVisit[]) {
   }
 
   function clearFilters() {
-    setFilters({ ...defaultDoctorDashboardFilters });
+    setFilters({ ...emptyDoctorDashboardFilters() });
   }
 
   function clearFilter(key: keyof DoctorDashboardFilters) {

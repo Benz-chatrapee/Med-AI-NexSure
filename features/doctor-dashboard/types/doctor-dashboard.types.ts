@@ -2,6 +2,7 @@ export type ReadinessStatus =
   | "Ready for Human Review"
   | "Needs Review"
   | "Not Ready";
+export type WorklistReadinessStatus = ReadinessStatus | "Assessment Unavailable";
 
 export type RiskLevel = "Low" | "Medium" | "High" | "Critical";
 export type PriorityLevel = "Low" | "Medium" | "High" | "Critical";
@@ -55,8 +56,8 @@ export interface DoctorWorklistVisit {
   age: number;
   encounterType: string;
   visitStatus: VisitStatus;
-  readinessScore: number;
-  readinessStatus: ReadinessStatus;
+  readinessScore: number | null;
+  readinessStatus: WorklistReadinessStatus;
   blockingGapCount: number;
   riskLevel: RiskLevel;
   priority: PriorityLevel;
@@ -135,7 +136,7 @@ export interface DoctorDashboardData {
   lastUpdated: string;
   kpis: DoctorKpi[];
   visits: DoctorWorklistVisit[];
-  selectedVisit: VisitReadinessDetail;
+  selectedVisit: VisitReadinessDetail | null;
   workflow: Array<{ status: VisitStatus; count: number }>;
   readinessMix: Array<{ status: ReadinessStatus; count: number }>;
   readinessTrend: Array<{
@@ -152,6 +153,12 @@ export interface DoctorDashboardData {
     risks: Record<string, RiskLevel>;
   }>;
   auditActivity: AuditEvent[];
+  mutationAvailability?: {
+    reevaluate: false;
+    assignReviewer: false;
+    manualOverride: false;
+    claimReviewHandoff: false;
+  };
 }
 
 export interface ManualOverrideInput {
