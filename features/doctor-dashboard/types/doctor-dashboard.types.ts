@@ -180,3 +180,40 @@ export interface ExportResult {
   content: string;
   mimeType: "text/csv";
 }
+
+export type DoctorDashboardMutationAction =
+  | "markReadyForHumanReview"
+  | "claimReviewHandoff"
+  | "readinessReevaluation"
+  | "reviewerAssignment"
+  | "manualOverride";
+
+export type DoctorDashboardWorkflowStatus = string;
+
+export interface DoctorDashboardMutationPrerequisiteInput {
+  visitId: string;
+  action: DoctorDashboardMutationAction;
+  reasonCode: string;
+  idempotencyKey: string;
+  externalEventId: string;
+}
+
+export interface DoctorDashboardClaimMutationContext {
+  claimId: string;
+  claimOrganizationId: string;
+  claimClinicId: string;
+  claimVisitId: string;
+  workflowStatus: DoctorDashboardWorkflowStatus;
+  expectedVersion: number;
+}
+
+export interface DoctorDashboardMutationPrerequisiteResult {
+  available: false;
+  action: DoctorDashboardMutationAction;
+  claimContext: DoctorDashboardClaimMutationContext | null;
+  correlationId: string;
+  idempotencyKey: string;
+  externalEventId: string;
+  reasonCode: string;
+  mutationExecuted: false;
+}

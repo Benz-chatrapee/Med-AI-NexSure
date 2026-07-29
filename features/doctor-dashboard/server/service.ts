@@ -1,12 +1,33 @@
 import "server-only";
 
-import type { DoctorDashboardData, DoctorDashboardFilters } from "../types/doctor-dashboard.types";
-import { validateDoctorDashboardFilters } from "../domain/validation";
-import { appendDoctorDashboardAuditEvent } from "./audit";
+import type {
+  DoctorDashboardClaimMutationContext,
+  DoctorDashboardData,
+  DoctorDashboardFilters,
+  DoctorDashboardMutationPrerequisiteInput,
+  DoctorDashboardMutationPrerequisiteResult,
+} from "../types/doctor-dashboard.types";
+import {
+  validateDoctorDashboardFilters,
+  validateDoctorDashboardMutationPrerequisiteInput,
+} from "../domain/validation";
+import {
+  appendDoctorDashboardAuditEvent,
+  appendDoctorDashboardMutationPrerequisiteAuditEvent,
+} from "./audit";
 import { DoctorDashboardError } from "./errors";
 import { resolveDoctorDashboardActor, type DoctorDashboardActor, type DoctorDashboardActorResult } from "./identity";
-import { exportDoctorDashboardCsv, readDoctorDashboard } from "./repository";
-import { requireDoctorDashboardReadPermission, requireDoctorDashboardScope } from "./rbac";
+import {
+  exportDoctorDashboardCsv,
+  readDoctorDashboard,
+  resolveDoctorDashboardClaimMutationContext,
+} from "./repository";
+import {
+  requireDoctorDashboardClaimTenantPreflight,
+  requireDoctorDashboardMutationPreflight,
+  requireDoctorDashboardReadPermission,
+  requireDoctorDashboardScope,
+} from "./rbac";
 
 export type DoctorDashboardResponseEnvelope<T> = {
   success: boolean;
@@ -28,6 +49,13 @@ type ServiceDependencies = {
     actor: DoctorDashboardActor,
     filters: DoctorDashboardFilters,
   ) => Promise<DoctorDashboardData>;
+  resolveClaimContext?: (
+    client: unknown,
+    actor: DoctorDashboardActor,
+    visitId: string,
+  ) => Promise<DoctorDashboardClaimMutationContext>;
+  appendMutationPrerequisiteAuditEvent?: typeof appendDoctorDashboardMutationPrerequisiteAuditEvent;
+  executeMutation?: never;
 };
 
 export async function getDoctorDashboard(
@@ -88,6 +116,92 @@ export async function exportDoctorDashboard(
   };
 }
 
+export async function prepareDoctorDashboardMutationPrerequisite(
+  input: Record<string, string | string[] | undefined>,
+  dependencies: ServiceDependencies = {},
+): Promise<DoctorDashboardResponseEnvelope<DoctorDashboardMutationPrerequisiteResult>> {
+  const correlationId = createCorrelationId();
+  const generatedAt = new Date().toISOString();
+  let actor: DoctorDashboardActor | null = null;
+  let parsedInput: DoctorDashboardMutationPrerequisiteInput | null = null;
+  let claimContext: DoctorDashboardClaimMutationContext | null = null;
+
+  try {
+    const parsed = validateDoctorDashboardMutationPrerequisiteInput(input);
+    if (!parsed.ok) {
+      throw new DoctorDashboardError("VALIDATION_ERROR", parsed.error);
+    }
+    parsedInput = parsed.value;
+
+    const actorResult = await (dependencies.resolveActor ?? resolveDoctorDashboardActor)();
+    if (!actorResult.ok) {
+      throw new DoctorDashboardError(actorResult.code, actorResult.message);
+    }
+    actor = actorResult.value;
+
+    requireDoctorDashboardMutationPreflight(actor);
+    claimContext = await (dependencies.resolveClaimContext ?? resolveDoctorDashboardClaimMutationContext)(
+      actorResult.client,
+      actor,
+      parsed.value.visitId,
+    );
+    requireDoctorDashboardClaimTenantPreflight(actor, claimContext, parsed.value.visitId);
+
+    await (dependencies.appendMutationPrerequisiteAuditEvent ?? appendDoctorDashboardMutationPrerequisiteAuditEvent)({
+      correlationId,
+      actorProfileId: actor.profileId,
+      organizationId: claimContext.claimOrganizationId,
+      clinicId: claimContext.claimClinicId,
+      visitId: parsed.value.visitId,
+      claimId: claimContext.claimId,
+      action: parsed.value.action,
+      reasonCode: parsed.value.reasonCode,
+      idempotencyKey: parsed.value.idempotencyKey,
+      externalEventId: parsed.value.externalEventId,
+      result: "prerequisite_passed_no_mutation",
+    });
+
+    return {
+      success: true,
+      data: {
+        available: false,
+        action: parsed.value.action,
+        claimContext,
+        correlationId,
+        idempotencyKey: parsed.value.idempotencyKey,
+        externalEventId: parsed.value.externalEventId,
+        reasonCode: parsed.value.reasonCode,
+        mutationExecuted: false,
+      },
+      meta: { correlationId, generatedAt },
+      error: null,
+    };
+  } catch (error) {
+    if (actor && parsedInput) {
+      await (dependencies.appendMutationPrerequisiteAuditEvent ?? appendDoctorDashboardMutationPrerequisiteAuditEvent)({
+        correlationId,
+        actorProfileId: actor.profileId,
+        organizationId: actor.activeOrganizationId,
+        clinicId: actor.activeClinicId ?? "",
+        visitId: parsedInput.visitId,
+        claimId: claimContext?.claimId ?? null,
+        action: parsedInput.action,
+        reasonCode: parsedInput.reasonCode,
+        idempotencyKey: parsedInput.idempotencyKey,
+        externalEventId: parsedInput.externalEventId,
+        result: "prerequisite_failed_no_mutation",
+      });
+    }
+
+    return {
+      success: false,
+      data: null,
+      meta: { correlationId, generatedAt },
+      error: toSafeError(error),
+    };
+  }
+}
+
 function withDeferredMutations(dashboard: DoctorDashboardData): DoctorDashboardData {
   return {
     ...dashboard,
@@ -105,6 +219,13 @@ function toSafeError(error: unknown) {
     return {
       code: error.code,
       message: error.message,
+    };
+  }
+
+  if (error instanceof Error && error.message === "claim_context_unavailable") {
+    return {
+      code: "CLAIM_CONTEXT_UNAVAILABLE",
+      message: "Canonical claim context is unavailable for this Doctor Dashboard action.",
     };
   }
 

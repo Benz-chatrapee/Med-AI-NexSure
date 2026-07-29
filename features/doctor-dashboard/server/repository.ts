@@ -3,6 +3,7 @@ import "server-only";
 import type {
   DoctorDashboardData,
   DoctorDashboardFilters,
+  DoctorDashboardClaimMutationContext,
   DoctorKpi,
   DoctorWorklistVisit,
   ExportResult,
@@ -212,6 +213,61 @@ export async function readDoctorDashboard(
   });
 }
 
+export async function resolveDoctorDashboardClaimMutationContext(
+  client: unknown,
+  actor: DoctorDashboardActor,
+  visitId: string,
+): Promise<DoctorDashboardClaimMutationContext> {
+  const supabase = client as DoctorDashboardSupabaseClient;
+  const visitResult = await supabase
+    .from("visits")
+    .select("id, organization_id, clinic_id")
+    .eq("id", visitId)
+    .eq("organization_id", actor.activeOrganizationId)
+    .in("clinic_id", actor.authorizedClinicIds)
+    .eq("is_active", true)
+    .is("deleted_at", null)
+    .maybeSingle<ClaimContextVisitRow>();
+
+  if (visitResult.error || !visitResult.data) {
+    throw new Error("claim_context_unavailable");
+  }
+
+  const claimResult = await supabase
+    .from("claims")
+    .select("id, organization_id, clinic_id, visit_id, workflow_status, version")
+    .eq("organization_id", actor.activeOrganizationId)
+    .eq("clinic_id", visitResult.data.clinic_id)
+    .eq("visit_id", visitResult.data.id)
+    .is("deleted_at", null)
+    .returns<ClaimContextClaimRow[]>();
+
+  if (claimResult.error || !claimResult.data || claimResult.data.length !== 1) {
+    throw new Error("claim_context_unavailable");
+  }
+
+  const claim = claimResult.data[0];
+  if (
+    claim.organization_id !== visitResult.data.organization_id ||
+    claim.clinic_id !== visitResult.data.clinic_id ||
+    claim.visit_id !== visitResult.data.id ||
+    typeof claim.workflow_status !== "string" ||
+    claim.workflow_status.length === 0 ||
+    !Number.isInteger(claim.version)
+  ) {
+    throw new Error("claim_context_unavailable");
+  }
+
+  return {
+    claimId: claim.id,
+    claimOrganizationId: claim.organization_id,
+    claimClinicId: claim.clinic_id,
+    claimVisitId: claim.visit_id,
+    workflowStatus: claim.workflow_status,
+    expectedVersion: claim.version,
+  };
+}
+
 type QueryResult<T> = { data: T | null; error: { message?: string } | null };
 type ListQueryResult<T> = { data: T | null; error: { message?: string } | null };
 type QueryBuilder = {
@@ -279,6 +335,15 @@ type ReadinessItemRow = {
   weighted_score: number;
   weight: number;
   evidence_reference: string | null;
+};
+type ClaimContextVisitRow = { id: string; organization_id: string; clinic_id: string };
+type ClaimContextClaimRow = {
+  id: string;
+  organization_id: string;
+  clinic_id: string;
+  visit_id: string;
+  workflow_status: string;
+  version: number;
 };
 
 function toCanonicalVisit(

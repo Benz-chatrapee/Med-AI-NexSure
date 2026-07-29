@@ -3,6 +3,7 @@ import { DoctorDashboardError } from "./errors";
 
 const readPermissions = ["doctorDashboard.view", "visit.view"] as const;
 const claimReadPermissions = ["claim.view", "claim.read"] as const;
+const claimReviewPermissions = ["claim.review", "claim.submit"] as const;
 
 export function requireDoctorDashboardReadPermission(actor: DoctorDashboardActor) {
   const canReadVisits = readPermissions.some((permission) => actor.permissions.includes(permission));
@@ -29,4 +30,31 @@ export function allowedClinicIds(actor: DoctorDashboardActor, requestedClinicId:
   if (requestedClinicId) return [requestedClinicId];
   if (actor.activeClinicId) return [actor.activeClinicId];
   return actor.authorizedClinicIds;
+}
+
+export function requireDoctorDashboardMutationPreflight(actor: DoctorDashboardActor) {
+  const canReadClaims = claimReadPermissions.some((permission) => actor.permissions.includes(permission));
+  const canMutateClaims = claimReviewPermissions.some((permission) => actor.permissions.includes(permission));
+
+  if (!canReadClaims || !canMutateClaims) {
+    throw new DoctorDashboardError(
+      "FORBIDDEN",
+      "The current actor is not authorized for Doctor Dashboard mutation prerequisites.",
+    );
+  }
+}
+
+export function requireDoctorDashboardClaimTenantPreflight(
+  actor: DoctorDashboardActor,
+  claimContext: { claimOrganizationId: string; claimClinicId: string; claimVisitId: string },
+  expectedVisitId: string,
+) {
+  if (
+    claimContext.claimOrganizationId !== actor.activeOrganizationId ||
+    !actor.authorizedOrganizationIds.includes(claimContext.claimOrganizationId) ||
+    !actor.authorizedClinicIds.includes(claimContext.claimClinicId) ||
+    claimContext.claimVisitId !== expectedVisitId
+  ) {
+    throw new Error("claim_context_unavailable");
+  }
 }

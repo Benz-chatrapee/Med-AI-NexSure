@@ -1,4 +1,8 @@
-import type { DoctorDashboardFilters } from "../types/doctor-dashboard.types";
+import type {
+  DoctorDashboardFilters,
+  DoctorDashboardMutationAction,
+  DoctorDashboardMutationPrerequisiteInput,
+} from "../types/doctor-dashboard.types";
 
 const dateRanges = ["today", "7d", "14d"] as const;
 const readinessStatuses = ["Ready for Human Review", "Needs Review", "Not Ready"] as const;
@@ -12,9 +16,22 @@ const visitStatuses = [
   "Completed",
 ] as const;
 const priorities = ["Low", "Medium", "High", "Critical"] as const;
+const mutationActions = [
+  "markReadyForHumanReview",
+  "claimReviewHandoff",
+  "readinessReevaluation",
+  "reviewerAssignment",
+  "manualOverride",
+] as const;
+const reasonCodePattern = /^[A-Z][A-Z0-9_]{2,63}$/;
+const identityPattern = /^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$/;
 
 export type DoctorDashboardValidationResult =
   | { ok: true; value: DoctorDashboardFilters }
+  | { ok: false; error: string };
+
+export type DoctorDashboardMutationPrerequisiteValidationResult =
+  | { ok: true; value: DoctorDashboardMutationPrerequisiteInput }
   | { ok: false; error: string };
 
 export function emptyDoctorDashboardFilters(): DoctorDashboardFilters {
@@ -52,10 +69,48 @@ export function validateDoctorDashboardFilters(
   return { ok: true, value: next };
 }
 
+export function validateDoctorDashboardMutationPrerequisiteInput(
+  input: Record<string, string | string[] | undefined>,
+): DoctorDashboardMutationPrerequisiteValidationResult {
+  const visitId = normalizeInputValue(input.visitId);
+  const action = normalizeInputValue(input.action);
+  const reasonCode = normalizeInputValue(input.reasonCode);
+  const idempotencyKey = normalizeInputValue(input.idempotencyKey);
+  const externalEventId = normalizeInputValue(input.externalEventId);
+
+  if (!visitId) return invalidMutationInput();
+  if (!includes(mutationActions, action)) return invalidMutationInput();
+  if (!reasonCodePattern.test(reasonCode)) return invalidMutationInput();
+  if (!identityPattern.test(idempotencyKey)) return invalidMutationInput();
+  if (!identityPattern.test(externalEventId)) return invalidMutationInput();
+
+  return {
+    ok: true,
+    value: {
+      visitId,
+      action: action as DoctorDashboardMutationAction,
+      reasonCode,
+      idempotencyKey,
+      externalEventId,
+    },
+  };
+}
+
 function includes<const T extends readonly string[]>(values: T, value: string): value is T[number] {
   return values.includes(value);
 }
 
 function invalid(): DoctorDashboardValidationResult {
   return { ok: false, error: "Doctor dashboard filters are invalid." };
+}
+
+function invalidMutationInput(): DoctorDashboardMutationPrerequisiteValidationResult {
+  return {
+    ok: false,
+    error: "Doctor dashboard mutation prerequisite input is invalid.",
+  };
+}
+
+function normalizeInputValue(value: string | string[] | undefined) {
+  return (Array.isArray(value) ? value[0] : value ?? "").trim();
 }
