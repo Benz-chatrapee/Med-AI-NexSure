@@ -103,9 +103,11 @@ Verified implementation state:
 | Authorized canonical visits | 1 / 1 | PASS |
 | Visit id | `DEMO-VIS-BATCH-E-001` | PASS |
 | Patient | `Synthetic Batch E Patient` | PASS |
+| Visit status | In Consultation | PASS |
 | Readiness score | 82 | PASS |
 | Readiness status | Needs Review | PASS |
 | Risk | Medium | PASS |
+| Payer | `Synthetic Demo Payer` | PASS |
 
 No repository evidence in this closure review invalidates the verified canonical read integration itself. Final working-tree review confirms the prior temporary Supabase evidence file is no longer present in the repository state reviewed for closure.
 
@@ -113,12 +115,16 @@ No repository evidence in this closure review invalidates the verified canonical
 
 | Search / Filter Check | Expected | Result |
 |---|---|---|
-| Search `DEMO-VIS-BATCH-E-001` | 1 / 1 | PASS |
-| Search `NO-SUCH-VISIT` | 0 / 0 | PASS |
-| Case Queue after no-match filter | 0 / 0 | PASS |
-| Doctor Action Worklist after no-match filter | 0 / 0 | PASS |
-| Selected Visit after no-match filter | `No authorized visit selected.` | PASS |
-| Clear search | 1 / 1 and canonical selected visit restored | PASS |
+| Search `Synthetic Batch E Patient` | 1 / 1 | PASS |
+| Search `ZZZ-NOT-FOUND` | 0 / 0 | PASS |
+| Case Queue after no-match search | 0 / 0 | PASS |
+| Doctor Action Worklist after no-match search | 0 / 0 | PASS |
+| Selected Visit after no-match search | `No authorized visit selected.` | PASS |
+| Readiness = `Needs Review` | 1 / 1 | PASS |
+| Risk = `Medium` | 1 / 1 | PASS |
+| Risk = `High` | 0 / 0 | PASS |
+| Selected Visit after non-matching risk filter | `No authorized visit selected.` | PASS |
+| Clear all filters | 1 / 1 and canonical selected visit restored | PASS |
 
 ## 9. Refresh Verification
 
@@ -126,50 +132,47 @@ No repository evidence in this closure review invalidates the verified canonical
 |---|---|
 | Hard refresh preserves authenticated canonical view | PASS |
 | Hard refresh preserves canonical count | PASS - 1 / 1 |
-| Hard refresh preserves canonical selected visit availability | PASS |
+| Hard refresh preserves canonical visit | PASS - `DEMO-VIS-BATCH-E-001` |
+| Hard refresh preserves readiness score/status | PASS - 82 / Needs Review |
+| Hard refresh preserves selected visit availability | PASS |
 
 ## 10. Network / Security Verification
 
 | Network / Security Check | Result |
 |---|---|
-| `fallback` request | PASS - no matching request |
-| `unauthorized-visits` request | PASS - no matching request |
-| service-role request keyword | PASS - no matching request |
-| service-role key env-name keyword | PASS - no matching request |
+| `/dashboard` authenticated request | PASS - `200 OK` |
+| Visible authenticated page requests | PASS - no observed `401`, `403`, or `500` during verification |
+| `service_role` request keyword | PASS - no matching request observed |
+| `SUPABASE_SERVICE_ROLE_KEY` request keyword | PASS - `0 / 48 requests` |
+| Service-role credential visible in inspected dashboard headers | PASS - not observed |
 
-Security interpretation: browser verification did not identify mock fallback requests, unauthorized-visit diagnostic requests, service-role usage, or service-role key exposure.
+Security interpretation: browser verification did not identify service-role usage or service-role key exposure in the inspected network evidence. Empty-state verification separately confirmed that no fabricated `unauthorized-visits` visit was rendered.
 
 ## 11. Automated Validation Summary
 
-Automated validation already reported for Batch E scoped work:
+Batch E automated validation evidence exists in the repository and prior implementation evidence. This closure session primarily added authenticated browser/runtime verification and did not change application code.
 
-| Validation | Reported Result |
+| Validation | Closure Treatment |
 |---|---|
-| Doctor Dashboard utility tests | PASS |
-| Auth/session targeted tests | PASS |
-| TypeScript | PASS |
-| Lint | PASS with existing warnings only |
-| `git diff --check` | PASS with LF/CRLF warnings only |
-| Local DB/RLS tests for Batch E scoped work | PASS |
+| Batch E focused identity/service/repository/domain/utility tests | Previously reported PASS; retained as implementation evidence |
+| TypeScript validation | Previously reported PASS; retained as implementation evidence |
+| Lint | Previously reported PASS; retained as implementation evidence |
+| Production build | Previously reported PASS; retained as implementation evidence |
+| `git diff --check` | PASS in final closure review |
+| Working tree cleanliness before closure update | PASS |
 
-This closure task did not rerun application tests, TypeScript, lint, build, database tests, or dependency audit because it is documentation closure and evidence review only.
+Closure rule: do not infer a new automated PASS from browser testing alone. Exact historical commands/counts should remain those already recorded in the implementation evidence or commit history.
 
-## 12. Deferred / Out-of-Scope Issues
+## 12. Deferred / Non-Blocking Findings
 
-Deferred security remediation:
+The following items remain outside Batch E closure scope and do not authorize production deployment:
 
-- Supabase advisory: RLS disabled on five existing reference tables:
-  - `claim_evidence_waivers`
-  - `claim_types`
-  - `claim_validation_overrides`
-  - `decision_reason_codes`
-  - `validation_categories`
+- Existing reference-table RLS/security advisories already tracked separately.
+- Existing npm audit/dependency findings, if any, remain separate remediation work.
+- Doctor Dashboard mutation paths remain deferred and require separate authorization.
+- This closure does not approve production release, deployment promotion, or secret-management changes.
 
-These advisories are recorded as deferred security remediation. They are not Batch E blockers based on the evidence provided for this closure because no repository evidence reviewed in this closure proves they directly invalidate Doctor Dashboard canonical read integration.
-
-Other deferred issue:
-
-- Existing npm audit findings may remain and should be tracked separately. This closure does not remediate dependency advisories.
+No repository evidence reviewed in this closure proves these deferred items directly invalidate Doctor Dashboard canonical read integration.
 
 ## 13. Blocking Issue Count
 
@@ -198,6 +201,7 @@ record_state: CLOSED
 contract_status: APPROVED
 implementation_status: COMPLETE
 verification_status: PASS
+closure_status: CLOSED
 blocking_issues: 0
 deployment_authorization: NO
 ```
