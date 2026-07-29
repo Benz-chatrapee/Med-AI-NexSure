@@ -14,7 +14,7 @@
 | Record State | APPROVED_CONTRACT |
 | Contract Status | APPROVED |
 | Implementation Status | NOT_STARTED |
-| Implementation Authorization | NO |
+| Implementation Authorization | YES |
 | Deployment Authorization | NO |
 
 This contract defines the smallest prerequisite remediation required before any Doctor Dashboard controlled mutation implementation can be authorized. It does not implement, approve, deploy, migrate, seed, generate types, change RBAC/RLS/RPC/database objects, or modify application behavior.
@@ -25,7 +25,7 @@ Final contract state:
 record_state: APPROVED_CONTRACT
 contract_status: APPROVED
 implementation_status: NOT_STARTED
-implementation_authorization: NO
+implementation_authorization: YES
 deployment_authorization: NO
 ```
 
@@ -46,6 +46,33 @@ This F1 contract resolves only these Batch F blockers:
 9. auditable mutation path.
 
 F1 does not implement or authorize Mark / submit for human review, claim review handoff, readiness re-evaluation, reviewer assignment, or manual override.
+
+## 2.1 Authorization Review Decision
+
+Implementation Authorization: YES.
+
+This authorization is limited to prerequisite remediation required to make future Doctor Dashboard controlled claim-workflow mutation review implementation-ready. It authorizes no user-facing mutation execution and no canonical workflow state change.
+
+Authorized prerequisite subset:
+
+1. server-derived canonical visit-to-claim context resolver for Doctor Dashboard;
+2. canonical claim id, organization id, clinic id, visit id, workflow status, and `claims.version` / `expectedVersion` projection for server mutation context;
+3. mutation-specific organization/clinic and RBAC preflight checks using E0 actor context and existing claim permissions;
+4. authenticated `/dashboard` App Router server-action boundary scaffolding that fails closed and keeps UI mutation availability unavailable until all prerequisites are satisfied;
+5. Doctor Dashboard workflow reason-code validation contract for future claim-workflow transitions only;
+6. Doctor Dashboard idempotency / external event identity validation and propagation contract, including reuse or extension of the existing server-only claim workflow command wrapper if needed;
+7. auditable server-side mutation-path correlation that relies on `transition_claim_workflow(...)` / `claim_workflow_events` as the canonical future mutation audit evidence and does not treat the current no-op Dashboard audit helper as sufficient;
+8. safe error mapping and canonical read-after-mutation dependency wiring without performing any actual mutation.
+
+Forbidden by this authorization:
+
+- readiness re-evaluation;
+- reviewer assignment;
+- manual override;
+- actual Mark / submit for human review mutation;
+- actual Claim review handoff mutation;
+- schema, migration, seed, generated-type, package, RBAC, RLS, RPC, or database-object changes;
+- browser direct database mutation or service-role browser usage.
 
 ## 3. Parent Batch F Dependency
 
@@ -82,15 +109,15 @@ F1 narrows Batch F to prerequisite remediation only. It does not reopen Batch E 
 
 | Prerequisite | Repository Evidence | Current State | Required Remediation | Status |
 |---|---|---|---|---|
-| Canonical claim id availability | `claims.id` and nullable `claims.visit_id` exist; Doctor Dashboard types/repository do not expose `claimId`. | Claim id exists globally but is absent from Doctor Dashboard projection. | Add server-derived canonical claim id to the authorized Doctor Dashboard mutation context only after implementation approval. | REMEDIATION_REQUIRED |
-| Current canonical claim workflow state | `claims.workflow_status` exists and RPC returns workflow status; Doctor Dashboard does not read it. | Available globally, absent from Doctor Dashboard. | Server-read current claim workflow state for selected visit/claim before any mutation. | REMEDIATION_REQUIRED |
-| Expected claim/workflow version | `claims.version` exists and RPC requires `p_expected_version`; Doctor Dashboard exposes readiness assessment version only. | Available globally, absent from Doctor Dashboard mutation context. | Server-read expected `claims.version`; do not use readiness version as workflow version. | REMEDIATION_REQUIRED |
-| Server-side visit-to-claim mapping | `claims.visit_id` exists; Doctor Dashboard repository currently reads visits/readiness and not claims. | Mapping source exists globally, no approved Dashboard resolver exists. | Add server-side resolver from authorized canonical visit id to exactly one authorized claim where evidence supports it. | REMEDIATION_REQUIRED |
-| Authorized organization and clinic mutation context | E0 and Doctor Dashboard identity/read service derive organization/clinic scope; RPC checks permission against claim tenant. | General context SATISFIED for reads; mutation-specific claim context not proven. | Reuse E0 actor context and verify mapped claim organization/clinic equals authorized Dashboard visit scope before RPC call. | REMEDIATION_REQUIRED |
-| Doctor Dashboard authenticated mutation server boundary | E0 server auth exists; Doctor Dashboard has read/export server actions only; mutation availability is false. | No approved Dashboard mutation boundary found. | Define App Router server action/handler that derives actor and claim context server-side and calls approved command service/RPC. | REMEDIATION_REQUIRED |
-| Reason-code input contract | RPC and command service require reason code; Doctor Dashboard UI/service has no workflow reason-code contract. | Backend requirement SATISFIED; Dashboard input contract NOT_FOUND. | Define allowed reason-code enum/source and required reason text rules per transition. | REMEDIATION_REQUIRED |
-| Idempotency key / external event identity contract | RPC supports `p_external_event_id`; command service type currently has `correlationId` but no external event id field. | RPC capability SATISFIED; Dashboard/service contract incomplete. | Define server-created idempotency/external event identity and propagate it through command service/RPC. | REMEDIATION_REQUIRED |
-| Auditable mutation path | RPC writes `claim_workflow_events`; Dashboard audit helper is no-op. | Canonical workflow event path exists; Dashboard audit path insufficient. | Require RPC event as canonical audit evidence and add/approve any Dashboard audit wrapper only through server-side audit path. | REMEDIATION_REQUIRED |
+| Canonical claim id availability | `claims.id` and nullable `claims.visit_id` exist; Doctor Dashboard types/repository do not expose `claimId`. | Claim id exists globally but is absent from Doctor Dashboard projection. | Add server-derived canonical claim id to the authorized Doctor Dashboard mutation context only. | AUTHORIZABLE_NOW |
+| Current canonical claim workflow state | `claims.workflow_status` exists and RPC returns workflow status; Doctor Dashboard does not read it. | Available globally, absent from Doctor Dashboard. | Server-read current claim workflow state for selected visit/claim before any mutation. | AUTHORIZABLE_NOW |
+| Expected claim/workflow version | `claims.version` exists and RPC requires `p_expected_version`; Doctor Dashboard exposes readiness assessment version only. | Available globally, absent from Doctor Dashboard mutation context. | Server-read expected `claims.version`; do not use readiness version as workflow version. | AUTHORIZABLE_NOW |
+| Server-side visit-to-claim mapping | `claims.visit_id` exists; Doctor Dashboard repository currently reads visits/readiness and not claims. | Mapping source exists globally, no approved Dashboard resolver exists. | Add server-side resolver from authorized canonical visit id to exactly one authorized claim where evidence supports it. | AUTHORIZABLE_NOW |
+| Authorized organization and clinic mutation context | E0 and Doctor Dashboard identity/read service derive organization/clinic scope; RPC checks permission against claim tenant. | General context SATISFIED for reads; mutation-specific claim context not proven. | Reuse E0 actor context and verify mapped claim organization/clinic equals authorized Dashboard visit scope before any future RPC call. | AUTHORIZABLE_NOW |
+| Doctor Dashboard authenticated mutation server boundary | E0 server auth exists; Doctor Dashboard has read/export server actions only; mutation availability is false. | Authenticated server boundary is satisfied; mutation-specific boundary is absent. | Define fail-closed App Router server action/handler that derives actor and claim context server-side without performing actual mutation. | AUTHORIZABLE_NOW |
+| Reason-code input contract | RPC and command service require reason code; Doctor Dashboard UI/service has no workflow reason-code contract. | Backend requirement SATISFIED; Dashboard input contract NOT_FOUND. | Define allowed reason-code enum/source and required reason text rules per future transition. | AUTHORIZABLE_NOW |
+| Idempotency key / external event identity contract | RPC supports `p_external_event_id`; command service type currently has `correlationId` but no external event id field. | RPC capability SATISFIED; Dashboard/service contract incomplete. | Define server-created idempotency/external event identity and propagation contract. | AUTHORIZABLE_NOW |
+| Auditable mutation path | RPC writes `claim_workflow_events`; Dashboard audit helper is no-op. | Canonical workflow event path exists; Dashboard audit helper insufficient. | Require RPC event as canonical audit evidence and add/approve only safe server-side Dashboard correlation. | AUTHORIZABLE_NOW |
 
 ## 6. Canonical Claim Context Contract
 
@@ -98,12 +125,12 @@ The future implementation may authorize mutation only after the server derives t
 
 | Field | Source Requirement | Status |
 |---|---|---|
-| `claimId` | `claims.id`, resolved server-side from authorized selected visit context. | REMEDIATION_REQUIRED |
-| `claimOrganizationId` | `claims.organization_id`, must match authorized actor/visit organization. | REMEDIATION_REQUIRED |
-| `claimClinicId` | `claims.clinic_id`, must match authorized actor/visit clinic. | REMEDIATION_REQUIRED |
-| `claimVisitId` | `claims.visit_id`, must match the canonical selected visit id. | REMEDIATION_REQUIRED |
-| `workflowStatus` | `claims.workflow_status`, not readiness status or visit status. | REMEDIATION_REQUIRED |
-| `expectedVersion` | `claims.version`, not readiness assessment version. | REMEDIATION_REQUIRED |
+| `claimId` | `claims.id`, resolved server-side from authorized selected visit context. | AUTHORIZABLE_NOW |
+| `claimOrganizationId` | `claims.organization_id`, must match authorized actor/visit organization. | AUTHORIZABLE_NOW |
+| `claimClinicId` | `claims.clinic_id`, must match authorized actor/visit clinic. | AUTHORIZABLE_NOW |
+| `claimVisitId` | `claims.visit_id`, must match the canonical selected visit id. | AUTHORIZABLE_NOW |
+| `workflowStatus` | `claims.workflow_status`, not readiness status or visit status. | AUTHORIZABLE_NOW |
+| `expectedVersion` | `claims.version`, not readiness assessment version. | AUTHORIZABLE_NOW |
 
 Do not infer claim context from UI labels, readiness status, visit status, payer labels, patient name, visible visit number, or client-provided hidden fields.
 
@@ -119,7 +146,7 @@ Required future remediation:
 - if no claim or multiple eligible claims are found, return mutation unavailable without record-existence disclosure;
 - never trust `DoctorWorklistVisit.id` alone, because current projection uses `visitNumber || id` for UI identity.
 
-Current status: REMEDIATION_REQUIRED.
+Current status: AUTHORIZABLE_NOW for prerequisite remediation.
 
 ## 8. Authorization / Tenant Context
 
@@ -138,7 +165,7 @@ Required future remediation:
 - RLS and RPC authorization remain authoritative;
 - no service-role or privileged browser credential path is authorized.
 
-Current status: REMEDIATION_REQUIRED for mutation-specific context.
+Current status: AUTHORIZABLE_NOW for prerequisite remediation.
 
 ## 9. Server Mutation Boundary Contract
 
@@ -155,7 +182,7 @@ The minimum future boundary must:
 7. perform read-after-mutation through Batch E canonical read projection;
 8. return only safe, authorized Dashboard data and safe error envelopes.
 
-Current status: REMEDIATION_REQUIRED.
+Current status: AUTHORIZABLE_NOW for prerequisite remediation.
 
 ## 10. Reason Code Contract
 
@@ -174,7 +201,7 @@ Required future remediation:
 - do not reuse manual override outcome values as workflow reason codes unless separately approved;
 - do not fabricate a default reason silently.
 
-Current status: REMEDIATION_REQUIRED.
+Current status: AUTHORIZABLE_NOW for prerequisite remediation.
 
 ## 11. Idempotency Contract
 
@@ -193,7 +220,7 @@ Required future remediation:
 - return confirmed replay only when the RPC reports `idempotent_replay`;
 - reject conflicts safely without duplicate mutation.
 
-Current status: REMEDIATION_REQUIRED.
+Current status: AUTHORIZABLE_NOW for prerequisite remediation.
 
 ## 12. Audit Contract
 
@@ -209,7 +236,7 @@ Minimum future audit requirement:
 - no raw database errors, secrets, access tokens, or unnecessary PHI/PII may be logged or returned;
 - failed and unauthorized attempts must be safely observable if an approved audit path exists.
 
-Current status: REMEDIATION_REQUIRED.
+Current status: AUTHORIZABLE_NOW for prerequisite remediation.
 
 ## 13. Read-After-Mutation Dependency
 
@@ -218,7 +245,7 @@ Future implementation must re-read `/dashboard` through the Batch E canonical re
 Current dependency status:
 
 - Batch E canonical read integration: SATISFIED.
-- Batch E read projection does not include claim workflow state/version: REMEDIATION_REQUIRED for mutation context and post-mutation UI result.
+- Batch E read projection does not include claim workflow state/version: AUTHORIZABLE_NOW for prerequisite mutation context and post-mutation UI dependency wiring.
 
 The UI must not fabricate success, workflow state, readiness change, reviewer assignment, claim submission, or audit result.
 
@@ -247,24 +274,22 @@ Errors must be safe, bilingual where user-facing helper text is needed, and must
 
 ## 15. Minimal Implementation Allowlist
 
-F1 does not authorize implementation.
+F1 authorizes only prerequisite remediation implementation within this allowlist:
 
-If a later approval authorizes prerequisite remediation, the smallest candidate allowlist is:
-
-1. `app/dashboard/page.tsx`
-2. `features/doctor-dashboard/types/doctor-dashboard.types.ts`
-3. `features/doctor-dashboard/server/service.ts`
-4. `features/doctor-dashboard/server/repository.ts`
-5. `features/doctor-dashboard/server/rbac.ts`
-6. `features/doctor-dashboard/server/audit.ts`
-7. `features/doctor-dashboard/server/identity.ts`
-8. `features/doctor-dashboard/domain/validation.ts`
+1. `app/dashboard/page.tsx` - fail-closed authenticated server-action boundary scaffolding only.
+2. `features/doctor-dashboard/types/doctor-dashboard.types.ts` - prerequisite context/input/result types only.
+3. `features/doctor-dashboard/server/service.ts` - server-side prerequisite orchestration and safe envelopes only.
+4. `features/doctor-dashboard/server/repository.ts` - canonical visit-to-claim resolver and claim context read only.
+5. `features/doctor-dashboard/server/rbac.ts` - mutation preflight permission checks using existing permission keys only.
+6. `features/doctor-dashboard/server/audit.ts` - safe server-side correlation wrapper only; no fabricated audit success.
+7. `features/doctor-dashboard/server/identity.ts` - reuse E0 actor context; no token serialization.
+8. `features/doctor-dashboard/domain/validation.ts` - reason-code, idempotency, and prerequisite input validation only.
 9. `features/doctor-dashboard/server/service.test.ts`
 10. `features/doctor-dashboard/server/repository.test.ts`
 11. `features/doctor-dashboard/server/identity.test.ts`
 12. `features/doctor-dashboard/domain/validation.test.ts`
 
-Conditional reuse only, if separately approved:
+Conditional allowlist for idempotency propagation only, if the prerequisite implementation cannot reuse the existing command wrapper without a small server-only extension:
 
 - `features/patient-claims/server/claim-workflow-command-service.ts`
 - `features/patient-claims/server/claim-workflow-command-service.test.ts`
@@ -275,8 +300,6 @@ Stop if implementation requires schema, migrations, generated types, RBAC/RLS/RP
 
 F1 forbids:
 
-- application code changes;
-- tests changes;
 - SQL, migrations, seeds, generated type changes;
 - package or lockfile changes;
 - existing contract or closure-record changes;
@@ -291,9 +314,11 @@ During this F1 task, only this file may be modified:
 
 - `docs/application/PHASE-5-BATCH-F1-DOCTOR-DASHBOARD-MUTATION-PREREQUISITE-CONTRACT.md`
 
+Future prerequisite implementation may modify only the allowlisted implementation and test files in Section 15.
+
 ## 17. Required Automated Tests
 
-Future approved prerequisite remediation must include focused tests for:
+Authorized prerequisite remediation must include focused tests for:
 
 - Dashboard mutation boundary rejects unauthenticated users;
 - unauthorized role and missing `claim.review` / `claim.submit` are rejected;
@@ -313,7 +338,7 @@ Future approved prerequisite remediation must include focused tests for:
 - no service-role or raw token exposure;
 - mutation availability remains disabled/unavailable until all prerequisites are satisfied.
 
-No automated tests are implemented by F1.
+Tests must not assert successful Mark / submit, claim review handoff, readiness re-evaluation, reviewer assignment, or manual override execution.
 
 ## 18. Manual Verification Requirements
 
@@ -343,40 +368,41 @@ This F1 contract is acceptable when:
 - service-role browser usage remains forbidden;
 - required remediation is limited to prerequisite context, validation, idempotency, audit, and server-boundary definition;
 - Mark / submit, claim review handoff, readiness re-evaluation, reviewer assignment, and manual override remain unauthorized;
-- implementation authorization remains `NO`;
+- implementation authorization is limited to prerequisite remediation only;
 - deployment authorization remains `NO`.
 
-## 20. Blocking Issues
+## 20. Remaining Blockers For Actual Mutations
 
-Blocking issues before Doctor Dashboard controlled mutation implementation authorization:
+Blocking issues before actual Doctor Dashboard controlled mutation implementation authorization:
 
-1. Doctor Dashboard projection does not expose canonical `claimId`.
-2. Doctor Dashboard projection does not expose canonical `claims.workflow_status`.
-3. Doctor Dashboard projection does not expose canonical `claims.version`.
-4. Doctor Dashboard repository does not resolve selected visit to canonical claim.
-5. Current UI worklist id may be visit number rather than canonical visit UUID.
-6. Doctor Dashboard mutation-specific organization/clinic claim context is not yet proven.
-7. No Doctor Dashboard mutation server action/handler is approved.
-8. No Doctor Dashboard workflow reason-code input contract exists.
-9. No Doctor Dashboard idempotency key / external event identity contract exists.
-10. Patient-claims command service does not currently expose `externalEventId` despite RPC support.
-11. Doctor Dashboard audit helper is a no-op and is insufficient for mutation audit.
+1. Actual Mark / submit for human review remains unauthorized until prerequisite remediation is completed and separately reviewed.
+2. Actual Claim review handoff remains unauthorized until prerequisite remediation is completed and separately reviewed.
+3. Readiness re-evaluation remains deferred because no approved canonical recalculation command path exists.
+4. Reviewer assignment remains deferred because no approved canonical assignment command path exists.
+5. Manual override remains blocked because no approved Doctor Dashboard readiness/manual override command path exists.
 
 ## 21. Implementation Authorization
 
-Implementation Authorization: NO.
+Implementation Authorization: YES.
 
-F1 authorizes no implementation. A future implementation contract may only proceed after review explicitly approves:
+F1 authorizes only the prerequisite remediation subset in Section 2.1 and only within the file allowlist in Section 15.
 
-- exact mutation subset;
-- exact prerequisite remediation allowlist;
-- server action interface;
-- canonical visit-to-claim resolver;
-- reason-code enum/source;
-- idempotency/external event identity design;
-- audit path;
-- automated tests;
-- manual verification plan.
+This authorization does not approve deployment and does not approve any actual Dashboard mutation execution. A future mutation implementation contract may proceed only after prerequisite remediation is completed and separately reviewed.
+
+Completion gate for the authorized prerequisite remediation:
+
+1. canonical claim context is server-derived and never trusted from browser input;
+2. selected Dashboard item resolves to canonical `visits.id` server-side;
+3. visit maps to exactly one authorized, non-deleted claim or fails closed;
+4. claim organization and clinic match authorized actor/visit scope;
+5. existing `claim.review` / `claim.submit` permission checks are enforced without RBAC/RLS changes;
+6. `claims.version` is the only `expectedVersion` source;
+7. reason-code and idempotency/external-event identity validation are covered by tests;
+8. Dashboard mutation boundary remains authenticated server-only and does not perform actual workflow mutation;
+9. audit/correlation path does not fabricate canonical mutation success;
+10. required tests pass;
+11. `git diff --check` passes;
+12. no files outside the allowlist are modified.
 
 ## 22. Approval Gate
 
@@ -384,7 +410,7 @@ Approval Gate: APPROVED_CONTRACT.
 
 F1 contract definition approved. Prerequisite remediation still requires separate implementation authorization.
 
-Implementation authorization remains NO.
+Implementation authorization is YES for prerequisite remediation only.
 
 Deployment authorization remains NO.
 
@@ -392,6 +418,6 @@ Deployment authorization remains NO.
 record_state: APPROVED_CONTRACT
 contract_status: APPROVED
 implementation_status: NOT_STARTED
-implementation_authorization: NO
+implementation_authorization: YES
 deployment_authorization: NO
 ```
